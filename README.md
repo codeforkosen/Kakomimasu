@@ -1,5 +1,5 @@
 # Kakomimasu
- #procon31 競技部門 コアモジュール for Deno/Node.js
+ #procon31 競技部門 コアモジュール for Deno/Node.js/web
 
 [![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
 [![deno](https://taisukef.github.com/denolib/denobadge.svg)](https://deno.land/)
