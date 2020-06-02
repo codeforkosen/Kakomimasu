@@ -8,7 +8,7 @@
 
 for Deno or ブラウザ
 ```
-import { Kakomimasu, Board, Action } from "https://taisukef.github.io/kakomimasu/Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.mjs";
 const kkmm = new Kakomimasu();
 ```
 
@@ -72,3 +72,15 @@ $ node main.mjs
 $ cd test
 $ deno test *
 ```
+
+## 出典
+
+高専プロコン第31回苫小牧大会  
+http://www.procon.gr.jp/  
+
+## 記事
+
+中止になった高専プロコン競技部門はオンラインで遊ぼう！ 競技システムのDeno/Node.js用コアモジュールのオープンソース公開  
+https://fukuno.jig.jp/2869  
+
+遊んでくれる人、協力者募集！
