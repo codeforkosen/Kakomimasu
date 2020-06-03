@@ -18,7 +18,7 @@ $ git close https://github.com/taisukef/Kakomimasu.git
 ```
 main.mjs を編集（そのままでも動きます）
 ```
-import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
 
 const kkmm = new Kakomimasu();
 
