@@ -69,14 +69,19 @@ $ node main.mjs
 ## テスト
 
 ```
-$ cd test
-$ deno test *
+$ deno run flow_test.mjs
+$ deno run unit_test.mjs
+...
 ```
+（deno 1.0.5 では、deno testが動かない状況）
 
 ## 出典
 
 高専プロコン第31回苫小牧大会  
 http://www.procon.gr.jp/  
+
+競技部門ルール  
+http://www.procon.gr.jp/?p=77044  
 
 ## 記事
 
