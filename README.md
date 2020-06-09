@@ -25,7 +25,7 @@ $ git close https://github.com/taisukef/Kakomimasu.git
 ```
 main.mjs を編集（そのままでも動きます）
 ```
-import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
 
 const kkmm = new Kakomimasu();
 
@@ -75,9 +75,11 @@ $ node main.mjs
 ## テスト
 
 ```
-$ cd test
-$ deno test *
+$ deno run flow_test.mjs
+$ deno run unit_test.mjs
+...
 ```
+（deno 1.0.5 では、deno testが動かない状況）
 
 ## プロトコル
 かこみますネットワークプロトコルを決めようの会  
@@ -102,6 +104,9 @@ $ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"act
 
 高専プロコン第31回苫小牧大会  
 http://www.procon.gr.jp/  
+
+競技部門ルール  
+http://www.procon.gr.jp/?p=77044  
 
 ## 記事
 
