@@ -1,8 +1,9 @@
 import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { test, assertEquals } from "../asserts.mjs";
+// import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import util from "../util.mjs";
 
-Deno.test("flow test", () => {
+test("flow", () => {
   const w = 8;
   const h = 8;
   const points = [];

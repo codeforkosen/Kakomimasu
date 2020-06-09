@@ -2,7 +2,14 @@
  #procon31 競技部門 コアモジュール for Deno/Node.js/web
 
 [![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
-[![deno](https://taisukef.github.com/denolib/denobadge.svg)](https://deno.land/)
+[![deno](https://taisukef.github.com/denolib/denobadge@1.0.3.svg)](https://deno.land/)
+
+## for Deno 1.0.3
+
+Denoを使う場合、[Denoインストール](https://deno.land/)後、最新版1.0.5ではmjs動作に問題あるので、1.0.3にする
+```
+$ deno upgrade --version 1.0.3
+```
 
 ## 利用方法
 
@@ -65,12 +72,30 @@ or
 $ node main.mjs
 ```
 
-
 ## テスト
 
 ```
 $ cd test
 $ deno test *
+```
+
+## プロトコル
+かこみますネットワークプロトコルを決めようの会  
+https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
+
+
+## APIサーバー for Deno
+
+ひとまず、受け取ったaction数だけ返すモックサーバー（[解説](https://fukuno.jig.jp/2876）
+```
+$ deno run -A main.mjs
+```
+
+アクセステスト
+```
+$ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
+
+{"yourToken":"token1","yourPath":"/action","nActions":2}
 ```
 
 ## 出典
@@ -83,4 +108,4 @@ http://www.procon.gr.jp/
 中止になった高専プロコン競技部門はオンラインで遊ぼう！ 競技システムのDeno/Node.js用コアモジュールのオープンソース公開  
 https://fukuno.jig.jp/2869  
 
-遊んでくれる人、協力者募集！
+遊んでくれる人、協力者募集！  

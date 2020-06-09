@@ -34,4 +34,3 @@ for (;;) {
   }
 }
 console.log(game.getStatusJSON());
-

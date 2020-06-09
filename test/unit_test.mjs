@@ -1,5 +1,5 @@
 import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { test, assertEquals } from "../asserts.mjs";
 import util from "../util.mjs";
 
 const prepare = () => {
@@ -25,7 +25,7 @@ const prepare = () => {
   return { game, p1, p2 };
 }
 
-Deno.test("action put", () => {
+test("action put", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   game.nextTurn();
@@ -33,7 +33,7 @@ Deno.test("action put", () => {
   assertEquals(status.field[0], [1, 0]);
 });
 
-Deno.test("action cant't put", () => {
+test("action cant't put", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 1000, 0],]));
   game.nextTurn();
@@ -42,7 +42,7 @@ Deno.test("action cant't put", () => {
   assertEquals(status.log[0][0][0].res, Action.ERR_ILLEGAL_ACTION);
 });
 
-Deno.test("action move", () => {
+test("action move", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   game.nextTurn();
@@ -51,7 +51,7 @@ Deno.test("action move", () => {
   assertEquals(status.field[0], [1, 0]);
 });
 
-Deno.test("action move series 連なり移動", () => {
+test("action move series 連なり移動", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -66,7 +66,7 @@ Deno.test("action move series 連なり移動", () => {
   assertEquals(game.getStatusJSON().field[2], [1, 0]);
 });
 
-Deno.test("action cant't move series 連なり移動失敗", () => {
+test("action cant't move series 連なり移動失敗", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -84,7 +84,7 @@ Deno.test("action cant't move series 連なり移動失敗", () => {
   assertEquals(game.getStatusJSON().field[2], [0, -1]);
 });
 
-Deno.test("action can't move", () => {
+test("action can't move", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   game.nextTurn();
@@ -95,7 +95,7 @@ Deno.test("action can't move", () => {
   assertEquals(status.log[1][0][0].res, Action.ERR_ILLEGAL_ACTION);
 });
 
-Deno.test("fill", () => {
+test("fill", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -112,7 +112,7 @@ Deno.test("fill", () => {
   assertEquals(status.field[4], [0, 0]);
 });
 
-Deno.test("action remove", () => {
+test("action remove", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -130,7 +130,7 @@ Deno.test("action remove", () => {
   assertEquals(game.getStatusJSON().field[0], [0, -1]);
 });
 
-Deno.test("action can't remove", () => {
+test("action can't remove", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -144,7 +144,7 @@ Deno.test("action can't remove", () => {
   assertEquals(game.getStatusJSON().log[1][0][0].res, Action.ERR_ILLEGAL_ACTION);
 });
 
-Deno.test("wall point", () => {
+test("wall point", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 1, 0],
@@ -154,7 +154,7 @@ Deno.test("wall point", () => {
   assertEquals(game.getStatusJSON().points[0], { basepoint: 0, wallpoint: 1 + 2 });
 });
 
-Deno.test("base point", () => {
+test("base point", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -172,7 +172,7 @@ Deno.test("base point", () => {
   assertEquals(game.getStatusJSON().points[0], { basepoint: 4, wallpoint: 0 + 1 + 2 + 3 + 5 + 6 + 7 + 8 });
 });
 
-Deno.test("remove on agent エージェントがいるマスの壁はREMOVE不可", () => {
+test("remove on agent エージェントがいるマスの壁はREMOVE不可", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   p2.setActions(Action.fromJSON([[0, Action.PUT, 1, 0],]));
@@ -183,7 +183,7 @@ Deno.test("remove on agent エージェントがいるマスの壁はREMOVE不�
   assertEquals(game.getStatusJSON().log[1][0][0].res, Action.REVERT);
 });
 
-Deno.test("conflict put", () => {
+test("conflict put", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   p2.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
@@ -195,7 +195,7 @@ Deno.test("conflict put", () => {
   assertEquals(status.log[0][1][0].res, Action.CONFLICT);
 });
 
-Deno.test("conflict move", () => {
+test("conflict move", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   p2.setActions(Action.fromJSON([[0, Action.PUT, 2, 0],]));
@@ -210,7 +210,7 @@ Deno.test("conflict move", () => {
   assertEquals(status.log[1][1][0].res, Action.CONFLICT);
 });
 
-Deno.test("conflict remove", () => {
+test("conflict remove", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   p2.setActions(Action.fromJSON([
@@ -229,7 +229,7 @@ Deno.test("conflict remove", () => {
   assertEquals(game.getStatusJSON().log[2][1][0].res, Action.CONFLICT);
 });
 
-Deno.test("conflict remove & move 壁がないところの先読みREMOVEは不可、移動が成功する", () => {
+test("conflict remove & move 壁がないところの先読みREMOVEは不可、移動が成功する", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   p2.setActions(Action.fromJSON([[0, Action.PUT, 2, 0],]));
@@ -242,7 +242,7 @@ Deno.test("conflict remove & move 壁がないところの先読みREMOVEは不�
   assertEquals(game.getStatusJSON().log[1][1][0].res, Action.SUCCESS);
 });
 
-Deno.test("conflict remove & move 壁がないところの先読みREMOVEは不可、PUTが成功する", () => {
+test("conflict remove & move 壁がないところの先読みREMOVEは不可、PUTが成功する", () => {
   const { game, p1, p2 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 0, 0],]));
   game.nextTurn();

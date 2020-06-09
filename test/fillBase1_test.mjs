@@ -35,7 +35,7 @@ const chk = s => {
       const n = parseInt(c);
       const f = field.field[i];
       if (f[0] !== Field.BASE || f[1] !== n) {
-        throw new Error();
+        throw new AssertionError();
       }
     }
   }
