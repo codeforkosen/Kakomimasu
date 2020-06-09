@@ -81,6 +81,10 @@ $ deno run unit_test.mjs
 ```
 （deno 1.0.5 では、deno testが動かない状況）
 
+## デザイン
+Kakomimasu – Figma  
+https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu  
+
 ## プロトコル
 かこみますネットワークプロトコルを決めようの会  
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
