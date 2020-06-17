@@ -4,6 +4,14 @@
 #define MAX_LEN_JSON (1 * 1024 * 1024) // 1Mbyte
 #define LEN_TOKEN 6 // TOKENの長さは固定
 
+/*
+-- /action (for test apiserver)
+- req
+curl -s -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
+- res
+{"yourToken":"token1","yourPath":"/action","nActions":2}
+*/
+
 int action_test(const char* host) {
   char buf[MAX_LEN_JSON];
   if (post(host, "/action", "{\"actions\":[{\"agentID\": 2, \"dx\": 1, \"dy\": 1, \"type\": \"move\"}, {\"agentID\": 3, \"dx\": 1, \"dy\": 1, \"type\": \"move\"}]}", buf, MAX_LEN_JSON)) {

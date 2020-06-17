@@ -1,13 +1,5 @@
 #include <stdio.h>
 
-/*
--- /action
-- req
-curl -s -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
-- res
-{"yourToken":"token1","yourPath":"/action","nActions":2}
-*/
-
 #define MAX_LEN_REQ (1 * 1024 * 1024) // 1Mbyte
 
 int post(const char* host, const char* path, const char* json, char* buf, int lenbuf) {
