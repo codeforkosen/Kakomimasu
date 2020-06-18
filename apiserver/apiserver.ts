@@ -22,11 +22,27 @@ export const newPlayerPost = async (req: ServerRequest) => {
   });
 };
 
+export const getGameInfo = async (req: ServerRequest) => {
+  console.log(req, "GameInfo");
+  const bodyJson = (await req.json()) as PlayerPost;
+  const player = new Player(bodyJson.playerName, bodyJson.spec);
+  players.push(player);
+
+  await req.respond({
+    status: 200,
+    headers: new Headers({
+      "content-type": "application/json",
+    }),
+    body: JSON.stringify(player),
+  });
+};
+
 // Setting routes
 export const routes = () => {
   const router = createRouter();
 
   router.post("match", contentTypeFilter("application/json"), newPlayerPost);
+  router.get(new RegExp("^match/(.\\d+?)$"), getGameInfo);
 
   return router;
 };
