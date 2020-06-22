@@ -147,10 +147,10 @@ class Agent {
   revert() {
     this.x = this.bkx;
     this.y = this.bky;
-    const act = this.lastacion;
+    const act = this.lastaction;
     if (
       act && (act.type === Action.MOVE || act.type === Action.PUT) &&
-      res === Action.SUCCESS
+      act.res === Action.SUCCESS
     ) {
       act.res = Action.REVERT;
     }
