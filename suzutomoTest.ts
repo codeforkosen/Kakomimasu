@@ -19,7 +19,9 @@ const p1 = kkmm.createPlayer("test1");
 const p2 = kkmm.createPlayer("test2");
 const p3 = kkmm.createPlayer("test3");
 game.attachPlayer(p1);
+//console.log(game.isFree());
 //game.attachPlayer(p2);
+//console.log(game.isFree());
 //game.attachPlayer(p3);
 //console.log(game.players);
 /*game.players.reduce(
@@ -40,9 +42,9 @@ game.players.reduce(
   },
   0,
 );*/
-console.log(game.players.length);
+//console.log(game.players.length);
 //console.log(game.players.reduce((p: any) => p ? 1 : 0, 0));
 //game.attachPlayer(p2);
 //game.attachPlayer(p3);
 
-//console.log(kkmm.getFreeGames());
+console.log(kkmm.getFreeGames());

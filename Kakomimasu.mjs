@@ -341,7 +341,8 @@ class Game {
   }
 
   isReady() {
-    return this.players.reduce((p) => p ? 1 : 0, 0) == this.board.nplayer;
+    return this.players.length == this.board.nplayer;
+    //return this.players.reduce((p) => p ? 1 : 0, 0) == this.board.nplayer;
   }
 
   isFree() {
@@ -490,9 +491,10 @@ class Game {
 }
 
 class Player {
-  constructor(uuid, name) {
+  constructor(uuid, name, spec = "スペック情報なし") {
     this.uuid = uuid;
     this.name = name;
+    this.spec = spec;
     this.game = null;
     this.actions = [];
   }
@@ -545,8 +547,9 @@ class Kakomimasu {
     return this.games.filter((g) => g.isFree());
   }
 
-  createPlayer(playername) {
-    return new Player(util.uuid(), playername);
+  createPlayer(playername, spec = "") {
+    if (spec == null || spec == "") return new Player(util.uuid(), playername);
+    else return new Player(util.uuid(), playername, spec);
   }
 }
 

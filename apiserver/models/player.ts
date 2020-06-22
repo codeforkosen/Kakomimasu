@@ -1,3 +1,5 @@
+// 未使用
+
 import { addPlayer } from "./room.ts";
 
 export class PlayerPost {
