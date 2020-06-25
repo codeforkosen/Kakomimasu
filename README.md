@@ -104,6 +104,28 @@ $ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"act
 {"yourToken":"token1","yourPath":"/action","nActions":2}
 ```
 
+## APIクライアント for Deno
+
+```
+$ cd client_deno
+$ deno run -A action_test.mjs
+```
+
+## APIクライアント for Node
+
+```
+$ cd client_node
+$ node --experimental-top-level-await action_test.mjs
+```
+
+## APIクライアント for C (Mac)
+
+```
+$ cd client_c
+$ gcc action_test.c
+$ ./a.out
+```
+
 ## 出典
 
 高専プロコン第31回苫小牧大会  
