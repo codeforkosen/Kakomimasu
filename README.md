@@ -92,9 +92,9 @@ https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 ## APIサーバー for Deno
 
-ひとまず、受け取ったaction数だけ返すモックサーバー（[解説](https://fukuno.jig.jp/2876）
+ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
-$ deno run -A main.mjs
+$ deno run -A apiserver.mjs
 ```
 
 アクセステスト
