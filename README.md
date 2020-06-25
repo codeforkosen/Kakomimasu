@@ -115,7 +115,7 @@ $ deno run -A action_test.mjs
 
 ```
 $ cd client_node
-$ node --experimental-top-level-await action_test.mjs
+$ node action_test.mjs
 ```
 
 ## APIクライアント for C (Mac)
