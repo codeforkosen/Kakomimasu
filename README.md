@@ -75,11 +75,8 @@ $ node main.mjs
 ## テスト
 
 ```
-$ deno run flow_test.mjs
-$ deno run unit_test.mjs
-...
+$ deno test
 ```
-（deno 1.0.5 では、deno testが動かない状況）
 
 ## デザイン
 Kakomimasu – Figma  
@@ -92,9 +89,9 @@ https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 ## APIサーバー for Deno
 
-ひとまず、受け取ったaction数だけ返すモックサーバー（[解説](https://fukuno.jig.jp/2876）
+ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
-$ deno run -A main.mjs
+$ deno run -A apiserver.js
 ```
 
 アクセステスト
@@ -102,6 +99,28 @@ $ deno run -A main.mjs
 $ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
 
 {"yourToken":"token1","yourPath":"/action","nActions":2}
+```
+
+## APIクライアント for Deno
+
+```
+$ cd client_deno
+$ deno run -A action.js
+```
+
+## APIクライアント for Node
+
+```
+$ cd client_node
+$ node action.mjs
+```
+
+## APIクライアント for C (Mac)
+
+```
+$ cd client_c
+$ gcc action_test.c
+$ ./a.out
 ```
 
 ## 出典
