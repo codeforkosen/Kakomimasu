@@ -8,7 +8,6 @@ util.rnd = (n) => {
 
 util.uuid = () => {
   return v4.generate();
-  //return Math.random().toString(); // another algrithm is better
 };
 
 util.p = (json) => {
