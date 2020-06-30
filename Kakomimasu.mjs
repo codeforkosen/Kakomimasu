@@ -341,8 +341,7 @@ class Game {
   }
 
   isReady() {
-    return this.players.length == this.board.nplayer;
-    //return this.players.reduce((p) => p ? 1 : 0, 0) == this.board.nplayer;
+    return this.players.length === this.board.nplayer;
   }
 
   isFree() {

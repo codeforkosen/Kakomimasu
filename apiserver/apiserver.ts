@@ -44,6 +44,8 @@ export class PlayerPost {
 }
 
 export const newPlayerPost = async (req: ServerRequest) => {
+  console.log(req.match);
+
   console.log(req, "newPlayer");
   const bodyJson = (await req.json()) as PlayerPost;
   const player = addPlayer(bodyJson.playerName, bodyJson.spec);
@@ -79,7 +81,13 @@ export const getGameInfo = async (req: ServerRequest) => {
 export const routes = () => {
   const router = createRouter();
 
-  router.post("match", contentTypeFilter("application/json"), newPlayerPost);
+  //router.get("match", contentTypeFilter("application/json"), newPlayerPost);
+  //router.post("match", newPlayerPost);
+  router.handle(
+    new RegExp("^match\?(.+)"),
+    newPlayerPost,
+  );
+
   router.get(new RegExp("^match/(.\\d+?)$"), getGameInfo);
 
   return router;
