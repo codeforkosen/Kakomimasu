@@ -42,8 +42,28 @@ export const newPlayerPost = async (req: ServerRequest) => {
 
 // #endregion
 
+//#region 試合情報取得API
 export const getGameInfo = async (req: ServerRequest) => {
-  console.log(req, "GameInfo");
+  try {
+    //console.log(req, "GameInfo");
+    const [, token] = req.match;
+    const game = kkmm.getGames().filter((item: any) => item.uuid === token);
+    //console.log(game[0]);
+
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(
+        game[0],
+        ["uuid", "gaming", "ending", "turn", "startTime", "nextTurnTime"],
+      ),
+    });
+  } catch (e) {
+    console.log("err", e);
+  }
+
   /*const bodyJson = (await req.json()) as PlayerPost;
   const player = new Player(bodyJson.playerName, bodyJson.spec);
   players.push(player);
@@ -57,13 +77,13 @@ export const getGameInfo = async (req: ServerRequest) => {
   });
 };
 
-// Setting routes
+//#endregion
+
 export const routes = () => {
   const router = createRouter();
 
-  router.handle("match", contentTypeFilter("application/json"), newPlayerPost);
-
-  router.get(new RegExp("^match/(.\\d+?)$"), getGameInfo);
+  router.post("match", contentTypeFilter("application/json"), newPlayerPost);
+  router.get(new RegExp("^match/(.+)$"), getGameInfo);
 
   return router;
 };

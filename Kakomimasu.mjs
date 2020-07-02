@@ -313,15 +313,19 @@ Field.WALL = 1;
 
 class Game {
   constructor(board, nturn = 30, nsec = 3) {
+    this.uuid = util.uuid();
     this.board = board;
     this.players = [];
     this.nturn = nturn;
+    this.nsec = nsec;
     this.gaming = false;
     this.ending = false;
     this.actinos = [];
     this.actionlog = [];
     this.field = new Field(board);
     this.log = [];
+    this.startTime = null;
+    this.nextTurnTime = null;
 
     // agents
     this.agents = [];
@@ -338,6 +342,11 @@ class Game {
     if (!this.isFree()) return false;
     if (this.players.indexOf(player) >= 0) return false;
     this.players.push(player);
+    player.setGame(this);
+    if (this.isReady()) {
+      this.startTime = Math.floor(new Date().getTime() / 1000) + 5;
+      this.nextTurnTime = this.startTime + this.nsec;
+    }
   }
 
   isReady() {
@@ -514,7 +523,12 @@ class Player {
   }
 
   getJSON() {
-    return { uuid: this.uuid, name: this.name };
+    return {
+      name: this.name,
+      spec: this.spec,
+      playerId: this.uuid,
+      roomId: this.game.uuid,
+    };
   }
 }
 
