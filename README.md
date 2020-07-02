@@ -1,15 +1,8 @@
 # Kakomimasu
- #procon31 競技部門 コアモジュール for Deno/Node.js/web
+ #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web
 
 [![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
-[![deno](https://taisukef.github.com/denolib/denobadge@1.0.3.svg)](https://deno.land/)
-
-## for Deno 1.0.3
-
-Denoを使う場合、[Denoインストール](https://deno.land/)後、最新版1.0.5ではmjs動作に問題あるので、1.0.3にする
-```
-$ deno upgrade --version 1.0.3
-```
+[![deno](https://taisukef.github.com/denolib/denobadge@1.1.2.svg)](https://deno.land/)
 
 ## 利用方法
 
