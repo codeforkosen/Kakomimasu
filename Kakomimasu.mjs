@@ -287,6 +287,7 @@ class Field {
   }
 
   getPoints() {
+    // tilePoint,areaPointの区別が必要→ここでいうWallとBaseかな？
     const points = [];
     for (let i = 0; i < this.board.nplayer; i++) {
       points[i] = { basepoint: 0, wallpoint: 0 };
@@ -298,7 +299,7 @@ class Field {
       if (att === Field.WALL) {
         p.wallpoint += pnt;
       } else if (att === Field.BASE) {
-        p.basepoint += pnt;
+        p.basepoint += pnt; // need abs()?
       }
     });
     return points;
@@ -312,7 +313,7 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, nturn = 30, nsec = 3) {
+  constructor(board, nturn = 10, nsec = 3) {
     this.uuid = util.uuid();
     this.board = board;
     this.players = [];
@@ -320,12 +321,13 @@ class Game {
     this.nsec = nsec;
     this.gaming = false;
     this.ending = false;
-    this.actinos = [];
+    this.actions = [];
     this.actionlog = [];
     this.field = new Field(board);
     this.log = [];
-    this.startTime = null;
-    this.nextTurnTime = null;
+    this.startedAtUnixTime = null;
+    this.nextTurnUnixTime = null;
+    this.turn = 0;
 
     // agents
     this.agents = [];
@@ -344,8 +346,10 @@ class Game {
     this.players.push(player);
     player.setGame(this);
     if (this.isReady()) {
-      this.startTime = Math.floor(new Date().getTime() / 1000) + 5;
-      this.nextTurnTime = this.startTime + this.nsec;
+      this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
+      this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
+      this.intervalId = setInterval(() => this.updateStatus(), 50);
+      console.log("intervalID", this.intervalId);
     }
   }
 
@@ -375,6 +379,7 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     this.checkActions(actions);
+    console.log(this.players[1].actions);
     this.checkConflict(actions);
     this.putOrMove();
     this.revertOverlap();
@@ -386,6 +391,7 @@ class Game {
 
     if (this.turn < this.nturn) {
       this.turn++;
+      this.nextTurnUnixTime = util.nowUnixTime() + this.nsec;
     } else {
       this.gaming = false;
       this.ending = true;
@@ -494,6 +500,71 @@ class Game {
       agents: this.agents.map((ar) => ar.map((a) => a.getJSON())),
       points: this.field.getPoints(),
       log: this.log,
+    };
+  }
+
+  updateStatus() {
+    let self = this;
+    if (
+      self.isReady() && !self.isGaming() && !this.ending &&
+      (util.nowUnixTime() > this.startedAtUnixTime)
+    ) {
+      self.start();
+    }
+    if (self.isGaming()) {
+      //console.log(util.nowUnixTime(), this.nextTurnUnixTime + 2);
+      if (util.nowUnixTime() > this.nextTurnUnixTime + 2) {
+        self.nextTurn();
+      }
+    }
+    if (this.ending) clearInterval(this.intervalId);
+  }
+
+  getFieldInfoJSON() {
+    const players = [];
+    this.players.forEach((p, i) => {
+      const playerId = p.uuid;
+      const agents = [];
+      this.agents[i].forEach((a) => {
+        const agent = {
+          agentID: null,
+          x: a.x,
+          y: a.y,
+        };
+        agents.push(agent);
+      });
+      const player = {
+        playerID: playerId,
+        agents: agents,
+        // don't need point, need tile&areaPoint
+        point: this.field.getPoints()[i],
+        tilePoint: null,
+        areaPoint: null,
+      };
+      players.push(player);
+    });
+
+    const actions = [];
+    this.actions.forEach((a) => {
+      // 仕様と違うので変更が必要
+      actions.push(a.getJSON());
+    });
+
+    // いろいろ仕様と違うので実際に使用するときに修正
+    return {
+      roomID: this.uuid,
+      gaming: this.gaming,
+      ending: this.ending,
+      width: this.board.w,
+      height: this.board.h,
+      points: this.board.points,
+      startedAtUnixTime: this.startedAtUnixTime,
+      nextTurnUnixTime: this.nextTurnUnixTime,
+      turn: this.turn,
+      totalTurn: this.nturn,
+      tiled: this.field.field,
+      players: players,
+      actions: actions,
     };
   }
 }
