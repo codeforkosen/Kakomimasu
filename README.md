@@ -4,9 +4,13 @@
 [![deno](https://taisukef.github.com/denolib/denobadge@1.1.3.svg)](https://deno.land/)  
 
 <!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->  
-
+https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
 囲みマス  
 https://codeforkosen.github.io/Kakomimasu/  
+
+## 人vs人で遊んでみる
+
+http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
 
 ## 利用方法
 
