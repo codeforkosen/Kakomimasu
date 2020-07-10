@@ -1,7 +1,8 @@
 # Kakomimasu
  #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
 
-[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
+<!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)]-->
+(https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
 [![deno](https://taisukef.github.com/denolib/denobadge@1.1.3.svg)](https://deno.land/)  
 
 囲みマス  
