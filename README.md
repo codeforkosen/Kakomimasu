@@ -2,7 +2,7 @@
  #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
 
 [![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
-[![deno](https://taisukef.github.com/denolib/denobadge@1.1.5.svg)](https://deno.land/)  
+[![deno](https://taisukef.github.com/denolib/denobadge@1.1.3.svg)](https://deno.land/)  
 
 囲みマス  
 https://codeforkosen.github.io/Kakomimasu/  
@@ -99,10 +99,18 @@ $ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"act
 
 ## APIクライアント for Deno
 
+[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/match.info)を開いた状態で下記を実行する。
+
 ```
 $ cd client_deno
-$ deno run -A action.js
+$ deno run -A client_test1.js
 ```
+別のコンソールから
+```
+$ cd client_deno
+$ deno run -A client_test2.js
+```
+
 
 ## APIクライアント for Node
 
