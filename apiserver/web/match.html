@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <script type="text/javascript" src="serverUtil.js"></script>
+        <title>ルーム一覧 : Kakomimasu</title>
+    </head>
+
+    <body>
+        <div style="width: 100%; text-align: center;">
+            <img height="70px" src="./img/kakomimasu-logo.png" alt="Kakomimasuロゴ">
+
+            <h1>ルーム一覧</h1>
+        </div>
+        <div>
+            <h4 id="now-time"></h4>
+            <table id="room-table">
+                <tr>
+                    <th>ルームID</th>
+                    <th>ステータス</th>
+                    <th>開始予定時刻</th>
+                    <th>ターン</th>
+                </tr>
+            </table>
+        </div>
+        <script type="module">
+            nowTimeDisp();
+            setInterval(nowTimeDisp, 1000);
+            getAllRoom();
+            setInterval(getAllRoom, 1000);
+
+            async function getAllRoom() {
+                const reqUrl = `${getRootURL()}/match`;
+
+                const roomJson = await (await fetch(reqUrl)).json();
+                console.log(roomJson);
+                const roomData = [];
+                roomJson.forEach((room, i) => {
+                    let linkedRoomid = `<a href=${getRootURL()}/match/${room.roomID}.info>${room.roomID}</a>`;
+                    let [status, startTime] = getGameStatus(room);
+
+
+                    roomData.push([
+                        linkedRoomid,//room.roomID,
+                        status,
+                        startTime,
+                        getTurnText(room),
+                    ]);
+                });
+
+                const table = document.getElementById("room-table");
+                //table.innerHTML = "";
+                roomData.forEach((data, i) => {
+                    let tr;
+                    let trElements = table.getElementsByClassName("room-" + i);
+                    if (trElements.length > 0) tr = trElements[0];
+                    else {
+                        tr = document.createElement("tr");
+                        tr.classList.add("room-" + i);
+                        table.appendChild(tr);
+                    }
+                    data.forEach((element, j) => {
+                        let td;
+                        let tdElements = tr.getElementsByClassName("roomdata-" + j);
+                        if (tdElements.length > 0) td = tdElements[0];
+                        else {
+                            td = document.createElement("td");
+                            td.classList.add("roomdata-" + j);
+                            tr.appendChild(td);
+                        }
+                        td.innerHTML = element;
+                    });
+                });
+            }
+
+            function nowTimeDisp() {
+                var now = new Date();
+                document.getElementById("now-time").innerHTML = "現在時刻：" + now.toLocaleString("ja-JP");
+            }
+
+        </script>
+
+    </body>
+
+</html>
+
+<style>
+    table,
+    td,
+    th {
+        border: 1px solid;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    table {
+        margin: 0 auto;
+    }
+
+    th,
+    td {
+        padding: 5px;
+    }
+
+    #now-time {
+        text-align: center;
+    }
+</style>

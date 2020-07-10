@@ -1,3 +1,5 @@
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
+
 const util = {};
 
 util.rnd = (n) => {
@@ -5,7 +7,7 @@ util.rnd = (n) => {
 };
 
 util.uuid = () => {
-  return Math.random().toString(); // another algrithm is better
+  return v4.generate();
 };
 
 util.p = (json) => {
@@ -27,6 +29,10 @@ util.deepEquals = (x, y) => {
     if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) return false;
   }
   return true;
+};
+
+util.nowUnixTime = () => {
+  return Math.floor(new Date().getTime() / 1000);
 };
 
 export default util;
