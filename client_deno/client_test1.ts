@@ -8,6 +8,8 @@ do {
   await sleep(100);
 } while (gameInfo.startedAtUnixTime === null);
 
+console.log(gameInfo);
+
 console.log(
   "ゲーム開始時間：",
   new Date(gameInfo.startedAtUnixTime / 1000).toLocaleString("ja-JP"),

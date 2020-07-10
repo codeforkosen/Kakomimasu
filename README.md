@@ -9,17 +9,17 @@ https://codeforkosen.github.io/Kakomimasu/
 
 ## 利用方法
 
-for Deno or ブラウザ
+for Deno
 ```
-import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
 
-for Deno or Node.js
+for Deno
 ```
 $ git close https://github.com/taisukef/Kakomimasu.git
 ```
-main.mjs を編集（そのままでも動きます）
+main.js を編集（そのままでも動きます）
 ```
 import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
 
@@ -63,10 +63,6 @@ console.log(game.getStatusJSON());
 ```
 $ deno run main.mjs
 ```
-or 
-```
-$ node main.mjs
-```
 
 ## テスト
 
@@ -82,10 +78,15 @@ https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu
 かこみますネットワークプロトコルを決めようの会  
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
 
-## APIサーバー for Deno
+## APIサーバー
+
+[apiserver/](apiserver)  
+
+## APIサーバー for Deno (unuse)
 
 ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
+$ cd unuse
 $ deno run -A apiserver.js
 ```
 
