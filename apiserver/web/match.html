@@ -25,11 +25,11 @@
                 </tr>
             </table>
         </div>
-        <script language="javascript" type="text/javascript">
+        <script type="module">
             nowTimeDisp();
-            setInterval('nowTimeDisp()', 1000);
+            setInterval(nowTimeDisp, 1000);
             getAllRoom();
-            setInterval("getAllRoom()", 1000);
+            setInterval(getAllRoom, 1000);
 
             async function getAllRoom() {
                 const reqUrl = `${getRootURL()}/match`;
