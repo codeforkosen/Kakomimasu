@@ -1,4 +1,4 @@
-import util from "./util.mjs";
+import util from "./util.js";
 
 class Board {
   constructor(w, h, points, nagent, nplayer = 2) {

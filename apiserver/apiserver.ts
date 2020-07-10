@@ -5,7 +5,7 @@ import {
   createApp,
 } from "https://servestjs.org/@v1.1.0/mod.ts";
 
-import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
 
 //#region プレイヤー登録・ルームID取得API

@@ -35,11 +35,11 @@
                 <table id="field-table"></table>
             </div>
         </div>
-        <script language="javascript" type="text/javascript">
+        <script type="module">
             nowTimeDisp();
-            setInterval('nowTimeDisp()', 1000);
+            setInterval(nowTimeDisp, 1000);
             getRoomInfo();
-            setInterval("getRoomInfo()", 100);
+            setInterval(getRoomInfo, 100);
 
             async function getRoomInfo() {
                 const roomid = document.URL.match(new RegExp("([^/]+?)?.info$"))[1];
