@@ -8,7 +8,7 @@ deno run -A apiserver.ts
 ## サンプルコード
 サーバを起動した状態で、次のコードを実行する
 ```
-deno run -A ./sample/apiserver_test.ts
+deno run -A ./sample/apiserver_sample.ts
 ```
 
 ## ブラウザで見る
