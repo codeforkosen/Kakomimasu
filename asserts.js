@@ -1,4 +1,4 @@
-import util from "./util.mjs";
+import util from "./util.js";
 
 class AssertionError extends Error {
 }
@@ -6,6 +6,12 @@ class AssertionError extends Error {
 const assertEquals = (x, y) => {
   if (!util.deepEquals(x, y)) {
     throw new AssertionError(`${x} is not equals ${y}`);
+  }
+};
+
+const assert = (b) => {
+  if (!b) {
+    throw new AssertionError();
   }
 };
 
@@ -20,4 +26,4 @@ const test = (s, f) => {
   console.log("test " + s, res);
 };
 
-export { test, assertEquals };
+export { test, assertEquals, assert };

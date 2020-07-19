@@ -3,7 +3,7 @@ import {
   createRouter,
   contentTypeFilter,
   createApp,
-} from "https://servestjs.org/@v1.1.0/mod.ts";
+} from "https://servestjs.org/@v1.1.1/mod.ts";
 
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
