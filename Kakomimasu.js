@@ -348,8 +348,9 @@ class Game {
     if (this.isReady()) {
       this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
       this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
+      this.updateStatus();
       this.intervalId = setInterval(() => this.updateStatus(), 50);
-      console.log("intervalID", this.intervalId);
+      //console.log("intervalID", this.intervalId);
     }
   }
 
@@ -570,7 +571,7 @@ class Game {
 }
 
 class Player {
-  constructor(uuid, name, spec = "スペック情報なし") {
+  constructor(uuid, name, spec = null) {
     this.uuid = uuid;
     this.name = name;
     this.spec = spec;
