@@ -87,19 +87,11 @@ https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 [apiserver/](apiserver)  
 
-## APIサーバー for Deno (unuse)
+## APIサーバー for Deno
 
-ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
-$ cd unuse
+$ cd apiserver
 $ deno run -A apiserver.js
-```
-
-アクセステスト
-```
-$ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
-
-{"yourToken":"token1","yourPath":"/action","nActions":2}
 ```
 
 ## APIクライアント for Deno
