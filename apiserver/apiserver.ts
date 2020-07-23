@@ -15,7 +15,8 @@ const addPlayer = (playerName: string, spec: string) => {
 
   const freeGame = kkmm.getFreeGames();
   if (freeGame.length == 0) {
-    freeGame.push(kkmm.createGame(createDefaultBoard()));
+    //freeGame.push(kkmm.createGame(createDefaultBoard()));
+    freeGame.push(kkmm.createGame(readBoard("A-1")));
   }
   freeGame[0].attachPlayer(player);
 
@@ -27,7 +28,9 @@ export class PlayerPost {
 }
 
 export const newPlayerPost = async (req: ServerRequest) => {
-  //console.log(req, "newPlayer");
+  console.log(req, "newPlayer");
+  console.log(await req.json());
+
   const playerPost = (await req.json()) as PlayerPost;
   const player = addPlayer(playerPost.name, playerPost.spec);
   await req.respond({
@@ -222,4 +225,12 @@ const createDefaultBoard = () => {
   }
   const nagent = 6;
   return new Board(w, h, points, nagent);
+};
+
+const readBoard = (fileName: string) => {
+  const boardJson = JSON.parse(
+    Deno.readTextFileSync(`./board/${fileName}.json`),
+  );
+  console.log(boardJson.width, boardJson.height, boardJson.points);
+  return new Board(boardJson.width, boardJson.height, boardJson.points);
 };
