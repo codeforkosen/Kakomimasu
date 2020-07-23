@@ -1,29 +1,30 @@
 # Kakomimasu
- #procon31 競技部門 コアモジュール for Deno/Node.js/web
+ #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
 
-[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)
-[![deno](https://taisukef.github.com/denolib/denobadge@1.0.3.svg)](https://deno.land/)
+[![deno](https://taisukef.github.com/denolib/denobadge@1.1.3.svg)](https://deno.land/)  
 
-## for Deno 1.0.3
+<!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->  
+https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
+囲みマス  
+https://codeforkosen.github.io/Kakomimasu/  
 
-Denoを使う場合、[Denoインストール](https://deno.land/)後、最新版1.0.5ではmjs動作に問題あるので、1.0.3にする
-```
-$ deno upgrade --version 1.0.3
-```
+## 人vs人で遊んでみる
+
+http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
 
 ## 利用方法
 
-for Deno or ブラウザ
+for Deno
 ```
-import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
 
-for Deno or Node.js
+for Deno
 ```
 $ git close https://github.com/taisukef/Kakomimasu.git
 ```
-main.mjs を編集（そのままでも動きます）
+main.js を編集（そのままでも動きます）
 ```
 import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
 
@@ -67,10 +68,6 @@ console.log(game.getStatusJSON());
 ```
 $ deno run main.mjs
 ```
-or 
-```
-$ node main.mjs
-```
 
 ## テスト
 
@@ -86,11 +83,15 @@ https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu
 かこみますネットワークプロトコルを決めようの会  
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
 
+## APIサーバー
 
-## APIサーバー for Deno
+[apiserver/](apiserver)  
+
+## APIサーバー for Deno (unuse)
 
 ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
+$ cd unuse
 $ deno run -A apiserver.js
 ```
 
@@ -103,10 +104,18 @@ $ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"act
 
 ## APIクライアント for Deno
 
+[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/match.info)を開いた状態で下記を実行する。
+
 ```
 $ cd client_deno
-$ deno run -A action.js
+$ deno run -A client_test1.js
 ```
+別のコンソールから
+```
+$ cd client_deno
+$ deno run -A client_test2.js
+```
+
 
 ## APIクライアント for Node
 
@@ -139,4 +148,4 @@ https://fukuno.jig.jp/2869
 2020-06-09 高専プロコン競技部門を勝手に開催する会オンラインハックデーの進捗、プロトコル、デザイン、Denoで30行のAPIサーバーのモック  
 https://fukuno.jig.jp/2876  
 
-遊んでくれる人、協力者募集！  
+遊んでくれる人、協力者募集！ 

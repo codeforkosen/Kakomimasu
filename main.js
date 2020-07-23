@@ -1,4 +1,4 @@
-import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "./Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
 
