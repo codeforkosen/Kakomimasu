@@ -42,11 +42,11 @@
             setInterval(getRoomInfo, 100);
 
             async function getRoomInfo() {
-                const roomid = document.URL.match(new RegExp("([^/]+?)?.info$"))[1];
+                const roomid = document.URL.match(new RegExp("([^/]+?)?/index.html$"))[1];
                 //console.log(roomid);
                 const reqUrl = `${getRootURL()}/match/${roomid}`;
                 const roomJson = await (await fetch(reqUrl)).json();
-                console.log(roomJson);
+                //console.log(roomJson);
                 const roomData = [];
 
                 //let linkedRoomid = `<a href=${getRootURL()}/match/${room.roomID}.info>`;

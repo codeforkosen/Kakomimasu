@@ -9,21 +9,16 @@ const assertEquals = (x, y) => {
   }
 };
 
-const assert = (b) => {
-  if (!b) {
-    throw new AssertionError();
-  }
-};
-
 // const test = Deno.test; // for 1.0.5 bug
-const test = (s, f) => {
+const test = async (s, f) => {
   let res = "ok";
   try {
-    f();
+    if (f.constructor.name === "AsyncFunction") await f();
+    else f();
   } catch (e) {
     res = "err";
   }
   console.log("test " + s, res);
 };
 
-export { test, assertEquals, assert };
+export { test, assertEquals };

@@ -38,7 +38,7 @@
                 console.log(roomJson);
                 const roomData = [];
                 roomJson.forEach((room, i) => {
-                    let linkedRoomid = `<a href=${getRootURL()}/match/${room.roomID}.info>${room.roomID}</a>`;
+                    let linkedRoomid = `<a href=${getRootURL()}/match/${room.roomID}/index.html>${room.roomID}</a>`;
                     let [status, startTime] = getGameStatus(room);
 
 

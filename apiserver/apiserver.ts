@@ -188,8 +188,8 @@ export const routes = () => {
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-  router.get("match.info", matchWeb);
-  router.get(new RegExp("^match/(.+).info$"), matchRoomWeb);
+  router.get("match/index.html", matchWeb);
+  router.get(new RegExp("^match/(.+)/index.html$"), matchRoomWeb);
 
   router.get(new RegExp("([^/]+?)?.js$"), async (req: ServerRequest) => {
     //console.log(req.match);
