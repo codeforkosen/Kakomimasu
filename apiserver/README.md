@@ -12,7 +12,7 @@ deno run -A ./sample/apiserver_sample.ts
 ```
 
 ## ブラウザで見る
-`http://localhost:8880/match.info`にアクセス。
+`http://localhost:8880/match/index.html`にアクセス。
 
 「囲みマス」のロゴが表示されたらOK
 
@@ -20,4 +20,4 @@ deno run -A ./sample/apiserver_sample.ts
 
 そのルームIDをクリックすると、フィールドの様子も見られます。
 
-ルームに直接アクセスするには`http://localhost:8880/match.info/(ルームID).info`
+ルームに直接アクセスするには`http://localhost:8880/match.info/(ルームID)/index.html`
