@@ -1,4 +1,4 @@
-import util from "./util.mjs";
+import util from "./util.js";
 
 class AssertionError extends Error {
 }
@@ -10,10 +10,11 @@ const assertEquals = (x, y) => {
 };
 
 // const test = Deno.test; // for 1.0.5 bug
-const test = (s, f) => {
+const test = async (s, f) => {
   let res = "ok";
   try {
-    f();
+    if (f.constructor.name === "AsyncFunction") await f();
+    else f();
   } catch (e) {
     res = "err";
   }
