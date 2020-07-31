@@ -59,7 +59,9 @@ async function setAction(roomid, playerid, actions) { // Actions[]
 }
 
 function diffTime(unixTime) {
-  return unixTime - Math.floor(new Date().getTime() / 1000);
+  const dt = unixTime * 1000 - new Date().getTime();
+  console.log("diffTime", dt);
+  return dt;
 }
 
 export { Action, sleep, match, getGameInfo, setAction, diffTime };

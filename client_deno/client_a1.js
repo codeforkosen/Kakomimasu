@@ -1,8 +1,7 @@
 import { Action, sleep, match, getGameInfo, setAction, diffTime } from "./client_util.js";
-
-const [ playerid, roomid] = await match(`ふくの`, "ポンコツ");
-
 import util from "../util.js";
+
+const [ playerid, roomid] = await match(`ふくの`, "ランダム");
 
 let gameInfo;
 do {
@@ -14,29 +13,35 @@ console.log(gameInfo);
 
 console.log(
   "ゲーム開始時間：",
-  new Date(gameInfo.startedAtUnixTime / 1000).toLocaleString("ja-JP"),
+  new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
 const pno = gameInfo.players[0].playerID === playerid ? 0 : 1;
-console.log(pno);
+console.log("playerid", pno);
 
 const points = gameInfo.points;
 const w = gameInfo.width;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
-console.log(totalTurn);
+console.log("totalTurn", totalTurn);
+
+// デタラメに置き、デタラメに動くアルゴリズム
+
+// 8方向、上から時計回り
+const DIR = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
 
 // ポイントの高い順ソート
 const pntall = points.map((p, idx) => { return { x: idx % w, y: Math.floor(idx / w), p: p }});
 const pntsorted = pntall.sort((a, b) => b.p - a.p);
 
+// スタート時間待ち
+await sleep(diffTime(gameInfo.startedAtUnixTime));
+
 for (let i = 1; i <= totalTurn; i++) {
   console.log("turn", i);
-  await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
 
-  // 上から時計回り
-  const DIR = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
-
+  // ランダムにずらしつつ置けるだけおく
+  // 置いたものはランダムに8方向動かす
   const actions = [];
   const offset = util.rnd(nplayers);
   for (let i = 0; i < nplayers; i++) {
@@ -51,6 +56,21 @@ for (let i = 1; i <= totalTurn; i++) {
     }
   }
   setAction(roomid, playerid, actions);
-  await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
-  gameInfo = await getGameInfo(roomid);
+  
+  const bknext = gameInfo.nextTurnUnixTime;
+  await sleep(diffTime(gameInfo.nextTurnUnixTime));
+
+  for (;;) {
+    gameInfo = await getGameInfo(roomid);
+    if (gameInfo.nextTurnUnixTime !== bknext)
+      break;
+    await sleep(100);
+  }
 }
+
+// ゲームデータ出力
+try {
+  Deno.mkdirSync("log");
+} catch (e) {}
+const fname = `log/${gameInfo.roomID}-player${pno}.log`;
+Deno.writeTextFileSync(fname, JSON.stringify(gameInfo, null, 2));
