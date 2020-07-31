@@ -5,8 +5,63 @@ import {
   createApp,
 } from "https://servestjs.org/@v1.1.1/mod.ts";
 
+import * as util from "./apiserver_util.ts";
+
+import { Account, User, UserUpdateError } from "./user.ts";
+const accounts = new Account();
+
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
+
+//#region アカウント登録・取得
+const usersUpdate = async (req: ServerRequest) => {
+  const getData = ((await req.json()) as User);
+
+  try {
+    const id = accounts.updateUser(getData);
+    const user = accounts.showUser(id);
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(user),
+    });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
+  }
+};
+
+const usersShow = async (req: ServerRequest) => {
+  console.log(req.match);
+  const [, , identifier] = req.match;
+  if (identifier !== "") {
+    try {
+      const user = accounts.showUser(identifier);
+      if (user !== undefined) {
+        await req.respond({
+          status: 200,
+          headers: new Headers({
+            "content-type": "application/json",
+          }),
+          body: JSON.stringify(user),
+        });
+      }
+    } catch (e) {
+      await req.respond(util.ErrorResponse(e.message));
+    }
+  } else {
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(accounts.users),
+    });
+  }
+};
+
+//#endregion
 
 //#region プレイヤー登録・ルームID取得API
 
@@ -186,6 +241,13 @@ const matchRoomWeb = async (req: ServerRequest) => {
 export const routes = () => {
   const router = createRouter();
 
+  router.post(
+    "users/update",
+    contentTypeFilter("application/json"),
+    usersUpdate,
+  );
+  router.get(new RegExp("^users/show(/?)(.*)$"), usersShow);
+
   router.post("match", contentTypeFilter("application/json"), newPlayerPost);
   router.get("match", getAllRooms);
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
@@ -231,7 +293,12 @@ const readBoard = (fileName: string) => {
   const boardJson = JSON.parse(
     Deno.readTextFileSync(`./board/${fileName}.json`),
   );
-  console.log(boardJson.width, boardJson.height, boardJson.points);
+  console.log(
+    boardJson.width,
+    boardJson.height,
+    boardJson.points,
+    boardJson.nagent,
+  );
   return new Board(
     boardJson.width,
     boardJson.height,
