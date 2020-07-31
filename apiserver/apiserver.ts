@@ -293,7 +293,12 @@ const readBoard = (fileName: string) => {
   const boardJson = JSON.parse(
     Deno.readTextFileSync(`./board/${fileName}.json`),
   );
-  console.log(boardJson.width, boardJson.height, boardJson.points);
+  console.log(
+    boardJson.width,
+    boardJson.height,
+    boardJson.points,
+    boardJson.nagent,
+  );
   return new Board(
     boardJson.width,
     boardJson.height,
