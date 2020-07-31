@@ -66,7 +66,7 @@ console.log(game.getStatusJSON());
 ```
 コンソールにて
 ```
-$ deno run main.mjs
+$ deno run main.js
 ```
 
 ## テスト
