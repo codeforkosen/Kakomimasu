@@ -1,4 +1,6 @@
-const host = "http://localhost:8880";
+//const host = "http://localhost:8880";
+//const host = "http://118.27.2.240:8880";
+const host = "https://kakomimasu.sabae.cc";
 
 class Action {
   constructor(agentid, type, x, y) {
