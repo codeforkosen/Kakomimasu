@@ -1,12 +1,16 @@
 # Kakomimasu
  #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
 
-[![deno](https://taisukef.github.com/denolib/denobadge@1.1.3.svg)](https://deno.land/)  
+[![deno](https://taisukef.github.com/denolib/denobadge@1.2.0.svg)](https://deno.land/)  
 
 <!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->  
 https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
 囲みマス  
 https://codeforkosen.github.io/Kakomimasu/  
+
+## 競技部門ルール  
+
+http://www.procon.gr.jp/?p=77044  
 
 ## 人vs人で遊んでみる
 
@@ -26,7 +30,7 @@ $ git close https://github.com/taisukef/Kakomimasu.git
 ```
 main.js を編集（そのままでも動きます）
 ```
-import { Kakomimasu, Board, Action } from "./Kakomimasu.mjs";
+import { Kakomimasu, Board, Action } from "./Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
 
@@ -66,7 +70,7 @@ console.log(game.getStatusJSON());
 ```
 コンソールにて
 ```
-$ deno run main.mjs
+$ deno run main.js
 ```
 
 ## テスト
@@ -87,19 +91,11 @@ https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 [apiserver/](apiserver)  
 
-## APIサーバー for Deno (unuse)
+## APIサーバー for Deno
 
-ひとまず、受け取ったaction数だけ返すモックサーバー [解説](https://fukuno.jig.jp/2876）
 ```
-$ cd unuse
+$ cd apiserver
 $ deno run -A apiserver.js
-```
-
-アクセステスト
-```
-$ curl -H 'Authorization: token1' -X POST http://localhost:8880/action -d '{"actions":[{"agentID": 2, "dx": 1, "dy": 1, "type": "move"}, {"agentID": 3, "dx": 1, "dy": 1, "type": "move"}]}'
-
-{"yourToken":"token1","yourPath":"/action","nActions":2}
 ```
 
 ## APIクライアント for Deno
@@ -136,9 +132,6 @@ $ ./a.out
 
 高専プロコン第31回苫小牧大会  
 http://www.procon.gr.jp/  
-
-競技部門ルール  
-http://www.procon.gr.jp/?p=77044  
 
 ## 記事
 

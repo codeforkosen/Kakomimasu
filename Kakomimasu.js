@@ -110,7 +110,7 @@ class Agent {
     this.x = x;
     this.y = y;
     if (!this.field.setAgent(this.playerid, this.x, this.y)) {
-      throw new Error("can't enter the wall");
+      return false; // throw new Error("can't enter the wall");
     }
     return true;
   }
@@ -125,7 +125,7 @@ class Agent {
     this.x = x;
     this.y = y;
     if (!this.field.setAgent(this.playerid, this.x, this.y)) {
-      throw new Error("can't enter the wall");
+      return false; // throw new Error("can't enter the wall");
     }
     return true;
   }
@@ -449,7 +449,9 @@ class Game {
     this.agents.flat().forEach((agent) => {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
-        throw new Error("illegal action!");
+        // throw new Error("illegal action!")
+        console.log(`throw new Error("illegal action!")`);
+        return;
       }
     });
   }
