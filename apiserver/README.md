@@ -24,6 +24,11 @@ deno run -A ../client_deno/client_test1.ts
 
 ゲーム詳細に直接アクセスするには`http://localhost:8880/match.info/:(ルームID)/index.html`
 
+## API仕様
+下記サイトを参考
+
+かこみますネットワークプロトコルを決めようの会  
+https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
 #### 2020.8.4
