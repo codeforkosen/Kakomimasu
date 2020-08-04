@@ -7,19 +7,22 @@ import {
 
 import * as util from "./apiserver_util.ts";
 
-import { Account, User, UserUpdateError } from "./user.ts";
+import { Account, User } from "./user.ts";
 const accounts = new Account();
 
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
 
-//#region アカウント登録・取得
-const usersUpdate = async (req: ServerRequest) => {
-  const getData = ((await req.json()) as User);
+//#region ユーザアカウント登録・取得・削除
+const usersRegist = async (req: ServerRequest) => {
+  const reqData = ((await req.json()) as User);
 
   try {
-    const id = accounts.updateUser(getData);
-    const user = accounts.showUser(id);
+    const user = accounts.registUser(
+      reqData.screenName,
+      reqData.name,
+      reqData.password,
+    );
     await req.respond({
       status: 200,
       headers: new Headers({
@@ -33,8 +36,7 @@ const usersUpdate = async (req: ServerRequest) => {
 };
 
 const usersShow = async (req: ServerRequest) => {
-  console.log(req.match);
-  const [, , identifier] = req.match;
+  const identifier = req.match[1];
   if (identifier !== "") {
     try {
       const user = accounts.showUser(identifier);
@@ -44,7 +46,7 @@ const usersShow = async (req: ServerRequest) => {
           headers: new Headers({
             "content-type": "application/json",
           }),
-          body: JSON.stringify(user),
+          body: JSON.stringify(user, ["screenName", "name", "id"]),
         });
       }
     } catch (e) {
@@ -56,8 +58,21 @@ const usersShow = async (req: ServerRequest) => {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      body: JSON.stringify(accounts.users),
+      body: JSON.stringify(accounts.getUsers()),
     });
+  }
+};
+
+const usersDelete = async (req: ServerRequest) => {
+  const reqData = ((await req.json()) as User);
+
+  try {
+    const user = accounts.deleteUser(
+      { name: reqData.name, id: reqData.id, password: reqData.password },
+    );
+    await req.respond({ status: 200 });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
   }
 };
 
@@ -65,36 +80,63 @@ const usersShow = async (req: ServerRequest) => {
 
 //#region プレイヤー登録・ルームID取得API
 
-const addPlayer = (playerName: string, spec: string) => {
-  const player = kkmm.createPlayer(playerName, spec);
+const addPlayer = (
+  name: string,
+  id: string,
+  password: string,
+  spec: string,
+) => {
+  var identifier = "";
+  if (id !== "") identifier = id;
+  else if (name !== "") identifier = name;
+  else throw Error("Invalid id or name.");
 
-  const freeGame = kkmm.getFreeGames();
-  if (freeGame.length == 0) {
-    //freeGame.push(kkmm.createGame(createDefaultBoard()));
-    freeGame.push(kkmm.createGame(readBoard("A-1")));
+  const user = accounts.getUser(identifier, password);
+  if (user !== undefined) {
+    const player = kkmm.createPlayer(user.id, spec);
+
+    const freeGame = kkmm.getFreeGames();
+    if (freeGame.length == 0) {
+      //freeGame.push(kkmm.createGame(createDefaultBoard()));
+      freeGame.push(kkmm.createGame(readBoard("A-1")));
+    }
+    freeGame[0].attachPlayer(player);
+
+    return player;
+  } else {
+    throw Error("Can not find user.");
   }
-  freeGame[0].attachPlayer(player);
-
-  return player;
 };
 
 export class PlayerPost {
-  constructor(public name: string, public spec: string) {}
+  constructor(
+    public name: string,
+    public id: string,
+    public password: string,
+    public spec: string,
+  ) {}
 }
 
 export const newPlayerPost = async (req: ServerRequest) => {
-  console.log(req, "newPlayer");
-  console.log(await req.json());
-
+  //console.log(req, "newPlayer");
   const playerPost = (await req.json()) as PlayerPost;
-  const player = addPlayer(playerPost.name, playerPost.spec);
-  await req.respond({
-    status: 200,
-    headers: new Headers({
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify(player.getJSON()),
-  });
+  try {
+    const player = addPlayer(
+      playerPost.name,
+      playerPost.id,
+      playerPost.password,
+      playerPost.spec,
+    );
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(player.getJSON()),
+    });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
+  }
 };
 
 // #endregion
@@ -123,26 +165,21 @@ const getAllRooms = async (req: ServerRequest) => {
 
 //#region 試合状態取得API
 export const getGameInfo = async (req: ServerRequest) => {
-  try {
-    //console.log(req.match, "GameInfo");
-    const [, token] = req.match;
-    const game = kkmm.getGames().filter((item: any) => item.uuid === token);
-    //console.log(game[0]);
-    //game[0].updateStatus();
+  //console.log(req.match, "GameInfo");
+  const id = req.match[1];
 
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(
-        game[0].getFieldInfoJSON(),
-        //["uuid", "gaming", "ending", "turn", "startTime", "nextTurnTime"],
-      ),
-    });
-  } catch (e) {
-    console.log("err", e);
-  }
+  //console.log(id);
+  const game = kkmm.getGames().filter((item: any) => item.uuid === id);
+  //console.log(game[0]);
+  //game[0].updateStatus();
+  //console.log(game);
+  await req.respond({
+    status: 200,
+    headers: new Headers({
+      "content-type": "application/json",
+    }),
+    body: JSON.stringify(game[0].getFieldInfoJSON()),
+  });
 };
 
 //#endregion
@@ -173,22 +210,13 @@ export class SetActionPost {
 export const setAction = async (req: ServerRequest) => {
   try {
     //console.log(req, "SetAction");
-    const [, roomid] = req.match;
-    const playerid = req.headers.get("Authorization");
-    const game = kkmm.getGames().find((item: any) => item.uuid === roomid);
-    //console.log(playerid, game.players);
-    const player = game.players.find((item: any) => item.uuid === playerid);
+    const [, gameId] = req.match;
+    const accessToken = req.headers.get("Authorization");
+    const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
+    //console.log(accessToken, game.players);
+    const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (player === undefined) {
-      await req.respond({
-        status: 401,
-        /*headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(
-          game[0].getFieldInfoJSON(),
-          //["uuid", "gaming", "ending", "turn", "startTime", "nextTurnTime"],
-        ),*/
-      });
+      await req.respond(util.ErrorResponse("Invalid accessToken."));
     } //console.log(game[0]);
     else {
       const r = (await req.json()) as SetActionPost;
@@ -242,11 +270,16 @@ export const routes = () => {
   const router = createRouter();
 
   router.post(
-    "users/update",
+    "users/regist",
     contentTypeFilter("application/json"),
-    usersUpdate,
+    usersRegist,
   );
-  router.get(new RegExp("^users/show(/?)(.*)$"), usersShow);
+  router.get(new RegExp("^users/show/(.*)$"), usersShow);
+  router.post(
+    "users/delete",
+    contentTypeFilter("application/json"),
+    usersDelete,
+  );
 
   router.post("match", contentTypeFilter("application/json"), newPlayerPost);
   router.get("match", getAllRooms);
@@ -293,12 +326,12 @@ const readBoard = (fileName: string) => {
   const boardJson = JSON.parse(
     Deno.readTextFileSync(`./board/${fileName}.json`),
   );
-  console.log(
+  /*console.log(
     boardJson.width,
     boardJson.height,
     boardJson.points,
     boardJson.nagent,
-  );
+  );*/
   return new Board(
     boardJson.width,
     boardJson.height,

@@ -5,10 +5,12 @@
 deno run -A apiserver.ts
 ```
 
-## サンプルコード
-サーバを起動した状態で、次のコードを実行する
+## サンプル対戦
+サーバを起動した状態で、`client_deno`フォルダ内の`client_test1.ts`,`client_test2.ts`をそれぞれ実行
+
+### 例
 ```
-deno run -A ./sample/apiserver_sample.ts
+deno run -A ../client_deno/client_test1.ts
 ```
 
 ## ブラウザで見る
@@ -16,8 +18,22 @@ deno run -A ./sample/apiserver_sample.ts
 
 「囲みマス」のロゴが表示されたらOK
 
-この状態でサンプルコードを動かすと、ルームの状態が分かります。
+この状態でサンプルコードを動かすと、各ゲームの状態が分かります。
 
-そのルームIDをクリックすると、フィールドの様子も見られます。
+それぞれのゲームIDをクリックすると、ゲーム詳細（フィールドの様子）も見られます。
 
-ルームに直接アクセスするには`http://localhost:8880/match.info/(ルームID)/index.html`
+ゲーム詳細に直接アクセスするには`http://localhost:8880/match.info/:(ルームID)/index.html`
+
+
+## 変更点（APIを使用するにあたって影響する部分のみ）
+#### 2020.8.4
+- 事前にユーザ登録しないといけなくなった。
+- それに伴い、match APIではユーザ名(またはユーザID)とパスワードが必要になった。
+- match API
+    - レスポンスJson Key変更：uuid => accessToken
+    - レスポンスJson Key変更：name => userId
+    - レスポンスJson Key変更：roomId => gameId
+- match/:gameId API
+    - レスポンスJson Key変更：roomID => gameId
+    - レスポンスJson Key変更：players[i].playerID => players[i].id
+- 言葉の定義の変更：ルーム => ゲーム(コードによっては直っていない部分もあります。)

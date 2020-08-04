@@ -1,6 +1,6 @@
 export const ErrorResponse = (message: string) => {
   return {
-    status: 500,
+    status: 400,
     headers: new Headers({
       "content-type": "application/json",
     }),

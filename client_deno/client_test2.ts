@@ -1,10 +1,34 @@
-import { Action, sleep, match, getGameInfo, setAction, diffTime } from "./client_util.ts";
+import {
+  Action,
+  sleep,
+  userRegist,
+  userShow,
+  match,
+  getGameInfo,
+  setAction,
+  diffTime,
+} from "./client_util.ts";
 
-const [ playerid, roomid] = await match(`高専太郎`, "ポンコツ");
+//const [ token, roomid] = await match(`高専太郎`, "ポンコツ");
+const name = `nit-taro2`;
+const password = `${name}-pw`;
+
+// ユーザ取得（ユーザがなかったら新規登録）
+let user = await userShow(name);
+if (user.hasOwnProperty("error")) {
+  user = await userRegist(`高専太郎2`, name, password);
+}
+
+// プレイヤー登録
+const resMatch = await match(
+  { id: user.id, password: password, spec: "ポンコツ" },
+);
+const token = resMatch.accessToken;
+const gameId = resMatch.gameId;
 
 let gameInfo;
 do {
-  gameInfo = await getGameInfo(roomid);
+  gameInfo = await getGameInfo(gameId);
   await sleep(100);
 } while (gameInfo.startedAtUnixTime === null);
 
@@ -17,31 +41,35 @@ await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
 
 // ターン1
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "PUT", 4, 4), new Action(1, "PUT", 6, 6)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン2
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "MOVE", 4, 5), new Action(1, "MOVE", 6, 5)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン3
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "MOVE", 4, 6), new Action(1, "MOVE", 6, 4)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン4
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "MOVE", 5, 6), new Action(1, "MOVE", 5, 4)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
