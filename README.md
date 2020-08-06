@@ -8,6 +8,10 @@ https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
 囲みマス  
 https://codeforkosen.github.io/Kakomimasu/  
 
+## 競技部門ルール  
+
+http://www.procon.gr.jp/?p=77044  
+
 ## 人vs人で遊んでみる
 
 http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
@@ -128,9 +132,6 @@ $ ./a.out
 
 高専プロコン第31回苫小牧大会  
 http://www.procon.gr.jp/  
-
-競技部門ルール  
-http://www.procon.gr.jp/?p=77044  
 
 ## 記事
 
