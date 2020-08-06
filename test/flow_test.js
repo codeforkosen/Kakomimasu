@@ -1,7 +1,7 @@
-import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
-import { test, assertEquals } from "../asserts.mjs";
+import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
+import { test, assertEquals } from "../asserts.js";
 // import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import util from "../util.mjs";
+//import util from "../util.mjs";
 
 test("flow", () => {
   const w = 8;

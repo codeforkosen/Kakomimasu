@@ -270,7 +270,7 @@ class Field {
             if (!chk(x + 1, y - 1)) return false;
             if (!chk(x - 1, y + 1)) return false;
             if (!chk(x, y + 1)) return false;
-            if (!chk(x - 1, y + 1)) return false;
+            if (!chk(x + 1, y + 1)) return false;
             return true;
           };
           if (chk(i, j)) {

@@ -9,6 +9,12 @@ const assertEquals = (x, y) => {
   }
 };
 
+const assert = b => {
+  if (!b) {
+    throw new AssertionError(`${x} is must be true`);
+  }
+};
+
 // const test = Deno.test; // for 1.0.5 bug
 const test = async (s, f) => {
   let res = "ok";
@@ -21,4 +27,4 @@ const test = async (s, f) => {
   console.log("test " + s, res);
 };
 
-export { test, assertEquals };
+export { test, assert, assertEquals, AssertionError };

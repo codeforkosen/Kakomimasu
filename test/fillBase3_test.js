@@ -1,4 +1,5 @@
-import { Board, Field } from "../Kakomimasu.mjs";
+import { Board, Field } from "../Kakomimasu.js";
+import { AssertionError } from "../asserts.js";
 
 const nagent = 6;
 const [ w, h ] = [ 3, 3 ];
@@ -29,14 +30,12 @@ const set = s => {
 };
 const chk = s => {
   s = s.replace(/\n/g, "");
-  for (let i = 0; i < s.length; i++) {
-    const c = s.charAt(i);
-    if (c !== ".") {
-      const n = parseInt(c);
-      const f = field.field[i];
-      if (f[0] !== Field.BASE || f[1] !== n) {
-        throw new AssertionError();
-      }
+  for (let i = 0; i < s.length; i += 2) {
+    const c = s.charAt(i) === 'W' ? Field.WALL : Field.BASE;
+    const n = s.charAt(i + 1) === '.' ? -1 : parseInt(s.charAt(i + 1));
+    const f = field.field[i / 2];
+    if (f[0] !== c || f[1] !== n) {
+      throw new AssertionError();
     }
   }
 }
@@ -46,7 +45,7 @@ p();
 set(`
 000
 0.0
-000
+00.
 `);
 
 p();
@@ -56,7 +55,7 @@ field.fillBase();
 p();
 
 chk(`
-...
-.0.
-...
+W0W0W0
+W0_.W0
+W0W0_.
 `);
