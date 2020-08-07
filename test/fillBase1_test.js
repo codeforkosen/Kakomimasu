@@ -1,7 +1,7 @@
-import { Board, Field } from "../Kakomimasu.mjs";
+import { Board, Field } from "../Kakomimasu.js";
 
 const nagent = 6;
-const [ w, h ] = [ 8, 8 ];
+const [ w, h ] = [ 3, 3 ];
 const board = new Board(w, h, new Array(w * h), nagent);
 const field = new Field(board);
 
@@ -24,8 +24,6 @@ const set = s => {
       field.field[i] = [1, 0];
     } else if (c === "1") {
       field.field[i] = [1, 1];
-    } else {
-      field.field[i] = [0, -1];
     }
   }
 };
@@ -37,96 +35,28 @@ const chk = s => {
       const n = parseInt(c);
       const f = field.field[i];
       if (f[0] !== Field.BASE || f[1] !== n) {
-        throw new Error();
+        throw new AssertionError();
       }
     }
   }
 }
 
-
 p();
 
-// test 1
 set(`
-.00000..
-00...00.
-0.1..00.
-0.....00
-0.1...0.
-0.....0.
-00..000.
-.00000..
+000
+0.0
+000
 `);
 
 p();
+
 field.fillBase();
 
 p();
 
 chk(`
-........
-..000...
-.0.00...
-.00000..
-.0.000..
-.00000..
-..00....
-........
-`);
-
-
-// test2
-
-set(`
-.00000..
-00...00.
-0.1..00.
-0......0
-0.1...0.
-0.....0.
-00..000.
-.00000..
-`);
-
-p();
-field.fillBase();
-p();
-
-chk(`
-........
-........
-........
-........
-........
-........
-........
-........
-`);
-
-// test3
-
-set(`
-.00000..
-00...00.
-0.11100.
-0.1.1.00
-0.1.1.0.
-0.111.0.
-00..000.
-.00000..
-`);
-
-p();
-field.fillBase();
-p();
-
-chk(`
-........
-..000...
-.0......
-.0.1.0..
-.0.1.0..
-.0...0..
-..00....
-........
+...
+.0.
+...
 `);

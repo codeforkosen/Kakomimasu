@@ -1,6 +1,6 @@
-import { Kakomimasu, Board, Action } from "../Kakomimasu.mjs";
-import { test, assertEquals } from "../asserts.mjs";
-import util from "../util.mjs";
+import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
+import { test, assertEquals } from "../asserts.js";
+// import util from "../util.mjs";
 
 const prepare = () => {
   const w = 3;
