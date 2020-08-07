@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+}
+
+header {
+    width: 100%;
+    margin: 0.5em;
+}
+header img {
+    height: 50px;
+}
+
+header h1 {
+    text-align: center;
+}
+
+footer {
+    margin-top: 1em;
+    background-color: rgb(255, 213, 149);
+    text-align: center;
+    padding: 0.5em 0;
+}

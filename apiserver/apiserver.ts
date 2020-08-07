@@ -250,19 +250,25 @@ export const setAction = async (req: ServerRequest) => {
 //#endregion
 
 //#region ブラウザ表示用
-const matchWeb = async (req: ServerRequest) => {
-  await req.sendFile("./web/match.html");
+const allGameWeb = async (req: ServerRequest) => {
+  await req.sendFile("./web/allGame.html");
   await req.respond({ status: 200 });
 };
-const matchRoomWeb = async (req: ServerRequest) => {
+const gameWeb = async (req: ServerRequest) => {
   const [, roomid] = req.match;
   const game = kkmm.getGames().filter((item: any) => item.uuid === roomid);
   if (game.length > 0) {
-    await req.sendFile("./web/match_room.html");
+    await req.sendFile("./web/game.html");
     await req.respond({ status: 200 });
   } else {
     await req.respond({ status: 404 });
   }
+};
+const userWeb = async (req: ServerRequest) => {
+  await req.sendFile("./web/user.html");
+  await req.respond({
+    status: 200,
+  });
 };
 //#endregion
 
@@ -282,22 +288,28 @@ export const routes = () => {
   );
 
   router.post("match", contentTypeFilter("application/json"), newPlayerPost);
-  router.get("match", getAllRooms);
+  router.get("match/", getAllRooms);
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-  router.get("match/index.html", matchWeb);
-  router.get(new RegExp("^match/(.+)/index.html$"), matchRoomWeb);
+  router.get("game", allGameWeb);
+  router.get(new RegExp("^game/(.{8}-.{4}-.{4}-.{4}-.{12})$"), gameWeb);
+  router.get(new RegExp("^user/(.+)(?<!\.(js|css))$"), userWeb);
 
   router.get(new RegExp("([^/]+?)?.js$"), async (req: ServerRequest) => {
     //console.log(req.match);
-    await req.sendFile(`./web/${req.match[1]}.js`);
+    await req.sendFile(`./web/js/${req.match[1]}.js`);
     //await req.sendFile(``);
     await req.respond({ status: 200 });
   });
   router.get(new RegExp("^(.*?)img/(.+)$"), async (req: ServerRequest) => {
     //console.log(req.match);
     await req.sendFile(`../img/${req.match[2]}`);
+    await req.respond({ status: 200 });
+  });
+  router.get(new RegExp("^(.*?)css/(.+)$"), async (req: ServerRequest) => {
+    console.log(req.match);
+    await req.sendFile(`./web/css/${req.match[2]}`);
     await req.respond({ status: 200 });
   });
 
