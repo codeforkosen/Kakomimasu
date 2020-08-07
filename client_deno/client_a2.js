@@ -43,8 +43,6 @@ console.log(
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
-//const pno = gameInfo.players[0].id === token ? 0 : 1;
-
 const points = gameInfo.points;
 const w = gameInfo.width;
 const nplayers = gameInfo.players[pno].agents.length;
@@ -88,8 +86,16 @@ for (let i = 1; i <= totalTurn; i++) {
       const p = pntsorted[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
     } else {
-      const [dx, dy] = DIR[util.rnd(8)];
-      actions.push(new Action(i, "MOVE", agent.x + dx, agent.y + dy));
+      for (;;) {
+        const [dx, dy] = DIR[util.rnd(8)];
+        const x = agent.x + dx;
+        const y = agent.y + dy;
+        if (x < 0 || x >= w || y < 0 || y >= w)
+          continue;
+        console.log(x, y);
+        actions.push(new Action(i, "MOVE", x, y));
+        break;
+      }
     }
   }
   setAction(roomid, token, actions);
