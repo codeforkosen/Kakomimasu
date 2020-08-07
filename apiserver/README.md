@@ -1,4 +1,4 @@
-# Kakomimasu server
+# 囲みマス server
 
 ## サーバ起動方法
 ```
@@ -14,7 +14,7 @@ deno run -A ../client_deno/client_test1.ts
 ```
 
 ## ブラウザで見る
-`http://localhost:8880/match/index.html`にアクセス。
+`http://localhost:8880/game`にアクセス。
 
 「囲みマス」のロゴが表示されたらOK
 
@@ -22,7 +22,9 @@ deno run -A ../client_deno/client_test1.ts
 
 それぞれのゲームIDをクリックすると、ゲーム詳細（フィールドの様子）も見られます。
 
-ゲーム詳細に直接アクセスするには`http://localhost:8880/match.info/:(ルームID)/index.html`
+ゲーム詳細に直接アクセスするには`http://localhost:8880/game/:(ルームID)`
+
+また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/:(ユーザID or ユーザネーム)`
 
 ## API仕様
 下記サイトを参考
