@@ -1,7 +1,32 @@
-import { Action, sleep, match, getGameInfo, setAction, diffTime } from "./client_util.js";
+import {
+  Action,
+  sleep,
+  userRegist,
+  userShow,
+  match,
+  getGameInfo,
+  setAction,
+  diffTime,
+} from "./client_util.js";
 import util from "../util.js";
 
-const [ playerid, roomid] = await match(`ふくの`, "ランダム");
+//const [ playerid, roomid] = await match(`ふくの`, "ランダム");
+
+const name = `taisukef`;
+const password = `${name}-pw`;
+
+// ユーザ取得（ユーザがなかったら新規登録）
+let user = await userShow(name);
+if (user.hasOwnProperty("error")) {
+  user = await userRegist(`ふくの`, name, password);
+}
+
+// プレイヤー登録
+const resMatch = await match(
+  { id: user.id, password: password, spec: "ランダム" },
+);
+const token = resMatch.accessToken;
+const roomid = resMatch.gameId;
 
 let gameInfo;
 do {
@@ -16,7 +41,7 @@ console.log(
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
-const pno = gameInfo.players[0].playerID === playerid ? 0 : 1;
+const pno = gameInfo.players[0].id === token ? 0 : 1;
 console.log("playerid", pno);
 
 const points = gameInfo.points;
@@ -28,10 +53,21 @@ console.log("totalTurn", totalTurn);
 // デタラメに置き、デタラメに動くアルゴリズム
 
 // 8方向、上から時計回り
-const DIR = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
+const DIR = [
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
 
 // ポイントの高い順ソート
-const pntall = points.map((p, idx) => { return { x: idx % w, y: Math.floor(idx / w), p: p }});
+const pntall = points.map((p, idx) => {
+  return { x: idx % w, y: Math.floor(idx / w), p: p };
+});
 const pntsorted = pntall.sort((a, b) => b.p - a.p);
 
 // スタート時間待ち
@@ -55,15 +91,16 @@ for (let i = 1; i <= totalTurn; i++) {
       actions.push(new Action(i, "MOVE", agent.x + dx, agent.y + dy));
     }
   }
-  setAction(roomid, playerid, actions);
-  
+  setAction(roomid, token, actions);
+
   const bknext = gameInfo.nextTurnUnixTime;
   await sleep(diffTime(gameInfo.nextTurnUnixTime));
 
   for (;;) {
     gameInfo = await getGameInfo(roomid);
-    if (gameInfo.nextTurnUnixTime !== bknext)
+    if (gameInfo.nextTurnUnixTime !== bknext) {
       break;
+    }
     await sleep(100);
   }
 }

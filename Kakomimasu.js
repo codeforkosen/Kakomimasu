@@ -526,7 +526,7 @@ class Game {
   getFieldInfoJSON() {
     const players = [];
     this.players.forEach((p, i) => {
-      const playerId = p.uuid;
+      const id = p.id;
       const agents = [];
       this.agents[i].forEach((a) => {
         const agent = {
@@ -537,7 +537,7 @@ class Game {
         agents.push(agent);
       });
       const player = {
-        playerID: playerId,
+        id: id,
         agents: agents,
         // don't need point, need tile&areaPoint
         point: this.field.getPoints()[i],
@@ -546,7 +546,6 @@ class Game {
       };
       players.push(player);
     });
-
     const actions = [];
     this.actions.forEach((a) => {
       // 仕様と違うので変更が必要
@@ -555,7 +554,7 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
-      roomID: this.uuid,
+      gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
       width: this.board.w,
@@ -573,9 +572,9 @@ class Game {
 }
 
 class Player {
-  constructor(uuid, name, spec = null) {
-    this.uuid = uuid;
-    this.name = name;
+  constructor(id, spec = "") {
+    this.accessToken = util.uuid(); //accessToken;
+    this.id = id;
     this.spec = spec;
     this.game = null;
     this.actions = [];
@@ -598,10 +597,10 @@ class Player {
 
   getJSON() {
     return {
-      name: this.name,
+      userId: this.id,
       spec: this.spec,
-      playerId: this.uuid,
-      roomId: this.game.uuid,
+      accessToken: this.accessToken,
+      gameId: this.game.uuid,
     };
   }
 }
@@ -635,8 +634,8 @@ class Kakomimasu {
   }
 
   createPlayer(playername, spec = "") {
-    if (spec == null || spec == "") return new Player(util.uuid(), playername);
-    else return new Player(util.uuid(), playername, spec);
+    if (spec == null) return new Player(playername);
+    else return new Player(playername, spec);
   }
 }
 

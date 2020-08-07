@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+        <link rel="stylesheet" href="./css/main.css">
+        <script type="text/javascript" src="./js/util.js"></script>
+
+
+        <title>ゲーム一覧 - 囲みマス</title>
+    </head>
+
+    <body>
+        <header></header>
+
+        <div>
+            <h4 id="now-time">現在時刻：{{nowTime}}</h4>
+            <table id="game-table">
+                <tr>
+                    <th>ゲームID</th>
+                    <th>ステータス</th>
+                    <th>開始時刻</th>
+                    <th>ターン</th>
+                </tr>
+                <tr v-for="(item,index) in games">
+                    <td><a :href="item.link">{{item.gameId}}</a></td>
+                    <td>{{item.status}}</td>
+                    <td>{{item.startTime}}</td>
+                    <td>{{item.turn}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <footer></footer>
+
+        <script type="module">
+            createHeader("ゲーム一覧");
+            createFooter();
+
+            const gameTableVue = new Vue({
+                el: "#game-table",
+                data: {
+                    games: [],
+                },
+                methods: {
+                    init: function () {
+                        this.update();
+                        setInterval(this.update, 1000);
+                    },
+                    update: async function () {
+                        const gamesData = await getAllGame();
+                        //console.log(gamesData);
+                        gamesData.forEach((game, i) => {
+                            const [status, startTime] = getGameStatus(game);
+
+                            Vue.set(this.games, i, {
+                                link: `${rootURL()}/game/${game.gameId}`,
+                                gameId: game.gameId,
+                                status: status,
+                                startTime: startTime,
+                                turn: getTurnText(game),
+                            });
+                        });
+                    },
+                },
+            });
+            gameTableVue.init();
+
+            const nowTimeVue = new Vue({
+                el: "#now-time",
+                data: {
+                    nowTime: "",
+                },
+                methods: {
+                    init: function () {
+                        this.getNowTime();
+                        setInterval(this.getNowTime, 1000);
+                    },
+                    getNowTime: function () {
+                        this.nowTime = new Date().toLocaleString("ja-JP");
+                    },
+                },
+            });
+            nowTimeVue.init();
+        </script>
+    </body>
+
+</html>
+
+<style>
+    table,
+    td,
+    th {
+        border: 1px solid;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    table {
+        margin: 0 auto;
+    }
+
+    th,
+    td {
+        padding: 5px;
+    }
+
+    #now-time {
+        text-align: center;
+    }
+</style>

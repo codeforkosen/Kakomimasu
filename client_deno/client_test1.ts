@@ -1,10 +1,35 @@
-import { Action, sleep, match, getGameInfo, setAction, diffTime } from "./client_util.ts";
+import {
+  Action,
+  sleep,
+  userRegist,
+  userShow,
+  match,
+  getGameInfo,
+  setAction,
+  diffTime,
+} from "./client_util.ts";
 
-const [ playerid, roomid] = await match(`高専太郎`, "ポンコツ");
+//const [token, roomid] = await match(`高専太郎`, "ポンコツ");
+
+const name = `nit-taro1`;
+const password = `${name}-pw`;
+
+// ユーザ取得（ユーザがなかったら新規登録）
+let user = await userShow(name);
+if (user.hasOwnProperty("error")) {
+  user = await userRegist(`高専太郎1`, name, password);
+}
+
+// プレイヤー登録
+const resMatch = await match(
+  { id: user.id, password: password, spec: "ポンコツ" },
+);
+const token = resMatch.accessToken;
+const gameId = resMatch.gameId;
 
 let gameInfo;
 do {
-  gameInfo = await getGameInfo(roomid);
+  gameInfo = await getGameInfo(gameId);
   await sleep(100);
 } while (gameInfo.startedAtUnixTime === null);
 
@@ -19,31 +44,35 @@ await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
 
 // ターン1
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "PUT", 1, 1), new Action(1, "PUT", 3, 3)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン2
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "MOVE", 1, 2), new Action(1, "MOVE", 3, 2)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン3
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
-  [new Action(0, "MOVE", 4, 6), new Action(1, "MOVE", 6, 4)],
+  gameId,
+  token,
+  [new Action(0, "MOVE", 1, 3), new Action(1, "MOVE", 3, 1)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
 
 // ターン4
-gameInfo = await getGameInfo(roomid);
+gameInfo = await getGameInfo(gameId);
 setAction(
-  roomid, playerid,
+  gameId,
+  token,
   [new Action(0, "MOVE", 2, 3), new Action(1, "MOVE", 2, 1)],
 );
 await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);

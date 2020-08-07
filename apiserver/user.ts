@@ -1,8 +1,5 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
-class UserUpdateError extends Error {
-}
-
 class User {
   public screenName: string;
   public name: string;
@@ -18,7 +15,7 @@ class User {
 }
 
 class Account {
-  public users: Array<User>;
+  private users: Array<User>;
 
   constructor() {
     this.users = new Array();
@@ -38,10 +35,34 @@ class Account {
     );
   }
 
-  updateUser(
+  getUsers = () => this.users;
+
+  registUser(screenName: string, name: string, password: string): User {
+    if (password === "") throw Error("Not password");
+    if (this.users.some((e) => e.name === name)) {
+      throw Error("Already registered name");
+    }
+    const user = new User(screenName, name, password);
+    this.users.push(user);
+    this.write();
+    return user;
+  }
+
+  deleteUser({ name = "", id = "", password = "" }) {
+    if (password === "") throw Error("Not password");
+    const index = this.users.findIndex((e) =>
+      e.password === password && (e.id === id || e.name === name)
+    );
+    if (index === -1) throw Error("Can not find user.");
+    this.users.splice(index, 1);
+
+    this.write();
+  }
+
+  /*updateUser(
     { screenName = "", name = "", id = "", password = "" },
   ): string {
-    console.log(screenName, name, id, password);
+    //console.log(screenName, name, id, password);
     var u: User | undefined;
     if (password !== "") {
       if (id !== "") {
@@ -87,15 +108,26 @@ class Account {
 
     this.write();
     return u.id;
-  }
+  }*/
 
-  showUser(identifier: string): User | undefined {
+  showUser(identifier: string) {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
     if (user === undefined) throw Error("Can not find user.");
     return user;
   }
+
+  getUser(identifier: string, password: string) {
+    if (password === "") throw Error("Invalid password.");
+    const user = this.users.find((
+      e,
+    ) => ((e.id === identifier || e.name === identifier) &&
+      e.password === password)
+    );
+    if (user === undefined) throw Error("Can not find user.");
+    return user;
+  }
 }
 
-export { User, Account, UserUpdateError };
+export { User, Account };

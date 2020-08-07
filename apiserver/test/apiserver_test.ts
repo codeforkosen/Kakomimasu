@@ -1,139 +1,137 @@
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
+
 import { test, assertEquals } from "../../asserts.js";
-import util from "../../util.js";
+import {
+  Action,
+  sleep,
+  userRegist,
+  userShow,
+  userDelete,
+  match,
+  getGameInfo,
+  setAction,
+  diffTime,
+} from "./client_util.ts";
 
-const host = "http://localhost:8880";
-
-const testName = "テスト 太郎";
+const testScreenName = "高専太郎";
+const testName = v4.generate();
+const testPassword = "nit-taro-pw";
 const testSpec = "test";
 
-class Action {
-  public agentid: number;
-  public type: string;
-  public x: number;
-  public y: number;
+var userId = "";
+var accessToken = "";
+var gameId = "";
 
-  constructor(agentid: number, type: string, x: number, y: number) {
-    this.agentid = agentid;
-    this.type = type;
-    this.x = x;
-    this.y = y;
-  }
-}
+await test("regist user", async () => {
+  const sampleFilePath = "./sample/userRegist_sample.json";
 
-test("get player&roomID", async () => {
-  const reqJson = await match(testName, testSpec);
-  await match(testName, testSpec);
-  assertEquals(reqJson.name, testName);
-  assertEquals(reqJson.spec, testSpec);
-  tokenCheck(reqJson.playerId);
-  tokenCheck(reqJson.roomId);
+  const res = await userRegist(testScreenName, testName, testPassword);
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
+
+  userId = res.id;
+
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+  sample.name = testName;
+  tokenCheck(res.id);
+  res.id = sample.id = "";
+  assertEquals(sample, res);
 });
 
-test("get gameinfo", async () => {
-  const matchJson = await match(testName, testSpec);
-  await match(testName, testSpec);
+await test("show user", async () => {
+  const sampleFilePath = "./sample/userShow_sample.json";
 
-  const reqJson = await getGameInfo(matchJson.roomId);
-  //Deno.writeTextFileSync("info_sample.json", JSON.stringify(reqJson, null, 2));
+  var res = await userShow(testName);
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
 
-  const sampleJson = JSON.parse(Deno.readTextFileSync("info_sample.json"));
-  tokenCheck(reqJson.roomID);
-  tokenCheck(reqJson.players[0].playerID);
-  tokenCheck(reqJson.players[1].playerID);
-  sampleJson.roomID = reqJson.roomID = "";
-  sampleJson.players[0].playerID = reqJson.players[0].playerID = "";
-  sampleJson.players[1].playerID = reqJson.players[1].playerID = "";
-  sampleJson.startedAtUnixTime = reqJson.startedAtUnixTime = 0;
-  sampleJson.nextTurnUnixTime = reqJson.nextTurnUnixTime = 0;
-
-  assertEquals(sampleJson, reqJson);
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+  sample.name = testName;
+  tokenCheck(res.id);
+  res.id = sample.id = "";
+  assertEquals(sample, res);
 });
 
-test("send action", async () => {
-  const matchJson = await match(testName, testSpec);
-  await match(testName, testSpec);
+await test("get playerToken&gameId", async () => {
+  const sampleFilePath = "./sample/match_sample.json";
 
-  const gameInfo = await getGameInfo(matchJson.roomId);
+  const res = await match(
+    { name: testName, password: testPassword, spec: testSpec },
+  );
+  await match({ name: testName, password: testPassword, spec: testSpec });
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
+
+  accessToken = res.accessToken;
+  gameId = res.gameId;
+
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+
+  tokenCheck(res.accessToken);
+  tokenCheck(res.gameId);
+  sample.accessToken = res.accessToken = "";
+  sample.gameId = res.gameId = "";
+  sample.userId = userId;
+  assertEquals(sample, res);
+});
+
+await test("get gameinfo", async () => {
+  const sampleFilePath = "./sample/matchGameInfo_sample.json";
+
+  const res = await getGameInfo(gameId);
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(reqJson, null, 2));
+
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+
+  tokenCheck(res.gameId);
+  tokenCheck(res.players[0].id);
+  tokenCheck(res.players[1].id);
+  sample.gameId = res.gameId = "";
+  sample.players[0].id = res.players[0].id = "";
+  sample.players[1].id = res.players[1].id = "";
+  sample.startedAtUnixTime = res.startedAtUnixTime = 0;
+  sample.nextTurnUnixTime = res.nextTurnUnixTime = 0;
+
+  assertEquals(sample, res);
+});
+
+await test("send action", async () => {
+  const sampleFilePath = "./sample/afterAction_sample.json";
+
+  const gameInfo = await getGameInfo(gameId);
   await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
   await setAction(
-    matchJson.roomId,
-    matchJson.playerId,
+    gameId,
+    accessToken,
     [new Action(0, "PUT", 1, 1)],
   );
   //console.log(reqJson);
 
   await sleep((diffTime(gameInfo.nextTurnUnixTime) + 1 + 3) * 1000);
-  const reqJson = await getGameInfo(matchJson.roomId);
-  //Deno.writeTextFileSync("afterAction_sample.json",JSON.stringify(reqJson, null, 2),);
+  const res = await getGameInfo(gameId);
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
 
   //console.log(gameInfo2);
   //console.log(JSON.stringify(reqJson, null, 2));
-  const sampleJson = JSON.parse(
-    Deno.readTextFileSync("afterAction_sample.json"),
-  );
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  tokenCheck(reqJson.roomID);
-  tokenCheck(reqJson.players[0].playerID);
-  tokenCheck(reqJson.players[1].playerID);
-  sampleJson.roomID = reqJson.roomID = "";
-  sampleJson.players[0].playerID = reqJson.players[0].playerID = "";
-  sampleJson.players[1].playerID = reqJson.players[1].playerID = "";
-  sampleJson.startedAtUnixTime = reqJson.startedAtUnixTime = 0;
-  sampleJson.nextTurnUnixTime = reqJson.nextTurnUnixTime = 0;
+  tokenCheck(res.gameId);
+  tokenCheck(res.players[0].id);
+  tokenCheck(res.players[1].id);
+  sample.gameId = res.gameId = "";
+  sample.players[0].id = res.players[0].id = "";
+  sample.players[1].id = res.players[1].id = "";
+  sample.startedAtUnixTime = res.startedAtUnixTime = 0;
+  sample.nextTurnUnixTime = res.nextTurnUnixTime = 0;
 
-  assertEquals(sampleJson, reqJson);
+  assertEquals(sample, res);
 });
 
-async function match(name: string, spec: string) {
-  const sendJson = { name: name, spec: spec };
-  const reqJson = await (await fetch(
-    `${host}/match`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sendJson),
-    },
-  )).json();
-  return reqJson;
-}
-
-async function getGameInfo(roomid: string) {
-  const reqJson = await (await fetch(`${host}/match/${roomid}`)).json();
-  return reqJson;
-}
-
-async function setAction(roomid: string, playerid: string, actions: Action[]) {
-  const sendJson = {
-    time: Math.floor(new Date().getTime() / 1000),
-    actions: actions,
-  };
-  const reqJson = await (await fetch(
-    `${host}/match/${roomid}/action`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": playerid,
-      },
-      body: JSON.stringify(sendJson),
-    },
-  )).json();
-  return reqJson;
-}
+await test("delete user", async () => {
+  var res = await userDelete({ name: testName, password: testPassword });
+  if (res.status !== 200) throw Error("Invalid delete user");
+});
 
 function tokenCheck(token: string) {
   const tokenRegExp = new RegExp("^(.{8}-.{4}-.{4}-.{4}-.{12})$");
   if (!tokenRegExp.test(token)) {
     throw new Error(`Different format token "${token}"`);
   }
-}
-
-function diffTime(unixTime: number) {
-  return unixTime - Math.floor(new Date().getTime() / 1000);
-}
-
-function sleep(msec: number) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), msec);
-  });
 }
