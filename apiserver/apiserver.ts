@@ -100,7 +100,8 @@ const addPlayer = (
       //freeGame.push(kkmm.createGame(createDefaultBoard()));
       freeGame.push(kkmm.createGame(readBoard("A-1")));
     }
-    freeGame[0].attachPlayer(player);
+    const playerIndex = freeGame[0].attachPlayer(player);
+    if (playerIndex === false) throw Error("Can not add Player");
 
     return player;
   } else {
@@ -127,6 +128,7 @@ export const newPlayerPost = async (req: ServerRequest) => {
       playerPost.password,
       playerPost.spec,
     );
+    //console.log(player);
     await req.respond({
       status: 200,
       headers: new Headers({

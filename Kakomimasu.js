@@ -343,6 +343,7 @@ class Game {
   attachPlayer(player) {
     if (!this.isFree()) return false;
     if (this.players.indexOf(player) >= 0) return false;
+    player.index = this.players.length;
     this.players.push(player);
     player.setGame(this);
     if (this.isReady()) {
@@ -578,6 +579,7 @@ class Player {
     this.spec = spec;
     this.game = null;
     this.actions = [];
+    this.index = -1;
   }
 
   setGame(game) {
@@ -601,6 +603,7 @@ class Player {
       spec: this.spec,
       accessToken: this.accessToken,
       gameId: this.game.uuid,
+      index: this.index,
     };
   }
 }
