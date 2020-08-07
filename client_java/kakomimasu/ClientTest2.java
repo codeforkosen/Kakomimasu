@@ -5,11 +5,11 @@ public class ClientTest2
 {
   public static void main(String[] args) throws Exception
   {
-    String name = "nit-taro1";
+    String name = "nit-taro2";
     String password = name + "-pw";
     User user = userShow(name);
     if (user.error != null) {
-      user = userRegist("高専太郎1", name, password);
+      user = userRegist("高専太郎2", name, password);
     }
     // プレイヤー登録
     Match resMatch = match("高専太郎", user.id, password, "ポンコツ");
