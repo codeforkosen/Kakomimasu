@@ -72,6 +72,7 @@ const pntsorted = pntall.sort((a, b) => b.p - a.p);
 // スタート時間待ち
 await sleep(diffTime(gameInfo.startedAtUnixTime));
 
+const log = [gameInfo];
 for (let i = 1; i <= totalTurn; i++) {
   console.log("turn", i);
 
@@ -112,11 +113,12 @@ for (let i = 1; i <= totalTurn; i++) {
       await sleep(100);
     }
   }
+  log.push(gameInfo);
 }
 
 // ゲームデータ出力
 try {
   Deno.mkdirSync("log");
 } catch (e) {}
-const fname = `log/${gameInfo.roomID}-player${pno}.log`;
-Deno.writeTextFileSync(fname, JSON.stringify(gameInfo, null, 2));
+const fname = `log/${gameInfo.gameId}-player${pno}.log`;
+Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
