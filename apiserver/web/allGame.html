@@ -18,8 +18,8 @@
         <header></header>
 
         <div>
-            <h4 id="now-time">現在時刻：{{nowTime}}</h4>
-            <table id="game-table">
+            <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
+            <table id="game-table" v-cloak>
                 <tr>
                     <th>ゲームID</th>
                     <th>ステータス</th>
@@ -55,7 +55,7 @@
                         const gamesData = await getAllGame();
                         //console.log(gamesData);
                         gamesData.forEach((game, i) => {
-                            const [status, startTime] = getGameStatus(game);
+                            const [status, startTime] = Game.getGameStatus(game);
 
                             Vue.set(this.games, i, {
                                 link: `${rootURL()}/game/${game.gameId}`,

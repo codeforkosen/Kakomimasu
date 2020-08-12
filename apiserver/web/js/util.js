@@ -1,5 +1,31 @@
 "use struct";
 
+class Game {
+  constructor() {
+    //const [status, startTime] = Game.getGameStatus(game);
+    this.gameId = "";
+    this.status = "";
+    this.startTime = "";
+  }
+
+  static getGameStatus(gameJson) {
+    let status = "";
+    let startTime = "";
+    if (gameJson.startedAtUnixTime === null) {
+      status = "プレイヤー入室待ち";
+      startTime = "-";
+    } else {
+      startTime = new Date(gameJson.startedAtUnixTime * 1000).toLocaleString(
+        "ja-JP",
+      );
+      if (!gameJson.gaming && !gameJson.ending) status = "ゲームスタート待ち";
+      else if (gameJson.gaming && !gameJson.ending) status = "プレイ中";
+      else if (gameJson.ending) status = "ゲーム終了";
+    }
+    return [status, startTime];
+  }
+}
+
 function rootURL() {
   return `${window.location.protocol}//${window.location.host}`;
 }
@@ -18,27 +44,10 @@ function createFooter() {
     'CC BY <a href="https://codeforkosen.github.io/">Code for KOSEN</a>(<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)';
 }
 
-function getGameStatus(roomJson) {
-  let status = "";
-  let startTime = "";
-  if (roomJson.startedAtUnixTime === null) {
-    status = "プレイヤー入室待ち";
-    startTime = "-";
-  } else {
-    startTime = new Date(roomJson.startedAtUnixTime * 1000).toLocaleString(
-      "ja-JP",
-    );
-    if (!roomJson.gaming && !roomJson.ending) status = "ゲームスタート待ち";
-    else if (roomJson.gaming && !roomJson.ending) status = "プレイ中";
-    else if (roomJson.ending) status = "ゲーム終了";
-  }
-  return [status, startTime];
-}
-
-function getTurnText(roomJson) {
+function getTurnText(game) {
   let turnText = "-";
-  if (roomJson.gaming || roomJson.ending) {
-    turnText = `${roomJson.turn}/${roomJson.totalTurn}`;
+  if (game.gaming || game.ending) {
+    turnText = `${game.turn}/${game.totalTurn}`;
   }
   return turnText;
 }

@@ -46,7 +46,7 @@ const usersShow = async (req: ServerRequest) => {
           headers: new Headers({
             "content-type": "application/json",
           }),
-          body: JSON.stringify(user, ["screenName", "name", "id"]),
+          body: JSON.stringify(user),
         });
       }
     } catch (e) {
@@ -118,7 +118,7 @@ export class PlayerPost {
   ) {}
 }
 
-export const newPlayerPost = async (req: ServerRequest) => {
+export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
   const playerPost = (await req.json()) as PlayerPost;
   try {
@@ -149,17 +149,12 @@ class Game {
 }
 const getAllRooms = async (req: ServerRequest) => {
   //console.log(req, "getAllRooms");
-  const games: any = [];
-  kkmm.getGames().forEach((item: Game) => {
-    games.push(item.getFieldInfoJSON());
-  });
-
   await req.respond({
     status: 200,
     headers: new Headers({
       "content-type": "application/json",
     }),
-    body: JSON.stringify(games),
+    body: JSON.stringify(kkmm.getGames()),
   });
 };
 
@@ -171,16 +166,15 @@ export const getGameInfo = async (req: ServerRequest) => {
   const id = req.match[1];
 
   //console.log(id);
-  const game = kkmm.getGames().filter((item: any) => item.uuid === id);
+  const game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
   //console.log(game[0]);
-  //game[0].updateStatus();
-  //console.log(game);
+  game.updateStatus();
   await req.respond({
     status: 200,
     headers: new Headers({
       "content-type": "application/json",
     }),
-    body: JSON.stringify(game[0].getFieldInfoJSON()),
+    body: JSON.stringify(game),
   });
 };
 
@@ -289,7 +283,7 @@ export const routes = () => {
     usersDelete,
   );
 
-  router.post("match", contentTypeFilter("application/json"), newPlayerPost);
+  router.post("match", contentTypeFilter("application/json"), match);
   router.get("match/", getAllRooms);
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
@@ -346,6 +340,7 @@ const readBoard = (fileName: string) => {
     boardJson.points,
     boardJson.nagent,
   );*/
+
   return new Board(
     boardJson.width,
     boardJson.height,
