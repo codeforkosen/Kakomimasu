@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "post.h"
 
-#define MAX_LEN_JSON (1 * 1024 * 1024) // 1Mbyte
+#define MAX_LEN_JSON (200 * 1024) // 100kbyte
 #define LEN_TOKEN 6 // TOKENの長さは固定
 
 /*
