@@ -395,6 +395,7 @@ class Game {
     this.putOrMove();
     this.revertOverlap();
     this.removeOrNot();
+    this.revertNotOwner();
     this.commit();
     this.log.push(actions.map((ar) => ar.map((a) => a.getJSON())));
 
@@ -492,6 +493,20 @@ class Game {
         act.res = Action.REVERT;
       } else {
         agent.remove();
+      }
+    });
+  }
+
+  revertNotOwner() {
+    const agents = this.agents.flat();
+    const fld = this.field.field;
+    const w = this.board.w;
+    agents.forEach((agent) => {
+      if (agent.x === -1) return;
+      if (!agent.isValidAction()) return;
+      const n = agent.x + agent.y * w;
+      if (fld[n][1] !== agent.playerid) {
+        agent.revert();
       }
     });
   }
