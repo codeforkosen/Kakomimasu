@@ -38,16 +38,16 @@ do {
 
 console.log(gameInfo);
 
+const points = gameInfo.board.points;
+const w = gameInfo.board.width;
+const nplayers = gameInfo.players[pno].agents.length;
+const totalTurn = gameInfo.totalTurn;
+console.log("totalTurn", totalTurn);
+
 console.log(
   "ゲーム開始時間：",
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
-
-const points = gameInfo.points;
-const w = gameInfo.width;
-const nplayers = gameInfo.players[pno].agents.length;
-const totalTurn = gameInfo.totalTurn;
-console.log("totalTurn", totalTurn);
 
 // デタラメに置き、デタラメに動くアルゴリズム
 
@@ -71,6 +71,8 @@ const pntsorted = pntall.sort((a, b) => b.p - a.p);
 
 // スタート時間待ち
 await sleep(diffTime(gameInfo.startedAtUnixTime));
+gameInfo = await getGameInfo(roomid);
+console.log(gameInfo);
 
 const log = [gameInfo];
 for (let i = 1; i <= totalTurn; i++) {
