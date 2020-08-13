@@ -253,7 +253,10 @@
                                 if (game.tiled[x + y * game.board.width][0] === 0) className += `p${playerid + 1}Area`;
                                 game.players.forEach((p, i) => {
                                     p.agents.forEach(a => {
-                                        if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) className += " agent";
+                                        if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) {
+                                            className += " agent agent" + (playerid + 1);
+                                            console.log(className);
+                                        }
                                     });
                                 });
                             }
@@ -360,10 +363,15 @@
     }
 
     td.agent {
-        background-image: url(img/agent.png);
         background-size: 80%;
         background-position: 0%, 50%;
         background-repeat: no-repeat;
+    }
+    td.agent1 {
+        background-image: url(img/agent1.png);
+    }
+    td.agent2 {
+        background-image: url(img/agent2.png);
     }
 
     td.p1Wall {

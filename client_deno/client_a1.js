@@ -43,10 +43,15 @@ console.log(
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
+// スタート時間待ち
+await sleep(diffTime(gameInfo.startedAtUnixTime));
+gameInfo = await getGameInfo(roomid);
+console.log(gameInfo);
+
 //const pno = gameInfo.players[0].id === token ? 0 : 1;
 
-const points = gameInfo.points;
-const w = gameInfo.width;
+const points = gameInfo.board.points;
+const w = gameInfo.board.width;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
 console.log("totalTurn", totalTurn);
@@ -70,9 +75,6 @@ const pntall = points.map((p, idx) => {
   return { x: idx % w, y: Math.floor(idx / w), p: p };
 });
 const pntsorted = pntall.sort((a, b) => b.p - a.p);
-
-// スタート時間待ち
-await sleep(diffTime(gameInfo.startedAtUnixTime));
 
 const log = [gameInfo];
 for (let i = 1; i <= totalTurn; i++) {
