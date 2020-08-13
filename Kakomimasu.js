@@ -22,6 +22,16 @@ class Board {
       nplayer: this.nplayer,
     };
   }
+
+  toJSON() {
+    return {
+      width: this.w,
+      height: this.h,
+      nAgent: this.nagent,
+      nPlayer: this.nplayer,
+      points: this.points,
+    };
+  }
 }
 
 class Agent {
@@ -322,7 +332,6 @@ class Game {
     this.gaming = false;
     this.ending = false;
     this.actions = [];
-    this.actionlog = [];
     this.field = new Field(board);
     this.log = [];
     this.startedAtUnixTime = null;
@@ -510,8 +519,8 @@ class Game {
   updateStatus() {
     let self = this;
     if (
-      self.isReady() && !self.isGaming() && !this.ending &&
-      (util.nowUnixTime() > this.startedAtUnixTime)
+      self.isReady() && !self.isGaming() && !self.ending &&
+      (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
     }
@@ -525,13 +534,13 @@ class Game {
   }
 
   getFieldInfoJSON() {
+    //console.log(this.agents);
     const players = [];
     this.players.forEach((p, i) => {
       const id = p.id;
       const agents = [];
       this.agents[i].forEach((a) => {
         const agent = {
-          agentID: null,
           x: a.x,
           y: a.y,
         };
@@ -561,6 +570,55 @@ class Game {
       width: this.board.w,
       height: this.board.h,
       points: this.board.points,
+      startedAtUnixTime: this.startedAtUnixTime,
+      nextTurnUnixTime: this.nextTurnUnixTime,
+      turn: this.turn,
+      totalTurn: this.nturn,
+      tiled: this.field.field,
+      players: players,
+      actions: actions,
+    };
+  }
+  toJSON() {
+    const players = [];
+    this.players.forEach((p, i) => {
+      const id = p.id;
+      let agents = null;
+      if (this.isReady()) {
+        agents = [];
+        this.agents[i].forEach((a) => {
+          const agent = {
+            x: a.x,
+            y: a.y,
+          };
+          agents.push(agent);
+        });
+      }
+      const player = {
+        id: id,
+        agents: agents,
+        // don't need point, need tile&areaPoint
+        point: this.field.getPoints()[i],
+        tilePoint: null,
+        areaPoint: null,
+      };
+      players.push(player);
+    });
+    const actions = [];
+    this.actions.forEach((a) => {
+      // 仕様と違うので変更が必要
+      actions.push(a.getJSON());
+    });
+
+    let board = null;
+    if (this.isReady()) board = this.board;
+
+    // いろいろ仕様と違うので実際に使用するときに修正
+    return {
+      gameId: this.uuid,
+      gaming: this.gaming,
+      ending: this.ending,
+      board: board,
       startedAtUnixTime: this.startedAtUnixTime,
       nextTurnUnixTime: this.nextTurnUnixTime,
       turn: this.turn,
@@ -623,6 +681,7 @@ class Kakomimasu {
   }
 
   createGame(board, nturn = 30) {
+    console.log(board);
     const game = new Game(board, nturn);
     this.games.push(game);
     return game;

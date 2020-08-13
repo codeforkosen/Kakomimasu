@@ -12,6 +12,14 @@ class User {
     this.id = v4.generate();
     this.password = password;
   }
+
+  toJSON = () => {
+    return {
+      screenName: this.screenName,
+      name: this.name,
+      id: this.id,
+    };
+  };
 }
 
 class Account {

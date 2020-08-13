@@ -76,7 +76,8 @@ await test("get gameinfo", async () => {
   const sampleFilePath = "./sample/matchGameInfo_sample.json";
 
   const res = await getGameInfo(gameId);
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(reqJson, null, 2));
+  //console.log(JSON.stringify(res));
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
@@ -108,7 +109,7 @@ await test("send action", async () => {
   const res = await getGameInfo(gameId);
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
 
-  //console.log(gameInfo2);
+  //console.log(res);
   //console.log(JSON.stringify(reqJson, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 

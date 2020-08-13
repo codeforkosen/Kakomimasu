@@ -16,43 +16,53 @@
     <body>
         <header></header>
         <div>
-            <h4 id="now-time">現在時刻：{{nowTime}}</h4>
-            <table id="game-table">
+            <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
+            <table id="game-table" v-cloak>
                 <tr>
                     <th>ルームID</th>
                     <th>ステータス</th>
                     <th>開始時刻</th>
                 </tr>
-                <tr v-for="(item,index) in games">
-                    <td>{{item.gameId}}</td>
-                    <td>{{item.status}}</td>
-                    <td>{{item.startTime}}</td>
+                <tr>
+                    <td>{{game.gameId}}</td>
+                    <td>{{game.status}}</td>
+                    <td>{{game.startTime}}</td>
                 </tr>
             </table>
         </div>
-        <div style="text-align: center;">
-            <h3>プレイヤー情報</h3>
-            <table id="player-table">
-                <tr>
-                    <th><span class="p1">プレイヤー1</span></th>
-                    <th><span class="p2">プレイヤー2</span></th>
-                </tr>
-                <tr>
-                    <td v-for="player in players"><a :href="player.link">{{player.screenName}}</a></td>
-                </tr>
-            </table>
-        </div>
+
         <div style="margin-top: 10px; text-align: center;">
             <h3>フィールドの様子</h3>
             <div style="margin: auto;display: inline-block;">
-                <div id="field-info" style="position:relative;height: 30px;">
-                    <h4 id="field-turn">{{turn}}</h4>
-                    <h4 id="field-point"><span class="p1">{{pointP1}}</span>：<span class="p2">{{pointP2}}</span></h4>
-                    <h4 id="field-nextTurnTime">{{status}}</h4>
+                <div id="field-info" style="position:relative;height: 30px;min-width: 16em;" v-cloak>
+                    <h4 v-if="turn !== '-'" id="field-turn">{{turn}}</h4>
+                    <h4 v-if="turn !== '-'" id="field-point"><span class="p1">{{pointP1}}</span>：<span
+                            class="p2">{{pointP2}}</span></h4>
+                    <h4 v-if="turn === '-'" id="field-point">{{status}}</h4>
+                    <h4 v-if="turn !== '-'" id="field-nextTurnTime">{{status}}</h4>
                 </div>
-                <table id="field-table">
+                <table id="field-table" v-cloak>
                     <tr v-for="(row,y) in point">
                         <td v-for="(item,x) in row" :class="className[x][y]">{{item}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <h3>プレイヤー情報</h3>
+            <div id="p-info" v-cloak>
+                <table v-for="(p,i) in players">
+                    <tr>
+                        <th><span :class="'p' + (i+1)">プレイヤー名</span></th>
+                        <td><a :href="p.link">{{p.screenName}}</a></td>
+                    </tr>
+                    <tr>
+                        <th><span :class="'p' + (i+1)">配置済みAgent数</span></th>
+                        <td>{{p.placedAgentNum}}</td>
+                    </tr>
+                    <tr>
+                        <th><span :class="'p' + (i+1)">未配置Agent数</span></th>
+                        <td>{{p.notPlacedAgentNum}}</td>
                     </tr>
                 </table>
             </div>
@@ -63,35 +73,24 @@
             createHeader("ゲーム詳細");
             createFooter();
 
+            let game;
+
             const gameTableVue = new Vue({
                 el: "#game-table",
                 data: {
-                    games: [],
+                    game: new Game(),
                 },
                 methods: {
-                    update: function (game) {
-                        const [status, startTime] = getGameStatus(game);
-                        Vue.set(this.games, 0, {
-                            gameId: game.gameId,
-                            status: status,
-                            startTime: startTime,
-                        });
+                    init: function (game) {
+                        const [status, startTime] = Game.getGameStatus(game);
+                        this.game.gameId = game.gameId;
+                        this.game.status = status;
+                        this.game.startTime = startTime;
                     },
-                },
-            });
-
-            const playerTableVue = new Vue({
-                el: "#player-table",
-                data: {
-                    players: [{ screenName: "", link: "" }, { screenName: "", link: "" }],
-                },
-                methods: {
-                    init: async function (game) {
-                        for (let i = 0; i < 2; i++) {
-                            const user = await userShow(game.players[i].id);
-                            user.link = `${rootURL()}/user/${user.name}`;
-                            this.players.splice(i, 1, user);
-                        }
+                    update: function (game) {
+                        const [status, startTime] = Game.getGameStatus(game);
+                        this.game.status = status;
+                        this.game.startTime = startTime;
                     },
                 },
             });
@@ -114,15 +113,15 @@
                 },
                 methods: {
                     init: function (game) {
-                        this.point = new Array(game.width);
-                        this.className = new Array(game.width);
-                        for (let i = 0; i < game.width; i++) {
-                            this.point[i] = new Array(game.height);
-                            this.className[i] = new Array(game.height);
+                        this.point = new Array(game.board.width);
+                        this.className = new Array(game.board.width);
+                        for (let i = 0; i < game.board.width; i++) {
+                            this.point[i] = new Array(game.board.height);
+                            this.className[i] = new Array(game.board.height);
                         }
-                        for (let i = 0; i < game.width; i++) {
-                            for (let j = 0; j < game.height; j++) {
-                                Vue.set(this.point[i], j, game.points[i + j * game.width]);
+                        for (let i = 0; i < game.board.width; i++) {
+                            for (let j = 0; j < game.board.height; j++) {
+                                Vue.set(this.point[i], j, game.board.points[i + j * game.board.width]);
                                 Vue.set(this.className[i], j, "");
                             }
                         }
@@ -130,35 +129,85 @@
                 }
             });
 
+            class PlayerInfo {
+                constructor() {
+                    this.screenName = "";
+                    this.link = "";
+                    this.spec = "";
+                    this.placedAgentNum = 0;
+                    this.notPlacedAgentNum = 0;
+                }
+            }
+
+            const playerInfoVue = new Vue({
+                el: "#p-info",
+                data: {
+                    players: [new PlayerInfo(), new PlayerInfo()],
+                },
+                methods: {
+                    init: async function (game) {
+                        for (let i = 0; i < 2; i++) {
+                            if (game.players[i] !== undefined) {
+                                const user = await userShow(game.players[i].id);
+                                this.players[i].screenName = user.screenName;
+                                this.players[i].link = `${rootURL()}/user/${user.name}`;
+                            }
+                        }
+                    },
+                    update: async function (game) {
+                        for (let i = 0; i < 2; i++) {
+                            if (game.players[i] !== undefined) {
+                                if (this.players[i].screenName === "") {
+                                    const user = await userShow(game.players[i].id);
+                                    this.players[i].screenName = user.screenName;
+                                    this.players[i].link = `${rootURL()}/user/${user.name}`;
+                                }
+                                let placedAgentNum = 0;
+                                let notPlacedAgentNum = 0;
+                                if (game.players[i].agents !== null) {
+                                    game.players[i].agents.forEach(e => {
+                                        if (e.x === -1 && e.y === -1) notPlacedAgentNum++;
+                                        else placedAgentNum++;
+                                    });
+                                }
+                                this.players[i].placedAgentNum = placedAgentNum;
+                                this.players[i].notPlacedAgentNum = notPlacedAgentNum;
+                            }
+                        }
+                    }
+                }
+            });
+
             const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
-            let game;
 
             main();
 
             async function main() {
                 game = await getGameInfo(gameId);
-                fieldTableVue.init(game);
-                playerTableVue.init(game);
+                gameTableVue.init(game);
+                playerInfoVue.init(game);
 
-                const waitGameStartId = setInterval(waitGameStart, 100);
+                const waitGameStartId = setInterval(waitGameStart, 200);
                 waitGameStart();
 
                 async function waitGameStart() {
-                    game = await getGameInfo(gameId);
+                    await getRoomInfo();
+                    //game = await getGameInfo(gameId);
                     if (game.startedAtUnixTime !== null) {
                         console.log("プレイヤーそろったよ！");
+                        fieldTableVue.init(game);
 
                         clearInterval(waitGameStartId);
                         setTimeout(() => {
                             console.log("ゲームスタート！");
                             updateField();
-                            setTimeout(updateField, ((game.nextTurnUnixTime + 3) * 1000) - new Date().getTime());
+                            setTimeout(updateField, ((game.nextTurnUnixTime + 3.2) * 1000) - new Date().getTime());
 
                             async function updateField() {
                                 console.log("フィールド更新！");
                                 await getRoomInfo();
-                                const diffTime = ((game.nextTurnUnixTime + 3) * 1000) - new Date().getTime();
-                                //console.log(diffTime);
+                                let diffTime = ((game.nextTurnUnixTime + 3.3) * 1000) - new Date().getTime();
+                                console.log(diffTime);
                                 if (game.ending) return;
                                 else setTimeout(updateField, diffTime);
                             }
@@ -182,24 +231,26 @@
                 game = await getGameInfo(gameId);
                 //console.log(game);
                 gameTableVue.update(game);
+                playerInfoVue.update(game);
 
                 // フィールド更新
                 if (game.startedAtUnixTime === null) {
                 }
                 else {
+                    console.log(getTurnText(game));
                     fieldInfoVue.turn = getTurnText(game);
                     fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
                     fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
 
 
-                    for (let x = 0; x < game.width; x++) {
+                    for (let x = 0; x < game.board.width; x++) {
                         const classNames = [];
-                        for (let y = 0; y < game.height; y++) {
+                        for (let y = 0; y < game.board.height; y++) {
                             let className = "";
-                            let playerid = game.tiled[x + y * game.width][1];
+                            let playerid = game.tiled[x + y * game.board.width][1];
                             if (playerid !== -1) {
-                                if (game.tiled[x + y * game.width][0] === 1) className += `p${playerid + 1}Wall`;
-                                if (game.tiled[x + y * game.width][0] === 0) className += `p${playerid + 1}Area`;
+                                if (game.tiled[x + y * game.board.width][0] === 1) className += `p${playerid + 1}Wall`;
+                                if (game.tiled[x + y * game.board.width][0] === 0) className += `p${playerid + 1}Area`;
                                 game.players.forEach((p, i) => {
                                     p.agents.forEach(a => {
                                         if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) className += " agent";
@@ -286,8 +337,21 @@
         text-align: center;
     }
 
-    .p1 {
+    #p-info {
+        display: flex;
+        max-width: 90%;
+        height: auto;
+        margin: 1em auto;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 
+    #p-info table {
+        width: 50%-1em;
+        margin: 1em;
+    }
+
+    .p1 {
         color: blue;
     }
 
