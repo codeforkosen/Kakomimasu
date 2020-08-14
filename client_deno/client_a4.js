@@ -3,7 +3,7 @@
 import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
 import util from "../util.js";
 
-const kc = new KakomimasuClient();
+const kc = new KakomimasuClient("a4", "破壊者", "サンプル", "a4-pw" );
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
