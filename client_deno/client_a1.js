@@ -1,3 +1,5 @@
+// だいたい点数の高い順にデタラメに置き、デタラメに動くアルゴリズム
+
 import {
   Action,
   sleep,
@@ -48,8 +50,6 @@ const w = gameInfo.board.width;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
 console.log("totalTurn", totalTurn);
-
-// デタラメに置き、デタラメに動くアルゴリズム
 
 // 8方向、上から時計回り
 const DIR = [

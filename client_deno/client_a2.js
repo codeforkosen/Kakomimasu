@@ -1,3 +1,5 @@
+// だいたい点数の高い順にデタラメに置き、画面外を避けつつデタラメに動くアルゴリズム
+
 import {
   Action,
   sleep,
@@ -49,8 +51,6 @@ console.log(
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
-// デタラメに置き、デタラメに動くアルゴリズム
-
 // 8方向、上から時計回り
 const DIR = [
   [0, -1],
@@ -80,6 +80,7 @@ for (let i = 1; i <= totalTurn; i++) {
 
   // ランダムにずらしつつ置けるだけおく
   // 置いたものはランダムに8方向動かす
+  // 画面外にはでない判定を追加（a1 → a2)
   const actions = [];
   const offset = util.rnd(nplayers);
   for (let i = 0; i < nplayers; i++) {
