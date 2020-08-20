@@ -54,7 +54,7 @@
                     update: async function () {
                         const gamesData = await getAllGame();
                         //console.log(gamesData);
-                        gamesData.forEach((game, i) => {
+                        gamesData.reverse().forEach((game, i) => {
                             const [status, startTime] = Game.getGameStatus(game);
 
                             Vue.set(this.games, i, {

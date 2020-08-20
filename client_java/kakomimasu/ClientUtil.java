@@ -36,21 +36,72 @@ public class ClientUtil
       e.printStackTrace();
     }
   }
-  public static String[] match(String name, String spec) throws IOException
+  public static class User
+  {
+    public String error;
+    public String screenName;
+    public String name;
+    public String id;
+    public String password;
+  }
+  public static User userRegist(String screenName, String name, String password) throws IOException
+  {
+    Map<String, Object> body = new HashMap<>();
+    body.put("screenName", screenName);
+    body.put("name", name);
+    body.put("password", password);
+    String resp = fetch("POST", host + "/match",
+      new String[]{
+        "Content-Type", "application/json"
+      },
+      new Gson().toJson(body)
+    );
+    return new Gson().fromJson(resp, User.class);
+  }
+  public static User userShow(String identifier) throws IOException
+  {
+    String resp = fetch("GET", host + "/users/show/" + identifier,
+      new String[]{
+        "Content-Type", "application/json"
+      },
+      null
+    );
+    return new Gson().fromJson(resp, User.class);
+  }
+  public static void userDelete(String name, String id, String password) throws IOException
   {
     Map<String, Object> body = new HashMap<>();
     body.put("name", name);
-    body.put("spec", spec);
-    Map<String, String> map = new Gson().fromJson(
-      fetch("POST", host + "/match",
-        new String[]{
-          "Content-Type", "application/json"
-        },
-        new Gson().toJson(body)
-      ),
-      Map.class
+    body.put("id", id);
+    body.put("password", password);
+    String resp = fetch("POST", host + "/users/delete",
+      new String[]{
+        "Content-Type", "application/json"
+      },
+      new Gson().toJson(body)
     );
-    return new String[] {map.get("playerId"), map.get("roomId")};
+  }
+  public static class Match
+  {
+    public String userId;
+    public String spec;
+    public String accessToken;
+    public String gameId;
+  }
+  public static Match match(String name, String id, String password, String spec) throws IOException
+  {
+    Map<String, Object> body = new HashMap<>();
+    body.put("name", name);
+    body.put("id", id);
+    body.put("password", password);
+    body.put("spec", spec);
+    String resp = fetch("POST", host + "/match",
+      new String[]{
+        "Content-Type", "application/json"
+      },
+      new Gson().toJson(body)
+    );
+    return new Gson().fromJson(resp, Match.class);
   }
   public static GameInfo getGameInfo(String roomid) throws IOException
   {
@@ -82,6 +133,7 @@ public class ClientUtil
   }
   public static class GameInfo
   {
+    public String error;
     public String roomID;
     public Boolean gaming;
     public Boolean ending;
@@ -95,7 +147,7 @@ public class ClientUtil
     public Integer[][] tiled;
     public static class Player
     {
-      public String playerID;
+      public String id;
       public static class Agent
       {
         public String agentID;
@@ -114,8 +166,7 @@ public class ClientUtil
     }
     public Player[] players;
   }
-  public static void printJson(Object obj)
-  {
+  public static void printJson(Object obj) {
     System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
   }
   private static String fetch(String method, String url, String[] headers, String body) throws IOException

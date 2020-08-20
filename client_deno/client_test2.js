@@ -7,7 +7,7 @@ import {
   getGameInfo,
   setAction,
   diffTime,
-} from "./client_util.ts";
+} from "./client_util.js";
 
 //const [ token, roomid] = await match(`高専太郎`, "ポンコツ");
 const name = `nit-taro2`;

@@ -16,13 +16,15 @@ http://www.procon.gr.jp/?p=77044
 
 http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
 
-## 利用方法
+## 利用方法（コアのみ使用する）
 
 for Deno
 ```
 import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
+
+## 利用方法（リポジトリを取得し、ローカルで使用する）
 
 for Deno
 ```
@@ -98,9 +100,9 @@ $ cd apiserver
 $ deno run -A apiserver.js
 ```
 
-## APIクライアント for Deno
+## APIクライアント for Deno (JavaScript)
 
-[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/match.info)を開いた状態で下記を実行する。
+[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/game)を開いた状態で下記を実行する。
 
 ```
 $ cd client_deno
@@ -112,7 +114,6 @@ $ cd client_deno
 $ deno run -A client_test2.js
 ```
 
-
 ## APIクライアント for Node
 
 ```
@@ -120,7 +121,7 @@ $ cd client_node
 $ node action.mjs
 ```
 
-## APIクライアント for C (Mac)
+## APIクライアント for C (Mac/Windows gcc)
 
 ```
 $ cd client_c

@@ -1,4 +1,4 @@
-// だいたい点数の高い順にデタラメに置き、デタラメに動くアルゴリズム
+// だいたい点数の高い順にデタラメに置き、画面外を避けつつデタラメに動くアルゴリズム
 
 import {
   Action,
@@ -40,19 +40,16 @@ do {
 
 console.log(gameInfo);
 
-console.log(
-  "ゲーム開始時間：",
-  new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
-);
-
-const pno = gameInfo.players[0].id === token ? 0 : 1;
-console.log("playerid", pno);
-
 const points = gameInfo.board.points;
 const w = gameInfo.board.width;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
 console.log("totalTurn", totalTurn);
+
+console.log(
+  "ゲーム開始時間：",
+  new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
+);
 
 // 8方向、上から時計回り
 const DIR = [
@@ -83,6 +80,7 @@ for (let i = 1; i <= totalTurn; i++) {
 
   // ランダムにずらしつつ置けるだけおく
   // 置いたものはランダムに8方向動かす
+  // 画面外にはでない判定を追加（a1 → a2)
   const actions = [];
   const offset = util.rnd(nplayers);
   for (let i = 0; i < nplayers; i++) {
@@ -92,8 +90,16 @@ for (let i = 1; i <= totalTurn; i++) {
       const p = pntsorted[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
     } else {
-      const [dx, dy] = DIR[util.rnd(8)];
-      actions.push(new Action(i, "MOVE", agent.x + dx, agent.y + dy));
+      for (;;) {
+        const [dx, dy] = DIR[util.rnd(8)];
+        const x = agent.x + dx;
+        const y = agent.y + dy;
+        if (x < 0 || x >= w || y < 0 || y >= w)
+          continue;
+        console.log(x, y);
+        actions.push(new Action(i, "MOVE", x, y));
+        break;
+      }
     }
   }
   setAction(roomid, token, actions);
@@ -102,7 +108,7 @@ for (let i = 1; i <= totalTurn; i++) {
     const bknext = gameInfo.nextTurnUnixTime;
     await sleep(diffTime(gameInfo.nextTurnUnixTime));
 
-    for (; ;) {
+    for (;;) {
       gameInfo = await getGameInfo(roomid);
       if (gameInfo.nextTurnUnixTime !== bknext) {
         break;
@@ -116,6 +122,6 @@ for (let i = 1; i <= totalTurn; i++) {
 // ゲームデータ出力
 try {
   Deno.mkdirSync("log");
-} catch (e) { }
+} catch (e) {}
 const fname = `log/${gameInfo.gameId}-player${pno}.log`;
 Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
