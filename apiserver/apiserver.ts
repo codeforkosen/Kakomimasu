@@ -313,6 +313,10 @@ export const routes = () => {
     await req.respond({ status: 200 });
   });
 
+  router.get("/", async (req: ServerRequest) => {
+    await req.respond({ headers: new Headers({ "Location": "game" }), status: 302 });
+  });
+
   return router;
 };
 
