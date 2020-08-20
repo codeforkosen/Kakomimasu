@@ -619,11 +619,11 @@ class Game {
       };
       players.push(player);
     });
-    const actions = [];
+    /*const actions = [];
     this.actions.forEach((a) => {
       // 仕様と違うので変更が必要
       actions.push(a.getJSON());
-    });
+    });*/
 
     let board = null;
     if (this.isReady()) board = this.board;
@@ -640,7 +640,7 @@ class Game {
       totalTurn: this.nturn,
       tiled: this.field.field,
       players: players,
-      actions: actions,
+      log: this.log,
     };
   }
 }
