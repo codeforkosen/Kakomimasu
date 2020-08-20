@@ -7,6 +7,7 @@ import {
   getGameInfo,
   setAction,
   diffTime,
+  setHost,
 } from "./client_util.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
@@ -18,6 +19,10 @@ class KakomimasuClient {
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
     console.log(this.id, this.password, this.name, this.spec);
+    this.setServerHost(Deno.env.get("host"));
+  }
+  setServerHost(host) {
+    setHost(host);
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）

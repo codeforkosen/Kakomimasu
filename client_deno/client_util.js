@@ -1,6 +1,9 @@
-const host = "http://localhost:8880";
-//const host = "http://118.27.2.240:8880";
-//const host = "https://kakomimasu.sabae.cc";
+// const defaulthost = "http://localhost:8880";
+const defaulthost = "https://kakomimasu.sabae.club";
+let host = defaulthost;
+const setHost = (s) => {
+  host = s || defaulthost;
+};
 
 class Action {
   constructor(agentid, type, x, y) {
@@ -118,4 +121,5 @@ export {
   getGameInfo,
   setAction,
   diffTime,
+  setHost,
 };
