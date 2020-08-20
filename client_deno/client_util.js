@@ -3,8 +3,8 @@ const host = "http://localhost:8880";
 //const host = "https://kakomimasu.sabae.cc";
 
 class Action {
-  constructor(agentid, type, x, y) {
-    this.agentid = agentid;
+  constructor(agentId, type, x, y) {
+    this.agentId = agentId;
     this.type = type;
     this.x = x;
     this.y = y;

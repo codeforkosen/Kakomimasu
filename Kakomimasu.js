@@ -649,6 +649,7 @@ class Player {
 
   setActions(actions) {
     this.actions = actions;
+    return this.game.turn;
   }
 
   getActions() {

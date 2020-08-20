@@ -44,8 +44,8 @@ console.log(
 const pno = gameInfo.players[0].id === token ? 0 : 1;
 console.log("playerid", pno);
 
-const points = gameInfo.points;
-const w = gameInfo.width;
+const points = gameInfo.board.points;
+const w = gameInfo.board.width;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
 console.log("totalTurn", totalTurn);
@@ -96,7 +96,7 @@ for (let i = 1; i <= totalTurn; i++) {
   const bknext = gameInfo.nextTurnUnixTime;
   await sleep(diffTime(gameInfo.nextTurnUnixTime));
 
-  for (;;) {
+  for (; ;) {
     gameInfo = await getGameInfo(roomid);
     if (gameInfo.nextTurnUnixTime !== bknext) {
       break;
@@ -108,6 +108,6 @@ for (let i = 1; i <= totalTurn; i++) {
 // ゲームデータ出力
 try {
   Deno.mkdirSync("log");
-} catch (e) {}
+} catch (e) { }
 const fname = `log/${gameInfo.roomID}-player${pno}.log`;
 Deno.writeTextFileSync(fname, JSON.stringify(gameInfo, null, 2));

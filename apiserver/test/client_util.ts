@@ -1,13 +1,13 @@
 const host = "http://localhost:8880";
 
 class Action {
-  public agentid: number;
+  public agentId: number;
   public type: string;
   public x: number;
   public y: number;
 
-  constructor(agentid: number, type: string, x: number, y: number) {
-    this.agentid = agentid;
+  constructor(agentId: number, type: string, x: number, y: number) {
+    this.agentId = agentId;
     this.type = type;
     this.x = x;
     this.y = y;
@@ -86,9 +86,8 @@ async function getGameInfo(roomid: string) {
 }
 
 async function setAction(roomid: string, playerid: string, actions: Action[]) {
-  //console.log(JSON.stringify(actions));
   const sendJson = {
-    time: Math.floor(new Date().getTime() / 1000),
+    //time: Math.floor(new Date().getTime() / 1000),
     actions: actions,
   };
   const reqJson = await (await fetch(
@@ -102,6 +101,7 @@ async function setAction(roomid: string, playerid: string, actions: Action[]) {
       body: JSON.stringify(sendJson),
     },
   )).json();
+  //console.log(reqJson, "setAction");
   return reqJson;
 }
 
