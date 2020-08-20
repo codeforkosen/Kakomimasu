@@ -13,13 +13,13 @@ class User {
     this.password = password;
   }
 
-  toJSON = () => {
+  /*toJSON = () => {
     return {
       screenName: this.screenName,
       name: this.name,
       id: this.id,
     };
-  };
+  };*/
 }
 
 class Account {
@@ -39,7 +39,7 @@ class Account {
   write() {
     Deno.writeTextFileSync(
       "./data/users.json",
-      JSON.stringify(this.users),
+      JSON.stringify(this.users, ["screenName", "name", "id", "password"]),
     );
   }
 

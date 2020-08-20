@@ -28,7 +28,7 @@ const usersRegist = async (req: ServerRequest) => {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      body: JSON.stringify(user),
+      body: JSON.stringify(user, ["screenName", "name", "id"]),
     });
   } catch (e) {
     await req.respond(util.ErrorResponse(e.message));
@@ -46,7 +46,7 @@ const usersShow = async (req: ServerRequest) => {
           headers: new Headers({
             "content-type": "application/json",
           }),
-          body: JSON.stringify(user),
+          body: JSON.stringify(user, ["screenName", "name", "id"]),
         });
       }
     } catch (e) {
