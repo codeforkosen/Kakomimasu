@@ -13,6 +13,10 @@ const accounts = new Account();
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
 
+import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
+dotenv.config();
+const port = parseInt((Deno.env.get("port") || "8880").toString());
+
 //#region ユーザアカウント登録・取得・削除
 const usersRegist = async (req: ServerRequest) => {
   const reqData = ((await req.json()) as User);
@@ -315,7 +319,7 @@ export const routes = () => {
 // Port Listen
 const app = createApp();
 app.route("/", routes());
-app.listen({ port: 8880 });
+app.listen({ port });
 
 const createDefaultBoard = () => {
   const w = 8;
