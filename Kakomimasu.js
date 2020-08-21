@@ -189,6 +189,14 @@ class Action {
       res: this.res,
     };
   }
+  toJSON() {
+    return {
+      type: this.type,
+      x: this.x,
+      y: this.y,
+      res: this.res,
+    };
+  }
 }
 Action.PUT = 1;
 Action.NONE = 2;
@@ -397,9 +405,17 @@ class Game {
     this.removeOrNot();
     this.revertNotOwner();
     this.commit();
-    this.log.push(actions.map((ar) => ar.map((a) => a.getJSON())));
 
     this.field.fillBase();
+
+    this.log.push(
+      actions.map((ar, idx) => {
+        return {
+          point: this.field.getPoints()[idx],
+          actions: ar,//ar.map((a) => a.getJSON()),
+        }
+      })
+    );
 
     if (this.turn < this.nturn) {
       this.turn++;
@@ -548,52 +564,6 @@ class Game {
     if (this.ending) clearInterval(this.intervalId);
   }
 
-  getFieldInfoJSON() {
-    //console.log(this.agents);
-    const players = [];
-    this.players.forEach((p, i) => {
-      const id = p.id;
-      const agents = [];
-      this.agents[i].forEach((a) => {
-        const agent = {
-          x: a.x,
-          y: a.y,
-        };
-        agents.push(agent);
-      });
-      const player = {
-        id: id,
-        agents: agents,
-        // don't need point, need tile&areaPoint
-        point: this.field.getPoints()[i],
-        tilePoint: null,
-        areaPoint: null,
-      };
-      players.push(player);
-    });
-    const actions = [];
-    this.actions.forEach((a) => {
-      // 仕様と違うので変更が必要
-      actions.push(a.getJSON());
-    });
-
-    // いろいろ仕様と違うので実際に使用するときに修正
-    return {
-      gameId: this.uuid,
-      gaming: this.gaming,
-      ending: this.ending,
-      width: this.board.w,
-      height: this.board.h,
-      points: this.board.points,
-      startedAtUnixTime: this.startedAtUnixTime,
-      nextTurnUnixTime: this.nextTurnUnixTime,
-      turn: this.turn,
-      totalTurn: this.nturn,
-      tiled: this.field.field,
-      players: players,
-      actions: actions,
-    };
-  }
   toJSON() {
     const players = [];
     this.players.forEach((p, i) => {
@@ -619,11 +589,6 @@ class Game {
       };
       players.push(player);
     });
-    /*const actions = [];
-    this.actions.forEach((a) => {
-      // 仕様と違うので変更が必要
-      actions.push(a.getJSON());
-    });*/
 
     let board = null;
     if (this.isReady()) board = this.board;
