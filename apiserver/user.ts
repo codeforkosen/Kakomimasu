@@ -31,9 +31,10 @@ class Account {
   }
 
   read() {
-    this.users = JSON.parse(
-      Deno.readTextFileSync("./data/users.json") || "[]",
-    ) as Array<User>;
+    try {
+      this.users = JSON.parse(Deno.readTextFileSync("./data/users.json")) as Array<User>;
+    } catch (e) {
+    }
   }
 
   write() {
