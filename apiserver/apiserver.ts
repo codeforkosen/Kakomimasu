@@ -62,7 +62,7 @@ const usersShow = async (req: ServerRequest) => {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      body: JSON.stringify(accounts.getUsers()),
+      body: JSON.stringify(accounts.getUsers().map((u) => ({ screenName: u.screenName, name: u.name, id: u.id }))),
     });
   }
 };
