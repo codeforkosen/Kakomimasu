@@ -1,5 +1,5 @@
 {
-  "gameId": "ebe436f1-adab-4d2f-bab5-5079cd12fc79",
+  "gameId": "6c45b699-47ce-4d3e-83ba-78c896d568e9",
   "gaming": true,
   "ending": false,
   "board": {
@@ -110,8 +110,8 @@
       12
     ]
   },
-  "startedAtUnixTime": 1597927595,
-  "nextTurnUnixTime": 1597927604,
+  "startedAtUnixTime": 1598030736,
+  "nextTurnUnixTime": 1598030745,
   "turn": 2,
   "totalTurn": 30,
   "tiled": [
@@ -518,7 +518,7 @@
   ],
   "players": [
     {
-      "id": "d183103f-a941-4ea5-b8f7-276d8d285c0d",
+      "id": "be275264-a69b-456d-9934-b4b9470a9834",
       "agents": [
         {
           "x": 1,
@@ -561,7 +561,7 @@
       "areaPoint": null
     },
     {
-      "id": "d183103f-a941-4ea5-b8f7-276d8d285c0d",
+      "id": "be275264-a69b-456d-9934-b4b9470a9834",
       "agents": [
         {
           "x": -1,
@@ -606,16 +606,27 @@
   ],
   "log": [
     [
-      [
-        {
-          "agentid": 0,
-          "type": 1,
-          "x": 1,
-          "y": 1,
-          "res": 0
-        }
-      ],
-      []
+      {
+        "point": {
+          "basepoint": 0,
+          "wallpoint": 5
+        },
+        "actions": [
+          {
+            "type": 1,
+            "x": 1,
+            "y": 1,
+            "res": 0
+          }
+        ]
+      },
+      {
+        "point": {
+          "basepoint": 0,
+          "wallpoint": 0
+        },
+        "actions": []
+      }
     ]
   ]
 }
