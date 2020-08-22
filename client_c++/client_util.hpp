@@ -74,7 +74,6 @@ nlohmann::json userShow(const std::string name) {
 }
 
 // 3つの引数を元にjsonデータを作成し、サーバーに登録する
-// 登録に成功した場合はjsonデータを、失敗した場合は「error」を返す
 nlohmann::json userRegist(const std::string sn, const std::string n, const std::string p) {
     nlohmann::json user_info = {
         {"screenName", sn},
@@ -85,3 +84,6 @@ nlohmann::json userRegist(const std::string sn, const std::string n, const std::
     // dumpメソッドを使うことで、jsonインスタンスをJSON形式の文字列に変換する
     return http_methods::post(host, "/users/regist", user_info.dump());
 }
+
+// サーバーにプレイヤーを登録し、トークとゲームIDのjsonデータを返す
+
