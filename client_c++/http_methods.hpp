@@ -8,7 +8,7 @@
 namespace http_methods {
 std::string post(const std::string host, const std::string path, const std::string json) {
     // 引数を元にcurlコマンドを文字列を作成
-    const std::string cmd = "curl -s -H 'Authorization: token1' -X POST " + host + path + " -d " + json;
+    const std::string cmd = "curl -s -H \"Content-Type:application/json\" -H \"Authorization: token1\" -X POST -d '" + json + "' " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
 
     // 作成したcurlコマンドをシェルで叩く
