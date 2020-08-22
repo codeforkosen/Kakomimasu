@@ -349,6 +349,10 @@ class Game {
     }
   }
 
+  dispose() {
+    clearInterval(this.intervalId);
+  }
+
   attachPlayer(player) {
     if (!this.isFree()) return false;
     if (this.players.indexOf(player) >= 0) return false;

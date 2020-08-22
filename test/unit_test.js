@@ -31,15 +31,17 @@ test("action put", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   assertEquals(status.field[0], [1, 0]);
+  game.dispose();
 });
 
-test("action cant't put", () => {
+test("action can't put", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([[0, Action.PUT, 1000, 0],]));
   game.nextTurn();
   const status = game.getStatusJSON();
   assertEquals(status.field[0], [0, -1]);
   assertEquals(status.log[0][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
+  game.dispose();
 });
 
 test("action move", () => {
@@ -49,6 +51,7 @@ test("action move", () => {
   p1.setActions(Action.fromJSON([[0, Action.MOVE, 1, 0],]));
   const status = game.getStatusJSON();
   assertEquals(status.field[0], [1, 0]);
+  game.dispose();
 });
 
 test("action move series 連なり移動", () => {
@@ -64,6 +67,7 @@ test("action move series 連なり移動", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[2], [1, 0]);
+  game.dispose();
 });
 
 test("action cant't move series 連なり移動失敗", () => {
@@ -82,6 +86,7 @@ test("action cant't move series 連なり移動失敗", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[2], [0, -1]);
+  game.dispose();
 });
 
 test("action can't move", () => {
@@ -93,6 +98,7 @@ test("action can't move", () => {
   const status = game.getStatusJSON();
   assertEquals(status.field[2], [0, -1]);
   assertEquals(status.log[1][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
+  game.dispose();
 });
 
 test("fill", () => {
@@ -110,6 +116,7 @@ test("fill", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   assertEquals(status.field[4], [0, 0]);
+  game.dispose();
 });
 
 test("action remove", () => {
@@ -128,6 +135,7 @@ test("action remove", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[0], [0, -1]);
+  game.dispose();
 });
 
 test("action can't remove", () => {
@@ -142,6 +150,7 @@ test("action can't remove", () => {
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], [0, -1]);
   assertEquals(game.getStatusJSON().log[1][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
+  game.dispose();
 });
 
 test("wall point", () => {
@@ -152,6 +161,7 @@ test("wall point", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().points[0], { basepoint: 0, wallpoint: 1 + 2 });
+  game.dispose();
 });
 
 test("base point", () => {
@@ -170,6 +180,7 @@ test("base point", () => {
   const status = game.getStatusJSON();
   assertEquals(status.field[4], [0, 0]);
   assertEquals(game.getStatusJSON().points[0], { basepoint: 4, wallpoint: 0 + 1 + 2 + 3 + 5 + 6 + 7 + 8 });
+  game.dispose();
 });
 
 test("remove on agent エージェントがいるマスの壁はREMOVE不可", () => {
@@ -181,6 +192,7 @@ test("remove on agent エージェントがいるマスの壁はREMOVE不可", (
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], [1, 1]);
   assertEquals(game.getStatusJSON().log[1][0].actions[0].res, Action.REVERT);
+  game.dispose();
 });
 
 test("conflict put", () => {
@@ -193,6 +205,7 @@ test("conflict put", () => {
   assertEquals(status.field[0], [0, -1]);
   assertEquals(status.log[0][0].actions[0].res, Action.CONFLICT);
   assertEquals(status.log[0][1].actions[0].res, Action.CONFLICT);
+  game.dispose();
 });
 
 test("conflict move", () => {
@@ -208,6 +221,7 @@ test("conflict move", () => {
   assertEquals(status.field[1], [0, -1]);
   assertEquals(status.log[1][0].actions[0].res, Action.CONFLICT);
   assertEquals(status.log[1][1].actions[0].res, Action.CONFLICT);
+  game.dispose();
 });
 
 test("conflict remove", () => {
@@ -227,6 +241,7 @@ test("conflict remove", () => {
   assertEquals(game.getStatusJSON().field[1], [1, 1]);
   assertEquals(game.getStatusJSON().log[2][0].actions[0].res, Action.CONFLICT);
   assertEquals(game.getStatusJSON().log[2][1].actions[0].res, Action.CONFLICT);
+  game.dispose();
 });
 
 test("conflict remove & move 壁がないところの先読みREMOVEは不可、移動が成功する", () => {
@@ -240,6 +255,7 @@ test("conflict remove & move 壁がないところの先読みREMOVEは不可、
   assertEquals(game.getStatusJSON().field[1], [1, 1]);
   assertEquals(game.getStatusJSON().log[1][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
   assertEquals(game.getStatusJSON().log[1][1].actions[0].res, Action.SUCCESS);
+  game.dispose();
 });
 
 test("conflict remove & move 壁がないところの先読みREMOVEは不可、PUTが成功する", () => {
@@ -252,4 +268,5 @@ test("conflict remove & move 壁がないところの先読みREMOVEは不可、
   assertEquals(game.getStatusJSON().field[1], [1, 1]);
   assertEquals(game.getStatusJSON().log[1][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
   assertEquals(game.getStatusJSON().log[1][1].actions[0].res, Action.SUCCESS);
+  game.dispose();
 });
