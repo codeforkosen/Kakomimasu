@@ -148,9 +148,6 @@ export const match = async (req: ServerRequest) => {
 // #endregion
 
 //#region 全ルーム取得API
-class Game {
-  getFieldInfoJSON() {}
-}
 const getAllRooms = async (req: ServerRequest) => {
   //console.log(req, "getAllRooms");
   await req.respond({
