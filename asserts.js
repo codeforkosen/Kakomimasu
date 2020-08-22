@@ -11,7 +11,7 @@ const assertEquals = (x, y) => {
 
 const assert = b => {
   if (!b) {
-    throw new AssertionError(`${x} is must be true`);
+    throw new AssertionError(`must be true`);
   }
 };
 
