@@ -86,6 +86,7 @@ async function getGameInfo(roomid: string) {
 }
 
 async function setAction(roomid: string, playerid: string, actions: Action[]) {
+  //console.log(JSON.stringify(actions));
   const sendJson = {
     //time: Math.floor(new Date().getTime() / 1000),
     actions: actions,
@@ -106,7 +107,9 @@ async function setAction(roomid: string, playerid: string, actions: Action[]) {
 }
 
 function diffTime(unixTime: number) {
-  return unixTime - Math.floor(new Date().getTime() / 1000);
+  const dt = unixTime * 1000 - new Date().getTime();
+  //console.log("diffTime", dt);
+  return dt;
 }
 
 export {

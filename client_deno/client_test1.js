@@ -9,8 +9,6 @@ import {
   diffTime,
 } from "./client_util.js";
 
-//const [token, roomid] = await match(`高専太郎`, "ポンコツ");
-
 const name = `nit-taro1`;
 const password = `${name}-pw`;
 
@@ -40,7 +38,7 @@ console.log(
   new Date(gameInfo.startedAtUnixTime / 1000).toLocaleString("ja-JP"),
 );
 
-await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
+await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
 
 // ターン1
 setAction(
@@ -48,7 +46,7 @@ setAction(
   token,
   [new Action(0, "PUT", 1, 1), new Action(1, "PUT", 3, 3)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン2
 gameInfo = await getGameInfo(gameId);
@@ -57,7 +55,7 @@ setAction(
   token,
   [new Action(0, "MOVE", 1, 2), new Action(1, "MOVE", 3, 2)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン3
 gameInfo = await getGameInfo(gameId);
@@ -66,7 +64,7 @@ setAction(
   token,
   [new Action(0, "MOVE", 1, 3), new Action(1, "MOVE", 3, 1)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン4
 gameInfo = await getGameInfo(gameId);
@@ -75,6 +73,6 @@ setAction(
   token,
   [new Action(0, "MOVE", 2, 3), new Action(1, "MOVE", 2, 1)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 //console.log(await getGameInfo(roomid[0]));

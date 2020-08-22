@@ -244,7 +244,7 @@
         async function main() {
             game = await getGameInfo(gameId);
             gameTableVue.init(game);
-            playerInfoVue.init(game);
+            playerInfoVue.update(game);
             pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
             for (let i = 0; i <= game.totalTurn; i++) {
                 pointChart.data.labels[i] = i;
@@ -267,13 +267,12 @@
                     setTimeout(() => {
                         console.log("ゲームスタート！");
                         updateField();
-                        setTimeout(updateField, ((game.nextTurnUnixTime + 3.2) * 1000) - new Date().getTime());
 
                         async function updateField() {
                             console.log("フィールド更新！");
                             await getRoomInfo();
-                            let diffTime = ((game.nextTurnUnixTime + 3.3) * 1000) - new Date().getTime();
-                            console.log(diffTime);
+                            const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
+                            //console.log(diffTime);
                             if (game.ending) return;
                             else setTimeout(updateField, diffTime);
                         }
@@ -303,7 +302,7 @@
             if (game.startedAtUnixTime === null) {
             }
             else {
-                console.log(getTurnText(game));
+                //console.log(getTurnText(game));
                 fieldInfoVue.turn = getTurnText(game);
                 fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
                 fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
@@ -341,12 +340,9 @@
                     t.forEach((p, pIdx) => {
                         const point = p.point.basepoint + p.point.wallpoint;
                         pointChart.data.datasets[pIdx].data[tIdx + 1] = point;
-                        if (pIdx === 0) console.log(point);
                     });
-                    //pointChart.data.datasets
                 });
 
-                console.log(pointChart.data.datasets[0].data);
                 pointChart.update();
             }
         }

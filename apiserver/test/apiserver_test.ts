@@ -97,7 +97,7 @@ await test("send action", async () => {
   const sampleFilePath = "./sample/afterAction_sample.json";
 
   const gameInfo = await getGameInfo(gameId);
-  await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
+  await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
   await setAction(
     gameId,
     accessToken,
@@ -105,7 +105,7 @@ await test("send action", async () => {
   );
   //console.log(reqJson);
 
-  await sleep((diffTime(gameInfo.nextTurnUnixTime) + 1 + 3) * 1000);
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
   const res = await getGameInfo(gameId);
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
 

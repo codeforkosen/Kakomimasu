@@ -45,9 +45,6 @@ console.log(
   new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
 );
 
-const pno = gameInfo.players[0].id === token ? 0 : 1;
-console.log("playerid", pno);
-
 const points = gameInfo.board.points;
 const w = gameInfo.board.width;
 const nplayers = gameInfo.players[pno].agents.length;

@@ -552,8 +552,7 @@ class Game {
       self.start();
     }
     if (self.isGaming()) {
-      //console.log(util.nowUnixTime(), this.nextTurnUnixTime + 2);
-      if (util.nowUnixTime() > this.nextTurnUnixTime + 2) {
+      if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
       }
     }
