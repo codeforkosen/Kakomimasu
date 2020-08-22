@@ -6,8 +6,8 @@ const setHost = (s) => {
 };
 
 class Action {
-  constructor(agentid, type, x, y) {
-    this.agentid = agentid;
+  constructor(agentId, type, x, y) {
+    this.agentId = agentId;
     this.type = type;
     this.x = x;
     this.y = y;

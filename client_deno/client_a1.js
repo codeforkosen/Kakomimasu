@@ -99,7 +99,7 @@ for (let i = 1; i <= totalTurn; i++) {
     const bknext = gameInfo.nextTurnUnixTime;
     await sleep(diffTime(gameInfo.nextTurnUnixTime));
 
-    for (;;) {
+    for (; ;) {
       gameInfo = await getGameInfo(roomid);
       if (gameInfo.nextTurnUnixTime !== bknext) {
         break;
@@ -113,6 +113,6 @@ for (let i = 1; i <= totalTurn; i++) {
 // ゲームデータ出力
 try {
   Deno.mkdirSync("log");
-} catch (e) {}
+} catch (e) { }
 const fname = `log/${gameInfo.gameId}-player${pno}.log`;
 Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));

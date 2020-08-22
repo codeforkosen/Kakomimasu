@@ -184,7 +184,7 @@ export const getGameInfo = async (req: ServerRequest) => {
 //#region エージェント行動情報API
 class ActionPost {
   constructor(
-    public agentid: number,
+    public agentId: number,
     public type: string,
     public x: number,
     public y: number,
@@ -197,9 +197,9 @@ class ActionPost {
     else if (type === "REMOVE") return Action.REMOVE;
   }
 }
-export class SetActionPost {
+class SetActionPost {
   constructor(
-    public time: number,
+    //public time: number,
     public actions: ActionPost[],
   ) {}
 }
@@ -207,35 +207,34 @@ export class SetActionPost {
 export const setAction = async (req: ServerRequest) => {
   try {
     //console.log(req, "SetAction");
-    const [, gameId] = req.match;
+
+    // Actionを受け取った時刻を取得
+    const reqTime = new Date().getTime() / 1000;
+
+    const gameId = req.match[1];
     const accessToken = req.headers.get("Authorization");
+
     const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
-    //console.log(accessToken, game.players);
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (player === undefined) {
       await req.respond(util.ErrorResponse("Invalid accessToken."));
-    } //console.log(game[0]);
-    else {
-      const r = (await req.json()) as SetActionPost;
+    } else {
+      const actionData = (await req.json()) as SetActionPost;
       const actionsAry: any = [];
-      r.actions.forEach((a) => {
-        actionsAry.push([a.agentid, ActionPost.getType(a.type), a.x, a.y]);
+      actionData.actions.forEach((a) => {
+        actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
       });
       //console.log(game.nextTurnUnixTime);
-      if (game.nextTurnUnixTime >= r.time) {
-        player.setActions(Action.fromJSON(actionsAry));
-      } else {
-        console.log("時間超過");
-      }
-      // 時間を超えてた場合にレスポンス変更する必要あり
+      //if (game.nextTurnUnixTime >= reqTime) {
+      console.log(actionsAry);
+      const nowTurn = player.setActions(Action.fromJSON(actionsAry));
       await req.respond({
         status: 200,
         headers: new Headers({
           "content-type": "application/json",
         }),
         body: JSON.stringify(
-          actionsAry,
-          //["uuid", "gaming", "ending", "turn", "startTime", "nextTurnTime"],
+          { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
         ),
       });
     }

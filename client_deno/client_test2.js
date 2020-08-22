@@ -37,7 +37,7 @@ console.log(
   new Date(gameInfo.startedAtUnixTime / 1000).toLocaleString("ja-JP"),
 );
 
-await sleep((diffTime(gameInfo.startedAtUnixTime) + 1) * 1000);
+await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
 
 // ターン1
 setAction(
@@ -45,7 +45,7 @@ setAction(
   token,
   [new Action(0, "PUT", 4, 4), new Action(1, "PUT", 6, 6)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン2
 gameInfo = await getGameInfo(gameId);
@@ -54,7 +54,7 @@ setAction(
   token,
   [new Action(0, "MOVE", 4, 5), new Action(1, "MOVE", 6, 5)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン3
 gameInfo = await getGameInfo(gameId);
@@ -63,7 +63,7 @@ setAction(
   token,
   [new Action(0, "MOVE", 4, 6), new Action(1, "MOVE", 6, 4)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 // ターン4
 gameInfo = await getGameInfo(gameId);
@@ -72,6 +72,6 @@ setAction(
   token,
   [new Action(0, "MOVE", 5, 6), new Action(1, "MOVE", 5, 4)],
 );
-await sleep((diffTime(gameInfo.nextTurnUnixTime) + 3 + 1) * 1000);
+await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
 
 //console.log(await getGameInfo(roomid[0]));

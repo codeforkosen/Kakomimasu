@@ -33,6 +33,16 @@ deno run -A ../client_deno/client_test1.ts
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
+#### 2020.8.13
+- action API
+    - リクエストデータ形式の変更
+        - timeが無くなった
+        - agentid => agentId
+    - レスポンスデータ形式の変更
+        - actionのオウム返しを無しに。
+        - 代わりに`receptionUnixTime`と`turn`を返すように。
+        - 詳しくはHackMDを見てね
+
 #### 2020.8.4
 - 事前にユーザ登録しないといけなくなった。
 - それに伴い、match APIではユーザ名(またはユーザID)とパスワードが必要になった。
