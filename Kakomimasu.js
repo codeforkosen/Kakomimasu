@@ -182,15 +182,7 @@ class Action {
 
   getJSON() {
     return {
-      agentid: this.agentid,
-      type: this.type,
-      x: this.x,
-      y: this.y,
-      res: this.res,
-    };
-  }
-  toJSON() {
-    return {
+      agentId: this.agentid,
       type: this.type,
       x: this.x,
       y: this.y,
@@ -398,7 +390,7 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     this.checkActions(actions);
-    console.log(this.players[1].actions);
+    //console.log(this.players[1].actions);
     this.checkConflict(actions);
     this.putOrMove();
     this.revertOverlap();
@@ -412,7 +404,7 @@ class Game {
       actions.map((ar, idx) => {
         return {
           point: this.field.getPoints()[idx],
-          actions: ar,//ar.map((a) => a.getJSON()),
+          actions: ar.map((a) => a.getJSON()),
         }
       })
     );
@@ -661,7 +653,7 @@ class Kakomimasu {
   }
 
   createGame(board, nturn = 30) {
-    console.log(board);
+    //console.log(board);
     const game = new Game(board, nturn);
     this.games.push(game);
     return game;
