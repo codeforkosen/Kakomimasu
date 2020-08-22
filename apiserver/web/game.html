@@ -246,9 +246,11 @@
             gameTableVue.init(game);
             playerInfoVue.init(game);
             pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
-            for (let i = 0; i < game.totalTurn; i++) {
-                pointChart.data.labels[i] = i + 1;
+            for (let i = 0; i <= game.totalTurn; i++) {
+                pointChart.data.labels[i] = i;
             }
+            pointChart.data.datasets[0].data[0] = 0;
+            pointChart.data.datasets[1].data[0] = 0;
             pointChart.update();
 
             const waitGameStartId = setInterval(waitGameStart, 200);
@@ -332,13 +334,13 @@
                 // グラフ更新
                 game.players.forEach((p, idx) => {
                     const point = p.point.basepoint + p.point.wallpoint;
-                    pointChart.data.datasets[idx].data[game.turn - 1] = point;
+                    pointChart.data.datasets[idx].data[game.turn] = point;
                 });
 
                 game.log.forEach((t, tIdx) => {
                     t.forEach((p, pIdx) => {
                         const point = p.point.basepoint + p.point.wallpoint;
-                        pointChart.data.datasets[pIdx].data[tIdx] = point;
+                        pointChart.data.datasets[pIdx].data[tIdx + 1] = point;
                         if (pIdx === 0) console.log(point);
                     });
                     //pointChart.data.datasets
