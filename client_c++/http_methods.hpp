@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
+#include "json.hpp"
 
 #define MAX_LEN_REQ (200 * 1024) // 100kbyte
 #define MAX_LEN_JSON (200 * 1024) // 100kbyte
 #define LEN_TOKEN 6 // TOKENの長さは固定
 
 namespace http_methods {
-std::string post(const std::string host, const std::string path, const std::string json) {
+nlohmann::json post(const std::string host, const std::string path, const std::string json) {
     // 引数を元にcurlコマンドを文字列を作成
     const std::string cmd = "curl -s -H \"Content-Type:application/json\" -H \"Authorization: token1\" -X POST -d '" + json + "' " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
@@ -29,12 +30,15 @@ std::string post(const std::string host, const std::string path, const std::stri
 
     pclose(fp);
 
-    std::cout << "[post res]" << std::endl << std::string(buf) << std::endl << std::endl;
+    // 受信したデータはJSON型の文字列のため、それをjsonオブジェクトに変換する
+    nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
+
+    std::cout << "[post res]" << std::endl << response_json << std::endl << std::endl;
   
-    return std::string(buf);
+    return response_json;
 }
 
-std::string get(const std::string host, const std::string path) {
+nlohmann::json get(const std::string host, const std::string path) {
     const std::string cmd = "curl -s -H 'Authorization: token1' -X GET " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
 
@@ -53,8 +57,10 @@ std::string get(const std::string host, const std::string path) {
 
     pclose(fp);
 
+    nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
+
     std::cout << "[post res]" << std::endl << std::string(buf) << std::endl << std::endl;
   
-    return std::string(buf);
+    return response_json;
 }
 }
