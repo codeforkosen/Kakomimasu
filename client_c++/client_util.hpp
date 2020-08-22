@@ -86,4 +86,12 @@ nlohmann::json userRegist(const std::string sn, const std::string n, const std::
 }
 
 // サーバーにプレイヤーを登録し、トークとゲームIDのjsonデータを返す
+nlohmann::json match(const std::string id, const std::string pw, const std::string spec) {
+    nlohmann::json match_info = {
+        {"id", id},
+        {"password", pw},
+        {"spec", spec}
+    };
 
+    return http_methods::post(host, "/match", match_info.dump());
+}

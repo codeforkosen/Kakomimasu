@@ -13,5 +13,5 @@ int main() {
         user_info = userRegist(screenName, name, password);
     }
     
-    //nlohmann::json match_info = match(user_info["id"], password, spec);
+    nlohmann::json match_info = match(user_info["id"], password, spec);
 }
