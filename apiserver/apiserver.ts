@@ -169,14 +169,18 @@ export const getGameInfo = async (req: ServerRequest) => {
   //console.log(id);
   const game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
   //console.log(game[0]);
-  game.updateStatus();
-  await req.respond({
-    status: 200,
-    headers: new Headers({
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify(game),
-  });
+  try {
+    game.updateStatus();
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(game),
+    });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
+  }
 };
 
 //#endregion

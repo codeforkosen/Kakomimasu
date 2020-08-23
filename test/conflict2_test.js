@@ -2,7 +2,7 @@ import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
 import { assert, assertEquals, AssertionError } from "../asserts.js";
 
 const nagent = 6;
-const [ w, h ] = [ 3, 1 ];
+const [ w, h ] = [ 3, 3 ];
 const board = new Board(w, h, new Array(w * h), nagent);
 
 const kkmm = new Kakomimasu();
@@ -53,134 +53,96 @@ const tos = () => {
 const p = () => console.log(tos());
 const chk = (s) => assertEquals(s.trim(), tos());
 
-const cl = console.log;
-
 // put
-cl("put");
 p1.setActions(Action.fromJSON([
   [0, Action.PUT, 0, 0],
+  [1, Action.PUT, 0, 1],
+  [2, Action.PUT, 0, 2],
 ]));
 p2.setActions(Action.fromJSON([
   [0, Action.PUT, 2, 0],
+  [1, Action.PUT, 2, 1],
+  [2, Action.PUT, 2, 2],
 ]));
 assert(game.nextTurn());
 p();
-chk("W00 _.. W11");
-
-cl("move conflict");
-p1.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 _.. W11");
+chk(`
+W00 _.. W11
+W00 _.. W11
+W00 _.. W11
+`);
 
 // move conflict
 p1.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
+  [0, Action.MOVE, 1, 1],
+  [1, Action.MOVE, 1, 1],
+  [2, Action.MOVE, 1, 1],
 ]));
 p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
+  [0, Action.MOVE, 1, 1],
+  [1, Action.MOVE, 1, 1],
+  [2, Action.MOVE, 1, 1],
 ]));
 assert(game.nextTurn());
 p();
-chk("W00 _.. W11");
+chk(`
+W00 _.. W11
+W00 _.. W11
+W00 _.. W11
+`);
 
-// put move conflict
+// move remove put conflict
 p1.setActions(Action.fromJSON([
-  [1, Action.PUT, 1, 0],
+  [0, Action.MOVE, 1, 1],
+  [1, Action.REMOVE, 1, 1],
+  [2, Action.REMOVE, 1, 1],
+  [3, Action.PUT, 1, 1],
 ]));
 p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
+  [0, Action.MOVE, 1, 1],
+  [1, Action.REMOVE, 1, 1],
+  [2, Action.MOVE, 1, 1],
+  [3, Action.PUT, 1, 1],
 ]));
 assert(game.nextTurn());
 p();
-chk("W00 _.. W11");
+chk(`
+W00 _.. W11
+W00 _.. W11
+W00 _.. W11
+`);
 
 // move no conflict
 p1.setActions(Action.fromJSON([
   [0, Action.MOVE, 1, 0],
+  [1, Action.MOVE, 1, 1],
+  [2, Action.MOVE, 1, 2],
 ]));
 p2.setActions(Action.fromJSON([
 ]));
 assert(game.nextTurn());
 p();
-chk("W0. W00 W11");
+chk(`
+W0. W00 W11
+W0. W00 W11
+W0. W00 W11
+`);
 
-// move no conflict
+// move no other wall and agent
 p1.setActions(Action.fromJSON([
-  [0, Action.MOVE, 0, 0],
+  [0, Action.MOVE, 2, 0],
+  [1, Action.MOVE, 2, 1],
+  [2, Action.MOVE, 2, 2],
 ]));
 p2.setActions(Action.fromJSON([
 ]));
 assert(game.nextTurn());
 p();
-chk("W00 W0. W11");
-
-// move remove conflict
-p1.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.REMOVE, 1, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 W0. W11");
-
-// remove no conflict
-p1.setActions(Action.fromJSON([
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.REMOVE, 1, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 _.. W11");
-
-cl("move no conflict");
-p1.setActions(Action.fromJSON([
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 W11 W1.");
-
-cl("remove failed");
-p1.setActions(Action.fromJSON([
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.REMOVE, 0, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 W11 W1.");
-
-cl("move failed");
-p1.setActions(Action.fromJSON([
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 0, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 W11 W1.");
-
-cl("cross move failed");
-p1.setActions(Action.fromJSON([
-  [0, Action.MOVE, 1, 0],
-]));
-p2.setActions(Action.fromJSON([
-  [0, Action.MOVE, 0, 0],
-]));
-assert(game.nextTurn());
-p();
-chk("W00 W11 W1.");
+chk(`
+W0. W00 W11
+W0. W00 W11
+W0. W00 W11
+`);
 
 // finish
 while (game.nextTurn());
