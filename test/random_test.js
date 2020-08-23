@@ -12,7 +12,7 @@ const initialput = false;
 
 const kkmm = new Kakomimasu();
 kkmm.appendBoard(board);
-const nturn = 100000;
+const nturn = 10000;
 const game = kkmm.createGame(board, nturn);
 
 const field = game.field;
