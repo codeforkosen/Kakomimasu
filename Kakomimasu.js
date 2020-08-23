@@ -398,8 +398,8 @@ class Game {
     // console.log("actions", actions);
     
     this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
-    this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move も現在は無効
     this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
+    this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
     this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
     this.putOrMove(); // 配置または動かし、フィールド更新
     this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
