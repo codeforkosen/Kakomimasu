@@ -14,4 +14,14 @@ int main() {
     }
     
     nlohmann::json match_info = match(user_info["id"], password, spec);
+    const string token = match_info["accessToken"];
+    const string gameId = match_info["gameId"];
+
+    nlohmann::json game_info;
+    do {
+        game_info = getGameInfo(gameId);
+        sleep_ms(100);
+    } while (game_info["gaming"] == false);
+
+    
 }
