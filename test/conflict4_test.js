@@ -105,6 +105,29 @@ W00 _.. W11
 _.. W00 _..
 `);
 
+cl("move");
+p1.setActions(Action.fromJSON([
+  [0, Action.MOVE, 1, 0],
+]));
+assert(game.nextTurn());
+p();
+chk(`
+W0. W00 W11
+_.. W00 _..
+`);
+
+cl("move remove conflict myself");
+p1.setActions(Action.fromJSON([
+  [0, Action.MOVE, 0, 0],
+  [0, Action.REMOVE, 0, 0],
+]));
+assert(game.nextTurn());
+p();
+chk(`
+W0. W00 W11
+_.. W00 _..
+`);
+
 
 // finish
 for (let i = 0;; i++) {
