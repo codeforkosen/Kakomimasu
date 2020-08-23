@@ -26,14 +26,10 @@ class Game {
   }
 }
 
-function rootURL() {
-  return `${window.location.protocol}//${window.location.host}`;
-}
-
 function createHeader(userScreenName) {
   const headerDiv = document.getElementsByTagName("header")[0];
   headerDiv.innerHTML = `
-    <a href="${rootURL()}/game"><img src="${rootURL()}/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
+    <a href="/game"><img src="/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
     <h1>${userScreenName}</h1>
   `;
 }
@@ -63,7 +59,7 @@ function diffTime(unixTime) {
 //#region API client
 async function userShow(identifier) {
   const resJson = await (await fetch(
-    `${rootURL()}/users/show/${identifier}`,
+    `/users/show/${identifier}`,
   )).json();
   //console.log(reqJson, "userShow");
   return resJson;
@@ -71,7 +67,7 @@ async function userShow(identifier) {
 
 async function getAllGame() {
   const resJson = await (await fetch(
-    `${rootURL()}/match/`,
+    `/match/`,
   )).json();
   //console.log(reqJson, "getAllRoom");
   return resJson;
@@ -79,7 +75,7 @@ async function getAllGame() {
 
 async function getGameInfo(roomid) {
   const resJson = await (await fetch(
-    `${rootURL()}/match/${roomid}`,
+    `/match/${roomid}`,
   )).json();
   return resJson;
 }
