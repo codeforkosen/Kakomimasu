@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <thread>
+
 #include "json.hpp"
 
 #define MAX_LEN_REQ (200 * 1024) // 100kbyte
@@ -95,3 +98,9 @@ nlohmann::json match(const std::string id, const std::string pw, const std::stri
 
     return http_methods::post(host, "/match", match_info.dump());
 }
+
+nlohmann::json getGameInfo(const std::string gi) {
+    return http_methods::get(host, "/match/" + gi);
+}
+
+void sleep_ms(int x) { std::this_thread::sleep_for(std::chrono::milliseconds(x)); }
