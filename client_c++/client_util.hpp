@@ -35,7 +35,7 @@ nlohmann::json post(const std::string host, const std::string path, const std::s
     // 受信したデータはJSON型の文字列のため、それをjsonオブジェクトに変換する
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
 
-    std::cout << "[post res]" << std::endl << response_json << std::endl << std::endl;
+    std::cout << "[post res]" << std::endl << response_json.dump(4) << std::endl << std::endl;
   
     return response_json;
 }
@@ -61,7 +61,7 @@ nlohmann::json get(const std::string host, const std::string path) {
 
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
 
-    std::cout << "[post res]" << std::endl << std::string(buf) << std::endl << std::endl;
+    std::cout << "[post res]" << std::endl << response_json.dump(4) << std::endl << std::endl;
   
     return response_json;
 }
