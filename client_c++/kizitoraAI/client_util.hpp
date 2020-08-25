@@ -99,8 +99,12 @@ nlohmann::json match(const std::string id, const std::string pw, const std::stri
     return http_methods::post(host, "/match", match_info.dump());
 }
 
-nlohmann::json getGameInfo(const std::string gi) {
-    return http_methods::get(host, "/match/" + gi);
+nlohmann::json getGameInfo(const std::string gi, const bool print) {
+    return http_methods::get(host, "/match/" + gi, print);
+}
+
+nlohmann::json setAction(const std::string id, const std::string token, const std::string json_of_agent_actions) {
+    return http_methods::post(host, "/match/" + id + "/action", json_of_agent_actions, token);
 }
 
 void sleep_ms(int x) { std::this_thread::sleep_for(std::chrono::milliseconds(x)); }
