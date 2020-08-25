@@ -44,7 +44,7 @@ nlohmann::json post(const std::string host, const std::string path, const std::s
     return response_json;
 }
 
-nlohmann::json get(const std::string host, const std::string path) {
+nlohmann::json get(const std::string host, const std::string path, const bool print=true) {
     const std::string cmd = "curl -s -H 'Authorization: token1' -X GET " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
 
@@ -65,7 +65,8 @@ nlohmann::json get(const std::string host, const std::string path) {
 
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
 
-    std::cout << "[post res]" << std::endl << response_json.dump(4) << std::endl << std::endl;
+    if(print)
+        std::cout << "[post res]" << std::endl << response_json.dump(4) << std::endl << std::endl;
   
     return response_json;
 }
