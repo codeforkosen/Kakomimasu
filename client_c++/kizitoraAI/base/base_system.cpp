@@ -4,15 +4,23 @@
 #include <iostream>
 #include <queue>
 
-bool TurnInfo::input_game_data(int height, 
-                               int width, 
-                               int max_agent_num, 
-                               int max_turn, 
-                               int time_limist_ms, 
-                               std::vector<std::vector<int>> score_board, 
-                               int now_turn, 
-                               std::vector<std::vector<int>> board_state, 
+bool TurnInfo::input_game_data(int h, 
+                               int w, 
+                               int a, 
+                               int max_t, 
+                               int s, 
+                               std::vector<std::vector<int>> sb, 
+                               int now_t, 
+                               std::vector<std::vector<int>> bs, 
                                std::vector<std::vector<std::pair<int, int>>> agent_positions) {
+    height = h;
+    width = w;
+    max_agent_num = a;
+    max_turn = max_t;
+    time_limist_ms = s;
+    now_turn = now_t;
+    score_board = sb;
+    board_state = bs;
     ally_agents_pos.resize(max_agent_num);
     enemy_agents_pos.resize(max_agent_num);
     
