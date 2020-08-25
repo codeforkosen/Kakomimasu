@@ -2,6 +2,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #include "json.hpp"
 
@@ -12,9 +13,9 @@
 const std::string host = "http://localhost:8880";
 
 namespace http_methods {
-nlohmann::json post(const std::string host, const std::string path, const std::string json) {
+nlohmann::json post(const std::string host, const std::string path, const std::string json, const std::string token="token1") {
     // 引数を元にcurlコマンドを文字列を作成
-    const std::string cmd = "curl -s -H \"Content-Type:application/json\" -H \"Authorization: token1\" -X POST -d '" + json + "' " + host + path;
+    const std::string cmd = "curl -s -H \"Content-Type:application/json\" -H \"Authorization: " + token + "\" -X POST -d '" + json + "' " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
 
     // 作成したcurlコマンドをシェルで叩く
