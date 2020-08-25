@@ -97,7 +97,7 @@ nlohmann::json next_agents_move_to_json(vector<Action> moves) {
             {"y", moves[i].get_target().get_y()}
         };
     }
-    cout << res.dump(4) << endl;
+    
     return res;
 }
 
