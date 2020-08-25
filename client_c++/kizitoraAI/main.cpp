@@ -10,13 +10,6 @@
 #include "client_util.hpp"
 
 #include <iostream>
-#include <vector>
-
-void output_answer(const TurnInfo& turn_info, const std::vector<Action>& actions) {
-    for (const Action action : actions) {
-        std::cout << action << std::endl;
-    }
-}
 
 using namespace std;
 
@@ -85,6 +78,29 @@ data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann:
     return res;
 }
 
+nlohmann::json next_agents_move_to_json(vector<Action> moves) {
+    nlohmann::json res = nlohmann::json::object();
+    
+    for(int i = 0; i < moves.size(); ++i) {
+        char t_tmcit = moves[i].get_behavior();
+        string t_Kakomimasu = "STAY";
+
+        // 行動の種類を表す文字列をtmcit時のフォーマットからKakomimasuのフォーマットに変更
+        if(t_tmcit == 'a') t_Kakomimasu = "PUT";
+        else if (t_tmcit == 'w') t_Kakomimasu = "MOVE";
+        else if(t_tmcit == 'e') t_Kakomimasu = "REMOVE";
+
+        res["actions"][i] = nlohmann::json {
+            {"agentId", i},
+            {"type", t_Kakomimasu},
+            {"x", moves[i].get_target().get_x()},
+            {"y", moves[i].get_target().get_y()}
+        };
+    }
+    cout << res.dump(4) << endl;
+    return res;
+}
+
 int main() {
     const string screenName = "kizitora";
     const string name = "kizitora";
@@ -103,28 +119,35 @@ int main() {
 
     nlohmann::json game_info;
     do {
-        game_info = getGameInfo(gameId);
+        game_info = getGameInfo(gameId, false);
         sleep_ms(100);
     } while (game_info["gaming"] == false);
     
-    data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId));
+    while (game_info["turn"] <= game_info["totalTurn"]) {
+        data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId, false));
 
-    vector<Action> next_agents_move;
+        vector<Action> next_agents_move;
 
-    TurnInfo turn_info;
-    
-    bool can_continue = turn_info.input_game_data(input_datas.height,
-                                                  input_datas.width,
-                                                  input_datas.each_agent_num,
-                                                  input_datas.max_turn,
-                                                  input_datas.max_time_limit_ms,
-                                                  input_datas.points,
-                                                  input_datas.now_turn,
-                                                  input_datas.tile,
-                                                  input_datas.agent_positions);
+        TurnInfo turn_info;
+        
+        bool can_continue = turn_info.input_game_data(input_datas.height,
+                                                    input_datas.width,
+                                                    input_datas.each_agent_num,
+                                                    input_datas.max_turn,
+                                                    input_datas.max_time_limit_ms,
+                                                    input_datas.points,
+                                                    input_datas.now_turn,
+                                                    input_datas.tile,
+                                                    input_datas.agent_positions);
 
-    //next_agents_move = beam_search_and_yugeki::beam_search_and_yugeki_search(turn_info);
-    next_agents_move = hill_climbing::hill_climbing_search(turn_info);
+        next_agents_move = maximize_wall_point_and_yugeki::maximize_wall_point_and_yugeki_search(turn_info);
 
-    output_answer(turn_info, next_agents_move);
+        nlohmann::json next_actions = next_agents_move_to_json(next_agents_move);
+        setAction(gameId, token, next_actions.dump());
+
+        do {
+            game_info = getGameInfo(gameId, false);
+            sleep_ms(100);
+        } while (game_info["turn"] == input_datas.now_turn);
+    }
 }
