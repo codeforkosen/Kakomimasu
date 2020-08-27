@@ -81,6 +81,9 @@ data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann:
 nlohmann::json next_agents_move_to_json(vector<Action> moves) {
     nlohmann::json res = nlohmann::json::object();
     
+    time_t now = time(NULL);
+    res["time"] = now;
+
     for(int i = 0; i < moves.size(); ++i) {
         char t_tmcit = moves[i].get_behavior();
         string t_Kakomimasu = "STAY";
@@ -97,7 +100,7 @@ nlohmann::json next_agents_move_to_json(vector<Action> moves) {
             {"y", moves[i].get_target().get_y()}
         };
     }
-    
+
     return res;
 }
 
