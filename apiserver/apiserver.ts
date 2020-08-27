@@ -1,3 +1,4 @@
+import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
 import {
   ServerRequest,
   createRouter,
@@ -98,7 +99,9 @@ const addPlayer = (
     const freeGame = kkmm.getFreeGames();
     if (freeGame.length == 0) {
       //freeGame.push(kkmm.createGame(createDefaultBoard()));
-      freeGame.push(kkmm.createGame(readBoard("A-1")));
+      const game = kkmm.createGame(readBoard("A-1"));
+      game.changeFuncs.push(sendAllGame);
+      freeGame.push(game);
     }
     const playerIndex = freeGame[0].attachPlayer(player);
     if (playerIndex === false) throw Error("Can not add Player");
@@ -142,20 +145,6 @@ export const match = async (req: ServerRequest) => {
 };
 
 // #endregion
-
-//#region 全ルーム取得API
-const getAllRooms = async (req: ServerRequest) => {
-  //console.log(req, "getAllRooms");
-  await req.respond({
-    status: 200,
-    headers: new Headers({
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify(kkmm.getGames()),
-  });
-};
-
-//#endregion
 
 //#region 試合状態取得API
 export const getGameInfo = async (req: ServerRequest) => {
@@ -264,6 +253,36 @@ const userWeb = async (req: ServerRequest) => {
 };
 //#endregion
 
+//#region WebSocket
+
+const socks: WebSocket[] = [];
+
+const ws_AllGame = async (sock: WebSocket) => {
+  socks.push(sock);
+  sock.send(JSON.stringify(kkmm.getGames()));
+
+  for await (const msg of sock) {
+    if (typeof msg === "string") {
+      //console.log(msg);
+    } else {
+      //console.log("err on ws", msg);
+      // ws { code: 0, reason: "" } -- close
+      // ws { code: 1001, reason: "" } -- 遮断
+      break;
+    }
+  }
+};
+
+const sendAllGame = () => {
+  socks.forEach((s) => {
+    if (!s.isClosed) {
+      s.send(JSON.stringify(kkmm.getGames()));
+    }
+  });
+};
+
+//#endregion
+
 export const routes = () => {
   const router = createRouter();
 
@@ -280,7 +299,6 @@ export const routes = () => {
   );
 
   router.post("match", contentTypeFilter("application/json"), match);
-  router.get("match/", getAllRooms);
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
@@ -304,6 +322,8 @@ export const routes = () => {
     await req.sendFile(`./web/css/${req.match[2]}`);
     await req.respond({ status: 200 });
   });
+
+  router.ws("allgame", ws_AllGame);
 
   return router;
 };

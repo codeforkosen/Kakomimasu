@@ -337,6 +337,7 @@ class Game {
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
     this.turn = 0;
+    this.changeFuncs = [];
 
     // agents
     this.agents = [];
@@ -366,6 +367,8 @@ class Game {
       this.intervalId = setInterval(() => this.updateStatus(), 50);
       //console.log("intervalID", this.intervalId);
     }
+
+    this.changeFuncs.forEach(func => func());
   }
 
   isReady() {
@@ -381,6 +384,7 @@ class Game {
   }
 
   start() {
+    console.log("start!");
     this.turn = 1;
     this.gaming = true;
     this.players.forEach((p) => p.noticeStart());
@@ -394,7 +398,7 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     this.checkActions(actions);
-    //console.log(this.players[1].actions);
+    console.log(this.players[1].actions);
     this.checkConflict(actions);
     this.putOrMove();
     this.revertOverlap();
@@ -550,13 +554,18 @@ class Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
+      this.changeFuncs.forEach(func => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
+        this.changeFuncs.forEach(func => func());
       }
     }
-    if (this.ending) clearInterval(this.intervalId);
+    if (this.ending) {
+      this.dispose();
+      //this.changeFuncs.forEach(func => func());
+    }
   }
 
   toJSON() {
@@ -623,6 +632,7 @@ class Player {
   }
 
   setActions(actions) {
+    console.log(this.game);
     this.actions = actions;
     return this.game.turn;
   }

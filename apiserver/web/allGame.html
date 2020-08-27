@@ -47,14 +47,8 @@
                 games: [],
             },
             methods: {
-                init: function () {
-                    this.update();
-                    setInterval(this.update, 1000);
-                },
-                update: async function () {
-                    const gamesData = await getAllGame();
-                    //console.log(gamesData);
-                    gamesData.reverse().forEach((game, i) => {
+                update: async function (games) {
+                    games.reverse().forEach((game, i) => {
                         const [status, startTime] = Game.getGameStatus(game);
 
                         Vue.set(this.games, i, {
@@ -68,7 +62,21 @@
                 },
             },
         });
-        gameTableVue.init();
+
+        var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/allGame");
+        socket.onopen = (event) => {
+            //console.log("hello");
+        }
+        socket.onmessage = (event) => {
+            const games = JSON.parse(event.data);
+            gameTableVue.update(games);
+        }
+        socket.onerror = (event) => {
+            //console.log('ws wrror', event);
+        }
+        socket.onclose = (event) => {
+            //console.log('ws wrror');
+        }
 
         const nowTimeVue = new Vue({
             el: "#now-time",
