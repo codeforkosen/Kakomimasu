@@ -62,7 +62,7 @@ nlohmann::json get(const std::string host, const std::string path, const bool pr
     }
 
     pclose(fp);
-    printf("[res]\n%s\n\n", buf);
+
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
 
     if(print)
