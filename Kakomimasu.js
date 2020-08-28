@@ -386,7 +386,6 @@ class Game {
   }
 
   start() {
-    console.log("start!");
     this.turn = 1;
     this.gaming = true;
     this.players.forEach((p) => p.noticeStart());
@@ -400,7 +399,7 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     // console.log("actions", actions);
-    
+
     this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
     this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
     this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
@@ -686,7 +685,6 @@ class Player {
   }
 
   setActions(actions) {
-    console.log(this.game);
     this.actions = actions;
     return this.game.turn;
   }
