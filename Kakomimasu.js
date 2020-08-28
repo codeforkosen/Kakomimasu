@@ -311,7 +311,7 @@ class Field {
       if (att === Field.WALL) {
         p.wallpoint += pnt;
       } else if (att === Field.BASE) {
-        p.basepoint += pnt; // need abs()?
+        p.basepoint += Math.abs(pnt);
       }
     });
     return points;
