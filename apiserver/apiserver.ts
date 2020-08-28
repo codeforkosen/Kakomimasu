@@ -181,6 +181,15 @@ class ActionPost {
     else if (type === "MOVE") return Action.MOVE;
     else if (type === "REMOVE") return Action.REMOVE;
   }
+
+  static isEnable(a: ActionPost) {
+    if (
+      a.agentId === undefined || a.type === undefined || a.x === undefined ||
+      a.y === undefined
+    ) {
+      return false;
+    } else return true;
+  }
 }
 class SetActionPost {
   constructor(
@@ -205,26 +214,32 @@ export const setAction = async (req: ServerRequest) => {
       await req.respond(util.ErrorResponse("Invalid accessToken."));
     } else {
       const actionData = (await req.json()) as SetActionPost;
-      const actionsAry: any = [];
-      actionData.actions.forEach((a) => {
-        actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
-      });
-      //console.log(game.nextTurnUnixTime);
-      //if (game.nextTurnUnixTime >= reqTime) {
-      console.log(actionsAry);
-      const nowTurn = player.setActions(Action.fromJSON(actionsAry));
-      await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(
-          { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
-        ),
-      });
+      const isDisable = actionData.actions.some((a) => !ActionPost.isEnable(a));
+      //console.log(actionData);
+      if (isDisable) {
+        await req.respond(util.ErrorResponse("Invalid action"));
+      } else {
+        const actionsAry: any = [];
+        actionData.actions.forEach((a) => {
+          actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
+        });
+        //console.log(game.nextTurnUnixTime);
+        //if (game.nextTurnUnixTime >= reqTime) {
+        console.log(actionsAry);
+        const nowTurn = player.setActions(Action.fromJSON(actionsAry));
+        await req.respond({
+          status: 200,
+          headers: new Headers({
+            "content-type": "application/json",
+          }),
+          body: JSON.stringify(
+            { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
+          ),
+        });
+      }
     }
   } catch (e) {
-    console.log("err", e);
+    await req.respond(util.ErrorResponse(e.message));
   }
 };
 
