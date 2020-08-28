@@ -47,6 +47,37 @@ bool TurnInfo::input_game_data(int h,
                 enemy_agents_pos[i] = Cell(y, x);
         }
     }
+
+    std::cout << height << " " << width << " " << max_agent_num << " " << max_turn << " " << time_limist_ms <<  std::endl;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            std::cout << score_board[i][j] << " ";
+        }
+        std::cout << std::endl;
+        
+    }
+    std::cout << now_turn << std::endl;
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            std::cout << board_state[i][j] << " ";
+        }
+        std::cout << std::endl;
+        
+    }
+    for (int i = 0; i < max_agent_num; i++)
+    {
+        std::cout << ally_agents_pos[i] << std::endl;
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < max_agent_num; i++)
+    {
+        std::cout << enemy_agents_pos[i] << std::endl;
+    }
+
     return true;
 }
 

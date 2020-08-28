@@ -31,7 +31,7 @@ public:
     }
 };
 
-data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann::json match_info) {
+data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann::json match_info, const int team) {
     int h = match_info["board"]["height"];
     int w = match_info["board"]["width"];
     int a = match_info["board"]["nAgent"];
@@ -68,11 +68,22 @@ data_to_input_in_solver match_info_format_to_solver_input_format(const nlohmann:
     }
 
     vector<vector<pair<int, int>>> ap(2, vector<pair<int, int>>(a));
-    for (int team = 0; team <= 1; team++) {
-        for (int i = 0; i < a; ++i) {
-            ap[team][i] = make_pair(match_info["players"][team]["agents"][i]["x"], match_info["players"][team]["agents"][i]["y"]);
+    if(team == 0) {
+        for(int i = 0; i <= 1; ++i) {
+            for(int j = 0; j < a; ++j) {
+                ap[i][j] = make_pair(match_info["players"][team]["agents"][j]["x"], match_info["players"][team]["agents"][j]["y"]);
+            }
         }
     }
+    else {
+        for(int i = 1; i >= 0; --i) {
+            for(int j = 0; j < a; ++j) {
+                ap[i][j] = make_pair(match_info["players"][team]["agents"][j]["x"], match_info["players"][team]["agents"][j]["y"]);
+            }
+        }
+    }
+
+    //ap[team][i] = make_pair(match_info["players"][team]["agents"][i]["x"], match_info["players"][team]["agents"][i]["y"]);
 
     data_to_input_in_solver res(h, w, a, s, max_t, p, now_t, f, ap);
     return res;
@@ -117,7 +128,8 @@ int main() {
     nlohmann::json match_info = match(user_info["id"], password, spec);
     const string token = match_info["accessToken"];
     const string gameId = match_info["gameId"];
-
+    const int team = match_info["index"];
+    
     nlohmann::json game_info;
     do {
         game_info = getGameInfo(gameId, false);
@@ -125,7 +137,7 @@ int main() {
     } while (game_info["gaming"] == false);
     
     while (game_info["turn"] <= game_info["totalTurn"]) {
-        data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId, false));
+        data_to_input_in_solver input_datas = match_info_format_to_solver_input_format(getGameInfo(gameId, true), team);
 
         vector<Action> next_agents_move;
 

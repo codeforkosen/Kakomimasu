@@ -128,7 +128,9 @@ public:
     }
 
     // セルの情報を取得するゲッタ
-    int get_cell_state(const Cell& pos) const { return board_state[pos.get_y()][pos.get_x()]; }
+    int get_cell_state(const Cell& pos) const { 
+        return board_state[pos.get_y()][pos.get_x()]; 
+    }
     int get_cell_point(const Cell& pos) const { return score_board[pos.get_y()][pos.get_x()]; }
 
     // 遷移判定

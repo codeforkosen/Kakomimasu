@@ -7,11 +7,11 @@
 #include "json.hpp"
 
 #define MAX_LEN_REQ (200 * 1024) // 100kbyte
-#define MAX_LEN_JSON (200 * 1024) // 100kbyte
+#define MAX_LEN_JSON (1024 * 1024) // 100kbyte
 #define LEN_TOKEN 6 // TOKENの長さは固定
 
 const std::string host = "http://localhost:8880";
-
+//const std::string host = "https://kakomimasu.sabae.club";
 namespace http_methods {
 nlohmann::json post(const std::string host, const std::string path, const std::string json, const std::string token="token1") {
     // 引数を元にcurlコマンドを文字列を作成

@@ -44,7 +44,7 @@ namespace maximize_wall_point_and_yugeki {
             const Cell& pos = pq.top().second;
             pq.pop();
 
-            if (agent_existed[pos.get_y()][pos.get_x()] == true) continue;
+            if (agent_existed[pos.get_y()][pos.get_x()] == true || turn_info.is_outside(pos) == true) continue;
 
             candidate.push_back(pos);
         }
@@ -183,6 +183,7 @@ namespace maximize_wall_point_and_yugeki {
                 const Cell next = now.now + kNextToEit[direction];
                 const int ny = next.get_y();
                 const int nx = next.get_x();
+                if(turn_info.is_outside(Cell(ny, nx)) == true) continue;
                 const int ns = turn_info.get_cell_state(next);
 
                 if (turn_info.is_outside(next) == false && checked[ny][nx] == false
