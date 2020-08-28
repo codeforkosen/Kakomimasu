@@ -28,7 +28,7 @@ const kkmm = new Kakomimasu();
 
 for Deno
 ```
-$ git close https://github.com/taisukef/Kakomimasu.git
+$ git clo https://github.com/taisukef/Kakomimasu.git
 ```
 main.js を編集（そのままでも動きます）
 ```
