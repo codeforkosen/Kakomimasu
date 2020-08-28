@@ -63,7 +63,13 @@ const usersShow = async (req: ServerRequest) => {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      body: JSON.stringify(accounts.getUsers().map((u) => ({ screenName: u.screenName, name: u.name, id: u.id }))),
+      body: JSON.stringify(
+        accounts.getUsers().map((u) => ({
+          screenName: u.screenName,
+          name: u.name,
+          id: u.id,
+        })),
+      ),
     });
   }
 };
@@ -106,7 +112,7 @@ const addPlayer = (
 
       //const boardname = "A-1";
       const boardname = "F-1";
-      const game = kkmm.createGame(readBoard(boardname)));
+      const game = kkmm.createGame(readBoard(boardname));
       game.changeFuncs.push(sendAllGame);
       freeGame.push(game);
     }
@@ -352,7 +358,9 @@ export const routes = () => {
   router.ws("allgame", ws_AllGame);
 
   router.get("/", async (req: ServerRequest) => {
-    await req.respond({ headers: new Headers({ "Location": "game" }), status: 302 });
+    await req.respond(
+      { headers: new Headers({ "Location": "game" }), status: 302 },
+    );
   });
 
   return router;
