@@ -709,7 +709,7 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board, nturn = 30) {
+  createGame(board, nturn = 60) {
     //console.log(board);
     const game = new Game(board, nturn);
     this.games.push(game);
