@@ -91,6 +91,7 @@ class Agent {
 
   checkRemove(x, y) {
     if (!this.isOnBoard()) return false;
+    if (!this.checkOnBoard(x, y)) return false;
     if (!this.checkDir(x, y)) return false;
     const n = x + y * this.board.w;
     if (this.field.get(x, y)[0] !== Field.WALL) return false;
@@ -104,6 +105,7 @@ class Agent {
   }
 
   putOrMove() {
+    //console.log("putormove", this);
     if (this.lastaction == null) throw new Error("putOrMove before check");
     if (this.lastaction.res !== Action.SUCCESS) return false;
     const act = this.lastaction;
@@ -117,11 +119,11 @@ class Agent {
 
   put(x, y) {
     if (!this.checkPut(x, y)) return false;
-    this.x = x;
-    this.y = y;
-    if (!this.field.setAgent(this.playerid, this.x, this.y)) {
+    if (!this.field.setAgent(this.playerid, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
+    this.x = x;
+    this.y = y;
     return true;
   }
 
@@ -132,11 +134,11 @@ class Agent {
 
   move(x, y) {
     if (!this.checkMove(x, y)) return false;
-    this.x = x;
-    this.y = y;
-    if (!this.field.setAgent(this.playerid, this.x, this.y)) {
+    if (!this.field.setAgent(this.playerid, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
+    this.x = x;
+    this.y = y;
     return true;
   }
 
@@ -397,14 +399,18 @@ class Game {
   nextTurn() {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
-    this.checkActions(actions);
-    console.log(this.players[1].actions);
-    this.checkConflict(actions);
-    this.putOrMove();
-    this.revertOverlap();
-    this.removeOrNot();
-    this.revertNotOwner();
+    // console.log("actions", actions);
+    
+    this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
+    this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
+    this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
+    this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
+    this.putOrMove(); // 配置または動かし、フィールド更新
+    this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
+
     this.commit();
+
+    this.checkAgentConflict();
 
     this.field.fillBase();
 
@@ -424,6 +430,7 @@ class Game {
       this.gaming = false;
       this.ending = true;
     }
+    this.players.forEach((p) => p.clearActions());
     return this.gaming;
   }
 
@@ -433,11 +440,6 @@ class Game {
       const done = {};
       actions[playerid].forEach((a) => {
         const aid = a.agentid;
-        if (done[aid]) {
-          a.res = Action.ERR_ONLY_ONE_TURN;
-          return;
-        }
-        done[aid] = true;
         const agents = this.agents[playerid];
         if (aid < 0 || aid >= agents.length) {
           a.res = Action.ERR_ILLEGAL_AGENT;
@@ -448,6 +450,14 @@ class Game {
           a.res = Action.ERR_ILLEGAL_ACTION;
           return;
         }
+
+        const doneAgent = done[aid];
+        if (doneAgent) {
+          a.res = Action.ERR_ONLY_ONE_TURN;
+          doneAgent.res = Action.ERR_ONLY_ONE_TURN;
+          return;
+        }
+        done[aid] = a;
       });
     }
   }
@@ -461,15 +471,37 @@ class Game {
     for (let playerid = 0; playerid < nplayer; playerid++) {
       actions[playerid].forEach((a) => {
         if (a.res !== Action.SUCCESS) return false;
-        const agent = this.agents[a.agentid];
         const n = a.x + a.y * this.board.w;
-        chkfield[n].push(a);
+        if (n >= 0 && n < chkfield.length) {
+          chkfield[n].push(a);
+        } else {
+          console.log("?? n", n);
+        }
       });
     }
     // PUT/MOVE/REMOVE、競合はすべて無効
-    chkfield.filter((a) => a.length >= 2).forEach((a) =>
-      a.forEach((action) => action.res = Action.CONFLICT)
-    );
+    chkfield.filter((a) => a.length >= 2).forEach((a) => {
+      // console.log("conflict", a);
+      a.forEach((action) => action.res = Action.CONFLICT);
+    });
+  }
+
+  checkAgentConflict() {
+    const chkfield = new Array(this.field.field.length);
+    for (let i = 0; i < chkfield.length; i++) {
+      chkfield[i] = [];
+    }
+    this.agents.flat().forEach((agent) => {
+      if (agent.x === -1) return;
+      const act = agent.lastaction;
+      const n = agent.x + agent.y * this.board.w;
+      chkfield[n].push(agent);
+      // console.log("agent", agent.playerid, agent.x, agent.y);
+    });
+    chkfield.filter((a) => a.length >= 2).forEach((a) => {
+      console.log("**\nduplicate!!", a);
+      Deno.exit(0);
+    });
   }
 
   putOrMove() {
@@ -477,25 +509,41 @@ class Game {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
         // throw new Error("illegal action!")
-        console.log(`throw new Error("illegal action!")`);
+        // console.log(`throw new Error("illegal action!")`);
         return;
       }
     });
   }
 
   revertOverlap() {
+    let reverts = false;
     const chkfield = new Array(this.field.field.length);
-    for (let i = 0; i < chkfield.length; i++) {
-      chkfield[i] = [];
-    }
-    this.agents.flat().forEach((agent) => {
-      if (agent.x === -1) return;
-      const n = agent.x + agent.y * this.board.w;
-      chkfield[n].push(agent);
-    });
-    chkfield.filter((a) => a.length >= 2).forEach((a) =>
-      a.forEach((agent) => agent.revert())
-    );
+    do {
+      for (let i = 0; i < chkfield.length; i++) {
+        chkfield[i] = [];
+      }
+      this.agents.flat().forEach((agent) => {
+        const act = agent.lastaction;
+        if (agent.isValidAction() && (act.type === Action.MOVE || act.type === Action.PUT)) {
+          const n = act.x + act.y * this.board.w;
+          //console.log("act", n);
+          chkfield[n].push(agent);
+        } else {
+          if (agent.x === -1) return;
+          const n = agent.x + agent.y * this.board.w;
+          //console.log("agent", n);
+          chkfield[n].push(agent);
+        }
+      });
+      reverts = false;
+      //console.log("chkfield", chkfield);
+      chkfield.filter((a) => a.length >= 2).forEach((a) => {
+        // console.log("**\nreverts", a);
+        a.forEach((agent) => agent.revert());
+        reverts = true;
+      });
+      //console.log(reverts);
+    } while (reverts); // revertがあったら再度全件チェック
   }
 
   removeOrNot() {
@@ -513,15 +561,21 @@ class Game {
     });
   }
 
-  revertNotOwner() {
+  revertNotOwnerWall() {
     const agents = this.agents.flat();
     const fld = this.field.field;
     const w = this.board.w;
     agents.forEach((agent) => {
       if (agent.x === -1) return;
       if (!agent.isValidAction()) return;
-      const n = agent.x + agent.y * w;
-      if (fld[n][1] !== agent.playerid) {
+      const act = agent.lastaction;
+      if (act.type !== Action.MOVE && act.type !== Action.PUT) return;
+      // only PUT & MOVE
+      const n = act.x + act.y * w;
+      const f = fld[n];
+      const iswall = f[0] === Field.WALL;
+      const owner = f[1];
+      if (iswall && owner !== agent.playerid && owner !== -1) {
         agent.revert();
       }
     });
@@ -530,8 +584,8 @@ class Game {
   commit() {
     const agents = this.agents.flat();
     agents.forEach((agent) => {
-      if (agent.x === -1) return;
-      if (!agent.isValidAction()) return;
+      // if (agent.x === -1) return;
+      // if (!agent.isValidAction()) return;
       agent.commit();
     });
   }
@@ -641,6 +695,10 @@ class Player {
     return this.actions;
   }
 
+  clearActions() {
+    this.actions = [];
+  }
+
   getJSON() {
     return {
       userId: this.id,
@@ -666,7 +724,7 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board, nturn = 30) {
+  createGame(board, nturn = 60) {
     //console.log(board);
     const game = new Game(board, nturn);
     this.games.push(game);

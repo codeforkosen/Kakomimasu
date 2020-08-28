@@ -1,6 +1,9 @@
-const host = "http://localhost:8880";
-//const host = "http://118.27.2.240:8880";
-//const host = "https://kakomimasu.sabae.cc";
+// const defaulthost = "http://localhost:8880";
+const defaulthost = "https://kakomimasu.sabae.club";
+let host = defaulthost;
+const setHost = (s) => {
+  host = s || defaulthost;
+};
 
 class Action {
   constructor(agentId, type, x, y) {
@@ -76,14 +79,17 @@ async function match({ name = "", id = "", password = "", spec = "" }) {
 }
 
 async function getGameInfo(roomid) {
-  const reqJson = await fetch(
-    `${host}/match/${roomid}`,
-  ).then((response) => response.json());
-  return reqJson;
+  const res = await (await fetch(`${host}/match/${roomid}`)).json();
+  if (res.error) {
+    console.log("error! ", res);
+    Deno.exit(0);
+  }
+  return res;
 }
 
 async function setAction(roomid, playerid, actions) {
-  //console.log(JSON.stringify(actions));
+  console.log("setAction", JSON.stringify(actions));
+  
   const sendJson = {
     time: Math.floor(new Date().getTime() / 1000),
     actions: actions,
@@ -119,4 +125,5 @@ export {
   getGameInfo,
   setAction,
   diffTime,
+  setHost,
 };

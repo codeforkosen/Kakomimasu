@@ -1,2 +1,4 @@
 .vscode/
 apiserver/test.ts
+log/
+apiserver/data/users.json

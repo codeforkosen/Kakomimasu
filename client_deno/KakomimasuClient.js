@@ -7,28 +7,32 @@ import {
   getGameInfo,
   setAction,
   diffTime,
+  setHost,
 } from "./client_util.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
 class KakomimasuClient {
-  constructor() {
+  constructor(id, name, spec, password) {
+    dotenv.config();
+    this.id = id || Deno.env.get("id");
+    this.password = password || Deno.env.get("password");
+    this.name = name || Deno.env.get("name");
+    this.spec = spec || Deno.env.get("spec");
+    console.log(this.id, this.password, this.name, this.spec);
+    this.setServerHost(Deno.env.get("host"));
+  }
+  setServerHost(host) {
+    setHost(host);
   }
   async waitMatching() { // GameInfo
-    dotenv.config();
-    const id = Deno.env.get("id");
-    const password = Deno.env.get("password");
-    const name = Deno.env.get("name");
-    const spec = Deno.env.get("spec");
-    console.log(id, password, name, spec);
-
     // ユーザ取得（ユーザがなかったら新規登録）
-    let user = await userShow(id);
+    let user = await userShow(this.id);
     if (user.hasOwnProperty("error")) {
-      user = await userRegist(name, id, password);
+      user = await userRegist(this.name, this.id, this.password);
     }
     
     // プレイヤー登録
-    const resMatch = await match({ id: user.id, password, spec });
+    const resMatch = await match({ id: user.id, password: this.password, spec: this.spec });
     this.token = resMatch.accessToken;
     this.roomid = resMatch.gameId;
     this.pno = resMatch.index;

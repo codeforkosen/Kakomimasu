@@ -312,15 +312,16 @@
                     const classNames = [];
                     for (let y = 0; y < game.board.height; y++) {
                         let className = "";
-                        let playerid = game.tiled[x + y * game.board.width][1];
+                        const playerid = game.tiled[x + y * game.board.width][1];
+                        // console.log(game.tiled);
                         if (playerid !== -1) {
                             if (game.tiled[x + y * game.board.width][0] === 1) className += `p${playerid + 1}Wall`;
                             if (game.tiled[x + y * game.board.width][0] === 0) className += `p${playerid + 1}Area`;
                             game.players.forEach((p, i) => {
                                 p.agents.forEach(a => {
                                     if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) {
-                                        className += " agent agent" + (playerid + 1);
-                                        console.log(className);
+                                        className += " agent agent" + (i + 1); // (playerid + 1);
+                                        // console.log(a.x, a.y, className);
                                     }
                                 });
                             });

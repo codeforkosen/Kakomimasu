@@ -14,6 +14,10 @@ const accounts = new Account();
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
 
+import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
+dotenv.config();
+const port = parseInt((Deno.env.get("port") || "8880").toString());
+
 //#region ユーザアカウント登録・取得・削除
 const usersRegist = async (req: ServerRequest) => {
   const reqData = ((await req.json()) as User);
@@ -59,7 +63,7 @@ const usersShow = async (req: ServerRequest) => {
       headers: new Headers({
         "content-type": "application/json",
       }),
-      body: JSON.stringify(accounts.getUsers()),
+      body: JSON.stringify(accounts.getUsers().map((u) => ({ screenName: u.screenName, name: u.name, id: u.id }))),
     });
   }
 };
@@ -99,7 +103,10 @@ const addPlayer = (
     const freeGame = kkmm.getFreeGames();
     if (freeGame.length == 0) {
       //freeGame.push(kkmm.createGame(createDefaultBoard()));
-      const game = kkmm.createGame(readBoard("A-1"));
+
+      //const boardname = "A-1";
+      const boardname = "F-1";
+      const game = kkmm.createGame(readBoard(boardname)));
       game.changeFuncs.push(sendAllGame);
       freeGame.push(game);
     }
@@ -154,14 +161,18 @@ export const getGameInfo = async (req: ServerRequest) => {
   //console.log(id);
   const game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
   //console.log(game[0]);
-  game.updateStatus();
-  await req.respond({
-    status: 200,
-    headers: new Headers({
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify(game),
-  });
+  try {
+    game.updateStatus();
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(game),
+    });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
+  }
 };
 
 //#endregion
@@ -340,13 +351,17 @@ export const routes = () => {
 
   router.ws("allgame", ws_AllGame);
 
+  router.get("/", async (req: ServerRequest) => {
+    await req.respond({ headers: new Headers({ "Location": "game" }), status: 302 });
+  });
+
   return router;
 };
 
 // Port Listen
 const app = createApp();
 app.route("/", routes());
-app.listen({ port: 8880 });
+app.listen({ port });
 
 const createDefaultBoard = () => {
   const w = 8;

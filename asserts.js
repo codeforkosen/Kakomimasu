@@ -5,13 +5,13 @@ class AssertionError extends Error {
 
 const assertEquals = (x, y) => {
   if (!util.deepEquals(x, y)) {
-    throw new AssertionError(`${x} is not equals ${y}`);
+    throw new AssertionError(`${y} is must be ${x}`);
   }
 };
 
 const assert = b => {
   if (!b) {
-    throw new AssertionError(`${x} is must be true`);
+    throw new AssertionError(`must be true`);
   }
 };
 

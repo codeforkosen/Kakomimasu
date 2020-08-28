@@ -3,7 +3,8 @@
 import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
 import util from "../util.js";
 
-const kc = new KakomimasuClient();
+const kc = new KakomimasuClient("a4", "破壊者", "サンプル", "a4-pw" );
+// kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
@@ -60,7 +61,7 @@ while (info) {
           }
         }
       }
-      if (dirall.length > 0) {
+      if (dirall.length > 0) { //  && util.rnd(5) > 0) { // 膠着状態を防ぐために20%で回避 → 弱くなった
         sortByPoint(dirall);
         const p = dirall[0];
         if (p.type === 0 || p.pid === -1) {
