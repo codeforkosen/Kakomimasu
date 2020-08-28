@@ -17,9 +17,9 @@ nlohmann::json post(const std::string host, const std::string path, const std::s
     // 引数を元にcurlコマンドを文字列を作成
     const std::string cmd = "curl -s -H \"Content-Type:application/json\" -H \"Authorization: " + token + "\" -X POST -d '" + json + "' " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
-
+    
     // 作成したcurlコマンドをシェルで叩く
-    FILE* fp = popen(cmd.c_str(), "r");
+    FILE* fp = _popen(cmd.c_str(), "r");
     if (!fp) {
         fprintf(stderr, "can't popen\n");
         return "error";
@@ -34,7 +34,7 @@ nlohmann::json post(const std::string host, const std::string path, const std::s
         return "error";
     }
 
-    pclose(fp);
+    _pclose(fp);
 
     // 受信したデータはJSON型の文字列のため、それをjsonオブジェクトに変換する
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
@@ -48,7 +48,7 @@ nlohmann::json get(const std::string host, const std::string path, const bool pr
     const std::string cmd = "curl -s -H 'Authorization: token1' -X GET " + host + path;
     std::cout << "[post req]" << std::endl << cmd << std::endl << std::endl;
 
-    FILE* fp = popen(cmd.c_str(), "r");
+    FILE* fp = _popen(cmd.c_str(), "r");
     if (!fp) {
         fprintf(stderr, "can't popen\n");
         return "error";
@@ -61,8 +61,8 @@ nlohmann::json get(const std::string host, const std::string path, const bool pr
         return "error";
     }
 
-    pclose(fp);
-
+    _pclose(fp);
+    printf("[res]\n%s\n\n", buf);
     nlohmann::json response_json = nlohmann::json::parse(std::string(buf));
 
     if(print)
