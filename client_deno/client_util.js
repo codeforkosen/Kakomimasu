@@ -88,7 +88,7 @@ async function setAction(roomid, playerid, actions) {
     time: Math.floor(new Date().getTime() / 1000),
     actions: actions,
   };
-  const reqJson = await (await fetch(
+  const resJson = await (await fetch(
     `${host}/match/${roomid}/action`,
     {
       method: "POST",
@@ -99,7 +99,8 @@ async function setAction(roomid, playerid, actions) {
       body: JSON.stringify(sendJson),
     },
   )).json();
-  return reqJson;
+  console.log(resJson, "setAction");
+  return resJson;
 }
 
 function diffTime(unixTime) {
