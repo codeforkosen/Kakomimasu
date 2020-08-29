@@ -311,7 +311,7 @@ class Field {
       if (att === Field.WALL) {
         p.wallpoint += pnt;
       } else if (att === Field.BASE) {
-        p.basepoint += pnt; // need abs()?
+        p.basepoint += Math.abs(pnt);
       }
     });
     return points;
@@ -467,7 +467,11 @@ class Game {
       actions[playerid].forEach((a) => {
         if (a.res !== Action.SUCCESS) return false;
         const n = a.x + a.y * this.board.w;
-        chkfield[n].push(a);
+        if (n >= 0 && n < chkfield.length) {
+          chkfield[n].push(a);
+        } else {
+          console.log("?? n", n);
+        }
       });
     }
     // PUT/MOVE/REMOVE、競合はすべて無効
@@ -709,7 +713,7 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board, nturn = 30) {
+  createGame(board, nturn = 60) {
     //console.log(board);
     const game = new Game(board, nturn);
     this.games.push(game);

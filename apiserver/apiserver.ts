@@ -102,7 +102,9 @@ const addPlayer = (
     const freeGame = kkmm.getFreeGames();
     if (freeGame.length == 0) {
       //freeGame.push(kkmm.createGame(createDefaultBoard()));
-      freeGame.push(kkmm.createGame(readBoard("A-1")));
+      //const boardname = "A-1";
+      const boardname = "F-1";
+      freeGame.push(kkmm.createGame(readBoard(boardname)));
     }
     const playerIndex = freeGame[0].attachPlayer(player);
     if (playerIndex === false) throw Error("Can not add Player");

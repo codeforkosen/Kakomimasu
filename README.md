@@ -19,7 +19,7 @@ http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&p
 ## 利用方法（コアのみ使用する）
 
 for Deno
-```
+```typescript
 import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
@@ -31,7 +31,7 @@ for Deno
 $ git clone https://github.com/taisukef/Kakomimasu.git
 ```
 main.js を編集（そのままでも動きます）
-```
+```javascript
 import { Kakomimasu, Board, Action } from "./Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
