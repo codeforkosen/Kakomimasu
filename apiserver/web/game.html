@@ -307,6 +307,11 @@
                 fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
                 fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
 
+                const lastLog = game.log[game.log.length - 1];
+                const lastFlatLog = [];
+                lastLog.forEach(p => {
+                    lastFlatLog.push(...p.actions);
+                });
 
                 for (let x = 0; x < game.board.width; x++) {
                     const classNames = [];
@@ -326,7 +331,15 @@
                                 });
                             });
                         }
+                        const isConflict = lastFlatLog.some(a => (a.res === 1 && a.x === x && a.y === y));
+                        if (isConflict) {
+                            //console.log("conflict", x, y);
+                            className += " conflict";
+                        }
+                        //console.log();
+
                         classNames.push(className);
+
                     }
                     fieldTableVue.className.splice(x, 1, classNames);
                 }
@@ -471,6 +484,20 @@
 
     td.p2Area {
         background-color: #FE9998;
+    }
+
+    td.conflict {
+        animation: flash 1s linear infinite;
+    }
+
+    @keyframes flash {
+
+        0%,
+        100% {}
+
+        50% {
+            background-color: #00ff00;
+        }
     }
 
     #graph-div {
