@@ -1,8 +1,6 @@
-"use struct";
+import { createHeader, createFooter, userShow } from "./util.js";
 
-main();
-
-async function main() {
+const main = async () => {
   createHeader("ユーザ詳細");
   createFooter();
 
@@ -25,3 +23,5 @@ async function main() {
     },
   });
 }
+
+main();
