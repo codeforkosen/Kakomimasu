@@ -340,18 +340,18 @@ export const routes = () => {
 
   router.get(new RegExp("([^/]+?)?.js$"), async (req: ServerRequest) => {
     //console.log(req.match);
-    await req.sendFile(`./web/js/${req.match[1]}.js`);
+    await req.sendFile(`./web/js/${util.getSafePath(req.match[1])}.js`);
     //await req.sendFile(``);
     await req.respond({ status: 200 });
   });
   router.get(new RegExp("^(.*?)img/(.+)$"), async (req: ServerRequest) => {
     //console.log(req.match);
-    await req.sendFile(`../img/${req.match[2]}`);
+    await req.sendFile(`../img/${util.getSafePath(req.match[2])}`);
     await req.respond({ status: 200 });
   });
   router.get(new RegExp("^(.*?)css/(.+)$"), async (req: ServerRequest) => {
     console.log(req.match);
-    await req.sendFile(`./web/css/${req.match[2]}`);
+    await req.sendFile(`./web/css/${util.getSafePath(req.match[2])}`);
     await req.respond({ status: 200 });
   });
 
