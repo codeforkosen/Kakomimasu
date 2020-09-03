@@ -346,11 +346,6 @@
                 }
 
                 // グラフ更新
-                game.players.forEach((p, idx) => {
-                    const point = p.point.basepoint + p.point.wallpoint;
-                    pointChart.data.datasets[idx].data[game.turn] = point;
-                });
-
                 game.log.forEach((t, tIdx) => {
                     t.forEach((p, pIdx) => {
                         const point = p.point.basepoint + p.point.wallpoint;
