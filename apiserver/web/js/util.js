@@ -1,5 +1,3 @@
-"use struct";
-
 class Game {
   constructor() {
     //const [status, startTime] = Game.getGameStatus(game);
@@ -80,3 +78,5 @@ async function getGameInfo(roomid) {
   return resJson;
 }
 //#endregion
+
+export { Game, createHeader, createFooter, getTurnText, nowUnixTime, diffTime, userShow, getAllGame, getGameInfo };

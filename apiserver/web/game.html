@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 
     <link rel="stylesheet" href="./css/main.css">
-    <script type="text/javascript" src="./js/util.js"></script>
 
     <title>ゲーム詳細 - 囲みマス</title>
 </head>
@@ -73,6 +72,8 @@
     </div>
     <footer></footer>
     <script type="module">
+        import { createHeader, createFooter, Game, userShow, getGameInfo, nowUnixTime, getTurnText } from "./util.js";
+
         createHeader("ゲーム詳細");
         createFooter();
 

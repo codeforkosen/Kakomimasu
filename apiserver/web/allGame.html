@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
     <link rel="stylesheet" href="./css/main.css">
-    <script type="text/javascript" src="./js/util.js"></script>
 
 
     <title>ゲーム一覧 - 囲みマス</title>
@@ -38,6 +37,8 @@
     <footer></footer>
 
     <script type="module">
+        import { createHeader, createFooter, Game, getTurnText } from "./util.js";
+
         createHeader("ゲーム一覧");
         createFooter();
 
