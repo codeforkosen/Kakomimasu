@@ -251,8 +251,11 @@ class Field {
     const h = this.board.h;
     const field = this.field;
 
+    const areas = [];
     for (let pid = 0; pid < this.board.nplayer; pid++) {
       const flg = new Array(w * h);
+      const area = new Array(w * h);
+      areas.push(area);
       for (let i = 1; i < w - 1; i++) {
         for (let j = 1; j < h - 1; j++) {
           if (
@@ -287,11 +290,84 @@ class Field {
           };
           if (chk(i, j)) {
             fill.forEach((f, idx) => {
-              if (this.field[idx][0] === Field.BASE) {
-                this.field[idx][1] = pid;
-                flg[idx] = true;
-              }
+              area[idx] = true;
             });
+          }
+        }
+      }
+    }
+    // かぶったところは小さい方を優先する
+    const countArea = (area, x, y) => {
+      const flg = new Array(w * h);
+      const countA = (x, y) => {
+        const idx = x + y * w;
+        if (!area[idx] || flg[idx])
+          return 0;
+        flg[idx] = true;
+        let cnt = 1;
+        cnt += countA(x - 1, y);
+        cnt += countA(x + 1, y);
+        cnt += countA(x, y - 1);
+        cnt += countA(x, y + 1);
+        return cnt;
+      };
+      return countA(x, y);
+    };
+    const removeAreaExcept = (x, y, expid) => {
+      const flg = new Array(w * h);
+      const area = areas[expid];
+      const removeAE = (x, y) => {
+        const idx = x + y * w;
+        if (!area[idx] || flg[idx])
+          return 0;
+        flg[idx] = true;
+        for (let pid = 0; pid < this.board.nplayer; pid++) {
+          if (pid === expid) {
+            continue;
+          }
+          areas[pid][idx] = false;
+        }
+        removeAE(x - 1, y);
+        removeAE(x + 1, y);
+        removeAE(x, y - 1);
+        removeAE(x, y + 1);
+      };
+      removeAE(x, y);
+    };
+    for (let i = 0; i < w; i++) {
+      for (let j = 0; j < h; j++) {
+        const idx = i + j * w;
+        let min = w * h;
+        let pmin = -1;
+        let nfill = 0; // 競合数
+        for (let pid = 0; pid < this.board.nplayer; pid++) {
+          const area = areas[pid];
+          if (area[idx]) {
+            const cnt = countArea(area, i, j, 0);
+            if (cnt > 0) {
+              nfill++;
+              if (cnt < min) {
+                min = cnt;
+                pmin = pid;
+              }
+            }
+          }
+        }
+        if (nfill > 1) {
+          removeAreaExcept(i, j, pmin);
+        }
+      }
+    }
+    // 最終的に塗る
+    for (let pid = 0; pid < this.board.nplayer; pid++) {
+      const area = areas[pid];
+      for (let i = 0; i < w; i++) {
+        for (let j = 0; j < h; j++) {
+          const idx = i + j * w;
+          if (area[idx]) {
+            if (this.field[idx][0] === Field.BASE) {
+              this.field[idx][1] = pid;
+            }
           }
         }
       }
