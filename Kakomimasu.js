@@ -339,6 +339,7 @@ class Game {
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
     this.turn = 0;
+    this.changeFuncs = [];
 
     // agents
     this.agents = [];
@@ -368,6 +369,8 @@ class Game {
       this.intervalId = setInterval(() => this.updateStatus(), 50);
       //console.log("intervalID", this.intervalId);
     }
+
+    this.changeFuncs.forEach(func => func());
   }
 
   isReady() {
@@ -396,13 +399,14 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     // console.log("actions", actions);
-    
+
     this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
     this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
     this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
     this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
     this.putOrMove(); // 配置または動かし、フィールド更新
     this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
+
     this.commit();
 
     this.checkAgentConflict();
@@ -603,13 +607,18 @@ class Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
+      this.changeFuncs.forEach(func => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
+        this.changeFuncs.forEach(func => func());
       }
     }
-    if (this.ending) clearInterval(this.intervalId);
+    if (this.ending) {
+      this.dispose();
+      //this.changeFuncs.forEach(func => func());
+    }
   }
 
   toJSON() {
