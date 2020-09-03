@@ -395,10 +395,5 @@ const readBoard = (fileName: string) => {
     boardJson.nagent,
   );*/
 
-  return new Board(
-    boardJson.width,
-    boardJson.height,
-    boardJson.points,
-    boardJson.nagent,
-  );
+  return new Board(boardJson);
 };
