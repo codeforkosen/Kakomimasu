@@ -44,7 +44,7 @@
             </div>
             <table id="field-table" v-cloak>
                 <tr v-for="(row,y) in point">
-                    <td v-for="(item,x) in row" :class="className[x][y]">{{item}}</td>
+                    <td v-for="(item,x) in row" :class="className[y][x]">{{item}}</td>
                 </tr>
             </table>
         </div>
@@ -167,15 +167,15 @@
             },
             methods: {
                 init: function (game) {
-                    this.point = new Array(game.board.width);
-                    this.className = new Array(game.board.width);
-                    for (let i = 0; i < game.board.width; i++) {
-                        this.point[i] = new Array(game.board.height);
-                        this.className[i] = new Array(game.board.height);
+                    this.point = new Array(game.board.height);
+                    this.className = new Array(game.board.height);
+                    for (let i = 0; i < game.board.height; i++) {
+                        this.point[i] = new Array(game.board.width);
+                        this.className[i] = new Array(game.board.width);
                     }
-                    for (let i = 0; i < game.board.width; i++) {
-                        for (let j = 0; j < game.board.height; j++) {
-                            Vue.set(this.point[i], j, game.board.points[i + j * game.board.width]);
+                    for (let i = 0; i < game.board.height; i++) {
+                        for (let j = 0; j < game.board.width; j++) {
+                            Vue.set(this.point[i], j, game.board.points[j + i * game.board.width]);
                             Vue.set(this.className[i], j, "");
                         }
                     }
@@ -307,10 +307,15 @@
                 fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
                 fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
 
+                const lastLog = game.log[game.log.length - 1];
+                const lastFlatLog = [];
+                lastLog.forEach(p => {
+                    lastFlatLog.push(...p.actions);
+                });
 
-                for (let x = 0; x < game.board.width; x++) {
+                for (let y = 0; y < game.board.height; y++) {
                     const classNames = [];
-                    for (let y = 0; y < game.board.height; y++) {
+                    for (let x = 0; x < game.board.width; x++) {
                         let className = "";
                         const playerid = game.tiled[x + y * game.board.width][1];
                         // console.log(game.tiled);
@@ -326,9 +331,17 @@
                                 });
                             });
                         }
+                        const isConflict = lastFlatLog.some(a => (a.res === 1 && a.x === x && a.y === y));
+                        if (isConflict) {
+                            //console.log("conflict", x, y);
+                            className += " conflict";
+                        }
+                        //console.log();
+
                         classNames.push(className);
+
                     }
-                    fieldTableVue.className.splice(x, 1, classNames);
+                    fieldTableVue.className.splice(y, 1, classNames);
                 }
 
                 // グラフ更新
@@ -471,6 +484,20 @@
 
     td.p2Area {
         background-color: #FE9998;
+    }
+
+    td.conflict {
+        animation: flash 1s linear infinite;
+    }
+
+    @keyframes flash {
+
+        0%,
+        100% {}
+
+        50% {
+            background-color: #00ff00;
+        }
     }
 
     #graph-div {
