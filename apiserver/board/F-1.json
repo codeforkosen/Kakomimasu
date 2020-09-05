@@ -2,7 +2,8 @@
     "width": 20,
     "height": 20,
     "nagent": 8,
-    "totalTurn": 60,
+    "nturn": 60,
+    "nsec": 3,
     "points": [
         -15,
         7,

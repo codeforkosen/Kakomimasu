@@ -1,16 +1,28 @@
 import util from "./util.js";
 
 class Board {
-  constructor(w, h, points, nagent, nplayer = 2) {
-    if (points.length !== w * h) {
-      throw new Error("points.length must be " + w * h);
+  constructor(w, h, points, nagent, nturn, nsec = 3, nplayer = 2) {
+    if (typeof w === "object") {
+      this.w = w.width;
+      this.h = w.height;
+      this.points = w.points;
+      this.nagent = w.nagent;
+      this.nturn = w.nturn;
+      this.nsec = w.nsec || 3;
+      this.nplayer = w.nplayer || 2;
+    } else {
+      this.w = w;
+      this.h = h;
+      this.points = points;
+      this.nagent = nagent;
+      this.nturn = nturn;
+      this.nsec = nsec;
+      this.nplayer = nplayer;
+    }
+    if (this.points.length !== this.w * this.h) {
+      throw new Error("points.length must be " + this.w * this.h);
     }
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
-    this.w = w;
-    this.h = h;
-    this.points = points;
-    this.nagent = nagent;
-    this.nplayer = nplayer;
   }
 
   getJSON() {
@@ -19,6 +31,8 @@ class Board {
       h: this.h,
       points: this.points,
       nagents: this.nagent,
+      nturn: this.nturn,
+      nsec: this.nsec,
       nplayer: this.nplayer,
     };
   }
@@ -29,6 +43,8 @@ class Board {
       height: this.h,
       nAgent: this.nagent,
       nPlayer: this.nplayer,
+      nTurn: this.nturn,
+      nSec: this.nsec,
       points: this.points,
     };
   }
@@ -401,12 +417,16 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, nturn = 10, nsec = 3) {
+  constructor(board, dummy) {
+    if (dummy) {
+      console.log(dummy);
+      throw new Error("too much");
+    }
     this.uuid = util.uuid();
     this.board = board;
     this.players = [];
-    this.nturn = nturn;
-    this.nsec = nsec;
+    this.nturn = board.nturn;
+    this.nsec = board.nsec;
     this.gaming = false;
     this.ending = false;
     this.actions = [];
@@ -798,9 +818,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board, nturn = 60) {
+  createGame(board) {
     //console.log(board);
-    const game = new Game(board, nturn);
+    const game = new Game(board);
     this.games.push(game);
     return game;
   }

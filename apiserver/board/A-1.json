@@ -2,6 +2,8 @@
     "width": 10,
     "height": 10,
     "nagent": 8,
+    "nturn": 30,
+    "nsec": 1,
     "points": [
         12,
         3,
