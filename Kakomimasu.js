@@ -511,6 +511,7 @@ class Game {
 
   checkActions(actions) {
     const nplayer = actions.length;
+    // 範囲外と、かぶりチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
       const done = {};
       actions[playerid].forEach((a) => {
@@ -520,12 +521,6 @@ class Game {
           a.res = Action.ERR_ILLEGAL_AGENT;
           return;
         }
-        const agent = agents[aid];
-        if (!agent.check(a)) {
-          a.res = Action.ERR_ILLEGAL_ACTION;
-          return;
-        }
-
         const doneAgent = done[aid];
         if (doneAgent) {
           a.res = Action.ERR_ONLY_ONE_TURN;
@@ -533,6 +528,18 @@ class Game {
           return;
         }
         done[aid] = a;
+      });
+    }
+    // 変な動きチェック
+    for (let playerid = 0; playerid < nplayer; playerid++) {
+      actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
+        const aid = a.agentid;
+        const agents = this.agents[playerid];
+        const agent = agents[aid];
+        if (!agent.check(a)) {
+          a.res = Action.ERR_ILLEGAL_ACTION;
+          return;
+        }
       });
     }
   }
