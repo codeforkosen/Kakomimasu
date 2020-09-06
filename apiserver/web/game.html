@@ -334,7 +334,7 @@
                                 });
                             });
                         }
-                        const isConflict = lastFlatLog.some(a => (a.res === 1 && a.x === x && a.y === y));
+                        const isConflict = lastFlatLog.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
                         if (isConflict) {
                             //console.log("conflict", x, y);
                             className += " conflict";
