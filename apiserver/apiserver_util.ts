@@ -7,3 +7,11 @@ export const ErrorResponse = (message: string) => {
     body: JSON.stringify({ error: message }),
   };
 };
+
+export const getSafePath = (fn: string) => {
+  console.log("safepath", fn, fn.indexOf(".."));
+  if (fn.indexOf("..") >= 0) {
+    throw new Error("unsafe path");
+  }
+  return fn;
+};
