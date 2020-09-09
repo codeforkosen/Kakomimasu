@@ -33,6 +33,15 @@ deno run -A ../client_deno/client_test1.ts
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
+#### 2020.9.9
+- apiにアクセスするURLの変更
+    - /users/regist => /api/users/regist
+    - /users/show/:userId => /api/users/show/:userId
+    - /users/delete => /api/users/delete
+    - /match => /api/match
+    - /match/:roomId => /api/match/:roomId
+    - /match/:roomId/action => /api/match/:roomId/action
+
 #### 2020.8.13
 - action API
     - リクエストデータ形式の変更
