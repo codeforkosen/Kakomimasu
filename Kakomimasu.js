@@ -259,132 +259,85 @@ class Field {
   }
 
   fillBase() {
-    // 外側1ます残した内側を全点チェック
-    // チェック済みであれば次の点
-    // 上下左右斜め、8方向をチェックし、外周にでたら中断（塗りなし確定）、壁であればチェック継続
-    // プレイヤー同士、かぶったところは小さい方を優先する
+    // プレイヤーごとに入れ子関係なく囲まれている所にフラグを立て、まとめる。
+    // (bitごと 例:010だったら、1番目のプレイヤーの領地or城壁であるという意味)
+    // 各マスの立っているbitが一つだけだったらそのプレイヤーの領地or城壁で確定。
+    // 2つ以上bitが立っていたら入れ子になっているので、その部分だけmaskをかけ、もう一度最初からやり直す。
+    // （whileするたびに入れ子が一個ずつ解消されていくイメージ）
+    // 説明難しい…
+
     const w = this.board.w;
     const h = this.board.h;
-    const field = this.field;
+    const field = [];
 
-    const areas = [];
-    for (let pid = 0; pid < this.board.nplayer; pid++) {
-      const flg = new Array(w * h);
-      const area = new Array(w * h);
-      areas.push(area);
-      for (let i = 1; i < w - 1; i++) {
-        for (let j = 1; j < h - 1; j++) {
-          if (
-            flg[i + j * w] || this.field[i + j * w][0] === Field.WALL
+    // 外側に空白のマスを作る
+    for (let y = -1; y < h + 1; y++) {
+      for (let x = -1; x < w + 1; x++) {
+        if (x < 0 || x >= w || y < 0 || y >= h) field.push([0, -1]);
+        else field.push(this.field[x + y * w].concat());
+      }
+    }
+
+    const mask = new Array(field.length);
+    for (let i = 0; i < mask.length; i++) mask[i] = 1;
+
+    while (mask.reduce((s, c) => s + c)) {
+      const area = new Array(field.length);
+      for (let pid = 0; pid < this.board.nplayer; pid++) {
+        const narea = new Array(field.length);
+        for (let i = 0; i < field.length; i++) {
+          narea[i] = 1; //mask[i] * 1;
+        }
+        // 外側の囲まれていないところを判定
+        const chk = (x, y) => {
+          const n = x + y * (w + 2);
+          if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return;
+          else if (narea[n] === 0) return;
+          else if (
+            mask[n] !== 0 && field[n][0] === Field.WALL && field[n][1] === pid
           ) {
-            continue;
+            return;
+          } else {
+            narea[n] = 0;
+            chk(x - 1, y);
+            chk(x + 1, y);
+            chk(x - 1, y - 1);
+            chk(x, y - 1);
+            chk(x + 1, y - 1);
+            chk(x - 1, y + 1);
+            chk(x, y + 1);
+            chk(x + 1, y + 1);
           }
-          const fill = new Array(w * h);
-          const chk = function (x, y) {
-            if (x < 0 || x >= w || y < 0 || y >= h) return false;
-            const n = x + y * w;
-            if (fill[n]) return true;
-            fill[n] = true;
+        };
+        chk(0, 0);
+        //console.log(mask, narea, pid);
 
-            const f = field[n];
-            if (f[0] === Field.WALL) {
-              if (f[1] === pid) {
-                return true;
-              }
-            } else {
-              fill[n] = true;
-            }
-            if (!chk(x - 1, y)) return false;
-            if (!chk(x + 1, y)) return false;
-            if (!chk(x - 1, y - 1)) return false;
-            if (!chk(x, y - 1)) return false;
-            if (!chk(x + 1, y - 1)) return false;
-            if (!chk(x - 1, y + 1)) return false;
-            if (!chk(x, y + 1)) return false;
-            if (!chk(x + 1, y + 1)) return false;
-            return true;
-          };
-          if (chk(i, j)) {
-            fill.forEach((f, idx) => {
-              area[idx] = true;
-            });
-          }
+        for (let i = 0; i < field.length; i++) {
+          area[i] |= (narea[i] << pid);
+        }
+      }
+
+      //console.log(area);
+
+      //console.log("mamamama");
+      //console.log(mask, area, "mask");
+      for (let i = 0; i < field.length; i++) {
+        if (area[i] === 0) {
+          mask[i] = 0;
+        } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
+          //field[i][0] = Field.BASE;
+          field[i][1] = Math.log2(area[i]);
+          mask[i] = 0;
         }
       }
     }
-    // かぶったところは小さい方を優先する
-    const countArea = (area, x, y) => {
-      const flg = new Array(w * h);
-      const countA = (x, y) => {
-        const idx = x + y * w;
-        if (!area[idx] || flg[idx])
-          return 0;
-        flg[idx] = true;
-        let cnt = 1;
-        cnt += countA(x - 1, y);
-        cnt += countA(x + 1, y);
-        cnt += countA(x, y - 1);
-        cnt += countA(x, y + 1);
-        return cnt;
-      };
-      return countA(x, y);
-    };
-    const removeAreaExcept = (x, y, expid) => {
-      const flg = new Array(w * h);
-      const area = areas[expid];
-      const removeAE = (x, y) => {
-        const idx = x + y * w;
-        if (!area[idx] || flg[idx])
-          return 0;
-        flg[idx] = true;
-        for (let pid = 0; pid < this.board.nplayer; pid++) {
-          if (pid === expid) {
-            continue;
-          }
-          areas[pid][idx] = false;
-        }
-        removeAE(x - 1, y);
-        removeAE(x + 1, y);
-        removeAE(x, y - 1);
-        removeAE(x, y + 1);
-      };
-      removeAE(x, y);
-    };
+
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
-        const idx = i + j * w;
-        let min = w * h;
-        let pmin = -1;
-        let nfill = 0; // 競合数
-        for (let pid = 0; pid < this.board.nplayer; pid++) {
-          const area = areas[pid];
-          if (area[idx]) {
-            const cnt = countArea(area, i, j, 0);
-            if (cnt > 0) {
-              nfill++;
-              if (cnt < min) {
-                min = cnt;
-                pmin = pid;
-              }
-            }
-          }
-        }
-        if (nfill > 1) {
-          removeAreaExcept(i, j, pmin);
-        }
-      }
-    }
-    // 最終的に塗る
-    for (let pid = 0; pid < this.board.nplayer; pid++) {
-      const area = areas[pid];
-      for (let i = 0; i < w; i++) {
-        for (let j = 0; j < h; j++) {
-          const idx = i + j * w;
-          if (area[idx]) {
-            if (this.field[idx][0] === Field.BASE) {
-              this.field[idx][1] = pid;
-            }
-          }
+        const n = i + j * w;
+        const nexp = (i + 1) + (j + 1) * (w + 2);
+        if (this.field[n][0] !== Field.WALL) {
+          this.field[n][1] = field[nexp][1];
         }
       }
     }
@@ -466,7 +419,7 @@ class Game {
       //console.log("intervalID", this.intervalId);
     }
 
-    this.changeFuncs.forEach(func => func());
+    this.changeFuncs.forEach((func) => func());
   }
 
   isReady() {
@@ -514,8 +467,8 @@ class Game {
         return {
           point: this.field.getPoints()[idx],
           actions: ar.map((a) => a.getJSON()),
-        }
-      })
+        };
+      }),
     );
 
     if (this.turn < this.nturn) {
@@ -626,7 +579,10 @@ class Game {
       }
       this.agents.flat().forEach((agent) => {
         const act = agent.lastaction;
-        if (agent.isValidAction() && (act.type === Action.MOVE || act.type === Action.PUT)) {
+        if (
+          agent.isValidAction() &&
+          (act.type === Action.MOVE || act.type === Action.PUT)
+        ) {
           const n = act.x + act.y * this.board.w;
           //console.log("act", n);
           chkfield[n].push(agent);
@@ -710,12 +666,12 @@ class Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
-      this.changeFuncs.forEach(func => func());
+      this.changeFuncs.forEach((func) => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
-        this.changeFuncs.forEach(func => func());
+        this.changeFuncs.forEach((func) => func());
       }
     }
     if (this.ending) {
