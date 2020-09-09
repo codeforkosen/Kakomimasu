@@ -284,21 +284,20 @@ class Field {
     while (mask.reduce((s, c) => s + c)) {
       const area = new Array(field.length);
       for (let pid = 0; pid < this.board.nplayer; pid++) {
-        const narea = new Array(field.length);
         for (let i = 0; i < field.length; i++) {
-          narea[i] = 1; //mask[i] * 1;
+          area[i] |= 1 << pid;
         }
         // 外側の囲まれていないところを判定
         const chk = (x, y) => {
           const n = x + y * (w + 2);
           if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return;
-          else if (narea[n] === 0) return;
+          else if ((area[n] & (1 << pid)) === 0) return;
           else if (
             mask[n] !== 0 && field[n][0] === Field.WALL && field[n][1] === pid
           ) {
             return;
           } else {
-            narea[n] = 0;
+            area[n] &= ~(1 << pid);
             chk(x - 1, y);
             chk(x + 1, y);
             chk(x - 1, y - 1);
@@ -311,10 +310,6 @@ class Field {
         };
         chk(0, 0);
         //console.log(mask, narea, pid);
-
-        for (let i = 0; i < field.length; i++) {
-          area[i] |= (narea[i] << pid);
-        }
       }
 
       //console.log(area);
@@ -325,7 +320,6 @@ class Field {
         if (area[i] === 0) {
           mask[i] = 0;
         } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
-          //field[i][0] = Field.BASE;
           field[i][1] = Math.log2(area[i]);
           mask[i] = 0;
         }
