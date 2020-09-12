@@ -4,6 +4,7 @@ import {
   createRouter,
   contentTypeFilter,
   createApp,
+  serveStatic,
 } from "https://servestjs.org/@v1.1.1/mod.ts";
 
 import * as util from "./apiserver_util.ts";
@@ -262,29 +263,6 @@ export const setAction = async (req: ServerRequest) => {
 
 //#endregion
 
-//#region ブラウザ表示用
-const allGameWeb = async (req: ServerRequest) => {
-  await req.sendFile("./web/allGame.html");
-  await req.respond({ status: 200 });
-};
-const gameWeb = async (req: ServerRequest) => {
-  const [, roomid] = req.match;
-  const game = kkmm.getGames().filter((item: any) => item.uuid === roomid);
-  if (game.length > 0) {
-    await req.sendFile("./web/game.html");
-    await req.respond({ status: 200 });
-  } else {
-    await req.respond({ status: 404 });
-  }
-};
-const userWeb = async (req: ServerRequest) => {
-  await req.sendFile("./web/user.html");
-  await req.respond({
-    status: 200,
-  });
-};
-//#endregion
-
 //#region WebSocket
 
 const socks: WebSocket[] = [];
@@ -315,7 +293,19 @@ const sendAllGame = () => {
 
 //#endregion
 
-export const routes = () => {
+const webRoutes = () => {
+  const router = createRouter();
+
+  router.get("/", async (req: ServerRequest) => {
+    await req.respond(
+      { headers: new Headers({ "Location": "index.html" }), status: 302 },
+    );
+  });
+
+  return router;
+};
+
+const apiRoutes = () => {
   const router = createRouter();
 
   router.post(
@@ -334,41 +324,16 @@ export const routes = () => {
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-  router.get("game", allGameWeb);
-  router.get(new RegExp("^game/(.{8}-.{4}-.{4}-.{4}-.{12})$"), gameWeb);
-  router.get(new RegExp("^user/(.+)(?<!\.(js|css))$"), userWeb);
-
-  router.get(new RegExp("([^/]+?)?.js$"), async (req: ServerRequest) => {
-    //console.log(req.match);
-    await req.sendFile(`./web/js/${util.getSafePath(req.match[1])}.js`);
-    //await req.sendFile(``);
-    await req.respond({ status: 200 });
-  });
-  router.get(new RegExp("^(.*?)img/(.+)$"), async (req: ServerRequest) => {
-    //console.log(req.match);
-    await req.sendFile(`../img/${util.getSafePath(req.match[2])}`);
-    await req.respond({ status: 200 });
-  });
-  router.get(new RegExp("^(.*?)css/(.+)$"), async (req: ServerRequest) => {
-    console.log(req.match);
-    await req.sendFile(`./web/css/${util.getSafePath(req.match[2])}`);
-    await req.respond({ status: 200 });
-  });
-
-  router.ws("allgame", ws_AllGame);
-
-  router.get("/", async (req: ServerRequest) => {
-    await req.respond(
-      { headers: new Headers({ "Location": "game" }), status: 302 },
-    );
-  });
+  router.ws("allGame", ws_AllGame);
 
   return router;
 };
 
 // Port Listen
 const app = createApp();
-app.route("/", routes());
+app.use(serveStatic("../public"));
+app.route("/api/", apiRoutes());
+app.route("/", webRoutes());
 app.listen({ port });
 
 const createDefaultBoard = () => {

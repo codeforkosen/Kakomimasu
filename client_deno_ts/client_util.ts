@@ -1,4 +1,4 @@
-const host = "http://localhost:8880";
+const host = "http://localhost:8880/api";
 
 class Action {
   public agentId: number;
