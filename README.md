@@ -1,7 +1,7 @@
 # Kakomimasu
  #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
 
-[![deno](https://taisukef.github.com/denolib/denobadge@1.2.0.svg)](https://deno.land/)  
+[![deno](https://taisukef.github.com/denolib/denobadge@1.3.3.svg)](https://deno.land/)  
 
 <!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->  
 https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
@@ -128,6 +128,11 @@ $ cd client_c
 $ gcc action_test.c
 $ ./a.out
 ```
+
+## フィールド
+
+参考、2019年 競技部門 公開フィールド  
+http://www.procon.gr.jp/?p=76585  
 
 ## 出典
 
