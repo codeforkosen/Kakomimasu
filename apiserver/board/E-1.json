@@ -1,7 +1,7 @@
 {
   "nturn": 50,
   "nsec": 3,
-  "nagent": 14, /* max 14, min 6 */
+  "nagent": 14,
   "width": 18,
   "height": 18,
   "points": [
