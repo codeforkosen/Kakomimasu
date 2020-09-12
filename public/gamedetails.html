@@ -8,7 +8,7 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 
-        <link rel="stylesheet" href="./css/main.css">
+        <link rel="stylesheet" href="/css/main.css">
         <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
         <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
 
@@ -74,7 +74,7 @@
         </div>
         <footer></footer>
         <script type="module">
-            import { createHeader, createFooter, Game, userShow, getGameInfo, nowUnixTime, getTurnText } from "./util.js";
+            import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
 
             createHeader("ゲーム詳細");
             createFooter();
@@ -219,7 +219,7 @@
                                 if (this.players[i].screenName === "") {
                                     const user = await userShow(game.players[i].id);
                                     this.players[i].screenName = user.screenName;
-                                    this.players[i].link = `/user/${user.name}`;
+                                    this.players[i].link = `user.html?id=${user.name}`;
 
                                     pointChart.data.datasets[i].label = user.screenName;
                                 }
@@ -240,8 +240,8 @@
                 }
             });
 
-            const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
-
+            //const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
+            const gameId = getUrlQueries().id;
             main();
 
             async function main() {
@@ -312,11 +312,9 @@
 
                     const lastLog = game.log[game.log.length - 1];
                     const lastFlatLog = [];
-                    if (lastLog !== undefined) {
-                        lastLog.forEach(p => {
-                            lastFlatLog.push(...p.actions);
-                        });
-                    }
+                    lastLog.forEach(p => {
+                        lastFlatLog.push(...p.actions);
+                    });
 
                     for (let y = 0; y < game.board.height; y++) {
                         const classNames = [];
@@ -338,9 +336,13 @@
                             }
                             const isConflict = lastFlatLog.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
                             if (isConflict) {
+                                //console.log("conflict", x, y);
                                 className += " conflict";
                             }
+                            //console.log();
+
                             classNames.push(className);
+
                         }
                         fieldTableVue.className.splice(y, 1, classNames);
                     }
@@ -459,11 +461,11 @@
     }
 
     td.agent1 {
-        background-image: url(img/agent1.png);
+        background-image: url(/img/agent1.png);
     }
 
     td.agent2 {
-        background-image: url(img/agent2.png);
+        background-image: url(/img/agent2.png);
     }
 
     td.p1Wall {

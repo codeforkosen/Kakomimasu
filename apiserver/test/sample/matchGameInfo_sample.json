@@ -1,5 +1,5 @@
 {
-  "gameId": "ebe436f1-adab-4d2f-bab5-5079cd12fc79",
+  "gameId": "c3eff993-a8ed-4388-80bb-8dc9dc400553",
   "gaming": false,
   "ending": false,
   "board": {
@@ -7,6 +7,8 @@
     "height": 10,
     "nAgent": 8,
     "nPlayer": 2,
+    "nTurn": 30,
+    "nSec": 1,
     "points": [
       12,
       3,
@@ -110,8 +112,8 @@
       12
     ]
   },
-  "startedAtUnixTime": 1597927595,
-  "nextTurnUnixTime": 1597927598,
+  "startedAtUnixTime": 1599487791,
+  "nextTurnUnixTime": 1599487792,
   "turn": 0,
   "totalTurn": 30,
   "tiled": [
@@ -518,7 +520,7 @@
   ],
   "players": [
     {
-      "id": "d183103f-a941-4ea5-b8f7-276d8d285c0d",
+      "id": "daccdb4e-f63f-4ae9-8189-82464cba2338",
       "agents": [
         {
           "x": -1,
@@ -561,7 +563,7 @@
       "areaPoint": null
     },
     {
-      "id": "d183103f-a941-4ea5-b8f7-276d8d285c0d",
+      "id": "daccdb4e-f63f-4ae9-8189-82464cba2338",
       "agents": [
         {
           "x": -1,
