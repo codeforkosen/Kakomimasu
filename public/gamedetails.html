@@ -312,10 +312,11 @@
 
                     const lastLog = game.log[game.log.length - 1];
                     const lastFlatLog = [];
-                    lastLog.forEach(p => {
-                        lastFlatLog.push(...p.actions);
-                    });
-
+                    if (lastLog !== undefined) {
+                        lastLog.forEach(p => {
+                            lastFlatLog.push(...p.actions);
+                        });
+                    }
                     for (let y = 0; y < game.board.height; y++) {
                         const classNames = [];
                         for (let x = 0; x < game.board.width; x++) {
