@@ -11,14 +11,15 @@
         <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
         <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
 
-        <title>ゲーム一覧 - 囲みマス</title>
+        <title>過去ゲーム一覧 - 囲みマス</title>
     </head>
 
     <body>
         <header></header>
         <div>
-            <a href="./pastgamelist.html">過去のゲーム一覧を見る</a>
+            <a href="./gamelist.html">ゲーム一覧に戻る</a>
         </div>
+
         <div>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
             <table id="game-table" v-cloak>
@@ -42,7 +43,7 @@
         <script type="module">
             import { createHeader, createFooter, Game, getTurnText } from "/js/util.js";
 
-            createHeader("ゲーム一覧");
+            createHeader("過去ゲーム一覧");
             createFooter();
 
             const gameTableVue = new Vue({
@@ -67,7 +68,16 @@
                 },
             });
 
-            var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/allGame");
+            const main = async () => {
+                const pastGames = await (await fetch("/api/allPastGame")).json();
+                gameTableVue.update(pastGames);
+            }
+
+            main();
+
+
+
+            /*var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/allGame");
             socket.onopen = (event) => {
                 //console.log("hello");
             }
@@ -80,7 +90,7 @@
             }
             socket.onclose = (event) => {
                 //console.log('ws wrror');
-            }
+            }*/
 
             const nowTimeVue = new Vue({
                 el: "#now-time",
