@@ -17,6 +17,9 @@
 
     <body>
         <header></header>
+        <div id="nogame" hidden>
+            <p>ゲームが存在しません。5秒後にゲーム一覧に戻ります。<a href="gamelist.html">今すぐ戻る</a></p>
+        </div>
         <div>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
             <table id="game-table" v-cloak>
@@ -247,6 +250,13 @@
 
             async function main() {
                 let game = await getGameInfo(gameId);
+                if (game.error) {
+                    nogame.hidden = false;
+                    setTimeout(() => {
+                        window.location.href = "/gamelist.html";
+                    }, 5000);
+                    return;
+                } else {
                     gameTableVue.init(game);
                     playerInfoVue.update(game);
                     pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
@@ -292,6 +302,7 @@
                         else fieldInfoVue.status = "ゲーム終了";
                         return updateStatus;
                     }(), 100);
+                }
             }
 
 
@@ -400,6 +411,11 @@
     th,
     td {
         padding: 5px;
+    }
+
+    #nogame {
+        color: red;
+        text-align: center;
     }
 
     #field-table td {

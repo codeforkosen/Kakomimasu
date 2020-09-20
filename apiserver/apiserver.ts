@@ -161,29 +161,33 @@ export const match = async (req: ServerRequest) => {
 
 //#region 試合状態取得API
 export const getGameInfo = async (req: ServerRequest) => {
-  try{
+  try {
     const id = req.match[1];
-let game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
-if (game) {
-  game.updateStatus();
-} else {
-  for (const dirEntry of Deno.readDirSync("./log")) {
-    const gameid = dirEntry.name.split(/[_.]/)[1];
-    console.log(gameid, id);
-    if (gameid === id) {
-      game = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
-      break;
+    let game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
+    if (game) {
+      game.updateStatus();
+    } else {
+      for (const dirEntry of Deno.readDirSync("./log")) {
+        const gameid = dirEntry.name.split(/[_.]/)[1];
+        console.log(gameid, id);
+        if (gameid === id) {
+          game = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
+          break;
+        }
+      }
     }
-  }
-}
 
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(game),
-    });
+    if (game) {
+      await req.respond({
+        status: 200,
+        headers: new Headers({
+          "content-type": "application/json",
+        }),
+        body: JSON.stringify(game),
+      });
+    } else {
+      throw Error("Invalid gameID.");
+    }
   } catch (e) {
     await req.respond(util.ErrorResponse(e.message));
   }
@@ -349,10 +353,10 @@ const apiRoutes = () => {
   );
 
   router.post("match", contentTypeFilter("application/json"), match);
-  router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
+router.get(new RegExp("^match/(.+)$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-router.get("allPastGame", allPastGame);
+  router.get("allPastGame", allPastGame);
   router.ws("allGame", ws_AllGame);
 
   return router;
