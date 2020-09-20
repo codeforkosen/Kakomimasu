@@ -72,6 +72,9 @@
         <div id="graph-div">
             <canvas id="graph"></canvas>
         </div>
+        <div style="text-align: right">
+            <a id="vr-link">VR版</a>
+        </div>
         <footer></footer>
         <script type="module">
             import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
@@ -242,6 +245,7 @@
 
             //const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
             const gameId = getUrlQueries().id;
+            document.getElementById("vr-link").href = "./vr.html?id=" + gameId;
             main();
 
             async function main() {
