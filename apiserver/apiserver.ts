@@ -161,14 +161,22 @@ export const match = async (req: ServerRequest) => {
 
 //#region 試合状態取得API
 export const getGameInfo = async (req: ServerRequest) => {
-  //console.log(req.match, "GameInfo");
-  const id = req.match[1];
+  try{
+    const id = req.match[1];
+let game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
+if (game) {
+  game.updateStatus();
+} else {
+  for (const dirEntry of Deno.readDirSync("./log")) {
+    const gameid = dirEntry.name.split(/[_.]/)[1];
+    console.log(gameid, id);
+    if (gameid === id) {
+      game = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
+      break;
+    }
+  }
+}
 
-  //console.log(id);
-  const game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
-  //console.log(game[0]);
-  try {
-    game.updateStatus();
     await req.respond({
       status: 200,
       headers: new Headers({
@@ -292,6 +300,27 @@ const sendAllGame = () => {
 
 //#endregion
 
+//#region log試合情報取得API
+const allPastGame = async (req: ServerRequest) => {
+  try {
+    const logGames = [];
+    for (const dirEntry of Deno.readDirSync("./log")) {
+      console.log(dirEntry.name);
+      const json = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
+      logGames.push(json);
+    }
+
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(logGames),
+    });
+  } catch (e) {
+    await req.respond(util.ErrorResponse(e.message));
+  }
+};
 const webRoutes = () => {
   const router = createRouter();
 
@@ -323,6 +352,7 @@ const apiRoutes = () => {
   router.get(new RegExp("^match/(.{8}-.{4}-.{4}-.{4}-.{12})$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
+router.get("allPastGame", allPastGame);
   router.ws("allGame", ws_AllGame);
 
   return router;

@@ -669,6 +669,14 @@ class Game {
       }
     }
     if (this.ending) {
+      /*const logData = {
+        gameId: this.uuid,
+        board: this.board,
+        log: this.log,
+      }*/
+
+      Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}-${this.uuid}.log`, JSON.stringify(this, null, 2));
+
       this.dispose();
       //this.changeFuncs.forEach(func => func());
     }
