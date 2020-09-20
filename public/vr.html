@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>VRTest</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://aframe.io/releases/1.0.4/aframe.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.js"></script>
+  </head>
+  <body>
+    <a-scene>
+
+      <a-entity oculus-touch-controls="hand: left"></a-entity>
+      <a-entity oculus-touch-controls="hand: right"></a-entity>
+
+      <a-entity
+        environment="preset: arches"
+        shadow="receive: true"
+      ></a-entity>
+
+      <a-entity
+        camera
+        look-controls
+        position="0 1.6 4.5"
+        wasd-controls="acceleration:100"
+      ></a-entity>
+
+      <a-entity
+        light="type:directional; castShadow:true;"
+        position="1 2 2"
+      ></a-entity>
+
+      <a-entity
+        id="field-info"
+        shadow="receive: true"
+      >
+        <a-box
+          color="darkslategray"
+          width="5"
+          height="0.4"
+          depth="0.2"
+          position="0 0.2 -0.5"
+          shadow="receive: true"
+        >
+          <a-text
+            :value="turn"
+            width="8"
+            color="white"
+            position="-2.4 0 0.1"
+            align="left"
+            shadow="receive: true"
+          ></a-text>
+          <a-text
+            :value="pointP1"
+            width="8"
+            color="#80C9FF"
+            width="10"
+            position="-0.15 0 0.1"
+            align="right"
+          ></a-text>
+          <a-text
+            value=":"
+            width="8"
+            color="white"
+            position="-0.1 0 0.1"
+            align="left"
+          ></a-text>
+          <a-text
+            :value="pointP2"
+            color="#FE9998"
+            width="8"
+            align="left"
+            position="0.1 0 0.1"
+          ></a-text>
+          <a-text
+            :value="status"
+            color="white"
+            width="8"
+            align="right"
+            position="2.4 0 0.1"
+          ></a-text>
+        </a-box>
+      </a-entity>
+
+      <a-entity
+        id="field-table"
+      >
+        <a-box
+          v-for="(point,i) in points"
+          v-bind:key="i"
+          v-bind:color="color[i]"
+          width="0.2"
+          height="0.04"
+          depth="0.2"
+          v-bind:position="pos[i]"
+          rotation="0 0 0"
+          shadow="receive: true"
+        >
+          <a-text
+            v-bind:value="point"
+            width="2"
+            v-bind:color="pointColor[i]"
+            position="0.04 0.02 0.04"
+            rotation="-90 0 0"
+            align="center"
+          >
+          </a-text>
+          <a-cone
+            v-if="coneVisible[i]"
+            v-bind:color="coneColor[i]"
+            radius-bottom="0.08"
+            radius-top="0.025"
+            height="0.2"
+            width="0.08"
+            depth="0.08"
+            position="-0.04 0.02 -0.04"
+          ></a-cone>
+        </a-box>
+      </a-entity>
+
+    </a-scene>
+
+    <script type="module">
+      import { getUrlQueries, getGameInfo, nowUnixTime, getTurnText } from "./js/util.js";
+      Vue.config.ignoredElements = [/^a-/];
+
+      let game;
+
+      const fieldInfoVue = new Vue({
+        el: "#field-info",
+        data: {
+          turn: "-",
+          pointP1: "0",
+          pointP2: "0",
+          status: "",
+        },
+      });
+
+      const fieldTableVue = new Vue({
+        el: "#field-table",
+        data: {
+          points: [],
+          pos: [],
+          coneVisible: [],
+          color: [],
+          pointColor: [],
+          coneColor: []
+        },
+        methods: {
+          init: function (game) {
+            for (let x = 0; x < game.board.width; x++) {
+              for (let y = 0; y < game.board.height; y++) {
+                let n = x + y * game.board.width;
+                Vue.set(this.points, n, game.board.points[n]);
+                Vue.set(this.pos, n, `${(x - game.board.width / 2) * 0.25} 0 ${y * 0.25}`);
+                Vue.set(this.coneVisible, n, false);
+                Vue.set(this.pointColor, n, "white");
+                Vue.set(this.coneColor, n, "white");
+                Vue.set(this.color, n, "gray");
+              }
+            }
+          },
+          update: function (game, lastFlatLog) {
+            let agents = new Array(game.board.width * game.board.height);
+            game.players.forEach((p, i) => {
+              p.agents.forEach(a => {
+                if (a.x >= 0 && a.y >= 0) {
+                  agents[a.x + a.y * game.board.width] = i;
+                }
+              });
+            });
+            for (let x = 0; x < game.board.width; x++) {
+              for (let y = 0; y < game.board.height; y++) {
+                let n = x + y * game.board.width;
+                Vue.set(this.coneVisible, n, false);
+                const isConflict = lastFlatLog.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
+                if (isConflict) {
+                  Vue.set(this.color, n, "lightgreen");
+                  Vue.set(this.pointColor, n, "gray");
+                } else {
+                  let gt = game.tiled[x + y * game.board.width];
+                  if (gt[0] === 0 && gt[1] === 0) {
+                    Vue.set(this.color, n, "#80C9FF");
+                    Vue.set(this.pointColor, n, "gray");
+                  } else if (gt[0] === 0 && gt[1] === 1) {
+                    Vue.set(this.color, n, "#FE9998");
+                    Vue.set(this.pointColor, n, "gray");
+                  } else if (gt[0] === 1 && gt[1] === 0) {
+                    Vue.set(this.color, n, "#0096FF");
+                    Vue.set(this.pointColor, n, "white");
+                  } else if (gt[0] === 1 && gt[1] === 1) {
+                    Vue.set(this.color, n, "#FF0200");
+                    Vue.set(this.pointColor, n, "white");
+                  } else {
+                    Vue.set(this.color, n, "gray");
+                    Vue.set(this.pointColor, n, "white");
+                  }
+                }
+                let pid = agents[x + y * game.board.width];
+                if (pid === undefined) {
+                  Vue.set(this.coneVisible, n, false);
+                } else {
+                  Vue.set(this.coneVisible, n, true);
+                  if (pid === 0) {
+                    Vue.set(this.coneColor, n, "royalblue");
+                  } else if (pid === 1) {
+                    Vue.set(this.coneColor, n, "hotpink");
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const gameId = getUrlQueries().id;
+
+      main();
+
+      async function main() {
+        game = await getGameInfo(gameId);
+
+        const waitGameStartId = setInterval(waitGameStart, 200);
+        waitGameStart();
+
+        async function waitGameStart() {
+          await getRoomInfo();
+          //game = await getGameInfo(gameId);
+          if (game.startedAtUnixTime !== null) {
+            console.log("プレイヤーそろったよ！");
+            fieldTableVue.init(game);
+
+            clearInterval(waitGameStartId);
+            setTimeout(() => {
+              console.log("ゲームスタート！");
+              updateField();
+
+              async function updateField() {
+                console.log("フィールド更新！");
+                await getRoomInfo();
+                const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
+                //console.log(diffTime);
+                if (game.ending) return;
+                else setTimeout(updateField, diffTime);
+              }
+            }, (game.startedAtUnixTime * 1000) - new Date().getTime());
+          }
+          return waitGameStart;
+        }
+
+        setInterval(function updateStatus() {
+          if (game.startedAtUnixTime === null) fieldInfoVue.status = "WAIT";
+          else if (nowUnixTime() < game.startedAtUnixTime) fieldInfoVue.status = `START ${game.startedAtUnixTime - nowUnixTime()}`;
+          else if (nowUnixTime() < game.nextTurnUnixTime) fieldInfoVue.status = `NEXT ${game.nextTurnUnixTime - nowUnixTime()}`;
+          else if (!game.ending) fieldInfoVue.status = "CHECK";
+          else fieldInfoVue.status = "END";
+          return updateStatus;
+        }(), 100);
+      }
+
+      async function getRoomInfo() {
+        game = await getGameInfo(gameId);
+        // console.log(game);
+
+        // フィールド更新
+        if (game.startedAtUnixTime === null) {
+        }
+        else {
+          const lastLog = game.log[game.log.length - 1];
+          const lastFlatLog = [];
+          if (lastLog !== undefined) {
+            lastLog.forEach(p => {
+              lastFlatLog.push(...p.actions);
+            });
+          }
+          fieldInfoVue.turn = getTurnText(game);
+          fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
+          fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
+          fieldTableVue.update(game, lastFlatLog);
+        }
+      }
+    </script>
+  </body>
+</html>
