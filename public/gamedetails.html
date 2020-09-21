@@ -17,6 +17,9 @@
 
     <body>
         <header></header>
+        <div id="nogame" hidden>
+            <p>ゲームが存在しません。5秒後にゲーム一覧に戻ります。<a href="gamelist.html">今すぐ戻る</a></p>
+        </div>
         <div>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
             <table id="game-table" v-cloak>
@@ -81,8 +84,6 @@
 
             createHeader("ゲーム詳細");
             createFooter();
-
-            let game;
 
             var pointChart = new Chart(graph, {
                 type: "line",
@@ -243,64 +244,70 @@
                 }
             });
 
-            //const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
             const gameId = getUrlQueries().id;
             document.getElementById("vr-link").href = "./vr.html?id=" + gameId;
             main();
 
             async function main() {
-                game = await getGameInfo(gameId);
-                gameTableVue.init(game);
-                playerInfoVue.update(game);
-                pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
-                for (let i = 0; i <= game.totalTurn; i++) {
-                    pointChart.data.labels[i] = i;
-                }
-                pointChart.data.datasets[0].data[0] = 0;
-                pointChart.data.datasets[1].data[0] = 0;
-                pointChart.update();
-
-                const waitGameStartId = setInterval(waitGameStart, 200);
-                waitGameStart();
-
-                async function waitGameStart() {
-                    await getRoomInfo();
-                    //game = await getGameInfo(gameId);
-                    if (game.startedAtUnixTime !== null) {
-                        console.log("プレイヤーそろったよ！");
-                        fieldTableVue.init(game);
-
-                        clearInterval(waitGameStartId);
-                        setTimeout(() => {
-                            console.log("ゲームスタート！");
-                            updateField();
-
-                            async function updateField() {
-                                console.log("フィールド更新！");
-                                await getRoomInfo();
-                                const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
-                                //console.log(diffTime);
-                                if (game.ending) return;
-                                else setTimeout(updateField, diffTime);
-                            }
-                        }, (game.startedAtUnixTime * 1000) - new Date().getTime());
+                let game = await getGameInfo(gameId);
+                if (game.error) {
+                    nogame.hidden = false;
+                    setTimeout(() => {
+                        window.location.href = "/gamelist.html";
+                    }, 5000);
+                    return;
+                } else {
+                    gameTableVue.init(game);
+                    playerInfoVue.update(game);
+                    pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
+                    for (let i = 0; i <= game.totalTurn; i++) {
+                        pointChart.data.labels[i] = i;
                     }
-                    return waitGameStart;
-                }
+                    pointChart.data.datasets[0].data[0] = 0;
+                    pointChart.data.datasets[1].data[0] = 0;
+                    pointChart.update();
 
-                setInterval(function updateStatus() {
-                    if (game.startedAtUnixTime === null) fieldInfoVue.status = "ゲーム開始までお待ちください...";
-                    else if (nowUnixTime() < game.startedAtUnixTime) fieldInfoVue.status = `ゲーム開始まで${game.startedAtUnixTime - nowUnixTime()}秒`;
-                    else if (nowUnixTime() < game.nextTurnUnixTime) fieldInfoVue.status = `次のターンまで${game.nextTurnUnixTime - nowUnixTime()}秒`;
-                    else if (!game.ending) fieldInfoVue.status = "競合チェック中...";
-                    else fieldInfoVue.status = "ゲーム終了";
-                    return updateStatus;
-                }(), 100);
+                    waitGameStart();
+
+                    async function waitGameStart() {
+                        game = await getRoomInfo();
+                        if (game.startedAtUnixTime !== null) {
+                            console.log("プレイヤーそろったよ！");
+                            fieldTableVue.init(game);
+
+                            setTimeout(() => {
+                                console.log("ゲームスタート！");
+                                updateField();
+
+                                async function updateField() {
+                                    console.log("フィールド更新！");
+                                    game = await getRoomInfo();
+                                    const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
+                                    //console.log(diffTime);
+                                    if (game.ending) return;
+                                    else setTimeout(updateField, diffTime);
+                                }
+                            }, (game.startedAtUnixTime * 1000) - new Date().getTime());
+                        } else {
+                            setTimeout(waitGameStart, 200);
+                        }
+                        return waitGameStart;
+                    }
+
+                    setInterval(function updateStatus() {
+                        if (game.startedAtUnixTime === null) fieldInfoVue.status = "ゲーム開始までお待ちください...";
+                        else if (nowUnixTime() < game.startedAtUnixTime) fieldInfoVue.status = `ゲーム開始まで${game.startedAtUnixTime - nowUnixTime()}秒`;
+                        else if (nowUnixTime() < game.nextTurnUnixTime) fieldInfoVue.status = `次のターンまで${game.nextTurnUnixTime - nowUnixTime()}秒`;
+                        else if (!game.ending) fieldInfoVue.status = "競合チェック中...";
+                        else fieldInfoVue.status = "ゲーム終了";
+                        return updateStatus;
+                    }(), 100);
+                }
             }
 
 
             async function getRoomInfo() {
-                game = await getGameInfo(gameId);
+                const game = await getGameInfo(gameId);
                 console.log(game);
                 gameTableVue.update(game);
                 playerInfoVue.update(game);
@@ -362,6 +369,7 @@
 
                     pointChart.update();
                 }
+                return game;
             }
 
             const nowTimeVue = new Vue({
@@ -403,6 +411,11 @@
     th,
     td {
         padding: 5px;
+    }
+
+    #nogame {
+        color: red;
+        text-align: center;
     }
 
     #field-table td {
