@@ -245,7 +245,7 @@
 
             //const gameId = document.URL.match(new RegExp("/game/(.+)$"))[1];
             const gameId = getUrlQueries().id;
-            document.getElementById("vr-link").href = "./vr.html?id=" + gameId;
+            document.getElementById("vr-link").href = "./vr/index.html?id=" + gameId;
             main();
 
             async function main() {
