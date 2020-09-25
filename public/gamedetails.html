@@ -170,7 +170,7 @@
                 el: "#field-table",
                 data: {
                     point: [],
-                    className: [],
+                    className: []
                 },
                 methods: {
                     init: function (game) {
@@ -185,6 +185,31 @@
                                 Vue.set(this.point[i], j, game.board.points[j + i * game.board.width]);
                                 Vue.set(this.className[i], j, "");
                             }
+                        }
+
+                        Vue.nextTick(() => {
+                            const tds = this.$el.getElementsByTagName("td");
+                            for (let i = 0; i < tds.length; i++) {
+                                const e = tds[i];
+                                const p = parseInt(e.innerText);
+                                let colorStr = "#";
+                                if (p < 0) {
+                                    let bn = 0xFF;
+                                    bn *= Math.abs(p + 16) / 16 * 0.5 + 0.5;
+                                    bn &= 0xFF;
+                                    for (let i = 0; i < 3; i++) colorStr += toHex(bn);
+                                } else if (p > 0) {
+                                    let bn = 0xFF;
+                                    bn *= Math.abs(p - 16) / 16 * 0.5 + 0.5;
+                                    bn &= 0xFF;
+                                    colorStr += `FFFF${toHex(bn)}`;
+                                }
+                                e.style.setProperty("--bg-color", colorStr);
+                            }
+                        });
+
+                        function toHex(v) {
+                            return ('00' + v.toString(16).toUpperCase()).substr(-2);
                         }
                     }
                 }
@@ -423,6 +448,8 @@
         height: 50px;
         text-align: right;
         vertical-align: bottom;
+        --bg-color: #FFFFFF;
+        background-color: var(--bg-color);
     }
 
     #field-turn,
@@ -487,19 +514,19 @@
     }
 
     td.p1Wall {
-        background-color: #0096FF;
+        background-color: #0096FF !important;
     }
 
     td.p2Wall {
-        background-color: #FF0200;
+        background-color: #FF0200 !important;
     }
 
     td.p1Area {
-        background-color: #80C9FF;
+        background-color: #80C9FF !important;
     }
 
     td.p2Area {
-        background-color: #FE9998;
+        background-color: #FE9998 !important;
     }
 
     td.conflict {
