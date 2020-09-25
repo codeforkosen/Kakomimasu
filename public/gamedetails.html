@@ -175,11 +175,9 @@
                     init: function (game) {
                         this.point = new Array(game.board.height);
                         this.className = new Array(game.board.height);
-                        this.brightness = new Array(game.board.height);
                         for (let i = 0; i < game.board.height; i++) {
                             this.point[i] = new Array(game.board.width);
                             this.className[i] = new Array(game.board.width);
-                            this.brightness[i] = new Array(game.board.width);
                         }
                         for (let i = 0; i < game.board.height; i++) {
                             for (let j = 0; j < game.board.width; j++) {
