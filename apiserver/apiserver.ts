@@ -308,8 +308,9 @@ const sendAllGame = () => {
 const allPastGame = async (req: ServerRequest) => {
   try {
     const logGames = [];
+    Deno.mkdirSync("./log", { recursive: true });
     for (const dirEntry of Deno.readDirSync("./log")) {
-      console.log(dirEntry.name);
+      //console.log(dirEntry.name);
       const json = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
       logGames.push(json);
     }
@@ -353,7 +354,7 @@ const apiRoutes = () => {
   );
 
   router.post("match", contentTypeFilter("application/json"), match);
-router.get(new RegExp("^match/(.+)$"), getGameInfo);
+  router.get(new RegExp("^match/(.+)$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
   router.get("allPastGame", allPastGame);
