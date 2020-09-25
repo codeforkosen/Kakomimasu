@@ -22,7 +22,12 @@ class KakomimasuClient {
     this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
-    setHost(`${host}/api`);
+    if (host) {
+      if (host.endsWith("/")) {
+        host = host.substring(0, host.length - 1);
+      }
+      setHost(`${host}/api`);
+    }
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
