@@ -2,13 +2,14 @@ import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
 import { assert, assertEquals, AssertionError } from "../asserts.js";
 
 const nagent = 2;
+const nturn = 20;
+const nsec = 3;
 const [ w, h ] = [ 3, 1 ];
-const board = new Board(w, h, new Array(w * h), nagent);
+const board = new Board(w, h, new Array(w * h), nagent, nturn, nsec);
 
 const kkmm = new Kakomimasu();
 kkmm.appendBoard(board);
-const nturn = 20;
-const game = kkmm.createGame(board, nturn);
+const game = kkmm.createGame(board);
 
 const field = game.field;
 

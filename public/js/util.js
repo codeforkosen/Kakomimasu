@@ -1,5 +1,3 @@
-"use struct";
-
 class Game {
   constructor() {
     //const [status, startTime] = Game.getGameStatus(game);
@@ -26,14 +24,10 @@ class Game {
   }
 }
 
-function rootURL() {
-  return `${window.location.protocol}//${window.location.host}`;
-}
-
 function createHeader(userScreenName) {
   const headerDiv = document.getElementsByTagName("header")[0];
   headerDiv.innerHTML = `
-    <a href="${rootURL()}/game"><img src="${rootURL()}/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
+    <a href="/index.html"><img src="/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
     <h1>${userScreenName}</h1>
   `;
 }
@@ -60,27 +54,59 @@ function diffTime(unixTime) {
   return unixTime - Math.floor(new Date().getTime() / 1000);
 }
 
+function getUrlQueries() {
+  var queryStr = window.location.search.slice(1); // 文頭?を除外
+  const queries = {};
+
+  // クエリがない場合は空のオブジェクトを返す
+  if (!queryStr) {
+    return queries;
+  }
+
+  // クエリ文字列を & で分割して処理
+  queryStr.split("&").forEach(function (queryStr) {
+    // = で分割してkey,valueをオブジェクトに格納
+    var queryArr = queryStr.split("=");
+    queries[queryArr[0]] = queryArr[1];
+  });
+
+  return queries;
+}
+
 //#region API client
 async function userShow(identifier) {
   const resJson = await (await fetch(
-    `${rootURL()}/users/show/${identifier}`,
+    `/api/users/show/${identifier}`,
   )).json();
   //console.log(reqJson, "userShow");
   return resJson;
 }
 
-async function getAllGame() {
+/*async function getAllGame() {
   const resJson = await (await fetch(
-    `${rootURL()}/match/`,
+    `/api/match/`,
   )).json();
   //console.log(reqJson, "getAllRoom");
   return resJson;
-}
+}*/
 
 async function getGameInfo(roomid) {
   const resJson = await (await fetch(
-    `${rootURL()}/match/${roomid}`,
+    `/api/match/${roomid}`,
   )).json();
   return resJson;
 }
 //#endregion
+
+export {
+  Game,
+  createHeader,
+  createFooter,
+  getTurnText,
+  nowUnixTime,
+  diffTime,
+  getUrlQueries,
+  userShow,
+  //getAllGame,
+  getGameInfo,
+};

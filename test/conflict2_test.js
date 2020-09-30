@@ -3,12 +3,12 @@ import { assert, assertEquals, AssertionError } from "../asserts.js";
 
 const nagent = 6;
 const [ w, h ] = [ 3, 3 ];
-const board = new Board(w, h, new Array(w * h), nagent);
+const nturn = 20;
+const board = new Board(w, h, new Array(w * h), nagent, nturn);
 
 const kkmm = new Kakomimasu();
 kkmm.appendBoard(board);
-const nturn = 20;
-const game = kkmm.createGame(board, nturn);
+const game = kkmm.createGame(board);
 
 const field = game.field;
 

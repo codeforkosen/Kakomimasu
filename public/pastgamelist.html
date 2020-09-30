@@ -7,15 +7,18 @@
 
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-        <link rel="stylesheet" href="./css/main.css">
-        <script type="text/javascript" src="./js/util.js"></script>
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+        <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
 
-
-        <title>ゲーム一覧 - 囲みマス</title>
+        <title>過去ゲーム一覧 - 囲みマス</title>
     </head>
 
     <body>
         <header></header>
+        <div>
+            <a href="./gamelist.html">ゲーム一覧に戻る</a>
+        </div>
 
         <div>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
@@ -38,7 +41,9 @@
         <footer></footer>
 
         <script type="module">
-            createHeader("ゲーム一覧");
+            import { createHeader, createFooter, Game, getTurnText } from "/js/util.js";
+
+            createHeader("過去ゲーム一覧");
             createFooter();
 
             const gameTableVue = new Vue({
@@ -47,18 +52,12 @@
                     games: [],
                 },
                 methods: {
-                    init: function () {
-                        this.update();
-                        setInterval(this.update, 1000);
-                    },
-                    update: async function () {
-                        const gamesData = await getAllGame();
-                        //console.log(gamesData);
-                        gamesData.reverse().forEach((game, i) => {
+                    update: async function (games) {
+                        games.reverse().forEach((game, i) => {
                             const [status, startTime] = Game.getGameStatus(game);
 
                             Vue.set(this.games, i, {
-                                link: `${rootURL()}/game/${game.gameId}`,
+                                link: `gamedetails.html?id=${game.gameId}`,
                                 gameId: game.gameId,
                                 status: status,
                                 startTime: startTime,
@@ -68,7 +67,30 @@
                     },
                 },
             });
-            gameTableVue.init();
+
+            const main = async () => {
+                const pastGames = await (await fetch("/api/allPastGame")).json();
+                gameTableVue.update(pastGames);
+            }
+
+            main();
+
+
+
+            /*var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/allGame");
+            socket.onopen = (event) => {
+                //console.log("hello");
+            }
+            socket.onmessage = (event) => {
+                const games = JSON.parse(event.data);
+                gameTableVue.update(games);
+            }
+            socket.onerror = (event) => {
+                //console.log('ws wrror', event);
+            }
+            socket.onclose = (event) => {
+                //console.log('ws wrror');
+            }*/
 
             const nowTimeVue = new Vue({
                 el: "#now-time",

@@ -1,16 +1,28 @@
 import util from "./util.js";
 
 class Board {
-  constructor(w, h, points, nagent, nplayer = 2) {
-    if (points.length !== w * h) {
-      throw new Error("points.length must be " + w * h);
+  constructor(w, h, points, nagent, nturn, nsec = 3, nplayer = 2) {
+    if (typeof w === "object") {
+      this.w = w.width;
+      this.h = w.height;
+      this.points = w.points;
+      this.nagent = w.nagent;
+      this.nturn = w.nturn;
+      this.nsec = w.nsec || 3;
+      this.nplayer = w.nplayer || 2;
+    } else {
+      this.w = w;
+      this.h = h;
+      this.points = points;
+      this.nagent = nagent;
+      this.nturn = nturn;
+      this.nsec = nsec;
+      this.nplayer = nplayer;
+    }
+    if (this.points.length !== this.w * this.h) {
+      throw new Error("points.length must be " + this.w * this.h);
     }
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
-    this.w = w;
-    this.h = h;
-    this.points = points;
-    this.nagent = nagent;
-    this.nplayer = nplayer;
   }
 
   getJSON() {
@@ -19,6 +31,8 @@ class Board {
       h: this.h,
       points: this.points,
       nagents: this.nagent,
+      nturn: this.nturn,
+      nsec: this.nsec,
       nplayer: this.nplayer,
     };
   }
@@ -29,6 +43,8 @@ class Board {
       height: this.h,
       nAgent: this.nagent,
       nPlayer: this.nplayer,
+      nTurn: this.nturn,
+      nSec: this.nsec,
       points: this.points,
     };
   }
@@ -243,56 +259,79 @@ class Field {
   }
 
   fillBase() {
-    // 外側1ます残した内側を全点チェック
-    // チェック済みであれば次の点
-    // 上下左右斜め、8方向をチェックし、外周にでたら中断（塗りなし確定）、壁であればチェック継続
-    // すべてのチェック終了で、そのプレイヤーの色で塗る
+    // プレイヤーごとに入れ子関係なく囲まれている所にフラグを立て、まとめる。
+    // (bitごと 例:010だったら、1番目のプレイヤーの領地or城壁であるという意味)
+    // 各マスの立っているbitが一つだけだったらそのプレイヤーの領地or城壁で確定。
+    // 2つ以上bitが立っていたら入れ子になっているので、その部分だけmaskをかけ、もう一度最初からやり直す。
+    // （whileするたびに入れ子が一個ずつ解消されていくイメージ）
+    // 説明難しい…
+
     const w = this.board.w;
     const h = this.board.h;
-    const field = this.field;
+    const field = [];
 
-    for (let pid = 0; pid < this.board.nplayer; pid++) {
-      const flg = new Array(w * h);
-      for (let i = 1; i < w - 1; i++) {
-        for (let j = 1; j < h - 1; j++) {
-          if (
-            flg[i + j * w] || this.field[i + j * w][0] === Field.WALL
+    // 外側に空白のマスを作る
+    for (let y = -1; y < h + 1; y++) {
+      for (let x = -1; x < w + 1; x++) {
+        if (x < 0 || x >= w || y < 0 || y >= h) field.push([0, -1]);
+        else field.push(this.field[x + y * w].concat());
+      }
+    }
+
+    const mask = new Array(field.length);
+    for (let i = 0; i < mask.length; i++) mask[i] = 1;
+
+    while (mask.reduce((s, c) => s + c)) {
+      const area = new Array(field.length);
+      for (let pid = 0; pid < this.board.nplayer; pid++) {
+        for (let i = 0; i < field.length; i++) {
+          area[i] |= 1 << pid;
+        }
+        // 外側の囲まれていないところを判定
+        const chk = (x, y) => {
+          const n = x + y * (w + 2);
+          if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return;
+          else if ((area[n] & (1 << pid)) === 0) return;
+          else if (
+            mask[n] !== 0 && field[n][0] === Field.WALL && field[n][1] === pid
           ) {
-            continue;
+            return;
+          } else {
+            area[n] &= ~(1 << pid);
+            chk(x - 1, y);
+            chk(x + 1, y);
+            chk(x - 1, y - 1);
+            chk(x, y - 1);
+            chk(x + 1, y - 1);
+            chk(x - 1, y + 1);
+            chk(x, y + 1);
+            chk(x + 1, y + 1);
           }
-          const fill = new Array(w * h);
-          const chk = function (x, y) {
-            if (x < 0 || x >= w || y < 0 || y >= h) return false;
-            const n = x + y * w;
-            if (fill[n]) return true;
-            fill[n] = true;
+        };
+        chk(0, 0);
+        //console.log(mask, narea, pid);
+      }
 
-            const f = field[n];
-            if (f[0] === Field.WALL) {
-              if (f[1] === pid) {
-                return true;
-              }
-            } else {
-              fill[n] = true;
-            }
-            if (!chk(x - 1, y)) return false;
-            if (!chk(x + 1, y)) return false;
-            if (!chk(x - 1, y - 1)) return false;
-            if (!chk(x, y - 1)) return false;
-            if (!chk(x + 1, y - 1)) return false;
-            if (!chk(x - 1, y + 1)) return false;
-            if (!chk(x, y + 1)) return false;
-            if (!chk(x + 1, y + 1)) return false;
-            return true;
-          };
-          if (chk(i, j)) {
-            fill.forEach((f, idx) => {
-              if (this.field[idx][0] === Field.BASE) {
-                this.field[idx][1] = pid;
-                flg[idx] = true;
-              }
-            });
-          }
+      //console.log(area);
+
+      //console.log("mamamama");
+      //console.log(mask, area, "mask");
+      for (let i = 0; i < field.length; i++) {
+        if (area[i] === 0) {
+          mask[i] = 0;
+        } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
+          field[i][1] = Math.log2(area[i]);
+          mask[i] = 0;
+        }
+      }
+    }
+
+    for (let i = 0; i < w; i++) {
+      for (let j = 0; j < h; j++) {
+        const n = i + j * w;
+        const nexp = (i + 1) + (j + 1) * (w + 2);
+        if (this.field[n][0] !== Field.WALL) {
+          this.field[n][1] = field[nexp][1];
         }
       }
     }
@@ -311,7 +350,7 @@ class Field {
       if (att === Field.WALL) {
         p.wallpoint += pnt;
       } else if (att === Field.BASE) {
-        p.basepoint += pnt; // need abs()?
+        p.basepoint += Math.abs(pnt);
       }
     });
     return points;
@@ -325,12 +364,16 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, nturn = 10, nsec = 3) {
+  constructor(board, dummy) {
+    if (dummy) {
+      console.log(dummy);
+      throw new Error("too much");
+    }
     this.uuid = util.uuid();
     this.board = board;
     this.players = [];
-    this.nturn = nturn;
-    this.nsec = nsec;
+    this.nturn = board.nturn;
+    this.nsec = board.nsec;
     this.gaming = false;
     this.ending = false;
     this.actions = [];
@@ -339,6 +382,7 @@ class Game {
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
     this.turn = 0;
+    this.changeFuncs = [];
 
     // agents
     this.agents = [];
@@ -368,6 +412,8 @@ class Game {
       this.intervalId = setInterval(() => this.updateStatus(), 50);
       //console.log("intervalID", this.intervalId);
     }
+
+    this.changeFuncs.forEach((func) => func());
   }
 
   isReady() {
@@ -396,13 +442,14 @@ class Game {
     const actions = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     // console.log("actions", actions);
-    
+
     this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
     this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
     this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
     this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
     this.putOrMove(); // 配置または動かし、フィールド更新
     this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
+
     this.commit();
 
     this.checkAgentConflict();
@@ -414,8 +461,8 @@ class Game {
         return {
           point: this.field.getPoints()[idx],
           actions: ar.map((a) => a.getJSON()),
-        }
-      })
+        };
+      }),
     );
 
     if (this.turn < this.nturn) {
@@ -431,6 +478,7 @@ class Game {
 
   checkActions(actions) {
     const nplayer = actions.length;
+    // 範囲外と、かぶりチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
       const done = {};
       actions[playerid].forEach((a) => {
@@ -440,12 +488,6 @@ class Game {
           a.res = Action.ERR_ILLEGAL_AGENT;
           return;
         }
-        const agent = agents[aid];
-        if (!agent.check(a)) {
-          a.res = Action.ERR_ILLEGAL_ACTION;
-          return;
-        }
-
         const doneAgent = done[aid];
         if (doneAgent) {
           a.res = Action.ERR_ONLY_ONE_TURN;
@@ -453,6 +495,18 @@ class Game {
           return;
         }
         done[aid] = a;
+      });
+    }
+    // 変な動きチェック
+    for (let playerid = 0; playerid < nplayer; playerid++) {
+      actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
+        const aid = a.agentid;
+        const agents = this.agents[playerid];
+        const agent = agents[aid];
+        if (!agent.check(a)) {
+          a.res = Action.ERR_ILLEGAL_ACTION;
+          return;
+        }
       });
     }
   }
@@ -467,7 +521,11 @@ class Game {
       actions[playerid].forEach((a) => {
         if (a.res !== Action.SUCCESS) return false;
         const n = a.x + a.y * this.board.w;
-        chkfield[n].push(a);
+        if (n >= 0 && n < chkfield.length) {
+          chkfield[n].push(a);
+        } else {
+          console.log("?? n", n);
+        }
       });
     }
     // PUT/MOVE/REMOVE、競合はすべて無効
@@ -515,7 +573,10 @@ class Game {
       }
       this.agents.flat().forEach((agent) => {
         const act = agent.lastaction;
-        if (agent.isValidAction() && (act.type === Action.MOVE || act.type === Action.PUT)) {
+        if (
+          agent.isValidAction() &&
+          (act.type === Action.MOVE || act.type === Action.PUT)
+        ) {
           const n = act.x + act.y * this.board.w;
           //console.log("act", n);
           chkfield[n].push(agent);
@@ -599,13 +660,26 @@ class Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
+      this.changeFuncs.forEach((func) => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
+        this.changeFuncs.forEach((func) => func());
       }
     }
-    if (this.ending) clearInterval(this.intervalId);
+    if (this.ending) {
+      /*const logData = {
+        gameId: this.uuid,
+        board: this.board,
+        log: this.log,
+      }*/
+
+      Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
+
+      this.dispose();
+      //this.changeFuncs.forEach(func => func());
+    }
   }
 
   toJSON() {
@@ -709,9 +783,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board, nturn = 30) {
+  createGame(board) {
     //console.log(board);
-    const game = new Game(board, nturn);
+    const game = new Game(board);
     this.games.push(game);
     return game;
   }

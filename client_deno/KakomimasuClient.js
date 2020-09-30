@@ -22,7 +22,12 @@ class KakomimasuClient {
     this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
-    setHost(host);
+    if (host) {
+      if (host.endsWith("/")) {
+        host = host.substring(0, host.length - 1);
+      }
+      setHost(`${host}/api`);
+    }
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
@@ -30,19 +35,21 @@ class KakomimasuClient {
     if (user.hasOwnProperty("error")) {
       user = await userRegist(this.name, this.id, this.password);
     }
-    
+
     // プレイヤー登録
-    const resMatch = await match({ id: user.id, password: this.password, spec: this.spec });
+    const resMatch = await match(
+      { id: user.id, password: this.password, spec: this.spec },
+    );
     this.token = resMatch.accessToken;
     this.roomid = resMatch.gameId;
     this.pno = resMatch.index;
     console.log("playerid", resMatch, this.pno);
-    
+
     do {
       this.gameInfo = await getGameInfo(this.roomid);
       await sleep(100);
     } while (this.gameInfo.startedAtUnixTime === null);
-    
+
     console.log(this.gameInfo);
     console.log(
       "ゲーム開始時間：",
@@ -132,7 +139,7 @@ class KakomimasuClient {
     if (this.turn < this.totalTurn) {
       const bknext = this.gameInfo.nextTurnUnixTime;
       await sleep(diffTime(this.gameInfo.nextTurnUnixTime));
-  
+
       for (;;) {
         this.gameInfo = await getGameInfo(this.roomid);
         if (this.gameInfo.nextTurnUnixTime !== bknext) {

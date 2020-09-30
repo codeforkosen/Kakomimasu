@@ -1,5 +1,5 @@
-// const defaulthost = "http://localhost:8880";
-const defaulthost = "https://kakomimasu.sabae.club";
+// const defaulthost = "http://localhost:8880/api";
+const defaulthost = "https://kakomimasu.sabae.club/api";
 let host = defaulthost;
 const setHost = (s) => {
   host = s || defaulthost;
@@ -89,12 +89,12 @@ async function getGameInfo(roomid) {
 
 async function setAction(roomid, playerid, actions) {
   console.log("setAction", JSON.stringify(actions));
-  
+
   const sendJson = {
     time: Math.floor(new Date().getTime() / 1000),
     actions: actions,
   };
-  const reqJson = await (await fetch(
+  const resJson = await (await fetch(
     `${host}/match/${roomid}/action`,
     {
       method: "POST",
@@ -105,7 +105,8 @@ async function setAction(roomid, playerid, actions) {
       body: JSON.stringify(sendJson),
     },
   )).json();
-  return reqJson;
+  console.log(resJson, "setAction");
+  return resJson;
 }
 
 function diffTime(unixTime) {
