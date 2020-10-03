@@ -1,8 +1,6 @@
 "use strict";
 
 export class Client {
-    #host = "https://kakomimasu.sabae.club/api";
-
     constructor(id, name, spec, password) {
         this.id = id;
         this.password = password;
@@ -11,25 +9,16 @@ export class Client {
         console.log(this.id, this.password, this.name, this.spec);
     }
 
-    changeHost(host) {
-        if (host) {
-            if (host.endsWith("/")) {
-                host = host.substring(0, host.length - 1);
-            }
-            this.#host = `${host}/api`;
-        }
-    }
-
     async waitMatching() {
         // ユーザ取得（ユーザがなかったら新規登録）
-        let user = await this.#userShow();
+        let user = await this.userShow();
         console.log(user.error);
         if (user.error) {
-            user = await this.#userRegist();
+            user = await this.userRegist();
         }
 
         // プレイヤー登録
-        const match = await this.#match(
+        const match = await this.match(
             { id: user.id, password: this.password, spec: this.spec },
         );
         this.token = match.accessToken;
@@ -38,8 +27,8 @@ export class Client {
         console.log("playerid", match, this.pno);
 
         do {
-            this.gameInfo = await this.#getGameInfo(this.gameId);
-            await this.#sleep(100);
+            this.gameInfo = await this.getGameInfo(this.gameId);
+            await this.sleep(100);
         } while (this.gameInfo.startedAtUnixTime === null);
 
         console.log(this.gameInfo);
@@ -52,38 +41,43 @@ export class Client {
 
     async waitNextTurn() {
         if (this.gameInfo?.startedAtUnixTime) {
-            let diff = this.#diffTime(this.gameInfo.startedAtUnixTime);
-            if (diff < 0) {
-                diff = this.#diffTime(this.gameInfo.nextTurnUnixTime);
+            if (!this.gameInfo.ending) {
+                let diff = this.diffTime(this.gameInfo.startedAtUnixTime);
+                if (diff < 0) {
+                    diff = this.diffTime(this.gameInfo.nextTurnUnixTime);
+                }
+                await this.sleep(diff + 200);
+                this.gameInfo = await this.getGameInfo(this.gameId);
+                console.log("gameInfo更新");
+                return 0;
             }
-            await this.#sleep(diff);
-            this.gameInfo = await this.#getGameInfo(this.gameId);
         }
+        return -1;
     }
 
     action(actions) {
-        this.#setAction(actions);
+        this.setAction(actions);
     }
 
-    #sleep(msec) {
+    sleep(msec) {
         return new Promise((resolve) => {
             setTimeout(() => resolve(), msec);
         });
     }
-    #diffTime(unixTime) {
+    diffTime(unixTime) {
         const dt = unixTime * 1000 - new Date().getTime();
         console.log("diffTime", dt);
         return dt;
     }
 
-    async #userRegist() {
+    async userRegist() {
         const sendJson = {
             screenName: this.name,//screenName,
             name: this.id,
             password: this.password,
         };
         const reqJson = await (await fetch(
-            `${this.#host}/users/regist`,
+            "/api/users/regist",
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -94,18 +88,18 @@ export class Client {
         return reqJson;
     }
 
-    async #userShow() {
+    async userShow() {
         const reqJson = await (await fetch(
-            `${this.#host}/users/show/${this.id}`,
+            `/api/users/show/${this.id}`,
         )).json();
         //console.log(reqJson, "userShow");
         return reqJson;
     }
 
-    async #match({ name = "", id = "", password = "", spec = "" }) {
+    async match({ name = "", id = "", password = "", spec = "" }) {
         const sendJson = { name: name, id: id, password: password, spec: spec };
         const resJson = await (await fetch(
-            `${this.#host}/match`,
+            `/api/match`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -116,15 +110,15 @@ export class Client {
         return resJson; //[reqJson.accessToken, reqJson.roomId];
     }
 
-    async #getGameInfo() {
-        const res = await (await fetch(`${this.#host}/match/${this.gameId}`)).json();
+    async getGameInfo() {
+        const res = await (await fetch(`/api/match/${this.gameId}`)).json();
         if (res.error) {
             console.log("error! ", res);
         }
         return res;
     }
 
-    async #setAction(actions) {
+    async setAction(actions) {
         console.log("setAction", JSON.stringify(actions));
 
         const sendJson = {
@@ -132,7 +126,7 @@ export class Client {
             actions: actions,
         };
         const resJson = await (await fetch(
-            `${this.#host}/match/${this.gameId}/action`,
+            `/api/match/${this.gameId}/action`,
             {
                 method: "POST",
                 headers: {
@@ -147,14 +141,7 @@ export class Client {
     }
 }
 
-
-/*const defaulthost = "https://kakomimasu.sabae.club/api";
-let host = defaulthost;
-const setHost = (s) => {
-    host = s || defaulthost;
-};*/
-
-class Action {
+export class Action {
     constructor(agentId, type, x, y) {
         this.agentId = agentId;
         this.type = type;
@@ -162,36 +149,3 @@ class Action {
         this.y = y;
     }
 }
-
-
-
-async function userDelete({ name = "", id = "", password = "" }) {
-    const sendJson = {
-        name: name,
-        id: id,
-        password: password,
-    };
-    const res = await fetch(
-        `${host}/users/delete`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(sendJson),
-        },
-    );
-    //console.log(res, "userDelete");
-    return res;
-}
-
-
-
-
-
-
-
-
-
-export {
-    Action,
-    userDelete,
-};
