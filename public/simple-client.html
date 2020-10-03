@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+        <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+        <title>簡易ゲームクライアント - 囲みマス</title>
+    </head>
+
+    <body>
+        <form id="connect">
+            <lavel>ユーザID：<input id="userid" type="text" value="nt-sabae"></lavel>
+            <input type="submit" value="ゲームに接続する">
+        </form>
+        <table id="controller" hidden>
+            <tr>
+                <td><input type="button" value="↖"></td>
+                <td><input type="button" value="↑"></td>
+                <td><input type="button" value="↗"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="←"></td>
+                <td></td>
+                <td><input type="button" value="→"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="↙"></td>
+                <td><input type="button" value="↓"></td>
+                <td><input type="button" value="↘"></td>
+            </tr>
+        </table>
+
+        <div id="log"></div>
+
+        <div id="nogame" hidden>
+            <p>ゲームが存在しません。5秒後にゲーム一覧に戻ります。<a href="gamelist.html">今すぐ戻る</a></p>
+        </div>
+        <div>
+            <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
+            <table id="game-table" v-cloak>
+                <tr>
+                    <th>ルームID</th>
+                    <th>ステータス</th>
+                    <th>開始時刻</th>
+                </tr>
+                <tr>
+                    <td>{{game.gameId}}</td>
+                    <td>{{game.status}}</td>
+                    <td>{{game.startTime}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-top: 10px; text-align: center;">
+            <h3>フィールドの様子</h3>
+            <div style="margin: auto;display: inline-block;">
+                <div id="field-info" style="position:relative;height: 30px;min-width: 16em;" v-cloak>
+                    <h4 v-if="turn !== '-'" id="field-turn">{{turn}}</h4>
+                    <h4 v-if="turn !== '-'" id="field-point"><span class="p1">{{pointP1}}</span>：<span
+                            class="p2">{{pointP2}}</span></h4>
+                    <h4 v-if="turn === '-'" id="field-point">{{status}}</h4>
+                    <h4 v-if="turn !== '-'" id="field-nextTurnTime">{{status}}</h4>
+                </div>
+                <table id="field-table" v-cloak>
+                    <tr v-for="(row,y) in point">
+                        <td v-for="(item,x) in row" :class="className[y][x]">{{item}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <h3>プレイヤー情報</h3>
+            <div id="p-info" v-cloak>
+                <table v-for="(p,i) in players">
+                    <tr>
+                        <th><span :class="'p' + (i+1)">プレイヤー名</span></th>
+                        <td><a :href="p.link">{{p.screenName}}</a></td>
+                    </tr>
+                    <tr>
+                        <th><span :class="'p' + (i+1)">配置済みAgent数</span></th>
+                        <td>{{p.placedAgentNum}}</td>
+                    </tr>
+                    <tr>
+                        <th><span :class="'p' + (i+1)">未配置Agent数</span></th>
+                        <td>{{p.notPlacedAgentNum}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <script type="module">
+            import { Client,Action } from "/js/api-client.js";
+            import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
+
+            let client;
+
+            connect.onsubmit = async (e) => {
+                e.preventDefault();
+                console.log(userid.value);
+                client = new Client(userid.value,userid.value,"簡易",`${userid.value}-pw`);
+                client.changeHost("http://localhost:20000");
+                
+                log.innerText = "マッチ中・・・";
+                await client.waitMatching();
+                log.innerText = "マッチしました！ゲーム開始まで待機中・・・";
+                await client.waitNextTurn();
+                log.innerText = "1ターン目のため、エージェントを配置しています・・・";
+                const putx = client.pno * (client.gameInfo.board.width - 1);
+                const puty = client.pno * (client.gameInfo.board.height - 1);
+                client.action([new Action(0,"PUT",putx,puty)]);
+                await client.waitNextTurn();
+                controller.hidden = false;
+            }
+
+            const main = async () => {
+                //const client = new Client()
+            }
+            main();
+/*
+            
+                        var pointChart = new Chart(graph, {
+                            type: "line",
+                            data: {
+                                labels: [],
+                                datasets: [
+                                    {
+                                        label: "",
+                                        data: [],
+                                        borderColor: "rgba(0,0,255,1)",
+                                        backgroundColor: "rgba(0,0,0,0)"
+                                    },
+                                    {
+                                        label: "",
+                                        data: [],
+                                        borderColor: "rgba(255,0,0,1)",
+                                        backgroundColor: "rgba(0,0,0,0)"
+                                    }
+                                ],
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            suggestedMax: 100,
+                                            suggestedMin: 0,
+                                        }
+                                    }],
+                                    xAxes: [{
+                                        ticks: {
+                                            min: 0,
+                                        }
+                                    }],
+                                },
+                                elements: {
+                                    line: {
+                                        tension: 0, // ベジェ曲線を無効にする
+                                    },
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false
+                                },
+                                hover: {
+                                    mode: 'index',
+                                    intersect: false
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false
+                            },
+                        });
+            
+                        const gameTableVue = new Vue({
+                            el: "#game-table",
+                            data: {
+                                game: new Game(),
+                            },
+                            methods: {
+                                init: function (game) {
+                                    const [status, startTime] = Game.getGameStatus(game);
+                                    this.game.gameId = game.gameId;
+                                    this.game.status = status;
+                                    this.game.startTime = startTime;
+                                },
+                                update: function (game) {
+                                    const [status, startTime] = Game.getGameStatus(game);
+                                    this.game.status = status;
+                                    this.game.startTime = startTime;
+                                },
+                            },
+                        });
+            
+                        const fieldInfoVue = new Vue({
+                            el: "#field-info",
+                            data: {
+                                turn: "-",
+                                pointP1: "0",
+                                pointP2: "0",
+                                status: "",
+                            },
+                        });
+            
+                        const fieldTableVue = new Vue({
+                            el: "#field-table",
+                            data: {
+                                point: [],
+                                className: []
+                            },
+                            methods: {
+                                init: function (game) {
+                                    this.point = new Array(game.board.height);
+                                    this.className = new Array(game.board.height);
+                                    for (let i = 0; i < game.board.height; i++) {
+                                        this.point[i] = new Array(game.board.width);
+                                        this.className[i] = new Array(game.board.width);
+                                    }
+                                    for (let i = 0; i < game.board.height; i++) {
+                                        for (let j = 0; j < game.board.width; j++) {
+                                            Vue.set(this.point[i], j, game.board.points[j + i * game.board.width]);
+                                            Vue.set(this.className[i], j, "");
+                                        }
+                                    }
+            
+                                    Vue.nextTick(() => {
+                                        const tds = this.$el.getElementsByTagName("td");
+                                        for (let i = 0; i < tds.length; i++) {
+                                            const e = tds[i];
+                                            const p = parseInt(e.innerText);
+                                            let colorStr = "#";
+                                            if (p < 0) {
+                                                let bn = 0xFF;
+                                                bn *= Math.abs(p + 16) / 16 * 0.5 + 0.5;
+                                                bn &= 0xFF;
+                                                for (let i = 0; i < 3; i++) colorStr += toHex(bn);
+                                            } else if (p > 0) {
+                                                let bn = 0xFF;
+                                                bn *= Math.abs(p - 16) / 16 * 0.5 + 0.5;
+                                                bn &= 0xFF;
+                                                colorStr += `FFFF${toHex(bn)}`;
+                                            }
+                                            e.style.setProperty("--bg-color", colorStr);
+                                        }
+                                    });
+            
+                                    function toHex(v) {
+                                        return ('00' + v.toString(16).toUpperCase()).substr(-2);
+                                    }
+                                }
+                            }
+                        });
+            
+                        class PlayerInfo {
+                            constructor() {
+                                this.screenName = "";
+                                this.link = "";
+                                this.spec = "";
+                                this.placedAgentNum = 0;
+                                this.notPlacedAgentNum = 0;
+                            }
+                        }
+            
+                        const playerInfoVue = new Vue({
+                            el: "#p-info",
+                            data: {
+                                players: [new PlayerInfo(), new PlayerInfo()],
+                            },
+                            methods: {
+                                init: async function (game) {
+                                    for (let i = 0; i < 2; i++) {
+                                        if (game.players[i] !== undefined) {
+                                            const user = await userShow(game.players[i].id);
+                                            this.players[i].screenName = user.screenName;
+                                            this.players[i].link = `/user/${user.name}`;
+            
+                                            pointChart.data.datasets[i].label = user.screenName;
+                                        }
+                                    }
+                                },
+                                update: async function (game) {
+                                    for (let i = 0; i < 2; i++) {
+                                        if (game.players[i] !== undefined) {
+                                            if (this.players[i].screenName === "") {
+                                                const user = await userShow(game.players[i].id);
+                                                this.players[i].screenName = user.screenName;
+                                                this.players[i].link = `user.html?id=${user.name}`;
+            
+                                                pointChart.data.datasets[i].label = user.screenName;
+                                            }
+                                            let placedAgentNum = 0;
+                                            let notPlacedAgentNum = 0;
+                                            if (game.players[i].agents !== null) {
+                                                game.players[i].agents.forEach(e => {
+                                                    if (e.x === -1 && e.y === -1) notPlacedAgentNum++;
+                                                    else placedAgentNum++;
+                                                });
+                                            }
+                                            this.players[i].placedAgentNum = placedAgentNum;
+                                            this.players[i].notPlacedAgentNum = notPlacedAgentNum;
+                                            pointChart.update();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+            
+                        const gameId = getUrlQueries().id;
+                        document.getElementById("vr-link").href = "./vr/index.html?id=" + gameId;
+                        main();
+            
+                        async function main() {
+                            let game = await getGameInfo(gameId);
+                            if (game.error) {
+            
+                            } else {
+                                gameTableVue.init(game);
+                                playerInfoVue.update(game);
+                                pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
+                                for (let i = 0; i <= game.totalTurn; i++) {
+                                    pointChart.data.labels[i] = i;
+                                }
+                                pointChart.data.datasets[0].data[0] = 0;
+                                pointChart.data.datasets[1].data[0] = 0;
+                                pointChart.update();
+            
+                                waitGameStart();
+            
+                                async function waitGameStart() {
+                                    game = await getRoomInfo();
+                                    if (game.startedAtUnixTime !== null) {
+                                        console.log("プレイヤーそろったよ！");
+                                        fieldTableVue.init(game);
+            
+                                        setTimeout(() => {
+                                            console.log("ゲームスタート！");
+                                            updateField();
+            
+                                            async function updateField() {
+                                                console.log("フィールド更新！");
+                                                game = await getRoomInfo();
+                                                const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
+                                                //console.log(diffTime);
+                                                if (game.ending) return;
+                                                else setTimeout(updateField, diffTime);
+                                            }
+                                        }, (game.startedAtUnixTime * 1000) - new Date().getTime());
+                                    } else {
+                                        setTimeout(waitGameStart, 200);
+                                    }
+                                    return waitGameStart;
+                                }
+            
+                                setInterval(function updateStatus() {
+                                    if (game.startedAtUnixTime === null) fieldInfoVue.status = "ゲーム開始までお待ちください...";
+                                    else if (nowUnixTime() < game.startedAtUnixTime) fieldInfoVue.status = `ゲーム開始まで${game.startedAtUnixTime - nowUnixTime()}秒`;
+                                    else if (nowUnixTime() < game.nextTurnUnixTime) fieldInfoVue.status = `次のターンまで${game.nextTurnUnixTime - nowUnixTime()}秒`;
+                                    else if (!game.ending) fieldInfoVue.status = "競合チェック中...";
+                                    else fieldInfoVue.status = "ゲーム終了";
+                                    return updateStatus;
+                                }(), 100);
+                            }
+                        }
+            
+            
+                        async function getRoomInfo() {
+                            const game = await getGameInfo(gameId);
+                            console.log(game);
+                            gameTableVue.update(game);
+                            playerInfoVue.update(game);
+            
+                            // フィールド更新
+                            if (game.startedAtUnixTime === null) {
+                            }
+                            else {
+                                //console.log(getTurnText(game));
+                                fieldInfoVue.turn = getTurnText(game);
+                                fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
+                                fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
+            
+                                const lastLog = game.log[game.log.length - 1];
+                                const lastFlatLog = [];
+                                if (lastLog !== undefined) {
+                                    lastLog.forEach(p => {
+                                        lastFlatLog.push(...p.actions);
+                                    });
+                                }
+                                for (let y = 0; y < game.board.height; y++) {
+                                    const classNames = [];
+                                    for (let x = 0; x < game.board.width; x++) {
+                                        let className = "";
+                                        const playerid = game.tiled[x + y * game.board.width][1];
+                                        // console.log(game.tiled);
+                                        if (playerid !== -1) {
+                                            if (game.tiled[x + y * game.board.width][0] === 1) className += `p${playerid + 1}Wall`;
+                                            if (game.tiled[x + y * game.board.width][0] === 0) className += `p${playerid + 1}Area`;
+                                            game.players.forEach((p, i) => {
+                                                p.agents.forEach(a => {
+                                                    if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) {
+                                                        className += " agent agent" + (i + 1); // (playerid + 1);
+                                                        // console.log(a.x, a.y, className);
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        const isConflict = lastFlatLog.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
+                                        if (isConflict) {
+                                            //console.log("conflict", x, y);
+                                            className += " conflict";
+                                        }
+                                        //console.log();
+            
+                                        classNames.push(className);
+            
+                                    }
+                                    fieldTableVue.className.splice(y, 1, classNames);
+                                }
+            
+                                // グラフ更新
+                                game.log.forEach((t, tIdx) => {
+                                    t.forEach((p, pIdx) => {
+                                        const point = p.point.basepoint + p.point.wallpoint;
+                                        pointChart.data.datasets[pIdx].data[tIdx + 1] = point;
+                                    });
+                                });
+            
+                                pointChart.update();
+                            }
+                            return game;
+                        }*/
+
+        </script>
+
+    </body>
+
+</html>
+
+<style>
+    table,
+    td,
+    th {
+        border: 1px solid;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    table {
+        margin: 0 auto;
+    }
+
+    th,
+    td {
+        padding: 5px;
+    }
+
+    #nogame {
+        color: red;
+        text-align: center;
+    }
+
+    #field-table td {
+        width: 50px;
+        height: 50px;
+        text-align: right;
+        vertical-align: bottom;
+        --bg-color: #FFFFFF;
+        background-color: var(--bg-color);
+    }
+
+    #field-turn,
+    #field-point,
+    #field-nextTurnTime {
+        position: absolute;
+        margin: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    #field-turn {
+        text-align: left;
+    }
+
+    #field-point {
+        text-align: center;
+    }
+
+    #field-nextTurnTime {
+        text-align: right;
+    }
+
+    #now-time {
+        text-align: center;
+    }
+
+    #p-info {
+        display: flex;
+        max-width: 90%;
+        height: auto;
+        margin: 1em auto;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #p-info table {
+        width: 50%-1em;
+        margin: 1em;
+    }
+
+    .p1 {
+        color: blue;
+    }
+
+    .p2 {
+        color: red;
+    }
+
+    td.agent {
+        background-size: 80%;
+        background-position: 0%, 50%;
+        background-repeat: no-repeat;
+    }
+
+    td.agent1 {
+        background-image: url(/img/agent1.png);
+    }
+
+    td.agent2 {
+        background-image: url(/img/agent2.png);
+    }
+
+    td.p1Wall {
+        background-color: #0096FF !important;
+    }
+
+    td.p2Wall {
+        background-color: #FF0200 !important;
+    }
+
+    td.p1Area {
+        background-color: #80C9FF !important;
+    }
+
+    td.p2Area {
+        background-color: #FE9998 !important;
+    }
+
+    td.conflict {
+        animation: flash 1s linear infinite;
+    }
+
+    @keyframes flash {
+
+        0%,
+        100% {}
+
+        50% {
+            background-color: #00ff00;
+        }
+    }
+
+    #graph-div {
+        margin: 50px;
+    }
+
+    #graph {
+        height: 200px;
+    }
+</style>
