@@ -3,8 +3,8 @@
 import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
 import util from "../util.js";
 
-const kc = new KakomimasuClient("a4", "破壊者", "サンプル", "a4-pw" );
-// kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
+const kc = new KakomimasuClient("a4", "破壊者", "サンプル", "a4-pw");
+kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
@@ -75,7 +75,7 @@ while (info) {
       } else {
         // 周りが全部埋まっていたらランダムに動く
         console.log("random", i);
-        for (;;) {
+        for (; ;) {
           const [dx, dy] = DIR[util.rnd(8)];
           const x = agent.x + dx;
           const y = agent.y + dy;

@@ -3,8 +3,8 @@
 import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
 import util from "../util.js";
 
-const kc = new KakomimasuClient("a5pre", "破壊者改", "", "a5-pw" );
-// kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
+const kc = new KakomimasuClient("a5pre", "破壊者改", "", "a5-pw");
+kc.setServerHost("http://localhost"); // ローカルに接続してチェックする場合に使う
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
@@ -96,7 +96,7 @@ while (info) {
           };
           const x2 = agent.x + sgn(target.x - agent.x);
           const y2 = agent.y + sgn(target.y - agent.y);
-          console.log("x2", x2, agent.x, target.x, w);``
+          console.log("x2", x2, agent.x, target.x, w); ``
           console.log("y2", y2, agent.y, target.y, h);
           const p = field[y2][x2];
           if (p.type === 0 || p.pid === -1) {
@@ -108,7 +108,7 @@ while (info) {
           poschk.push({ x: agent.x, y: agent.y });
         } else {
           // 空いているところなければランダム
-          for (;;) {
+          for (; ;) {
             const [dx, dy] = DIR[util.rnd(8)];
             const x = agent.x + dx;
             const y = agent.y + dy;
