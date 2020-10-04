@@ -114,8 +114,9 @@
             }
 
             document.onkeydown = (e) => {
-                if (controller.hidden === true) return;
                 let keyName = e.key;
+                if (keyName === "Enter") connectBtn.onclick(e);
+                if (controller.hidden === true) return;
                 console.log(keyName);
                 for (const input of inputs) input.disabled = false;
                 for (let i = 0; i < keyMap.length; i++) {
