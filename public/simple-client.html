@@ -50,6 +50,7 @@
 
             const inputs = controller.getElementsByTagName("input");
             const around = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+            const keyMap = ["q", "w", "e", "a", "d", "z", "x", "c"];
 
             let client;
 
@@ -90,20 +91,37 @@
                 }
             }
 
+            const action = (i) => {
+                inputs[i].disabled = true;
+
+                const aPos = client.gameInfo.players[client.pno].agents[0];
+                const nPos = { x: aPos.x + around[i][0], y: aPos.y + around[i][1] };
+                const tile = client.gameInfo.tiled[nPos.x + nPos.y * client.gameInfo.board.width];
+                const aType = tile[1] !== client.pno && tile[0] === 1 ? "REMOVE" : "MOVE";
+                client.action([new Action(0, aType, nPos.x, nPos.y)]);
+            }
+
             for (const input of inputs) {
                 input.onclick = (e) => {
                     for (let i = 0; i < inputs.length; i++) {
                         for (const input of inputs) input.disabled = false;
                         if (e.target === inputs[i]) {
-                            inputs[i].disabled = true;
-
-                            const aPos = client.gameInfo.players[client.pno].agents[0];
-                            const nPos = { x: aPos.x + around[i][0], y: aPos.y + around[i][1] };
-                            const tile = client.gameInfo.tiled[nPos.x + nPos.y * client.gameInfo.board.width];
-                            const aType = tile[1] !== client.pno && tile[0] === 1 ? "REMOVE" : "MOVE";
-                            client.action([new Action(0, aType, nPos.x, nPos.y)]);
+                            action(i);
                             break;
                         }
+                    }
+                }
+            }
+
+            document.onkeydown = (e) => {
+                if (controller.hidden === true) return;
+                let keyName = e.key;
+                console.log(keyName);
+                for (const input of inputs) input.disabled = false;
+                for (let i = 0; i < keyMap.length; i++) {
+                    if (keyName === keyMap[i]) {
+                        action(i);
+                        break;
                     }
                 }
             }
