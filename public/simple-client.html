@@ -46,7 +46,8 @@
 
         <script type="module">
             import { Client, Action } from "/js/api-client.js";
-            import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
+            import { getUrlQueries } from "/js/util.js";
+            getUrlQueries();
 
             const inputs = controller.getElementsByTagName("input");
             const around = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
@@ -56,29 +57,38 @@
 
             const nextAudio = new Audio("/sound/crrect_answer1.mp3");
 
-            connectBtn.onclick = async (e) => {
-                e.preventDefault();
-
+            connectBtn.onclick = async (e, token, pno) => {
                 document.body.style.backgroundColor = "#FFFFFF";
                 nextAudio.play();
-                controller.hidden = true;
-                client = new Client(userid.value, userid.value, "簡易", `${userid.value}-pw`);
 
-                log.innerText = "マッチ中・・・";
-                await client.waitMatching();
-                document.body.style.backgroundColor = client.pno === 0 ? "#A0A0FF" : "#FFA0A0";
+                if (!token) {
+                    e.preventDefault();
 
-                log.innerText = "マッチしました！ゲーム開始まで待機中・・・";
-                await client.waitNextTurn();
+                    controller.hidden = true;
 
-                log.innerText = "1ターン目のため、エージェントを配置しています・・・";
-                const putx = client.pno * (client.gameInfo.board.width - 1);
-                const puty = client.pno * (client.gameInfo.board.height - 1);
-                client.action([new Action(0, "PUT", putx, puty)]);
-                await client.waitNextTurn();
+                    client = new Client(userid.value, userid.value, "簡易", `${userid.value}-pw`);
+
+                    log.innerText = "マッチ中・・・";
+                    await client.waitMatching();
+                    document.body.style.backgroundColor = client.pno === 0 ? "#A0A0FF" : "#FFA0A0";
+
+                    log.innerText = "マッチしました！ゲーム開始まで待機中・・・";
+                    await client.waitNextTurn();
+
+                    log.innerText = "1ターン目のため、エージェントを配置しています・・・";
+                    const putx = client.pno * (client.gameInfo.board.width - 1);
+                    const puty = client.pno * (client.gameInfo.board.height - 1);
+                    client.action([new Action(0, "PUT", putx, puty)]);
+                    await client.waitNextTurn();
+
+                } else if (token) {
+                    client = new Client(e, token, pno);
+                    await client.waitNextTurn();
+                }
 
                 controller.hidden = false;
                 while (true) {
+                    if (client.gameInfo?.ending) break;
                     //nextAudio.play();
                     log.innerText = `${client.gameInfo.turn}ターン目`;
                     for (const input of inputs) input.disabled = false;
@@ -93,7 +103,6 @@
 
             const action = (i) => {
                 inputs[i].disabled = true;
-
                 const aPos = client.gameInfo.players[client.pno].agents[0];
                 const nPos = { x: aPos.x + around[i][0], y: aPos.y + around[i][1] };
                 const tile = client.gameInfo.tiled[nPos.x + nPos.y * client.gameInfo.board.width];
@@ -126,6 +135,11 @@
                     }
                 }
             }
+
+            const query = getUrlQueries();
+            console.log(query);
+            if (Object.keys(query).length) connectBtn.onclick(query.gameId, query.token, query.pno);
+
         </script>
     </body>
 

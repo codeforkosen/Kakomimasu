@@ -2,11 +2,18 @@
 
 export class Client {
     constructor(id, name, spec, password) {
-        this.id = id;
-        this.password = password;
-        this.name = name;
-        this.spec = spec;
-        console.log(this.id, this.password, this.name, this.spec);
+        if (password) {
+            this.id = id;
+            this.name = name;
+            this.spec = spec;
+            this.password = password;
+            console.log(this.id, this.password, this.name, this.spec);
+        } else {
+            this.gameId = id;
+            this.token = name;
+            this.pno = spec;
+            console.log("既存のゲームに接続", this.gameId, this.token, this.pno);
+        }
     }
 
     async waitMatching() {
@@ -52,6 +59,7 @@ export class Client {
                 return 0;
             }
         }
+        this.gameInfo = await this.getGameInfo(this.gameId);
         return -1;
     }
 
