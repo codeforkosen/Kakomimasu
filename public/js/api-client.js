@@ -29,7 +29,7 @@ export class Client {
         do {
             this.gameInfo = await this.getGameInfo(this.gameId);
             await this.sleep(100);
-        } while (this.gameInfo.startedAtUnixTime === null);
+        } while (this.gameInfo.startedAtUnixTime === undefined || this.gameInfo.startedAtUnixTime === null);
 
         console.log(this.gameInfo);
         console.log(

@@ -23,7 +23,7 @@
                 <input id="connectBtn" type="button" value="ゲームに接続する">
             </form>
             <hr>
-            <table id="controller">
+            <table id="controller" hidden>
                 <tr>
                     <td><input type="button" value="↖"></td>
                     <td><input type="button" value="↑"></td>
@@ -78,12 +78,15 @@
 
                 controller.hidden = false;
                 while (true) {
-                    nextAudio.play();
+                    //nextAudio.play();
                     log.innerText = `${client.gameInfo.turn}ターン目`;
                     for (const input of inputs) input.disabled = false;
                     const status = await client.waitNextTurn();
 
-                    if (status !== 0) break;
+                    if (status !== 0) {
+                        controller.hidden = true;
+                        break;
+                    }
                 }
             }
 
