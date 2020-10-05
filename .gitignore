@@ -1,4 +1,6 @@
 .vscode/
 apiserver/test.ts
 log/
-apiserver/data/users.json
+*.bat
+*.env
+apiserver/data/
