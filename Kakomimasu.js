@@ -674,7 +674,7 @@ class Game {
         board: this.board,
         log: this.log,
       }*/
-
+      Deno.mkdirSync("./log", { recursive: true });
       Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
 
       this.dispose();
