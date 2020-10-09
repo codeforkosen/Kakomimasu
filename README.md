@@ -20,7 +20,7 @@ http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&p
 
 for Deno
 ```typescript
-import { Kakomimasu, Board, Action } from "https://taisukef.github.io/Kakomimasu/Kakomimasu.js";
+import { Kakomimasu, Board, Action } from "https://codeforkosen.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
 
