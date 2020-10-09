@@ -28,7 +28,7 @@ const kkmm = new Kakomimasu();
 
 for Deno
 ```
-$ git clone https://github.com/taisukef/Kakomimasu.git
+$ git clone https://github.com/codeforkosen/Kakomimasu.git
 ```
 main.js を編集（そのままでも動きます）
 ```javascript
