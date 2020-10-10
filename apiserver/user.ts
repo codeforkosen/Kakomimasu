@@ -31,15 +31,21 @@ class Account {
   }
 
   read() {
+    const path = "./data/users.json";
     try {
-      this.users = JSON.parse(Deno.readTextFileSync("./data/users.json")) as Array<User>;
+      if (Deno.statSync(path).isFile) {
+        this.users = JSON.parse(Deno.readTextFileSync(path)) as Array<User>;
+      }
     } catch (e) {
+      console.log(e);
     }
   }
 
   write() {
+    const dirName = "./data";
+    Deno.mkdirSync(dirName, { recursive: true });
     Deno.writeTextFileSync(
-      "./data/users.json",
+      `${dirName}/users.json`,
       JSON.stringify(this.users, ["screenName", "name", "id", "password"]),
     );
   }
@@ -139,4 +145,4 @@ class Account {
   }
 }
 
-export { User, Account };
+export { Account, User };
