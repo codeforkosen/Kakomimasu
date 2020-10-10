@@ -8,6 +8,9 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
 
+        <script src="/js/vue-util.js"></script>
+        <link rel="stylesheet" href="/css/vue-util.css">
+
         <link rel="stylesheet" href="/css/main.css">
         <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
         <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
@@ -46,11 +49,9 @@
                     <h4 v-if="turn === '-'" id="field-point">{{status}}</h4>
                     <h4 v-if="turn !== '-'" id="field-nextTurnTime">{{status}}</h4>
                 </div>
-                <table id="field-table" v-cloak>
-                    <tr v-for="(row,y) in point">
-                        <td v-for="(item,x) in row" :class="className[y][x]">{{item}}</td>
-                    </tr>
-                </table>
+                <div id="field-table">
+                    <field-table ref="table"></field-table>
+                </div>
             </div>
         </div>
         <div style="text-align: center;">
@@ -168,50 +169,8 @@
 
             const fieldTableVue = new Vue({
                 el: "#field-table",
-                data: {
-                    point: [],
-                    className: []
-                },
-                methods: {
-                    init: function (game) {
-                        this.point = new Array(game.board.height);
-                        this.className = new Array(game.board.height);
-                        for (let i = 0; i < game.board.height; i++) {
-                            this.point[i] = new Array(game.board.width);
-                            this.className[i] = new Array(game.board.width);
-                        }
-                        for (let i = 0; i < game.board.height; i++) {
-                            for (let j = 0; j < game.board.width; j++) {
-                                Vue.set(this.point[i], j, game.board.points[j + i * game.board.width]);
-                                Vue.set(this.className[i], j, "");
-                            }
-                        }
-
-                        Vue.nextTick(() => {
-                            const tds = this.$el.getElementsByTagName("td");
-                            for (let i = 0; i < tds.length; i++) {
-                                const e = tds[i];
-                                const p = parseInt(e.innerText);
-                                let colorStr = "#";
-                                if (p < 0) {
-                                    let bn = 0xFF;
-                                    bn *= Math.abs(p + 16) / 16 * 0.5 + 0.5;
-                                    bn &= 0xFF;
-                                    for (let i = 0; i < 3; i++) colorStr += toHex(bn);
-                                } else if (p > 0) {
-                                    let bn = 0xFF;
-                                    bn *= Math.abs(p - 16) / 16 * 0.5 + 0.5;
-                                    bn &= 0xFF;
-                                    colorStr += `FFFF${toHex(bn)}`;
-                                }
-                                e.style.setProperty("--bg-color", colorStr);
-                            }
-                        });
-
-                        function toHex(v) {
-                            return ('00' + v.toString(16).toUpperCase()).substr(-2);
-                        }
-                    }
+                components: {
+                    'field-table': fieldTableComp,
                 }
             });
 
@@ -293,7 +252,7 @@
                     gameTableVue.init(game);
                     playerInfoVue.update(game);
                     if (game.startedAtUnixTime !== null) {
-                        fieldTableVue.init(game);
+                        fieldTableVue.$refs.table.init(game);
 
                         pointChart.options.scales.xAxes[0].ticks.max = game.totalTurn;
                         for (let i = 0; i <= game.totalTurn; i++) {
@@ -438,7 +397,7 @@
                             classNames.push(className);
 
                         }
-                        fieldTableVue.className.splice(y, 1, classNames);
+                        fieldTableVue.$refs.table.className.splice(y, 1, classNames);
                     }
 
                     // グラフ更新
