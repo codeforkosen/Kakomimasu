@@ -1,5 +1,6 @@
 # Kakomimasu
  #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
+ <img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.png">  
 
 [![deno](https://taisukef.github.com/denolib/denobadge@1.3.3.svg)](https://deno.land/)  
 
