@@ -13,6 +13,55 @@ https://codeforkosen.github.io/Kakomimasu/
 
 http://www.procon.gr.jp/?p=77044  
 
+## プロトコル
+かこみますネットワークプロトコルを決めようの会  
+https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
+
+## APIサーバー
+
+[apiserver/](apiserver)  
+
+## APIサーバー for Deno
+
+```
+$ cd apiserver
+$ deno run -A apiserver.js
+```
+
+## APIクライアント for Deno (JavaScript)
+
+[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/game)を開いた状態で下記を実行する。
+
+```
+$ cd client_deno
+$ deno run -A client_test1.js
+```
+別のコンソールから
+```
+$ cd client_deno
+$ deno run -A client_test2.js
+```
+
+## APIクライアント for Node
+
+```
+$ cd client_node
+$ node action.mjs
+```
+
+## APIクライアント for C (Mac/Windows gcc)
+
+```
+$ cd client_c
+$ gcc action_test.c
+$ ./a.out
+```
+
+## サポート Slack
+
+Code for KOSEN Slack #kakomimasu チャンネル  
+https://codeforkosen.github.io/about/  
+
 ## 人vs人で遊んでみる
 
 http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
@@ -85,50 +134,6 @@ $ deno test
 ## デザイン
 Kakomimasu – Figma  
 https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu  
-
-## プロトコル
-かこみますネットワークプロトコルを決めようの会  
-https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
-
-## APIサーバー
-
-[apiserver/](apiserver)  
-
-## APIサーバー for Deno
-
-```
-$ cd apiserver
-$ deno run -A apiserver.js
-```
-
-## APIクライアント for Deno (JavaScript)
-
-[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/game)を開いた状態で下記を実行する。
-
-```
-$ cd client_deno
-$ deno run -A client_test1.js
-```
-別のコンソールから
-```
-$ cd client_deno
-$ deno run -A client_test2.js
-```
-
-## APIクライアント for Node
-
-```
-$ cd client_node
-$ node action.mjs
-```
-
-## APIクライアント for C (Mac/Windows gcc)
-
-```
-$ cd client_c
-$ gcc action_test.c
-$ ./a.out
-```
 
 ## フィールド
 
