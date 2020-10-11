@@ -1,4 +1,14 @@
-export const ErrorResponse = (message: string) => {
+export const jsonResponse = (json: any) => {
+  return {
+    status: 200,
+    headers: new Headers({
+      "content-type": "application/json",
+    }),
+    body: JSON.stringify(json),
+  };
+};
+
+export const errorResponse = (message: string) => {
   return {
     status: 400,
     headers: new Headers({
@@ -14,4 +24,8 @@ export const getSafePath = (fn: string) => {
     throw new Error("unsafe path");
   }
   return fn;
+};
+
+export const readJsonFileSync = (path: string | URL) => {
+  return JSON.parse(Deno.readTextFileSync(path));
 };

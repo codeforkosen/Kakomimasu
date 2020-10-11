@@ -1,9 +1,9 @@
 import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
 import {
-  ServerRequest,
-  createRouter,
   contentTypeFilter,
   createApp,
+  createRouter,
+  ServerRequest,
   serveStatic,
 } from "https://servestjs.org/@v1.1.1/mod.ts";
 
@@ -12,8 +12,9 @@ import * as util from "./apiserver_util.ts";
 import { Account, User } from "./user.ts";
 const accounts = new Account();
 
-import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
+const kkmm_self = new Kakomimasu();
 
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 dotenv.config();
@@ -38,7 +39,7 @@ const usersRegist = async (req: ServerRequest) => {
       body: JSON.stringify(user, ["screenName", "name", "id"]),
     });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -57,7 +58,7 @@ const usersShow = async (req: ServerRequest) => {
         });
       }
     } catch (e) {
-      await req.respond(util.ErrorResponse(e.message));
+      await req.respond(util.errorResponse(e.message));
     }
   } else {
     await req.respond({
@@ -85,7 +86,27 @@ const usersDelete = async (req: ServerRequest) => {
     );
     await req.respond({ status: 200 });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
+  }
+};
+
+//#endregion
+
+//#region ゲーム作成API
+class BoardNamePost {
+  constructor(public name: string, public boardName: string) {}
+}
+
+const createSelfGame = async (req: ServerRequest) => {
+  try {
+    const reqJson = (await req.json()) as BoardNamePost;
+    const game = kkmm_self.createGame(
+      readBoard(reqJson.boardName),
+      reqJson.name,
+    );
+    await req.respond(util.jsonResponse(JSON.stringify(game)));
+  } catch (e) {
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -93,67 +114,67 @@ const usersDelete = async (req: ServerRequest) => {
 
 //#region プレイヤー登録・ルームID取得API
 
-const addPlayer = (
-  name: string,
-  id: string,
-  password: string,
-  spec: string,
-) => {
-  var identifier = "";
-  if (id !== "") identifier = id;
-  else if (name !== "") identifier = name;
-  else throw Error("Invalid id or name.");
-
-  const user = accounts.getUser(identifier, password);
-  if (user !== undefined) {
-    const player = kkmm.createPlayer(user.id, spec);
-
-    const freeGame = kkmm.getFreeGames();
-    if (freeGame.length == 0) {
-      //freeGame.push(kkmm.createGame(createDefaultBoard()));
-
-      const game = kkmm.createGame(readBoard(boardname));
-      game.changeFuncs.push(sendAllGame);
-      freeGame.push(game);
-    }
-    const playerIndex = freeGame[0].attachPlayer(player);
-    if (playerIndex === false) throw Error("Can not add Player");
-
-    return player;
-  } else {
-    throw Error("Can not find user.");
-  }
-};
-
 export class PlayerPost {
   constructor(
     public name: string,
     public id: string,
     public password: string,
     public spec: string,
+    public gameId: string,
   ) {}
 }
 
 export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
-  const playerPost = (await req.json()) as PlayerPost;
   try {
-    const player = addPlayer(
-      playerPost.name,
-      playerPost.id,
-      playerPost.password,
-      playerPost.spec,
-    );
-    //console.log(player);
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(player.getJSON()),
-    });
+    const playerPost = (await req.json()) as PlayerPost;
+
+    let identifier = "";
+    if (playerPost.id !== "") identifier = playerPost.id;
+    else if (playerPost.name !== "") identifier = playerPost.name;
+    else throw Error("Invalid id or name.");
+
+    const user = accounts.getUser(identifier, playerPost.password);
+    if (user !== undefined) {
+      const player = kkmm.createPlayer(user.id, playerPost.spec);
+      if (playerPost.gameId) {
+        const game = kkmm_self.getGames().find((game) =>
+          game.uuid === playerPost.gameId
+        );
+        if (game) {
+          if (game.attachPlayer(player) === false) {
+            throw Error("Game is not free");
+          }
+        } else {
+          throw Error("Can not find Game");
+        }
+      } else {
+        const freeGame = kkmm.getFreeGames();
+        if (freeGame.length == 0) {
+          //freeGame.push(kkmm.createGame(createDefaultBoard()));
+
+          const game = kkmm.createGame(readBoard(boardname));
+          game.changeFuncs.push(sendAllGame);
+          freeGame.push(game);
+        }
+        //const playerIndex = ;
+        if (freeGame[0].attachPlayer(player) === false) {
+          throw Error("Can not add Player");
+        }
+        //console.log(player);
+      }
+      await req.respond({
+        status: 200,
+        headers: new Headers({
+          "content-type": "application/json",
+        }),
+        body: JSON.stringify(player.getJSON()),
+      });
+    } else {
+      throw Error("Can not find user.");
+    }
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -189,7 +210,7 @@ export const getGameInfo = async (req: ServerRequest) => {
       throw Error("Invalid gameID.");
     }
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -240,13 +261,13 @@ export const setAction = async (req: ServerRequest) => {
     const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (player === undefined) {
-      await req.respond(util.ErrorResponse("Invalid accessToken."));
+      await req.respond(util.errorResponse("Invalid accessToken."));
     } else {
       const actionData = (await req.json()) as SetActionPost;
       const isDisable = actionData.actions.some((a) => !ActionPost.isEnable(a));
       //console.log(actionData);
       if (isDisable) {
-        await req.respond(util.ErrorResponse("Invalid action"));
+        await req.respond(util.errorResponse("Invalid action"));
       } else {
         const actionsAry: any = [];
         actionData.actions.forEach((a) => {
@@ -268,7 +289,7 @@ export const setAction = async (req: ServerRequest) => {
       }
     }
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -323,7 +344,7 @@ const allPastGame = async (req: ServerRequest) => {
       body: JSON.stringify(logGames),
     });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 const webRoutes = () => {
@@ -351,6 +372,12 @@ const apiRoutes = () => {
     "users/delete",
     contentTypeFilter("application/json"),
     usersDelete,
+  );
+
+  router.post(
+    "game/create",
+    contentTypeFilter("application/json"),
+    createSelfGame,
   );
 
   router.post("match", contentTypeFilter("application/json"), match);
@@ -384,18 +411,23 @@ const createDefaultBoard = () => {
 };
 
 const readBoard = (fileName: string) => {
-  const boardJson = JSON.parse(
-    Deno.readTextFileSync(`./board/${fileName}.json`),
-  );
-  if (boardJson.points[0] instanceof Array) {
-    boardJson.points = boardJson.points.flat();
-  }
-  /*console.log(
-    boardJson.width,
-    boardJson.height,
-    boardJson.points,
-    boardJson.nagent,
-  );*/
+  const path = `./board/${fileName}.json`;
+  if (Deno.statSync(path).isFile) {
+    const boardJson = JSON.parse(
+      Deno.readTextFileSync(path),
+    );
+    if (boardJson.points[0] instanceof Array) {
+      boardJson.points = boardJson.points.flat();
+    }
+    /*console.log(
+      boardJson.width,
+      boardJson.height,
+      boardJson.points,
+      boardJson.nagent,
+    );*/
 
-  return new Board(boardJson);
+    return new Board(boardJson);
+  } else {
+    throw Error("Can not find Board");
+  }
 };

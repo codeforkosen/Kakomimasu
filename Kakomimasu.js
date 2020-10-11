@@ -364,13 +364,14 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, dummy) {
+  constructor(board, name, dummy) {
     if (dummy) {
       console.log(dummy);
       throw new Error("too much");
     }
     this.uuid = util.uuid();
     this.board = board;
+    this.name = name;
     this.players = [];
     this.nturn = board.nturn;
     this.nsec = board.nsec;
@@ -414,6 +415,7 @@ class Game {
     }
 
     this.changeFuncs.forEach((func) => func());
+    return true;
   }
 
   isReady() {
@@ -783,9 +785,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board) {
+  createGame(...param) {
     //console.log(board);
-    const game = new Game(board);
+    const game = new Game(...param);
     this.games.push(game);
     return game;
   }
