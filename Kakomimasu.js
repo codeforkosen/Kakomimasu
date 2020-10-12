@@ -715,6 +715,7 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
+      gameName: this.name,
       gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
