@@ -680,7 +680,7 @@ class Game {
       Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
 
       this.dispose();
-      //this.changeFuncs.forEach(func => func());
+      this.changeFuncs.forEach(func => func());
     }
   }
 

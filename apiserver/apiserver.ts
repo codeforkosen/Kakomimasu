@@ -104,7 +104,8 @@ const createSelfGame = async (req: ServerRequest) => {
       readBoard(reqJson.boardName),
       reqJson.gameName,
     );
-    game.changeFuncs.push(sendAllSelfGame);
+    game.changeFuncs.push(sendAllGame);
+    sendAllGame(game.uuid);
 
     await req.respond(util.jsonResponse(JSON.stringify(game)));
 
@@ -288,7 +289,7 @@ export const setAction = async (req: ServerRequest) => {
     const game = [...kkmm.getGames(), ...kkmm_self.getGames()].find((
       item: any,
     ) => item.uuid === gameId);
-    if (!game) throw Error("Incalid gameId");
+    if (!game) throw Error("Invalid gameId");
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (player === undefined) {
       throw Error("Invalid accessToken.");
@@ -305,7 +306,7 @@ export const setAction = async (req: ServerRequest) => {
     });
     //console.log(game.nextTurnUnixTime);
     //if (game.nextTurnUnixTime >= reqTime) {
-    console.log(actionsAry);
+    //console.log(actionsAry);
     const nowTurn = player.setActions(Action.fromJSON(actionsAry));
     await req.respond({
       status: 200,
@@ -325,11 +326,13 @@ export const setAction = async (req: ServerRequest) => {
 
 //#region WebSocket
 
-const socks: WebSocket[] = [];
+let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
   socks.push(sock);
-  sock.send(JSON.stringify(kkmm.getGames()));
+  sock.send(
+    JSON.stringify([kkmm.getGames(), kkmm_self.getGames(), getLogGames()]),
+  );
 
   for await (const msg of sock) {
     if (typeof msg === "string") {
@@ -343,62 +346,43 @@ const ws_AllGame = async (sock: WebSocket) => {
   }
 };
 const sendAllGame = () => {
-  socks.forEach((s) => {
-    if (!s.isClosed) {
-      s.send(JSON.stringify(kkmm.getGames()));
+  //console.log(socks.length);
+  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+
+  socks = socks.filter((s) => {
+    try {
+      if (!s.isClosed) {
+        s.send(
+          JSON.stringify(games),
+        );
+        return true;
+      }
+    } catch (e) {
+      console.log(e);
     }
+    return false;
   });
 };
 
-const socksSelf: WebSocket[] = [];
-
-const ws_AllSelfGame = async (sock: WebSocket) => {
-  socksSelf.push(sock);
-  sock.send(JSON.stringify(kkmm_self.getGames()));
-
-  for await (const msg of sock) {
-    if (typeof msg === "string") {
-      //console.log(msg);
-    } else {
-      //console.log("err on ws", msg);
-      // ws { code: 0, reason: "" } -- close
-      // ws { code: 1001, reason: "" } -- 遮断
-      break;
+const logGames: any[] = [];
+let logFoldermtime: (Date | null) = null;
+const getLogGames = (): any => {
+  logGames.length = 0;
+  const stat = Deno.statSync("./log");
+  if (stat.isDirectory) {
+    if (logFoldermtime !== stat.mtime) {
+      for (const dirEntry of Deno.readDirSync("./log")) {
+        const json = JSON.parse(
+          Deno.readTextFileSync(`./log/${dirEntry.name}`),
+        );
+        logGames.push(json);
+      }
     }
+    logFoldermtime = stat.mtime;
   }
-};
-const sendAllSelfGame = () => {
-  socksSelf.forEach((s) => {
-    if (!s.isClosed) {
-      s.send(JSON.stringify(kkmm_self.getGames()));
-    }
-  });
+  return logGames;
 };
 
-//#endregion
-
-//#region log試合情報取得API
-const allPastGame = async (req: ServerRequest) => {
-  try {
-    const logGames = [];
-    Deno.mkdirSync("./log", { recursive: true });
-    for (const dirEntry of Deno.readDirSync("./log")) {
-      //console.log(dirEntry.name);
-      const json = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
-      logGames.push(json);
-    }
-
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(logGames),
-    });
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
 const webRoutes = () => {
   const router = createRouter();
 
@@ -437,9 +421,9 @@ const apiRoutes = () => {
   router.get(new RegExp("^match/(.+)$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-  router.get("allPastGame", allPastGame);
+  //router.get("allPastGame", allPastGame);
   router.ws("allGame", ws_AllGame);
-  router.ws("allSelfGame", ws_AllSelfGame);
+  //router.ws("allSelfGame", ws_AllSelfGame);
 
   return router;
 };

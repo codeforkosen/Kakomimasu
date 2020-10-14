@@ -11,60 +11,75 @@
         <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
         <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
 
-        <title>ゲーム一覧（ランダムマッチ） - 囲みマス</title>
+        <title>ゲーム一覧 - 囲みマス</title>
     </head>
 
     <body>
         <header></header>
-        <div>
-            <a href="./pastgamelist.html">過去のゲーム一覧を見る</a>
-        </div>
-        <div>
+        <main>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
-            <table id="game-table" v-cloak>
-                <tr>
-                    <th>ゲームID</th>
-                    <th>ステータス</th>
-                    <th>開始時刻</th>
-                    <th>ターン</th>
-                </tr>
-                <tr v-for="(item,index) in games">
-                    <td><a :href="item.link">{{item.gameId}}</a></td>
-                    <td>{{item.status}}</td>
-                    <td>{{item.startTime}}</td>
-                    <td>{{item.turn}}</td>
-                </tr>
-            </table>
-        </div>
+            <div id="game-table">
+                <button v-on:click="nowType = 0" :disabled="nowType === 0">ランダムマッチ</button>
+                <button v-on:click="nowType = 1" :disabled="nowType === 1">フリーマッチ</button>
+                <button v-on:click="nowType = 2" :disabled="nowType === 2">終了したゲーム</button>
+
+                <table v-cloak>
+                    <tr>
+                        <th>ゲーム名</th>
+                        <th>ゲームID</th>
+                        <th>ステータス</th>
+                        <th>開始時刻</th>
+                        <th>ターン</th>
+                    </tr>
+                    <tr v-for="(item,index) in games[nowType]">
+                        <td>{{item.gameName}}</td>
+                        <td><a :href="item.link">{{item.gameId}}</a></td>
+                        <td>{{item.status}}</td>
+                        <td>{{item.startTime}}</td>
+                        <td>{{item.turn}}</td>
+                    </tr>
+                </table>
+            </div>
+        </main>
 
         <footer></footer>
 
         <script type="module">
             import { createHeader, createFooter, Game, getTurnText } from "/js/util.js";
 
-            createHeader("ゲーム一覧（ランダムマッチ）");
+            createHeader("ゲーム一覧");
             createFooter();
 
             const gameTableVue = new Vue({
                 el: "#game-table",
                 data: {
-                    games: [],
+                    games: [[], [], []],
+                    nowType: -1,
                 },
                 methods: {
                     update: async function (games) {
-                        games.reverse().forEach((game, i) => {
-                            const [status, startTime] = Game.getGameStatus(game);
+                        //console.log(games);
+                        games.forEach((game, i) => {
+                            game.reverse().forEach((g, j) => {
+                                //console.log(g, i, j);
+                                const [status, startTime] = Game.getGameStatus(g);
 
-                            Vue.set(this.games, i, {
-                                link: `gamedetails.html?id=${game.gameId}`,
-                                gameId: game.gameId,
-                                status: status,
-                                startTime: startTime,
-                                turn: getTurnText(game),
+                                Vue.set(this.games[i], j, {
+                                    link: `gamedetails.html?id=${g.gameId}`,
+                                    gameName: g.gameName,
+                                    gameId: g.gameId,
+                                    status: status,
+                                    startTime: startTime,
+                                    turn: getTurnText(g),
+                                });
                             });
                         });
+                        //console.log(this.games)
                     },
                 },
+                created: function () {
+                    this.nowType = 0;
+                }
             });
 
             var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/allGame");
@@ -104,6 +119,10 @@
 </html>
 
 <style>
+    main {
+        text-align: center;
+    }
+
     table,
     td,
     th {
