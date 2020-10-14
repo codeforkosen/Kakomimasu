@@ -105,7 +105,7 @@ const createSelfGame = async (req: ServerRequest) => {
       reqJson.gameName,
     );
     game.changeFuncs.push(sendAllGame);
-    sendAllGame(game.uuid);
+    sendAllGame();
 
     await req.respond(util.jsonResponse(JSON.stringify(game)));
 
