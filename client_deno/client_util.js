@@ -64,8 +64,7 @@ async function userDelete({ name = "", id = "", password = "" }) {
   return res;
 }
 
-async function match({ name = "", id = "", password = "", spec = "" }) {
-  const sendJson = { name: name, id: id, password: password, spec: spec };
+async function match(sendJson) {
   const resJson = await (await fetch(
     `${host}/match`,
     {

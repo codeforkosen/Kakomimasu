@@ -1,10 +1,13 @@
 // だいたい点数の高い順に置き、点数の高い順に壊しながら動くアルゴリズム （KakomimasuClient版）
+import { readline } from "https://deno.land/x/readline/mod.ts";
 
-import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
+import { Action, DIR, KakomimasuClient } from "./KakomimasuClient.js";
 import util from "../util.js";
 
-const kc = new KakomimasuClient("a5pre", "破壊者改", "", "a5-pw" );
+const kc = new KakomimasuClient("a5pre", "破壊者改", "", "a5-pw");
 // kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
+
+kc.readGameId();
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
@@ -20,7 +23,7 @@ for (let i = 0; i < h; i++) {
     pntall.push({ x: j, y: i, point: points[i][j] });
   }
 }
-const sortByPoint = p => {
+const sortByPoint = (p) => {
   p.sort((a, b) => b.point - a.point);
 };
 sortByPoint(pntall);
@@ -34,8 +37,9 @@ while (info) {
   const checkFree = (x, y) => {
     for (let i = 0; i < poschk.length; i++) {
       const p = poschk[i];
-      if (p.x === x && p.y === y)
+      if (p.x === x && p.y === y) {
         return false;
+      }
     }
     return true;
   };
@@ -54,9 +58,13 @@ while (info) {
           const f = field[y][x];
           if (f.point > 0) { // プラスのときだけ
             if (f.type === 0 && f.pid !== -1 && f.pid !== pno && f.point > 0) { // 敵土地、おいしい！
-              dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point + 10 });
+              dirall.push(
+                { x, y, type: f.type, pid: f.pid, point: f.point + 10 },
+              );
             } else if (f.type === 0 && f.pid === -1 && f.point > 0) { // 空き土地優先
-              dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point + 5 });
+              dirall.push(
+                { x, y, type: f.type, pid: f.pid, point: f.point + 5 },
+              );
             } else if (f.type === 1 && f.pid !== pno) { // 敵壁
               dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point });
             }
@@ -96,7 +104,7 @@ while (info) {
           };
           const x2 = agent.x + sgn(target.x - agent.x);
           const y2 = agent.y + sgn(target.y - agent.y);
-          console.log("x2", x2, agent.x, target.x, w);``
+          console.log("x2", x2, agent.x, target.x, w);
           console.log("y2", y2, agent.y, target.y, h);
           const p = field[y2][x2];
           if (p.type === 0 || p.pid === -1) {
@@ -108,12 +116,13 @@ while (info) {
           poschk.push({ x: agent.x, y: agent.y });
         } else {
           // 空いているところなければランダム
-          for (;;) {
+          for (; ;) {
             const [dx, dy] = DIR[util.rnd(8)];
             const x = agent.x + dx;
             const y = agent.y + dy;
-            if (x < 0 || x >= w || y < 0 || y >= w)
+            if (x < 0 || x >= w || y < 0 || y >= w) {
               continue;
+            }
             actions.push(new Action(i, "MOVE", x, y));
             poschk.push({ x, y });
             break;

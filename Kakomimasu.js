@@ -364,13 +364,14 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, dummy) {
+  constructor(board, name, dummy) {
     if (dummy) {
       console.log(dummy);
       throw new Error("too much");
     }
     this.uuid = util.uuid();
     this.board = board;
+    this.name = name;
     this.players = [];
     this.nturn = board.nturn;
     this.nsec = board.nsec;
@@ -414,6 +415,7 @@ class Game {
     }
 
     this.changeFuncs.forEach((func) => func());
+    return true;
   }
 
   isReady() {
@@ -678,7 +680,7 @@ class Game {
       Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
 
       this.dispose();
-      //this.changeFuncs.forEach(func => func());
+      this.changeFuncs.forEach(func => func());
     }
   }
 
@@ -713,6 +715,7 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
+      gameName: this.name,
       gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
@@ -783,9 +786,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board) {
+  createGame(...param) {
     //console.log(board);
-    const game = new Game(board);
+    const game = new Game(...param);
     this.games.push(game);
     return game;
   }
