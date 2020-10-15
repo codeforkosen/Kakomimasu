@@ -28,12 +28,11 @@ const getRandomBoardName = async () => {
   const list = [];
   for await (const b of bd) {
     if (b.name.endsWith(".json")) {
-      list.push(b.name);
+      list.push(b.name.substring(0, b.name.length - 5));
     }
   }
   return list[util2.rnd(list.length)];
 };
-console.log(await getRandomBoardName());
 
 //#region ユーザアカウント登録・取得・削除
 const usersRegist = async (req: ServerRequest) => {
@@ -197,8 +196,8 @@ export const match = async (req: ServerRequest) => {
       const freeGame = kkmm.getFreeGames();
       if (freeGame.length == 0) {
         const bname = boardname || await getRandomBoardName();
-        const game = kkmm.createGame(readBoard(bname));
-        console.log(game);
+        const brd = readBoard(bname);
+        const game = kkmm.createGame(brd);
         game.changeFuncs.push(sendAllGame);
         freeGame.push(game);
       }
