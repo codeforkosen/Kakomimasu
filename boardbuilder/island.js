@@ -1,8 +1,12 @@
 import util from "../util.js";
 const b = JSON.parse(Deno.readTextFileSync("../apiserver/board/A-1.json"));
 console.log(b);
+const n = 4;
+b.name = "island-" + n;
 b.width = 20;
 b.height = 20;
+b.nturn = 60;
+b.nsec = 2;
 
 b.points = [];
 const len = b.width * b.height;
@@ -22,4 +26,4 @@ for (let i = 0; i < 6; i++) {
 }
 console.log(b, b.points.length);
 
-Deno.writeTextFileSync("../apiserver/board/island-1.json", JSON.stringify(b));
+Deno.writeTextFileSync("../apiserver/board/" + b.name + ".json", JSON.stringify(b));
