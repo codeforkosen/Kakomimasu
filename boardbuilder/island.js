@@ -1,7 +1,7 @@
 import util from "../util.js";
 const b = JSON.parse(Deno.readTextFileSync("../apiserver/board/A-1.json"));
 console.log(b);
-const n = 4;
+const n = 5;
 b.name = "island-" + n;
 b.width = 20;
 b.height = 20;
