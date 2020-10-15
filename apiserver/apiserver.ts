@@ -383,6 +383,7 @@ const logGames: any[] = [];
 let logFoldermtime: (Date | null) = null;
 const getLogGames = (): any => {
   logGames.length = 0;
+  Deno.mkdirSync("./log", { recursive: true });
   const stat = Deno.statSync("./log");
   if (stat.isDirectory) {
     if (logFoldermtime !== stat.mtime) {
