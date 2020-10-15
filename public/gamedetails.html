@@ -60,7 +60,7 @@
                 <table v-for="(p,i) in players">
                     <tr>
                         <th><span :class="'p' + (i+1)">プレイヤー名</span></th>
-                        <td><a : {{ p.screenName }}</a></td>
+                        <td><a :href="p.link">{{ p.screenName }}</a></td>
                     </tr>
                     <tr>
                         <th><span :class="'p' + (i+1)">配置済みAgent数</span></th>
