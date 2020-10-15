@@ -10,6 +10,7 @@ class Board {
       this.nturn = w.nturn;
       this.nsec = w.nsec || 3;
       this.nplayer = w.nplayer || 2;
+      this.name = w.name;
     } else {
       this.w = w;
       this.h = h;
@@ -22,11 +23,13 @@ class Board {
     if (this.points.length !== this.w * this.h) {
       throw new Error("points.length must be " + this.w * this.h);
     }
+    console.log("board", this, this.name);
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
   getJSON() {
     return {
+      name: this.name,
       w: this.w,
       h: this.h,
       points: this.points,
@@ -39,6 +42,7 @@ class Board {
 
   toJSON() {
     return {
+      name: this.name,
       width: this.w,
       height: this.h,
       nAgent: this.nagent,

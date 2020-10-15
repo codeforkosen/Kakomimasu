@@ -27,11 +27,13 @@
             <h4 id="now-time" v-cloak>現在時刻：{{ nowTime }}</h4>
             <table id="game-table" v-cloak>
                 <tr>
+                    <th>ボード名</th>
                     <th>ルームID</th>
                     <th>ステータス</th>
                     <th>開始時刻</th>
                 </tr>
                 <tr>
+                    <td>{{ game.boardName }}</td>
                     <td>{{ game.gameId }}</td>
                     <td>{{ game.status }}</td>
                     <td>{{ game.startTime }}</td>
@@ -144,15 +146,17 @@
                 },
                 methods: {
                     init: function (game) {
-                        const [status, startTime] = Game.getGameStatus(game);
+                        const [status, startTime, boardName] = Game.getGameStatus(game);
                         this.game.gameId = game.gameId;
                         this.game.status = status;
                         this.game.startTime = startTime;
+                        this.game.boardName = boardName;
                     },
                     update: function (game) {
-                        const [status, startTime] = Game.getGameStatus(game);
+                        const [status, startTime, boardName] = Game.getGameStatus(game);
                         this.game.status = status;
                         this.game.startTime = startTime;
+                        this.game.boardName = boardName;
                     },
                 },
             });

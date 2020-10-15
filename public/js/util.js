@@ -20,7 +20,8 @@ class Game {
       else if (gameJson.gaming && !gameJson.ending) status = "プレイ中";
       else if (gameJson.ending) status = "ゲーム終了";
     }
-    return [status, startTime];
+    console.log(gameJson);
+    return [status, startTime, gameJson.board ? gameJson.board.name : null];
   }
 }
 
