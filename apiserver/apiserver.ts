@@ -19,7 +19,20 @@ const kkmm_self = new Kakomimasu();
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 dotenv.config();
 const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname") || "E-1"; // "F-1" "A-1"
+const boardname = Deno.env.get("boardname");// || "E-1"; // "F-1" "A-1"
+
+import util2 from "../util.js";
+
+const getRandomBoardName = async () => {
+  const bd = await Deno.readDir("board");
+  const list = [];
+  for await (const b of bd) {
+    if (b.name.endsWith(".json")) {
+      list.push(b.name.substring(0, b.name.length - 5));
+    }
+  }
+  return list[util2.rnd(list.length)];
+};
 
 //#region ユーザアカウント登録・取得・削除
 const usersRegist = async (req: ServerRequest) => {
@@ -182,7 +195,9 @@ export const match = async (req: ServerRequest) => {
     } else {
       const freeGame = kkmm.getFreeGames();
       if (freeGame.length == 0) {
-        const game = kkmm.createGame(readBoard(boardname));
+        const bname = boardname || await getRandomBoardName();
+        const brd = readBoard(bname);
+        const game = kkmm.createGame(brd);
         game.changeFuncs.push(sendAllGame);
         freeGame.push(game);
       }
