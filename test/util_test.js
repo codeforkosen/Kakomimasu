@@ -11,6 +11,6 @@ Deno.test("rnd", () => {
 Deno.test("uuid", () => {
   const uuid = util.uuid();
   //console.log("uuid", uuid);
-  const num = uuid.match(/[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}/);
+  const num = uuid.match(/^[0-9a-f]{8}\-[0-9a-f]{4}\-4[0-9a-f]{3}\-[89ab][0-9a-f]{3}\-[0-9a-f]{12}$/);
   assert(num !== null);
 });
