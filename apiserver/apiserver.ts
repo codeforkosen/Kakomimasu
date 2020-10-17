@@ -13,13 +13,15 @@ import { Account, User } from "./user.ts";
 const accounts = new Account();
 
 import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-const kkmm = new Kakomimasu();
-const kkmm_self = new Kakomimasu();
+import { ExpKakomimasu } from "./parts/expKakomimasu.js";
+
+const kkmm = new ExpKakomimasu();
+const kkmm_self = new ExpKakomimasu();
 
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 dotenv.config();
 const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname");// || "E-1"; // "F-1" "A-1"
+const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
 
@@ -381,6 +383,7 @@ const sendAllGame = () => {
 
 const logGames: any[] = [];
 let logFoldermtime: (Date | null) = null;
+
 const getLogGames = (): any => {
   logGames.length = 0;
   Deno.mkdirSync("./log", { recursive: true });
