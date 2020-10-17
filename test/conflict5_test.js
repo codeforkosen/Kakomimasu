@@ -13,16 +13,16 @@ Deno.test("a", async () => {
   assert(true);
 });
 */
-Deno.test("conflict test", () => {
+Deno.test("conflict5 test", () => {
   const nagent = 2;
-  const [ w, h ] = [ 3, 1 ];
+  const [w, h] = [3, 1];
   const points = [1, 1, 1];
-  const board = new Board(w, h, points, nagent);
+  const nturn = 20;
+  const board = new Board(w, h, points, nagent, nturn);
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
-  const nturn = 20;
-  const game = kkmm.createGame(board, nturn);
+  const game = kkmm.createGame(board);
 
   const field = game.field;
 
@@ -31,6 +31,8 @@ Deno.test("conflict test", () => {
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();
+
+  const cl = (...a) => { a; };//console.log(...a);
 
   const showAgents = () => {
     let i = 0;
@@ -76,14 +78,12 @@ Deno.test("conflict test", () => {
     }
     return res.join("\n");
   };
-  const p = () => console.log(tos());
+  const p = () => cl(tos());
   const chk = (s) => assertEquals(s.trim(), tos());
 
-  const cl = console.log;
-
   //put 2,2
-//kc.setActions([ new Action(0, "MOVE", 4, 2),new Action(0, "MOVE", 3, 2)]); // こっちだとAgentが[3,2]に移動する。
-//kc.setActions([ new Action(0, "MOVE", 3, 2),new Action(0, "MOVE", 4, 2)]); // こっちだとAgentは移動しない。
+  //kc.setActions([ new Action(0, "MOVE", 4, 2),new Action(0, "MOVE", 3, 2)]); // こっちだとAgentが[3,2]に移動する。
+  //kc.setActions([ new Action(0, "MOVE", 3, 2),new Action(0, "MOVE", 4, 2)]); // こっちだとAgentは移動しない。
   cl("put");
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -135,11 +135,11 @@ Deno.test("conflict test", () => {
 
 
   // finish
-  for (let i = 0;; i++) {
+  for (let i = 0; ; i++) {
     //console.log("turn", i);
     // showAgents();
     if (!game.nextTurn()) break;
   }
   console.log("finish");
-  game.dispose();
+  //game.dispose();
 });

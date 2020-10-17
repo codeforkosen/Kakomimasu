@@ -1,53 +1,55 @@
 import { Board, Field } from "../Kakomimasu.js";
 
-const nagent = 6;
-const [ w, h ] = [ 8, 8 ];
-const board = new Board(w, h, new Array(w * h), nagent);
-const field = new Field(board);
+const cl = (...a) => { a; };//console.log(...a);
 
-const p = () => {
-  for (let i = 0; i < h; i++) {
-    const s = [];
-    for (let j = 0; j < w; j++) {
-      const n = field.field[j + i * w];
-      s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString());
+Deno.test("fillBase2", () => {
+  const nagent = 6;
+  const [w, h] = [8, 8];
+  const board = new Board(w, h, new Array(w * h), nagent);
+  const field = new Field(board);
+
+  const p = () => {
+    for (let i = 0; i < h; i++) {
+      const s = [];
+      for (let j = 0; j < w; j++) {
+        const n = field.field[j + i * w];
+        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString());
+      }
+      cl(s.join(" "));
     }
-    console.log(s.join(" "));
-  }
-  console.log();
-};
-const set = s => {
-  s = s.replace(/\n/g, "");
-  for (let i = 0; i < s.length; i++) {
-    const c = s.charAt(i);
-    if (c === "0") {
-      field.field[i] = [1, 0];
-    } else if (c === "1") {
-      field.field[i] = [1, 1];
-    } else {
-      field.field[i] = [0, -1];
+    cl();
+  };
+  const set = s => {
+    s = s.replace(/\n/g, "");
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charAt(i);
+      if (c === "0") {
+        field.field[i] = [1, 0];
+      } else if (c === "1") {
+        field.field[i] = [1, 1];
+      } else {
+        field.field[i] = [0, -1];
+      }
     }
-  }
-};
-const chk = s => {
-  s = s.replace(/\n/g, "");
-  for (let i = 0; i < s.length; i++) {
-    const c = s.charAt(i);
-    if (c !== ".") {
-      const n = parseInt(c);
-      const f = field.field[i];
-      if (f[0] !== Field.BASE || f[1] !== n) {
-        throw new Error();
+  };
+  const chk = s => {
+    s = s.replace(/\n/g, "");
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charAt(i);
+      if (c !== ".") {
+        const n = parseInt(c);
+        const f = field.field[i];
+        if (f[0] !== Field.BASE || f[1] !== n) {
+          throw new Error();
+        }
       }
     }
   }
-}
 
+  p();
 
-p();
-
-// test 1
-set(`
+  // test 1
+  set(`
 .00000..
 00...00.
 0.1..00.
@@ -58,12 +60,12 @@ set(`
 .00000..
 `);
 
-p();
-field.fillBase();
+  p();
+  field.fillBase();
 
-p();
+  p();
 
-chk(`
+  chk(`
 ........
 ..000...
 .0.00...
@@ -75,9 +77,9 @@ chk(`
 `);
 
 
-// test2
+  // test2
 
-set(`
+  set(`
 .00000..
 00...00.
 0.1..00.
@@ -88,11 +90,11 @@ set(`
 .00000..
 `);
 
-p();
-field.fillBase();
-p();
+  p();
+  field.fillBase();
+  p();
 
-chk(`
+  chk(`
 ........
 ........
 ........
@@ -103,9 +105,9 @@ chk(`
 ........
 `);
 
-// test3
+  // test3
 
-set(`
+  set(`
 .00000..
 00...00.
 0.11100.
@@ -116,11 +118,11 @@ set(`
 .00000..
 `);
 
-p();
-field.fillBase();
-p();
+  p();
+  field.fillBase();
+  p();
 
-chk(`
+  chk(`
 ........
 ..000...
 .0......
@@ -130,3 +132,4 @@ chk(`
 ..00....
 ........
 `);
+});
