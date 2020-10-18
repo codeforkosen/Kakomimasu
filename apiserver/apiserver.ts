@@ -171,15 +171,10 @@ export const match = async (req: ServerRequest) => {
     const playerPost = (await req.json()) as PlayerPost;
     console.log(playerPost);
 
-    let identifier = "";
-    if (playerPost.id !== "") identifier = playerPost.id;
-    else if (playerPost.name !== "") identifier = playerPost.name;
-    else throw Error("Invalid id or name.");
+    const identifier = playerPost.id || playerPost.name;
+    if (!identifier) throw Error("Invalid id or name.");
 
     const user = accounts.getUser(identifier, playerPost.password);
-    if (user === undefined) {
-      throw Error("Can not find user.");
-    }
 
     const player = kkmm.createPlayer(user.id, playerPost.spec);
     console.log(playerPost.gameId);
