@@ -41,8 +41,12 @@
             <div style="margin: auto;display: inline-block;">
                 <div id="field-info" style="position:relative;height: 30px;min-width: 16em;" v-cloak>
                     <h4 v-if="turn !== '-'" id="field-turn">{{turn}}</h4>
-                    <h4 v-if="turn !== '-'" id="field-point"><span class="p1">{{pointP1}}</span>：<span
-                            class="p2">{{pointP2}}</span></h4>
+                    <h4 v-if="turn !== '-'" id="field-point">
+                        <span v-for="(item, index) in point">
+                            <span :class="[`p${index+1}`]">{{item}}</span>
+                            <span v-if="index < point.length - 1">:</v-if>
+                        </span>
+                    </h4>
                     <h4 v-if="turn === '-'" id="field-point">{{status}}</h4>
                     <h4 v-if="turn !== '-'" id="field-nextTurnTime">{{status}}</h4>
                 </div>
@@ -89,20 +93,7 @@
                 type: "line",
                 data: {
                     labels: [],
-                    datasets: [
-                        {
-                            label: "",
-                            data: [],
-                            borderColor: "rgba(0,0,255,1)",
-                            backgroundColor: "rgba(0,0,0,0)"
-                        },
-                        {
-                            label: "",
-                            data: [],
-                            borderColor: "rgba(255,0,0,1)",
-                            backgroundColor: "rgba(0,0,0,0)"
-                        }
-                    ],
+                    datasets: [],
                 },
                 options: {
                     scales: {
@@ -160,8 +151,7 @@
                 el: "#field-info",
                 data: {
                     turn: "-",
-                    pointP1: "0",
-                    pointP2: "0",
+                    point: [],
                     status: "",
                 },
             });
@@ -228,11 +218,12 @@
             const playerInfoVue = new Vue({
                 el: "#p-info",
                 data: {
-                    players: [new PlayerInfo(), new PlayerInfo()],
+                    players: [],
                 },
                 methods: {
                     init: async function (game) {
-                        for (let i = 0; i < 2; i++) {
+                        for (let i = 0; i < game.board.nPlayer; i++) {
+                            Vue.set(this.players, i, new PlayerInfo());
                             if (game.players[i] !== undefined) {
                                 const user = await userShow(game.players[i].id);
                                 this.players[i].screenName = user.screenName;
@@ -243,14 +234,18 @@
                         }
                     },
                     update: async function (game) {
-                        for (let i = 0; i < 2; i++) {
+                        for (let i = 0; i < game.players.length; i++) {
                             if (game.players[i] !== undefined) {
+                                if (this.players[i] === undefined) {
+                                    Vue.set(this.players, i, new PlayerInfo());
+                                }
                                 if (this.players[i].screenName === "") {
                                     const user = await userShow(game.players[i].id);
                                     this.players[i].screenName = user.screenName;
                                     this.players[i].link = `user.html?id=${user.name}`;
-
-                                    pointChart.data.datasets[i].label = user.screenName;
+                                }
+                                if (pointChart.data.datasets[i] !== undefined) {
+                                    pointChart.data.datasets[i].label = this.players[i].screenName;
                                 }
                                 let placedAgentNum = 0;
                                 let notPlacedAgentNum = 0;
@@ -288,8 +283,6 @@
                     for (let i = 0; i <= game.totalTurn; i++) {
                         pointChart.data.labels[i] = i;
                     }
-                    pointChart.data.datasets[0].data[0] = 0;
-                    pointChart.data.datasets[1].data[0] = 0;
                     pointChart.update();
 
                     waitGameStart();
@@ -334,6 +327,16 @@
             async function getRoomInfo() {
                 const game = await getGameInfo(gameId);
                 console.log(game);
+                for (let i = 0; i < game.players.length; i++) {
+                    if (pointChart.data.datasets[i] === undefined) {
+                        pointChart.data.datasets[i] = {
+                            label: "",
+                            data: [0],
+                            borderColor: ["rgba(0,0,255,1)", "rgba(255,0,0,1)", "mediumpurple", "darkorange"][i],
+                            backgroundColor: "rgba(0,0,0,0)"
+                        };
+                    }
+                }
                 gameTableVue.update(game);
                 playerInfoVue.update(game);
 
@@ -343,8 +346,9 @@
                 else {
                     //console.log(getTurnText(game));
                     fieldInfoVue.turn = getTurnText(game);
-                    fieldInfoVue.pointP1 = game.players[0].point.basepoint + game.players[0].point.wallpoint;
-                    fieldInfoVue.pointP2 = game.players[1].point.basepoint + game.players[1].point.wallpoint;
+                    for (let i = 0; i < game.players.length; i++) {
+                        Vue.set(fieldInfoVue.point, i, game.players[i].point.basepoint + game.players[i].point.wallpoint);
+                    }
 
                     const lastLog = game.log[game.log.length - 1];
                     const lastFlatLog = [];
@@ -499,6 +503,14 @@
         color: red;
     }
 
+    .p3 {
+        color: mediumpurple;
+    }
+
+    .p4 {
+        color: orange;
+    }
+
     td.agent {
         background-size: 80%;
         background-position: 0%, 50%;
@@ -513,6 +525,14 @@
         background-image: url(/img/agent2.png);
     }
 
+    td.agent3 {
+        background-image: url(/img/agent3.png);
+    }
+
+    td.agent4 {
+        background-image: url(/img/agent4.png);
+    }
+
     td.p1Wall {
         background-color: #0096FF !important;
     }
@@ -521,12 +541,28 @@
         background-color: #FF0200 !important;
     }
 
+    td.p3Wall {
+        background-color: mediumpurple !important;
+    }
+
+    td.p4Wall {
+        background-color: darkorange !important;
+    }
+
     td.p1Area {
         background-color: #80C9FF !important;
     }
 
     td.p2Area {
         background-color: #FE9998 !important;
+    }
+
+    td.p3Area {
+        background-color: #B8ABD6 !important;
+    }
+
+    td.p4Area {
+        background-color: #FFCF99 !important;
     }
 
     td.conflict {
