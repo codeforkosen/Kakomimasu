@@ -1,0 +1,17 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
+      - run: |
+          deno --version
+          deno fmt **/*.ts --check
+          deno test -A
