@@ -13,13 +13,15 @@ import { Account, User } from "./user.ts";
 const accounts = new Account();
 
 import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-const kkmm = new Kakomimasu();
-const kkmm_self = new Kakomimasu();
+import { ExpKakomimasu } from "./parts/expKakomimasu.js";
+
+const kkmm = new ExpKakomimasu();
+const kkmm_self = new ExpKakomimasu();
 
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 dotenv.config();
 const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname");// || "E-1"; // "F-1" "A-1"
+const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
 
@@ -169,15 +171,10 @@ export const match = async (req: ServerRequest) => {
     const playerPost = (await req.json()) as PlayerPost;
     console.log(playerPost);
 
-    let identifier = "";
-    if (playerPost.id !== "") identifier = playerPost.id;
-    else if (playerPost.name !== "") identifier = playerPost.name;
-    else throw Error("Invalid id or name.");
+    const identifier = playerPost.id || playerPost.name;
+    if (!identifier) throw Error("Invalid id or name.");
 
     const user = accounts.getUser(identifier, playerPost.password);
-    if (user === undefined) {
-      throw Error("Can not find user.");
-    }
 
     const player = kkmm.createPlayer(user.id, playerPost.spec);
     console.log(playerPost.gameId);
@@ -381,6 +378,7 @@ const sendAllGame = () => {
 
 const logGames: any[] = [];
 let logFoldermtime: (Date | null) = null;
+
 const getLogGames = (): any => {
   logGames.length = 0;
   Deno.mkdirSync("./log", { recursive: true });
