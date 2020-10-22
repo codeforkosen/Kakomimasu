@@ -1,9 +1,9 @@
 import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
 import {
-  ServerRequest,
-  createRouter,
   contentTypeFilter,
   createApp,
+  createRouter,
+  ServerRequest,
   serveStatic,
 } from "https://servestjs.org/@v1.1.1/mod.ts";
 
@@ -12,13 +12,27 @@ import * as util from "./apiserver_util.ts";
 import { Account, User } from "./user.ts";
 const accounts = new Account();
 
-import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 const kkmm = new Kakomimasu();
+const kkmm_self = new Kakomimasu();
 
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 dotenv.config();
 const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname") || "E-1"; // "F-1" "A-1"
+const boardname = Deno.env.get("boardname");// || "E-1"; // "F-1" "A-1"
+
+import util2 from "../util.js";
+
+const getRandomBoardName = async () => {
+  const bd = await Deno.readDir("board");
+  const list = [];
+  for await (const b of bd) {
+    if (b.name.endsWith(".json")) {
+      list.push(b.name.substring(0, b.name.length - 5));
+    }
+  }
+  return list[util2.rnd(list.length)];
+};
 
 //#region ユーザアカウント登録・取得・削除
 const usersRegist = async (req: ServerRequest) => {
@@ -38,7 +52,7 @@ const usersRegist = async (req: ServerRequest) => {
       body: JSON.stringify(user, ["screenName", "name", "id"]),
     });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -57,7 +71,7 @@ const usersShow = async (req: ServerRequest) => {
         });
       }
     } catch (e) {
-      await req.respond(util.ErrorResponse(e.message));
+      await req.respond(util.errorResponse(e.message));
     }
   } else {
     await req.respond({
@@ -85,7 +99,53 @@ const usersDelete = async (req: ServerRequest) => {
     );
     await req.respond({ status: 200 });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
+  }
+};
+
+//#endregion
+
+//#region ゲーム作成API
+class BoardNamePost {
+  constructor(public gameName: string, public boardName: string) {}
+}
+
+const createSelfGame = async (req: ServerRequest) => {
+  try {
+    const reqJson = (await req.json()) as BoardNamePost;
+    const game = kkmm_self.createGame(
+      readBoard(reqJson.boardName),
+      reqJson.gameName,
+    );
+    game.changeFuncs.push(sendAllGame);
+    sendAllGame();
+
+    await req.respond(util.jsonResponse(JSON.stringify(game)));
+
+    console.log(kkmm_self);
+  } catch (e) {
+    await req.respond(util.errorResponse(e.message));
+  }
+};
+
+const getAllBoards = async (req: ServerRequest) => {
+  try {
+    const boards = [];
+    if (Deno.statSync("./board").isDirectory) {
+      for (const dirEntry of Deno.readDirSync("./board")) {
+        boards.push(util.readJsonFileSync(`./board/${dirEntry.name}`));
+      }
+    }
+
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(boards),
+    });
+  } catch (e) {
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -93,58 +153,59 @@ const usersDelete = async (req: ServerRequest) => {
 
 //#region プレイヤー登録・ルームID取得API
 
-const addPlayer = (
-  name: string,
-  id: string,
-  password: string,
-  spec: string,
-) => {
-  var identifier = "";
-  if (id !== "") identifier = id;
-  else if (name !== "") identifier = name;
-  else throw Error("Invalid id or name.");
-
-  const user = accounts.getUser(identifier, password);
-  if (user !== undefined) {
-    const player = kkmm.createPlayer(user.id, spec);
-
-    const freeGame = kkmm.getFreeGames();
-    if (freeGame.length == 0) {
-      //freeGame.push(kkmm.createGame(createDefaultBoard()));
-
-      const game = kkmm.createGame(readBoard(boardname));
-      game.changeFuncs.push(sendAllGame);
-      freeGame.push(game);
-    }
-    const playerIndex = freeGame[0].attachPlayer(player);
-    if (playerIndex === false) throw Error("Can not add Player");
-
-    return player;
-  } else {
-    throw Error("Can not find user.");
-  }
-};
-
 export class PlayerPost {
   constructor(
     public name: string,
     public id: string,
     public password: string,
     public spec: string,
+    public gameId: string,
   ) {}
 }
 
 export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
-  const playerPost = (await req.json()) as PlayerPost;
   try {
-    const player = addPlayer(
-      playerPost.name,
-      playerPost.id,
-      playerPost.password,
-      playerPost.spec,
-    );
-    //console.log(player);
+    const playerPost = (await req.json()) as PlayerPost;
+    console.log(playerPost);
+
+    let identifier = "";
+    if (playerPost.id !== "") identifier = playerPost.id;
+    else if (playerPost.name !== "") identifier = playerPost.name;
+    else throw Error("Invalid id or name.");
+
+    const user = accounts.getUser(identifier, playerPost.password);
+    if (user === undefined) {
+      throw Error("Can not find user.");
+    }
+
+    const player = kkmm.createPlayer(user.id, playerPost.spec);
+    console.log(playerPost.gameId);
+    if (playerPost.gameId) {
+      const game = kkmm_self.getGames().find((game) =>
+        game.uuid === playerPost.gameId
+      );
+      if (game) {
+        if (game.attachPlayer(player) === false) {
+          throw Error("Game is not free");
+        }
+      } else {
+        throw Error("Can not find Game");
+      }
+    } else {
+      const freeGame = kkmm.getFreeGames();
+      if (freeGame.length == 0) {
+        const bname = boardname || await getRandomBoardName();
+        const brd = readBoard(bname);
+        const game = kkmm.createGame(brd);
+        game.changeFuncs.push(sendAllGame);
+        freeGame.push(game);
+      }
+      if (freeGame[0].attachPlayer(player) === false) {
+        throw Error("Can not add Player");
+      }
+      //console.log(player);
+    }
     await req.respond({
       status: 200,
       headers: new Headers({
@@ -153,7 +214,7 @@ export const match = async (req: ServerRequest) => {
       body: JSON.stringify(player.getJSON()),
     });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -163,7 +224,10 @@ export const match = async (req: ServerRequest) => {
 export const getGameInfo = async (req: ServerRequest) => {
   try {
     const id = req.match[1];
-    let game = kkmm.getGames().filter((item: any) => item.uuid === id)[0];
+    let game =
+      [...kkmm.getGames(), ...kkmm_self.getGames()].filter((item: any) =>
+        item.uuid === id
+      )[0];
     if (game) {
       game.updateStatus();
     } else {
@@ -189,7 +253,7 @@ export const getGameInfo = async (req: ServerRequest) => {
       throw Error("Invalid gameID.");
     }
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -237,38 +301,39 @@ export const setAction = async (req: ServerRequest) => {
     const gameId = req.match[1];
     const accessToken = req.headers.get("Authorization");
 
-    const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
+    const game = [...kkmm.getGames(), ...kkmm_self.getGames()].find((
+      item: any,
+    ) => item.uuid === gameId);
+    if (!game) throw Error("Invalid gameId");
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (player === undefined) {
-      await req.respond(util.ErrorResponse("Invalid accessToken."));
-    } else {
-      const actionData = (await req.json()) as SetActionPost;
-      const isDisable = actionData.actions.some((a) => !ActionPost.isEnable(a));
-      //console.log(actionData);
-      if (isDisable) {
-        await req.respond(util.ErrorResponse("Invalid action"));
-      } else {
-        const actionsAry: any = [];
-        actionData.actions.forEach((a) => {
-          actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
-        });
-        //console.log(game.nextTurnUnixTime);
-        //if (game.nextTurnUnixTime >= reqTime) {
-        console.log(actionsAry);
-        const nowTurn = player.setActions(Action.fromJSON(actionsAry));
-        await req.respond({
-          status: 200,
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-          body: JSON.stringify(
-            { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
-          ),
-        });
-      }
+      throw Error("Invalid accessToken.");
     }
+    const actionData = (await req.json()) as SetActionPost;
+    const isDisable = actionData.actions.some((a) => !ActionPost.isEnable(a));
+    //console.log(actionData);
+    if (isDisable) {
+      throw Error("Invalid action");
+    }
+    const actionsAry: any = [];
+    actionData.actions.forEach((a) => {
+      actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
+    });
+    //console.log(game.nextTurnUnixTime);
+    //if (game.nextTurnUnixTime >= reqTime) {
+    //console.log(actionsAry);
+    const nowTurn = player.setActions(Action.fromJSON(actionsAry));
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(
+        { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
+      ),
+    });
   } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    await req.respond(util.errorResponse(e.message));
   }
 };
 
@@ -276,11 +341,13 @@ export const setAction = async (req: ServerRequest) => {
 
 //#region WebSocket
 
-const socks: WebSocket[] = [];
+let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
   socks.push(sock);
-  sock.send(JSON.stringify(kkmm.getGames()));
+  sock.send(
+    JSON.stringify([kkmm.getGames(), kkmm_self.getGames(), getLogGames()]),
+  );
 
   for await (const msg of sock) {
     if (typeof msg === "string") {
@@ -293,39 +360,45 @@ const ws_AllGame = async (sock: WebSocket) => {
     }
   }
 };
-
 const sendAllGame = () => {
-  socks.forEach((s) => {
-    if (!s.isClosed) {
-      s.send(JSON.stringify(kkmm.getGames()));
+  //console.log(socks.length);
+  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+
+  socks = socks.filter((s) => {
+    try {
+      if (!s.isClosed) {
+        s.send(
+          JSON.stringify(games),
+        );
+        return true;
+      }
+    } catch (e) {
+      console.log(e);
     }
+    return false;
   });
 };
 
-//#endregion
-
-//#region log試合情報取得API
-const allPastGame = async (req: ServerRequest) => {
-  try {
-    const logGames = [];
-    Deno.mkdirSync("./log", { recursive: true });
-    for (const dirEntry of Deno.readDirSync("./log")) {
-      //console.log(dirEntry.name);
-      const json = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
-      logGames.push(json);
+const logGames: any[] = [];
+let logFoldermtime: (Date | null) = null;
+const getLogGames = (): any => {
+  logGames.length = 0;
+  Deno.mkdirSync("./log", { recursive: true });
+  const stat = Deno.statSync("./log");
+  if (stat.isDirectory) {
+    if (logFoldermtime !== stat.mtime) {
+      for (const dirEntry of Deno.readDirSync("./log")) {
+        const json = JSON.parse(
+          Deno.readTextFileSync(`./log/${dirEntry.name}`),
+        );
+        logGames.push(json);
+      }
     }
-
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(logGames),
-    });
-  } catch (e) {
-    await req.respond(util.ErrorResponse(e.message));
+    logFoldermtime = stat.mtime;
   }
+  return logGames;
 };
+
 const webRoutes = () => {
   const router = createRouter();
 
@@ -353,12 +426,20 @@ const apiRoutes = () => {
     usersDelete,
   );
 
+  router.post(
+    "game/create",
+    contentTypeFilter("application/json"),
+    createSelfGame,
+  );
+  router.get("game/boards", getAllBoards);
+
   router.post("match", contentTypeFilter("application/json"), match);
   router.get(new RegExp("^match/(.+)$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
 
-  router.get("allPastGame", allPastGame);
+  //router.get("allPastGame", allPastGame);
   router.ws("allGame", ws_AllGame);
+  //router.ws("allSelfGame", ws_AllSelfGame);
 
   return router;
 };
@@ -384,18 +465,23 @@ const createDefaultBoard = () => {
 };
 
 const readBoard = (fileName: string) => {
-  const boardJson = JSON.parse(
-    Deno.readTextFileSync(`./board/${fileName}.json`),
-  );
-  if (boardJson.points[0] instanceof Array) {
-    boardJson.points = boardJson.points.flat();
-  }
-  /*console.log(
-    boardJson.width,
-    boardJson.height,
-    boardJson.points,
-    boardJson.nagent,
-  );*/
+  const path = `./board/${fileName}.json`;
+  if (Deno.statSync(path).isFile) {
+    const boardJson = JSON.parse(
+      Deno.readTextFileSync(path),
+    );
+    if (boardJson.points[0] instanceof Array) {
+      boardJson.points = boardJson.points.flat();
+    }
+    /*console.log(
+      boardJson.width,
+      boardJson.height,
+      boardJson.points,
+      boardJson.nagent,
+    );*/
 
-  return new Board(boardJson);
+    return new Board(boardJson);
+  } else {
+    throw Error("Can not find Board");
+  }
 };

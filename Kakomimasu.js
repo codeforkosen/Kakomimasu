@@ -10,6 +10,7 @@ class Board {
       this.nturn = w.nturn;
       this.nsec = w.nsec || 3;
       this.nplayer = w.nplayer || 2;
+      this.name = w.name;
     } else {
       this.w = w;
       this.h = h;
@@ -22,11 +23,13 @@ class Board {
     if (this.points.length !== this.w * this.h) {
       throw new Error("points.length must be " + this.w * this.h);
     }
+    console.log("board", this, this.name);
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
   getJSON() {
     return {
+      name: this.name,
       w: this.w,
       h: this.h,
       points: this.points,
@@ -39,6 +42,7 @@ class Board {
 
   toJSON() {
     return {
+      name: this.name,
       width: this.w,
       height: this.h,
       nAgent: this.nagent,
@@ -364,13 +368,14 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, dummy) {
+  constructor(board, name, dummy) {
     if (dummy) {
       console.log(dummy);
       throw new Error("too much");
     }
     this.uuid = util.uuid();
     this.board = board;
+    this.name = name;
     this.players = [];
     this.nturn = board.nturn;
     this.nsec = board.nsec;
@@ -414,6 +419,7 @@ class Game {
     }
 
     this.changeFuncs.forEach((func) => func());
+    return true;
   }
 
   isReady() {
@@ -678,7 +684,7 @@ class Game {
       Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
 
       this.dispose();
-      //this.changeFuncs.forEach(func => func());
+      this.changeFuncs.forEach(func => func());
     }
   }
 
@@ -713,6 +719,7 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
+      gameName: this.name,
       gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
@@ -783,9 +790,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame(board) {
+  createGame(...param) {
     //console.log(board);
-    const game = new Game(board);
+    const game = new Game(...param);
     this.games.push(game);
     return game;
   }

@@ -1,0 +1,97 @@
+#vue-field-table,
+#vue-field-table td,
+th {
+    border: 1px solid;
+}
+
+#vue-field-table {
+    border-collapse: collapse;
+}
+
+#vue-field-table th,
+td {
+    padding: 5px;
+}
+
+#vue-field-table td {
+    width: 50px;
+    height: 50px;
+    text-align: right;
+    vertical-align: bottom;
+    white-space: pre-line;
+    --bg-color: #FFFFFF;
+    background-color: var(--bg-color);
+}
+
+#vue-field-table .agent {
+    background-size: 80%;
+    background-position: 0%, 50%;
+    background-repeat: no-repeat;
+}
+
+#vue-field-table .agent1 {
+    background-image: url(/img/agent1.png);
+}
+
+#vue-field-table .agent2 {
+    background-image: url(/img/agent2.png);
+}
+
+#vue-field-table .agent3 {
+    background-image: url(/img/agent3.png);
+}
+
+#vue-field-table .agent4 {
+    background-image: url(/img/agent4.png);
+}
+
+#vue-field-table .p1Wall {
+    background-color: #0096FF !important;
+}
+
+#vue-field-table .p2Wall {
+    background-color: #FF0200 !important;
+}
+
+#vue-field-table .p3Wall {
+    background-color: mediumpurple !important;
+}
+
+#vue-field-table .p4Wall {
+    background-color: darkorange !important;
+}
+
+#vue-field-table .p1Area {
+    background-color: #80C9FF !important;
+}
+
+#vue-field-table .p2Area {
+    background-color: #FE9998 !important;
+}
+
+#vue-field-table .p3Area {
+    background-color: #B8ABD6 !important;
+}
+
+#vue-field-table .p4Area {
+    background-color: #FFCF99 !important;
+}
+
+#vue-field-table .conflict {
+    animation: vue-field-flash 1s linear infinite;
+}
+
+#vue-field-table .striket {
+    text-decoration: line-through;
+    color: red;
+}
+
+@keyframes vue-field-flash {
+
+    0%,
+    100% {}
+
+    50% {
+        background-color: #00ff00;
+    }
+}

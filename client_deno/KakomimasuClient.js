@@ -29,6 +29,15 @@ class KakomimasuClient {
       setHost(`${host}/api`);
     }
   }
+  readGameId() {
+    console.log("入室するゲームIDを入力してください。入力しないとランダムマッチを行います。");
+    const stdinArray = new Uint8Array(37);
+    Deno.stdin.readSync(stdinArray);
+    const gameId = new TextDecoder().decode(stdinArray).match(/\S*/)[0];
+    if (gameId !== "") {
+      this.gameId = gameId;
+    }
+  }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
     let user = await userShow(this.id);
@@ -38,7 +47,9 @@ class KakomimasuClient {
 
     // プレイヤー登録
     const resMatch = await match(
-      { id: user.id, password: this.password, spec: this.spec },
+      this.gameId
+        ? { id: user.id, password: this.password, spec: this.spec, gameId: this.gameId }
+        : { id: user.id, password: this.password, spec: this.spec },
     );
     this.token = resMatch.accessToken;
     this.roomid = resMatch.gameId;
@@ -140,7 +151,7 @@ class KakomimasuClient {
       const bknext = this.gameInfo.nextTurnUnixTime;
       await sleep(diffTime(this.gameInfo.nextTurnUnixTime));
 
-      for (;;) {
+      for (; ;) {
         this.gameInfo = await getGameInfo(this.roomid);
         if (this.gameInfo.nextTurnUnixTime !== bknext) {
           break;
@@ -161,7 +172,7 @@ class KakomimasuClient {
   saveLog() {
     try {
       Deno.mkdirSync("log");
-    } catch (e) {}
+    } catch (e) { }
     const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
     Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
   }
