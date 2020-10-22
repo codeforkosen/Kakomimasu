@@ -64,8 +64,8 @@ async function userDelete({ name = "", id = "", password = "" }) {
   return res;
 }
 
-async function match({ name = "", id = "", password = "", spec = "" }) {
-  const sendJson = { name: name, id: id, password: password, spec: spec };
+async function match(sendJson: object) {
+  //const sendJson = { name: name, id: id, password: password, spec: spec };
   const resJson = await (await fetch(
     `${host}/match`,
     {
@@ -106,6 +106,20 @@ async function setAction(roomid: string, playerid: string, actions: Action[]) {
   return reqJson;
 }
 
+const createGame = async (gameName: string, boardName: string) => {
+  const req = JSON.parse(
+    await (await fetch(`${host}/game/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gameName: gameName,
+        boardName: boardName,
+      }),
+    })).json(),
+  );
+  return req;
+};
+
 function diffTime(unixTime: number) {
   const dt = unixTime * 1000 - new Date().getTime();
   //console.log("diffTime", dt);
@@ -114,12 +128,13 @@ function diffTime(unixTime: number) {
 
 export {
   Action,
+  createGame,
+  diffTime,
+  getGameInfo,
+  match,
+  setAction,
   sleep,
+  userDelete,
   userRegist,
   userShow,
-  userDelete,
-  match,
-  getGameInfo,
-  setAction,
-  diffTime,
 };
