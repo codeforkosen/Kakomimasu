@@ -37,6 +37,14 @@ td {
     background-image: url(/img/agent2.png);
 }
 
+#vue-field-table .agent3 {
+    background-image: url(/img/agent3.png);
+}
+
+#vue-field-table .agent4 {
+    background-image: url(/img/agent4.png);
+}
+
 #vue-field-table .p1Wall {
     background-color: #0096FF !important;
 }
@@ -45,12 +53,28 @@ td {
     background-color: #FF0200 !important;
 }
 
+#vue-field-table .p3Wall {
+    background-color: mediumpurple !important;
+}
+
+#vue-field-table .p4Wall {
+    background-color: darkorange !important;
+}
+
 #vue-field-table .p1Area {
     background-color: #80C9FF !important;
 }
 
 #vue-field-table .p2Area {
     background-color: #FE9998 !important;
+}
+
+#vue-field-table .p3Area {
+    background-color: #B8ABD6 !important;
+}
+
+#vue-field-table .p4Area {
+    background-color: #FFCF99 !important;
 }
 
 #vue-field-table .conflict {
