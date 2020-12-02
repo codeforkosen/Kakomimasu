@@ -5,16 +5,22 @@
     <meta charset="utf-8">
     <title>囲みマス</title>
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/css/main.css">
     <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
     <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
     <style>
       body {
         text-align: center;
-        font-family: sans-serif;
+      }
+
+      main {
+        max-width: 1000px;
+        margin: 0 auto;
       }
 
       #title {
         width: 60vw;
+        max-width: 500px;
         margin: 2em;
       }
 
@@ -31,60 +37,64 @@
         text-align: left;
       }
 
-      a {
+      main a {
         color: #5C4C40 !important;
       }
 
       footer {
-        margin: 1.5em;
+        margin: 1.5em 0;
       }
     </style>
   </head>
 
   <body>
+    <header id="header"></header>
     <img id="title" src="/img/kakomimasu-logo.png">
 
-    <section>
-      <h2>Webコンテンツ</h2>
-      オンラインで対戦中のゲームをリアルタイムで見ることができます。<br>
-      <a href="gamelist.html">ゲーム一覧はこちらから</a><br>
-      <a href="latestgame.html">最新のゲームビューアはこちらから</a><br>
-      <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a><br>
-      <a href="create/game.html">フリーゲーム作成はこちらから</a>
-    </section>
+    <main>
+      <section>
+        <h2>Webコンテンツ</h2>
+        オンラインで対戦中のゲームをリアルタイムで見ることができます。<br>
+        <a href="gamelist.html">ゲーム一覧はこちらから</a><br>
+        <a href="latestgame.html">最新のゲームビューアはこちらから</a><br>
+        <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a><br>
+        <a href="create/game.html">フリーゲーム作成はこちらから</a>
+      </section>
 
-    <section>
-      <h2>囲みマスとは</h2>
-      囲碁と将棋とリアルタイムストラテジーゲームが混ざったような陣取りゲームです。<br>
-      フィールドは、点数がついたマス目、辿ったり囲んだりして自分の陣地を広げ、点数が高いほうが勝ち！<br>
-      誰でも開発に参加できる、オープンソース (<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)。
-    </section>
+      <section>
+        <h2>囲みマスとは</h2>
+        囲碁と将棋とリアルタイムストラテジーゲームが混ざったような陣取りゲームです。<br>
+        フィールドは、点数がついたマス目、辿ったり囲んだりして自分の陣地を広げ、点数が高いほうが勝ち！<br>
+        誰でも開発に参加できる、オープンソース (<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)。
+      </section>
 
-    <section>
-      <h2>人対AI!?</h2>
-      同時に動かせるエージェントの人数は最大14コマ。1ターンは最短3秒。人の判断では間に合わない？<br>
-      そんな時はプログラミングしたAIにサポートしてもらいましょう！
-    </section>
+      <section>
+        <h2>人対AI!?</h2>
+        同時に動かせるエージェントの人数は最大14コマ。1ターンは最短3秒。人の判断では間に合わない？<br>
+        そんな時はプログラミングしたAIにサポートしてもらいましょう！
+      </section>
 
-    <section>
-      <h2>ランクシステム</h2>
-      AIを登録しておけば、勝手にリーグ戦が組まれてランキング登録されます。<br>
-      囲みマス世界ランク一位には豪華賞品があるかも！？
-    </section>
+      <section>
+        <h2>ランクシステム</h2>
+        AIを登録しておけば、勝手にリーグ戦が組まれてランキング登録されます。<br>
+        囲みマス世界ランク一位には豪華賞品があるかも！？
+      </section>
 
-    <section>
-      <h2>勝手プロコン実行委員会</h2>
-      中止になった第31回高専プロコン競技部門を勝手にやっちゃおうと立ち上がった、Code for KOSEN の部門のひとつ。
-    </section>
-
-    <footer>
+      <section>
+        <h2>勝手プロコン実行委員会</h2>
+        中止になった第31回高専プロコン競技部門を勝手にやっちゃおうと立ち上がった、Code for KOSEN の部門のひとつ。
+      </section>
+    </main>
+    <!--<footer>
       CC BY <a href="https://codeforkosen.github.io/">Code for KOSEN</a> (<a
         href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)
-    </footer>
+    </footer>-->
+    <footer id="footer"></footer>
 
     <script type='module' src="https://code4sabae.github.io/leaflet-mjs/qr-code.mjs"></script>
     <qr-code></qr-code>
 
+    <script type="module" src="js/vue-comp/common.js"></script>
   </body>
 
 </html>

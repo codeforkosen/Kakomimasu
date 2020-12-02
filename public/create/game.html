@@ -15,8 +15,9 @@
     </head>
 
     <body>
-        <header></header>
+        <header id="header"></header>
         <main>
+            <h1 id="title">ゲーム作成</h1>
             <form id="create-form">
                 <div>
                     <label>
@@ -39,14 +40,8 @@
                 <p>ゲームID：{{game.gameId}}</p>
             </div>
         </main>
-        <footer></footer>
+        <footer id="footer"></footer>
 
-        <script type="module">
-            import { createHeader, createFooter, Game, getTurnText } from "/js/util.js";
-
-            createHeader("ゲーム作成");
-            createFooter();
-        </script>
         <script type="module">
             import * as api from "/js/api-util.js";
 
@@ -85,6 +80,8 @@
                 createdGameVue.update(req);
             }
         </script>
+
+        <script type="module" src="/js/vue-comp/common.js"></script>
     </body>
 
 </html>

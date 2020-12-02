@@ -16,7 +16,8 @@
     </head>
 
     <body>
-        <header></header>
+        <header id="header"></header>
+        <h1 id="title">ユーザ詳細</h1>
 
         <div id="basic-info" v-cloak>
             <div id="screen-name">{{ screenName }}</div>
@@ -24,14 +25,11 @@
             <div id="id">{{id}}</div>
         </div>
 
-        <footer></footer>
+        <footer id="footer"></footer>
         <script type="module">
-            import { createHeader, createFooter, userShow, getUrlQueries } from "/js/util.js";
+            import { userShow, getUrlQueries } from "/js/util.js";
 
             const main = async () => {
-                createHeader("ユーザ詳細");
-                createFooter();
-
                 const identifier = getUrlQueries().id;//document.URL.match(new RegExp("^(.+)/user/(.+)$"))[2];
                 const user = await userShow(identifier);
                 if (user.hasOwnProperty("error")) {
@@ -55,6 +53,9 @@
             main();
 
         </script>
+
+
+        <script type="module" src="js/vue-comp/common.js"></script>
 
     </body>
 

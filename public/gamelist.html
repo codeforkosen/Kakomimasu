@@ -15,8 +15,9 @@
     </head>
 
     <body>
-        <header></header>
+        <header id="header"></header>
         <main>
+            <h1 id="title">ゲーム一覧</h1>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
             <div id="game-table">
                 <button v-on:click="nowType = 0" :disabled="nowType === 0">ランダムマッチ</button>
@@ -42,13 +43,10 @@
             </div>
         </main>
 
-        <footer></footer>
+        <footer id="footer"></footer>
 
         <script type="module">
-            import { createHeader, createFooter, Game, getTurnText } from "/js/util.js";
-
-            createHeader("ゲーム一覧");
-            createFooter();
+            import { Game, getTurnText } from "/js/util.js";
 
             const gameTableVue = new Vue({
                 el: "#game-table",
@@ -114,6 +112,8 @@
             });
             nowTimeVue.init();
         </script>
+
+        <script type="module" src="js/vue-comp/common.js"></script>
     </body>
 
 </html>
