@@ -1,5 +1,7 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
+import { solvedPath } from "./apiserver_util.ts";
+
 class User {
   public screenName: string;
   public name: string;
@@ -31,7 +33,7 @@ class Account {
   }
 
   read() {
-    const path = "./data/users.json";
+    const path = solvedPath(import.meta.url, "./data/users.json");
     try {
       if (Deno.statSync(path).isFile) {
         this.users = JSON.parse(Deno.readTextFileSync(path)) as Array<User>;
@@ -42,7 +44,7 @@ class Account {
   }
 
   write() {
-    const dirName = "./data";
+    const dirName = solvedPath(import.meta.url, "./data");
     Deno.mkdirSync(dirName, { recursive: true });
     Deno.writeTextFileSync(
       `${dirName}/users.json`,
