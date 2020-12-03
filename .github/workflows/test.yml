@@ -10,7 +10,9 @@ name: Deno
 
 on:
   push:
-    branches: [master]
+    branches: 
+      - master
+      - Add-deno-test
   pull_request:
     branches: [master]
 
