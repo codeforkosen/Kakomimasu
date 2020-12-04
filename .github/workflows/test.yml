@@ -19,4 +19,5 @@ jobs:
     steps:
     - name: Hello world action step
       id: hello
-      uses: codeforkosen/Kakomimasu
+      uses: docker://hayd/deno:1.5.2
+      run : deno test ./test
