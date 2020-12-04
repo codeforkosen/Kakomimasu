@@ -1,4 +1,4 @@
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import { v4 } from "https://deno.land/std@0.79.0/uuid/mod.ts";
 
 import { solvedPath } from "./apiserver_util.ts";
 

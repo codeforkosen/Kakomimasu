@@ -1,11 +1,11 @@
-import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
+import type { WebSocket } from "https://deno.land/std@0.79.0/ws/mod.ts";
 import {
   contentTypeFilter,
   createApp,
   createRouter,
   ServerRequest,
   serveStatic,
-} from "https://servestjs.org/@v1.1.1/mod.ts";
+} from "https://servestjs.org/@v1.1.7/mod.ts";
 
 import * as util from "./apiserver_util.ts";
 
