@@ -6,38 +6,16 @@
 # This workflow will install Deno and run tests across stable and nightly builds on Windows, Ubuntu and macOS.
 # For more information see: https://github.com/denolib/setup-deno
 
-name: Deno
 
-on:
-  push:
-    branches: 
-      - master
+on: push:
+    branches:
       - Add-deno-test
-  pull_request:
-    branches: [master]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }} # runs a test on Ubuntu, Windows and macOS
-
-    strategy:
-      matrix:
-        deno: ["v1.x", "nightly"]
-        os: [macOS-latest, windows-latest, ubuntu-latest]
-
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
     steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
-
-      - name: Setup Deno
-        uses: denolib/setup-deno@v2
-        with:
-          deno-version: ${{ matrix.deno }} # tests across multiple Deno versions
-
-      - name: Run Tests
-        shell: pwsh
-        run: |
-          deno run -A ./apiserver/apiserver.ts $
-          deno test -A
-          Stop-Job 1
-          Remove-Job 1
+    - name: Hello world action step
+      id: hello
+      uses: codeforkosen/Kakomimasu
