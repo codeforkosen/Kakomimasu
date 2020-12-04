@@ -4,3 +4,4 @@ log/
 *.bat
 *.env
 apiserver/data/
+*.code-workspace
