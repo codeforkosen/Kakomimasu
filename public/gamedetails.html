@@ -19,7 +19,8 @@
     </head>
 
     <body>
-        <header></header>
+        <header id="header"></header>
+        <h1 id="title">ゲーム詳細</h1>
         <div id="nogame" hidden>
             <p>ゲームが存在しません。5秒後にゲーム一覧に戻ります。<a href="/gamelist.html">今すぐ戻る</a></p>
         </div>
@@ -50,7 +51,7 @@
                         <span v-for="(item, index) in point">
                             <span :class="[`p${index+1}`]">{{ item }}</span>
                             <span v-if="index < point.length - 1">:</v-if>
-                        </span>
+                            </span>
                     </h4>
                     <h4 v-if="turn === '-'" id="field-point">{{ status }}</h4>
                     <h4 v-if="turn !== '-'" id="field-nextTurnTime">{{ status }}</h4>
@@ -85,12 +86,9 @@
         <div style="text-align: right">
             <a id="vr-link">VR版</a>
         </div>
-        <footer></footer>
+        <footer id="footer"></footer>
         <script type="module">
-            import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
-
-            createHeader("ゲーム詳細");
-            createFooter();
+            import { Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
 
             var pointChart = new Chart(graph, {
                 type: "line",
@@ -385,6 +383,7 @@
 
         </script>
 
+        <script type="module" src="js/vue-comp/common.js"></script>
     </body>
 
 </html>

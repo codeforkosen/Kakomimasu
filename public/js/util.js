@@ -25,20 +25,6 @@ class Game {
   }
 }
 
-function createHeader(userScreenName) {
-  const headerDiv = document.getElementsByTagName("header")[0];
-  headerDiv.innerHTML = `
-    <a href="/index.html"><img src="/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
-    <h1>${userScreenName}</h1>
-  `;
-}
-
-function createFooter() {
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML =
-    'CC BY <a href="https://codeforkosen.github.io/">Code for KOSEN</a>(<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)';
-}
-
 function getTurnText(game) {
   let turnText = "-";
   if (game.gaming || game.ending) {
@@ -101,8 +87,6 @@ async function getGameInfo(roomid) {
 
 export {
   Game,
-  createHeader,
-  createFooter,
   getTurnText,
   nowUnixTime,
   diffTime,

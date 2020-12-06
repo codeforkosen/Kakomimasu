@@ -19,7 +19,8 @@
     </head>
 
     <body>
-        <header></header>
+        <header id="header"></header>
+        <h1 id="title">最新ゲーム詳細</h1>
         <div id="nogame" hidden>
             <p>ゲームが存在しません。5秒後にゲーム一覧に戻ります。<a href="gamelist.html">今すぐ戻る</a></p>
         </div>
@@ -79,12 +80,9 @@
         <div style="text-align: right">
             <a id="vr-link">VR版</a>
         </div>
-        <footer></footer>
+        <footer id="footer"></footer>
         <script type="module">
-            import { createHeader, createFooter, Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
-
-            createHeader("ゲーム詳細");
-            createFooter();
+            import { Game, getUrlQueries, userShow, getGameInfo, nowUnixTime, getTurnText } from "/js/util.js";
 
             var pointChart = new Chart(graph, {
                 type: "line",
@@ -432,6 +430,7 @@
 
         </script>
 
+        <script type="module" src="js/vue-comp/common.js"></script>
     </body>
 
 </html>
