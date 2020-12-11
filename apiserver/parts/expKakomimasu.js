@@ -18,7 +18,7 @@ class ExpGame extends Game {
       this.intervalId = setInterval(() => this.updateStatus(), 50);
       //console.log("intervalID", this.intervalId);
     }
-    this.changeFuncs.forEach((func) => func());
+    this.wsSend();//this.changeFuncs.forEach((func) => func());
     return true;
   }
 
@@ -37,12 +37,12 @@ class ExpGame extends Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
-      this.changeFuncs.forEach((func) => func());
+      this.wsSend();//this.changeFuncs.forEach((func) => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
-        this.changeFuncs.forEach((func) => func());
+        this.wsSend();//this.changeFuncs.forEach((func) => func());
       }
     }
     if (this.ending) {
@@ -56,7 +56,7 @@ class ExpGame extends Game {
 
       this.dispose();
       console.log("turn", this.turn);
-      this.changeFuncs.forEach(func => func());
+      this.wsSend();//this.changeFuncs.forEach(func => func());
     }
   }
 
@@ -72,6 +72,11 @@ class ExpGame extends Game {
 
   dispose() {
     clearInterval(this.intervalId);
+  }
+
+  wsSend() {
+    console.log("expKakomimasu", this.uuid);
+    this.changeFuncs.forEach(func => func(this.uuid));
   }
 }
 
