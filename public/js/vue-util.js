@@ -1,4 +1,6 @@
-const fieldTableComp = {
+import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
+
+export const fieldTableComp = {
     data: function () {
         return {
             point: [],
@@ -15,15 +17,21 @@ const fieldTableComp = {
         </table>`,
     methods: {
         init: function (game) {
-            this.point = new Array(game.board.height);
-            this.className = new Array(game.board.height);
-            for (let i = 0; i < game.board.height; i++) {
-                this.point[i] = new Array(game.board.width);
-                this.className[i] = new Array(game.board.width);
-            }
-            for (let i = 0; i < game.board.height; i++) {
-                for (let j = 0; j < game.board.width; j++) {
-                    Vue.set(this.point[i], j, game.board.points[j + i * game.board.width]);
+            const h = game.board.height;
+            const w = game.board.width;
+            this.point = new Array(h);
+            this.className = new Array(h);
+            for (let i = 0; i < h; i++) {
+                this.point[i] = new Array(w);
+                this.className[i] = new Array(w);
+                for (let j = 0; j < w; j++) {
+                    const point = game.board.points[j + i * w];
+                    const tile = game.tiled[j + i * w];
+                    let pointText = point;
+                    if (point < 0 && tile[1] !== -1 && tile[0] === 0) {
+                        pointText = `<span class="striket">${point}</span>\n${Math.abs(point)}`;
+                    }
+                    Vue.set(this.point[i], j, pointText);
                     Vue.set(this.className[i], j, "");
                 }
             }
@@ -51,19 +59,6 @@ const fieldTableComp = {
 
             function toHex(v) {
                 return ('00' + v.toString(16).toUpperCase()).substr(-2);
-            }
-        },
-        pointUpdate: function (game) {
-            for (let i = 0; i < this.point.length; i++) {
-                for (let j = 0; j < this.point[i].length; j++) {
-                    const point = game.board.points[j + i * game.board.width];
-                    const tile = game.tiled[j + i * game.board.width];
-                    let pointText = point;
-                    if (point < 0 && tile[1] !== -1 && tile[0] === 0) {
-                        pointText = `<span class="striket">${point}</span>\n${Math.abs(point)}`;
-                    }
-                    Vue.set(this.point[i], j, pointText);
-                }
             }
         }
     }
