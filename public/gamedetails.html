@@ -214,6 +214,7 @@
             let socket;
             let nowGameId = null;
             if (gameId) {
+                document.getElementById("vr-link").href = "./vr/index.html?id=" + gameId;
                 socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/ws/game/" + gameId);
 
                 socket.onmessage = (event) => {
@@ -222,6 +223,7 @@
                     update(game);
                 }
             } else {
+                document.getElementById("vr-link").href = "./vr/latest.html";
                 socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/allGame");
 
                 socket.onmessage = (event) => {
