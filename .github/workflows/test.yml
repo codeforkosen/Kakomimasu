@@ -1,0 +1,21 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# This workflow will install Deno and run tests across stable and nightly builds on Windows, Ubuntu and macOS.
+# For more information see: https://github.com/denolib/setup-deno
+
+
+on: [push,pull_request]
+
+jobs:
+  deno_test:
+    runs-on: ubuntu-latest
+    name: Deno test by Docker
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Deno test
+        uses: ./
+            

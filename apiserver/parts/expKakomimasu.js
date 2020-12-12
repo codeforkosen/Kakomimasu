@@ -1,5 +1,6 @@
 import util from "../../util.js";
 import { Game, Kakomimasu } from "../../Kakomimasu.js";
+import { saveLogFile } from "./file_opration.ts";
 
 class ExpGame extends Game {
   constructor(board, name, dummy) {
@@ -46,13 +47,7 @@ class ExpGame extends Game {
       }
     }
     if (this.ending) {
-      /*const logData = {
-        gameId: this.uuid,
-        board: this.board,
-        log: this.log,
-      }*/
-      Deno.mkdirSync("./log", { recursive: true });
-      Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
+      saveLogFile(this);
 
       this.dispose();
       console.log("turn", this.turn);
