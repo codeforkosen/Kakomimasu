@@ -1,11 +1,11 @@
-import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
+import type { WebSocket } from "https://deno.land/std@0.79.0/ws/mod.ts";
 import {
   contentTypeFilter,
   createApp,
   createRouter,
   ServerRequest,
   serveStatic,
-} from "https://servestjs.org/@v1.1.1/mod.ts";
+} from "https://servestjs.org/@v1.1.7/mod.ts";
 
 import * as util from "./apiserver_util.ts";
 
@@ -231,11 +231,14 @@ export const getGameInfo = async (req: ServerRequest) => {
     if (game) {
       game.updateStatus();
     } else {
-      for (const dirEntry of Deno.readDirSync("./log")) {
+      const logPath = util.solvedPath(import.meta.url, "./log");
+      for (const dirEntry of Deno.readDirSync(logPath)) {
         const gameid = dirEntry.name.split(/[_.]/)[1];
         console.log(gameid, id);
         if (gameid === id) {
-          game = JSON.parse(Deno.readTextFileSync(`./log/${dirEntry.name}`));
+          game = JSON.parse(
+            Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
+          );
           break;
         }
       }
@@ -435,13 +438,14 @@ let logFoldermtime: (Date | null) = null;
 
 const getLogGames = (): any => {
   logGames.length = 0;
-  Deno.mkdirSync("./log", { recursive: true });
-  const stat = Deno.statSync("./log");
+  const logPath = util.solvedPath(import.meta.url, "./log");
+  Deno.mkdirSync(logPath, { recursive: true });
+  const stat = Deno.statSync(logPath);
   if (stat.isDirectory) {
     if (logFoldermtime !== stat.mtime) {
-      for (const dirEntry of Deno.readDirSync("./log")) {
+      for (const dirEntry of Deno.readDirSync(logPath)) {
         const json = JSON.parse(
-          Deno.readTextFileSync(`./log/${dirEntry.name}`),
+          Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
         );
         logGames.push(json);
       }
@@ -499,7 +503,7 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveStatic("../public"));
+app.use(serveStatic(util.solvedPath(import.meta.url, "../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());
 app.listen({ port });
@@ -518,7 +522,7 @@ const createDefaultBoard = () => {
 };
 
 const readBoard = (fileName: string) => {
-  const path = `./board/${fileName}.json`;
+  const path = util.solvedPath(import.meta.url, `./board/${fileName}.json`);
   if (Deno.statSync(path).isFile) {
     const boardJson = JSON.parse(
       Deno.readTextFileSync(path),
