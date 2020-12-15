@@ -6,6 +6,7 @@ th {
 
 #vue-field-table {
     border-collapse: collapse;
+    user-select: none;
 }
 
 #vue-field-table th,
@@ -21,6 +22,7 @@ td {
     white-space: pre-line;
     --bg-color: #FFFFFF;
     background-color: var(--bg-color);
+    position: relative;
 }
 
 #vue-field-table .agent {
@@ -84,6 +86,46 @@ td {
 #vue-field-table .striket {
     text-decoration: line-through;
     color: red;
+}
+
+#vue-field-table .detail {
+    display: none;
+    pointer-events: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, .7);
+    color: white;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    border-radius: 10px;
+    transform: translate(+0%, -100%);
+    padding: 1em;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, .7));
+}
+
+#vue-field-table .detail {
+    width: max-content;
+}
+
+#vue-field-table .p1Wall>.detail {
+    border: solid 4px #0096FF;
+}
+
+#vue-field-table .p2Wall>.detail {
+    border: solid 4px #FF0200;
+}
+
+#vue-field-table .p3Wall>.detail {
+    border: solid 4px mediumpurple;
+}
+
+#vue-field-table .p4Wall>.detail {
+    border: solid 4px darkorange;
+}
+
+#vue-field-table td:hover>.detail {
+    display: block;
 }
 
 @keyframes vue-field-flash {

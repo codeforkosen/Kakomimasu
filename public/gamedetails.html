@@ -151,8 +151,158 @@
                 }
             }
 
-            import { fieldTableComp } from "./js/vue-util.js";
+            const fieldTableComp = {
+                data: function () {
+                    return {
+                        className: [],
+                        game: {},
+                        playerName: [],
+                    }
+                },
+                template:
+                    `<table id="vue-field-table" v-cloak>
+                        <tbody>
+                            <tr v-if="height.length !== 0">
+                                <th></th>
+                                <th v-for="x in width">{{x}}</th>   
+                                <th></th> 
+                            </tr>
+                            <tr v-for="y in height">
+                                <th>{{y}}</th>
+                                <td v-for="x in width" :class="tileClass(x,y)">
+                                    <span class="striket" v-if="isSurrounded(x,y)">{{point(x,y)}}</span>
+                                    <br>
+                                    <span v-if="isSurrounded(x.y)">{{Math.abs(point(x,y))}}</span>
+                                    <span v-else>{{point(x,y)}}</span>
+                                    <div class="detail" v-if="isAgent(x,y)">
+                                        <span>{{playerName[isAgent(x,y).player]}}:{{isAgent(x,y).n+1}}</span><br>
+                                        <div>
+                                            <span>行動履歴</span>
+                                            <div v-for="(item,i) in agentHistory(isAgent(x,y))">
+                                                <span>{{i+1}}手前({{item?.type}}) x:{{item?.x}} , y:{{item?.y}}</span>
+                                            </div>
+                                            </div>
+                                    </div>
+                                </td><th>{{y}}</th>
+                            </tr>
+                            <tr v-if="height.length !== 0">
+                                <th></th>
+                                <th v-for="x in width">{{x}}</th>   
+                                <th></th> 
+                            </tr>
+                        </tbody>
+                    </table>`,
+                methods: {
+                    init: function (game) {
+                        this.game = game;
+                        const h = game.board.height;
+                        const w = game.board.width;
+                        this.className = new Array(h);
+                        for (let i = 0; i < h; i++) {
+                            this.className[i] = new Array(w);
+                            for (let j = 0; j < w; j++) {
+                                Vue.set(this.className[i], j, "");
+                            }
+                        }
 
+                        Vue.nextTick(() => {
+                            const tds = this.$el.getElementsByTagName("td");
+                            for (let i = 0; i < tds.length; i++) {
+                                const e = tds[i];
+                                const p = parseInt(e.innerText);
+                                let colorStr = "#";
+                                if (p < 0) {
+                                    let bn = 0xFF;
+                                    bn *= Math.abs(p + 16) / 16 * 0.5 + 0.5;
+                                    bn &= 0xFF;
+                                    for (let i = 0; i < 3; i++) colorStr += toHex(bn);
+                                } else if (p > 0) {
+                                    let bn = 0xFF;
+                                    bn *= Math.abs(p - 16) / 16 * 0.5 + 0.5;
+                                    bn &= 0xFF;
+                                    colorStr += `FFFF${toHex(bn)}`;
+                                }
+                                e.style.setProperty("--bg-color", colorStr);
+                            }
+                        });
+
+                        function toHex(v) {
+                            return ('00' + v.toString(16).toUpperCase()).substr(-2);
+                        }
+                    },
+                    index: function (x, y) {
+                        return x + y * this.game.board.width;
+                    },
+                    point: function (x, y) {
+                        return this.game.board.points[this.index(x, y)];
+                    },
+                    isSurrounded: function (x, y) {
+                        return this.point(x, y) < 0 && this.tiled(x, y)[1] !== -1 && this.tiled(x, y)[0] === 0
+                    },
+                    isAgent: function (x, y) {
+                        const agent = this.game.players.map((e, i) => e.agents.map((e_, j) => { return { agent: e_, player: i, n: j }; })).flat().find(e => e.agent.x === x && e.agent.y === y);
+                        return agent;
+                    },
+                    tiled: function (x, y) {
+                        return this.game.tiled[this.index(x, y)];
+                    },
+                    isConflict: function (x, y) {
+                        const lastActLog = game.log[game.log.length - 1]?.map(e => e.actions).flat();
+                        const isConflict = lastActLog?.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
+                        return isConflict;
+                    },
+                    tileClass: function (x, y) {
+                        const classObj = {};
+                        const [type, pid] = this.tiled(x, y);
+                        if (pid !== -1) {
+                            if (type === 1) {
+                                classObj[`p${pid + 1}Wall`] = true;
+                                const agent = this.isAgent(x, y);
+                                if (agent) {
+                                    classObj["agent"] = true;
+                                    classObj[`agent${agent.player + 1}`] = true;
+                                }
+                            }
+                            else if (type === 0) classObj[`p${pid + 1}Area`] = true;
+                        }
+                        if (this.isConflict(x, y)) {
+                            classObj["conflict"] = true;
+                        }
+                        return classObj;
+                    },
+                    agentHistory: function (agent) {
+                        const log = this.game.log;
+                        const pid = agent.player, aid = agent.n;
+
+                        const history = [];
+                        for (let i = log.length - 1; i >= 0; i--) {
+                            const act = log[i][pid].actions.find(e => e.agentId === aid);
+                            if (act) {
+                                if (act.type === 1) act.type = "配置";
+                                else if (act.type === 2) act.type = "停留";
+                                else if (act.type === 3) act.type = "移動";
+                                else if (act.type === 4) act.type = "除去";
+
+                                history.push(act);
+                                if (history.length > 5) break;
+                            }
+                        }
+                        return history;
+                    }
+                },
+                computed: {
+                    width: function () {
+                        const ary = [];
+                        for (let i = 0; i < this.game?.board?.width; i++) ary[i] = i;
+                        return ary;
+                    },
+                    height: function () {
+                        const ary = [];
+                        for (let i = 0; i < this.game?.board?.height; i++) ary[i] = i;
+                        return ary;
+                    }
+                }
+            }
             const VFieldInfo = new Vue({
                 el: "#field-info",
                 data: {
@@ -176,6 +326,7 @@
                                 pointChart.data.datasets[i].label = user.screenName;
                             }
                         }
+
                     },
                     update: async function (game) {
                         //console.log(game);
@@ -188,6 +339,8 @@
                                     const user = await userShow(game.players[i].id);
                                     this.players[i].screenName = user.screenName;
                                     this.players[i].link = `user.html?id=${user.name}`;
+
+                                    VFieldInfo.$refs.table.playerName.splice(i, 1, user.screenName);
                                 }
                                 if (pointChart.data.datasets[i] !== undefined) {
                                     pointChart.data.datasets[i].label = this.players[i].screenName;
@@ -205,6 +358,7 @@
                                 pointChart.update();
                             }
                         }
+                        console.log(VFieldInfo.$refs.table.playerName);
                     }
                 }
             });
@@ -292,39 +446,6 @@
                 VFieldInfo.turn = getTurnText(game);
                 for (let i = 0; i < game.players.length; i++) {
                     Vue.set(VFieldInfo.pPoint, i, game.players[i].point.basepoint + game.players[i].point.wallpoint);
-                }
-
-                // 最後のアクションを取得
-                const lastActLog = game.log[game.log.length - 1]?.map(e => e.actions).flat();
-
-                for (let y = 0; y < game.board.height; y++) {
-                    const classNames = [];
-                    for (let x = 0; x < game.board.width; x++) {
-                        let className = "";
-                        const playerid = game.tiled[x + y * game.board.width][1];
-                        // console.log(game.tiled);
-                        if (playerid !== -1) {
-                            if (game.tiled[x + y * game.board.width][0] === 1) className += `p${playerid + 1}Wall`;
-                            if (game.tiled[x + y * game.board.width][0] === 0) className += `p${playerid + 1}Area`;
-                            game.players.forEach((p, i) => {
-                                p.agents.forEach(a => {
-                                    if (a.x >= 0 && a.x === x && a.y >= 0 && a.y === y) {
-                                        className += " agent agent" + (i + 1); // (playerid + 1);
-                                        // console.log(a.x, a.y, className);
-                                    }
-                                });
-                            });
-                        }
-                        const isConflict = lastActLog?.some(a => ((a.res > 0 && a.res < 3) && a.x === x && a.y === y));
-                        if (isConflict) {
-                            //console.log("conflict", x, y);
-                            className += " conflict";
-                        }
-                        //console.log();
-
-                        classNames.push(className);
-                    }
-                    VFieldInfo.$refs.table.className.splice(y, 1, classNames);
                 }
 
                 // グラフ更新
