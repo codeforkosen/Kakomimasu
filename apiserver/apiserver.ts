@@ -12,7 +12,7 @@ import * as util from "./apiserver_util.ts";
 import { Account, User } from "./user.ts";
 const accounts = new Account();
 
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 
 const kkmm = new ExpKakomimasu();
@@ -120,6 +120,7 @@ const createSelfGame = async (req: ServerRequest) => {
       reqJson.gameName,
     );
     game.changeFuncs.push(sendAllGame);
+    game.changeFuncs.push(sendGame);
     sendAllGame();
 
     await req.respond(util.jsonResponse(JSON.stringify(game)));
@@ -196,6 +197,8 @@ export const match = async (req: ServerRequest) => {
         const brd = readBoard(bname);
         const game = kkmm.createGame(brd);
         game.changeFuncs.push(sendAllGame);
+        game.changeFuncs.push(sendGame);
+
         freeGame.push(game);
       }
       if (freeGame[0].attachPlayer(player) === false) {
@@ -360,6 +363,7 @@ const ws_AllGame = async (sock: WebSocket) => {
     }
   }
 };
+
 const sendAllGame = () => {
   //console.log(socks.length);
   const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
@@ -377,6 +381,53 @@ const sendAllGame = () => {
     }
     return false;
   });
+};
+
+let getGameSocks: { sock: WebSocket; id: string }[] = [];
+
+const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
+  const id = req.match[1];
+
+  const game = getGame(id);
+  if (game) {
+    sock.send(JSON.stringify(game));
+    if (!game.ending) {
+      getGameSocks.push({ sock: sock, id: id });
+    }
+  }
+  for await (const msg of sock) {
+  }
+};
+const sendGame = (id: string) => {
+  const game = getGame(id);
+  if (game) {
+    getGameSocks = getGameSocks.filter((e) => {
+      if (e.id === id) {
+        try {
+          if (!e.sock.isClosed) {
+            e.sock.send(JSON.stringify(game));
+            return true;
+          }
+        } catch (e) {
+          console.log(e);
+        }
+        return false;
+      } else return true;
+    });
+  }
+};
+
+const getGame = (id: string): any => {
+  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+  //console.log(games);
+  console.log("getGame!!", id);
+  try {
+    if (id) return games.flat().find((e) => (e.uuid || e.gameId) === id);
+    else return games[0].reverse()[0];
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
 };
 
 const logGames: any[] = [];
@@ -441,6 +492,7 @@ const apiRoutes = () => {
 
   //router.get("allPastGame", allPastGame);
   router.ws("allGame", ws_AllGame);
+  router.ws(new RegExp("^ws/game/(.+)$"), ws_getGame);
   //router.ws("allSelfGame", ws_AllSelfGame);
 
   return router;
