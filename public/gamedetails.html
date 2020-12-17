@@ -176,10 +176,12 @@
                                     <span v-else>{{point(x,y)}}</span>
                                     <div class="detail" v-if="isAgent(x,y)">
                                         <span>{{playerName[isAgent(x,y).player]}}:{{isAgent(x,y).n+1}}</span><br>
-                                        <div>
-                                            <span>行動履歴</span>
-                                            <div v-for="(item,i) in agentHistory(isAgent(x,y))">
-                                                <span>{{i+1}}手前({{item?.type}}) x:{{item?.x}} , y:{{item?.y}}</span>
+                                        <span>行動履歴</span>
+                                        <div class="history">
+                                            <div v-for="(item,i) in agentHistory(isAgent(x,y))" :style="{'text-decoration':(item.res > 0) ? 'line-through':'none'}">
+                                                <span>T{{item.turn}}：</span>
+                                                <span v-if="item?.x"> x:{{item?.x}} , y:{{item?.y}}に</span>
+                                                <span>{{item?.type}}</span>
                                             </div>
                                             </div>
                                     </div>
@@ -275,19 +277,26 @@
                         const pid = agent.player, aid = agent.n;
 
                         const history = [];
-                        for (let i = log.length - 1; i >= 0; i--) {
-                            const act = log[i][pid].actions.find(e => e.agentId === aid);
+                        for (let i = 0; i < log.length; i++) {
+                            const act = {};
+                            Object.assign(act, log[i][pid].actions.find(e => e.agentId === aid));
                             if (act) {
+                                console.log(act.type);
                                 if (act.type === 1) act.type = "配置";
-                                else if (act.type === 2) act.type = "停留";
                                 else if (act.type === 3) act.type = "移動";
                                 else if (act.type === 4) act.type = "除去";
-
-                                history.push(act);
-                                if (history.length > 5) break;
+                                else {
+                                    act.type = "停留";
+                                    act.x = act.y = undefined;
+                                }
                             }
+                            else {
+                                act.type = "停留"
+                            }
+                            act.turn = i;
+                            history.push(act);
                         }
-                        return history;
+                        return history.reverse();
                     }
                 },
                 computed: {
