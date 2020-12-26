@@ -393,9 +393,12 @@ const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
     sock.send(JSON.stringify(game));
     if (!game.ending) {
       getGameSocks.push({ sock: sock, id: id });
+      for await (const msg of sock) {
+      }
     }
   }
-  for await (const msg of sock) {
+  if (!sock.isClosed) {
+    sock.close();
   }
 };
 const sendGame = (id: string) => {
