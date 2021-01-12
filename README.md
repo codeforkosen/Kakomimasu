@@ -25,7 +25,7 @@ https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 ```
 $ cd apiserver
-$ deno run -A apiserver.js
+$ deno run -A apiserver.ts
 ```
 
 ## APIクライアント for Deno (JavaScript)
