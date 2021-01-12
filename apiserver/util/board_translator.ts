@@ -1,4 +1,5 @@
 // 2019年の公開フィールドを囲みマスように変換してboardディレクトリに配置します。
+// ファイルパスを引数にしてこのファイルを実行してください。
 
 import { IBoard } from "../parts/interface.ts";
 import { saveBoardFile } from "../parts/file_opration.ts";
