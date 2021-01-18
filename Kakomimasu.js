@@ -7,7 +7,7 @@ class Board {
       this.h = w.height;
       this.points = w.points;
       this.nagent = w.nagent;
-      this.nturn = w.nturn;
+      this.nturn = w.nturn || 30;
       this.nsec = w.nsec || 3;
       this.nplayer = w.nplayer || 2;
       this.name = w.name;
