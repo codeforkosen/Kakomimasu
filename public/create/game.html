@@ -45,18 +45,15 @@
         <script type="module">
             import * as api from "/js/api-util.js";
 
-            const boardsListVue = new Vue({
+            const VBoardsList = new Vue({
                 el: "#boards-list",
                 data: {
                     boards: [],
                 },
-                methods: {
-                    init: async function () {
-                        this.boards = await api.getAllBoards();
-                    },
+                created: async function () {
+                    this.boards = await api.getAllBoards();
                 }
             });
-            boardsListVue.init();
 
             const createdGameVue = new Vue({
                 el: "#created-game",
