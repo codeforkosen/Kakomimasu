@@ -201,15 +201,12 @@
             async function update(game) {
                 VGameInfo.update(game);
                 VFieldInfo.update(game);
-                for (let i = 0; i < game.players.length; i++) {
-                    if (pointChart.data.datasets[i] !== undefined) {
-                        pointChart.data.datasets[i].label = this.players[i].screenName;
-                    }
-                }
-                //pointChart.update();
 
                 for (let i = 0; i < game.players.length; i++) {
-                    if (pointChart.data.datasets[i] === undefined) {
+                    if (pointChart.data.datasets[i]) {
+                        pointChart.data.datasets[i].label = VFieldInfo.players[i].screenName;
+                    }
+                    else {
                         pointChart.data.datasets[i] = {
                             label: "",
                             data: [0],
@@ -218,6 +215,7 @@
                         };
                     }
                 }
+                pointChart.update();
                 if (game.startedAtUnixTime === null) return;
 
                 VFieldInfo.tableInit(game);
@@ -243,8 +241,6 @@
                 });
 
                 pointChart.update();
-
-                //return game;
             }
 
             new Vue({
