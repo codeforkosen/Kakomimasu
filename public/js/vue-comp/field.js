@@ -68,7 +68,7 @@ export const VFieldInfo = new Vue({
                               <td v-for="x in width" :class="tileClass(x,y)">
                                   <span class="striket" v-if="isSurrounded(x,y)">{{point(x,y)}}</span>
                                   <br>
-                                  <span v-if="isSurrounded(x.y)">{{Math.abs(point(x,y))}}</span>
+                                  <span v-if="isSurrounded(x,y)">{{Math.abs(point(x,y))}}</span>
                                   <span v-else>{{point(x,y)}}</span>
                                   <div class="detail" v-if="isAgent(x,y)">
                                       <span>{{playerName[isAgent(x,y).player]}}:{{isAgent(x,y).n+1}}</span><br>
