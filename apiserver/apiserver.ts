@@ -7,6 +7,8 @@ import {
   serveStatic,
 } from "https://servestjs.org/@v1.1.7/mod.ts";
 
+import { aiList } from "./parts/ai-list.ts";
+
 import * as util from "./apiserver_util.ts";
 
 import { Account, User } from "./user.ts";
@@ -26,7 +28,7 @@ const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
 import util2 from "../util.js";
 
 const getRandomBoardName = async () => {
-  const bd = await Deno.readDir("board");
+  const bd = Deno.readDir("board");
   const list = [];
   for await (const b of bd) {
     if (b.name.endsWith(".json")) {
@@ -156,32 +158,35 @@ const getAllBoards = async (req: ServerRequest) => {
 
 //#region プレイヤー登録・ルームID取得API
 
-export class PlayerPost {
-  constructor(
-    public name: string,
-    public id: string,
-    public password: string,
-    public spec: string,
-    public gameId: string,
-  ) {}
+interface IMatchRequest {
+  name?: string;
+  id?: string;
+  password: string;
+  spec?: string;
+  gameId?: string;
+  aiName?: string;
+  useAi?: boolean;
+  aiOption?: {
+    aiName: string;
+    boardName?: string;
+  };
 }
 
 export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
   try {
-    const playerPost = (await req.json()) as PlayerPost;
-    console.log(playerPost);
+    const reqData = (await req.json()) as IMatchRequest;
+    console.log(reqData);
 
-    const identifier = playerPost.id || playerPost.name;
+    const identifier = reqData.id || reqData.name;
     if (!identifier) throw Error("Invalid id or name.");
 
-    const user = accounts.getUser(identifier, playerPost.password);
+    const user = accounts.getUser(identifier, reqData.password);
 
-    const player = kkmm.createPlayer(user.id, playerPost.spec);
-    console.log(playerPost.gameId);
-    if (playerPost.gameId) {
-      const game = kkmm_self.getGames().find((game) =>
-        game.uuid === playerPost.gameId
+    const player = kkmm.createPlayer(user.id, reqData.spec);
+    if (reqData.gameId) {
+      const game = [...kkmm_self.getGames(), ...kkmm.getGames()].find((game) =>
+        game.uuid === reqData.gameId
       );
       if (game) {
         if (game.attachPlayer(player) === false) {
@@ -189,6 +194,32 @@ export const match = async (req: ServerRequest) => {
         }
       } else {
         throw Error("Can not find Game");
+      }
+    } else if (reqData.useAi) {
+      const aiFolderPath = util.solvedPath(import.meta.url, "../client_deno/");
+      const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
+      if (ai) {
+        const bname = reqData.aiOption?.boardName || boardname ||
+          await getRandomBoardName();
+        const brd = readBoard(bname);
+        const game = kkmm.createGame(brd);
+        game.changeFuncs.push(sendAllGame);
+        game.changeFuncs.push(sendGame);
+        game.attachPlayer(player);
+        Deno.run(
+          {
+            cmd: [
+              "deno",
+              "run",
+              "-A",
+              aiFolderPath + ai.filePath,
+              "--local",
+              "--nolog",
+              "--gameId",
+              game.uuid,
+            ],
+          },
+        );
       }
     } else {
       const freeGame = kkmm.getFreeGames();
@@ -234,7 +265,7 @@ export const getGameInfo = async (req: ServerRequest) => {
       const logPath = util.solvedPath(import.meta.url, "./log");
       for (const dirEntry of Deno.readDirSync(logPath)) {
         const gameid = dirEntry.name.split(/[_.]/)[1];
-        console.log(gameid, id);
+        //console.log(gameid, id);
         if (gameid === id) {
           game = JSON.parse(
             Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
