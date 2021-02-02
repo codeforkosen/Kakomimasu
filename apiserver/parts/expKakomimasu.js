@@ -27,6 +27,8 @@ class ExpGame extends Game {
     const ret = super.nextTurn();
     if (this.turn < this.nturn) {
       this.nextTurnUnixTime = util.nowUnixTime() + this.nsec;
+    } else if (this.turn == this.nturn) {
+      this.nextTurnUnixTime = null;
     }
     return ret;
   }
@@ -66,6 +68,7 @@ class ExpGame extends Game {
   }
 
   dispose() {
+    //console.log(this.intervalId);
     clearInterval(this.intervalId);
   }
 
