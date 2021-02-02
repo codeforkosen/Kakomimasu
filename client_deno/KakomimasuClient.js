@@ -21,7 +21,8 @@ class KakomimasuClient {
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
     cl(this.id, this.password, this.name, this.spec);
-    this.setServerHost(Deno.env.get("host"));
+    if (args.local) this.setServerHost("http://localhost:8880");
+    else this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
     if (host) {
@@ -55,22 +56,18 @@ class KakomimasuClient {
         aiName: args.useAi,
         boardName: args.aiBoard,
       }
-    } else if (this.gameId) {
-      matchParam.gameId = this.gameId;
+    } else if (args.gameId) {
+      matchParam.gameId = args.gameId;
     }
     cl(matchParam);
-    const resMatch = await match(
-      /*this.gameId
-        ? { id: user.id, password: this.password, spec: this.spec, gameId: this.gameId }
-        : { id: user.id, password: this.password, spec: this.spec },*/matchParam
-    );
+    const resMatch = await match(matchParam);
     this.token = resMatch.accessToken;
-    this.roomid = resMatch.gameId;
+    this.gameId = resMatch.gameId;
     this.pno = resMatch.index;
     cl("playerid", resMatch, this.pno);
 
     do {
-      this.gameInfo = await getGameInfo(this.roomid);
+      this.gameInfo = await getGameInfo(this.gameId);
       await sleep(100);
     } while (this.gameInfo.startedAtUnixTime === null);
 
@@ -145,7 +142,7 @@ class KakomimasuClient {
 
   async waitStart() { // GameInfo
     await sleep(diffTime(this.gameInfo.startedAtUnixTime));
-    this.gameInfo = await getGameInfo(this.roomid);
+    this.gameInfo = await getGameInfo(this.gameId);
     cl(this.gameInfo);
     this.log = [this.gameInfo];
     this.turn = 1;
@@ -156,7 +153,7 @@ class KakomimasuClient {
   }
 
   setActions(actions) { // void
-    setAction(this.roomid, this.token, actions);
+    setAction(this.gameId, this.token, actions);
   }
 
   async waitNextTurn() { // GameInfo? (null if end)
@@ -166,7 +163,7 @@ class KakomimasuClient {
       await sleep(diffTime(bknext));
 
       for (; ;) {
-        this.gameInfo = await getGameInfo(this.roomid);
+        this.gameInfo = await getGameInfo(this.gameId);
         if (this.gameInfo.nextTurnUnixTime !== bknext) {
           break;
         }

@@ -4,12 +4,7 @@ import { Action, DIR, KakomimasuClient, cl, args } from "./KakomimasuClient.js";
 
 const kc = new KakomimasuClient("ai-1", "AI-1", "", "ai-1-pw");
 
-if (args.gameId) {
-  kc.gameId = args.gameId;
-}
-if (args.local) kc.setServerHost("http://localhost:8880");
 let gameInfo = await kc.waitMatching();
-const roomid = gameInfo.gameId;
 const pno = kc.getPlayerNumber();
 
 const points = kc.getPoints();
@@ -36,7 +31,6 @@ gameInfo = await kc.waitStart();
 cl(gameInfo);
 
 const log = [gameInfo];
-console.log(pntall);
 while (gameInfo) {
   // ランダムにずらしつつ置けるだけおく
   // 置いたものはランダムに8方向動かす
@@ -47,7 +41,7 @@ while (gameInfo) {
     cl(pno, agent);
     if (agent.x === -1) {
       const p = pntall[i + offset];
-      console.log(i, "p", p);
+      cl(i, "p", p);
       actions.push(new Action(i, "PUT", p.x, p.y));
     } else {
       const [dx, dy] = DIR[util.rnd(8)];
