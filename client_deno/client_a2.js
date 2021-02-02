@@ -1,83 +1,37 @@
 // だいたい点数の高い順にデタラメに置き、画面外を避けつつデタラメに動くアルゴリズム
-
-import {
-  Action,
-  sleep,
-  userRegist,
-  userShow,
-  match,
-  getGameInfo,
-  setAction,
-  diffTime,
-} from "./client_util.js";
 import util from "../util.js";
+import { Action, DIR, KakomimasuClient, cl, args } from "./KakomimasuClient.js";
 
-//const [ playerid, roomid] = await match(`ふくの`, "ランダム");
+const kc = new KakomimasuClient("ai-2", "AI-2", "", "ai-2-pw");
 
-const name = `taisukef`;
-const password = `${name}-pw`;
+let gameInfo = await kc.waitMatching();
+const pno = kc.getPlayerNumber();
 
-// ユーザ取得（ユーザがなかったら新規登録）
-let user = await userShow(name);
-if (user.hasOwnProperty("error")) {
-  user = await userRegist(`ふくの`, name, password);
-}
-
-// プレイヤー登録
-const resMatch = await match(
-  { id: user.id, password: password, spec: "ランダム" },
-);
-const token = resMatch.accessToken;
-const roomid = resMatch.gameId;
-const pno = resMatch.index;
-console.log("playerid", resMatch, pno);
-
-let gameInfo;
-do {
-  gameInfo = await getGameInfo(roomid);
-  await sleep(100);
-} while (gameInfo.startedAtUnixTime === null);
-
-console.log(gameInfo);
-
-const points = gameInfo.board.points;
-const w = gameInfo.board.width;
+const points = kc.getPoints();
+const w = points[0].length;
+const h = points.length;
 const nplayers = gameInfo.players[pno].agents.length;
 const totalTurn = gameInfo.totalTurn;
-console.log("totalTurn", totalTurn);
-
-console.log(
-  "ゲーム開始時間：",
-  new Date(gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
-);
-
-// 8方向、上から時計回り
-const DIR = [
-  [0, -1],
-  [1, -1],
-  [1, 0],
-  [1, 1],
-  [0, 1],
-  [-1, 1],
-  [-1, 0],
-  [-1, -1],
-];
+cl("totalTurn", totalTurn);
 
 // ポイントの高い順ソート
-const pntall = points.map((p, idx) => {
-  return { x: idx % w, y: Math.floor(idx / w), p: p };
-});
-const pntsorted = pntall.sort((a, b) => b.p - a.p);
+const pntall = [];
+for (let i = 0; i < h; i++) {
+  for (let j = 0; j < w; j++) {
+    pntall.push({ x: j, y: i, point: points[i][j] });
+  }
+}
+const sortByPoint = (p) => {
+  p.sort((a, b) => b.point - a.point);
+};
+sortByPoint(pntall);
 
 // スタート時間待ち
-await sleep(diffTime(gameInfo.startedAtUnixTime));
-gameInfo = await getGameInfo(roomid);
-console.log(gameInfo);
+gameInfo = await kc.waitStart();
+cl(gameInfo);
 
 const log = [gameInfo];
-for (let i = 1; i <= totalTurn; i++) {
-  console.log("turn", i);
-
+while (gameInfo) {
   // ランダムにずらしつつ置けるだけおく
   // 置いたものはランダムに8方向動かす
   // 画面外にはでない判定を追加（a1 → a2)
@@ -85,43 +39,33 @@ for (let i = 1; i <= totalTurn; i++) {
   const offset = util.rnd(nplayers);
   for (let i = 0; i < nplayers; i++) {
     const agent = gameInfo.players[pno].agents[i];
-    console.log(pno, agent);
+    cl(pno, agent);
     if (agent.x === -1) {
-      const p = pntsorted[i + offset];
+      const p = pntall[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
     } else {
-      for (;;) {
+      for (; ;) {
         const [dx, dy] = DIR[util.rnd(8)];
         const x = agent.x + dx;
         const y = agent.y + dy;
         if (x < 0 || x >= w || y < 0 || y >= w)
           continue;
-        console.log(x, y);
+        cl(x, y);
         actions.push(new Action(i, "MOVE", x, y));
         break;
       }
     }
   }
-  setAction(roomid, token, actions);
-
-  if (i < totalTurn) {
-    const bknext = gameInfo.nextTurnUnixTime;
-    await sleep(diffTime(gameInfo.nextTurnUnixTime));
-
-    for (;;) {
-      gameInfo = await getGameInfo(roomid);
-      if (gameInfo.nextTurnUnixTime !== bknext) {
-        break;
-      }
-      await sleep(100);
-    }
-  }
+  kc.setActions(actions);
+  gameInfo = await kc.waitNextTurn();
   log.push(gameInfo);
 }
 
 // ゲームデータ出力
-try {
-  Deno.mkdirSync("log");
-} catch (e) {}
-const fname = `log/${gameInfo.gameId}-player${pno}.log`;
-Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
+if (!args.nolog) {
+  try {
+    Deno.mkdirSync("log");
+  } catch (e) { }
+  const fname = `log/${gameInfo.gameId}-player${pno}.log`;
+  Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
+}
