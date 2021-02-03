@@ -164,7 +164,6 @@ interface IMatchRequest {
   password: string;
   spec?: string;
   gameId?: string;
-  aiName?: string;
   useAi?: boolean;
   aiOption?: {
     aiName: string;
