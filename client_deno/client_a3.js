@@ -1,9 +1,8 @@
 // だいたい点数の高い順にデタラメに置き、デタラメに動くアルゴリズム （KakomimasuClient版）
-
-import { KakomimasuClient, Action, DIR } from "./KakomimasuClient.js"
 import util from "../util.js";
+import { KakomimasuClient, Action, DIR, cl } from "./KakomimasuClient.js"
 
-const kc = new KakomimasuClient("a3", "デタラメ", "サンプル", "a3-pw" );
+const kc = new KakomimasuClient("ai-3", "AI-3", "デタラメ", "ai-3-pw");
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
@@ -27,7 +26,7 @@ while (info) {
   const offset = util.rnd(nagents);
   for (let i = 0; i < nagents; i++) {
     const agent = info.players[pno].agents[i];
-    console.log(pno, agent);
+    cl(pno, agent);
     if (agent.x === -1) { // 置く前?
       const p = pntsorted[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
