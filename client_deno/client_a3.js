@@ -37,7 +37,7 @@ while (info) {
     const agent = info.players[pno].agents[i];
     cl(pno, agent);
     if (agent.x === -1) { // 置く前?
-      const p = pntsorted[i + offset];
+      const p = pntall[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
     } else {
       const [dx, dy] = DIR[util.rnd(8)];
