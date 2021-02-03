@@ -220,6 +220,8 @@ export const match = async (req: ServerRequest) => {
             ],
           },
         );
+      } else {
+        throw Error("Can not find AI");
       }
     } else {
       const freeGame = kkmm.getFreeGames();
