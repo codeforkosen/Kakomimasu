@@ -1,17 +1,15 @@
 // だいたい点数の高い順に置き、点数の高い順に壊しながら動くアルゴリズム （KakomimasuClient版）
-
-import { KakomimasuClient, Action, DIR, cl } from "./KakomimasuClient.js"
 import util from "../util.js";
+import { KakomimasuClient, Action, DIR, cl } from "./KakomimasuClient.js"
 
 const kc = new KakomimasuClient("ai-4", "AI-4", "破壊者", "ai-4-pw");
-// kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
-const nagents = kc.getAgentCount();
 const points = kc.getPoints();
 const w = points[0].length;
 const h = points.length;
+const nagents = kc.getAgentCount();
 
 // ポイントの高い順ソート
 const pntall = [];
@@ -25,7 +23,11 @@ const sortByPoint = p => {
 };
 sortByPoint(pntall);
 
-info = await kc.waitStart(); // スタート時間待ち
+// スタート時間待ち
+info = await kc.waitStart();
+cl(info);
+
+// ↓ここからがAIの中身↓
 const field = kc.getField();
 while (info) {
   const actions = [];

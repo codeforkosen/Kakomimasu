@@ -4,15 +4,12 @@ import { Action, DIR, KakomimasuClient, cl, args } from "./KakomimasuClient.js";
 
 const kc = new KakomimasuClient("ai-2", "AI-2", "", "ai-2-pw");
 
-let gameInfo = await kc.waitMatching();
+let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
-
 const points = kc.getPoints();
 const w = points[0].length;
 const h = points.length;
-const nplayers = gameInfo.players[pno].agents.length;
-const totalTurn = gameInfo.totalTurn;
-cl("totalTurn", totalTurn);
+const nagents = kc.getAgentCount();
 
 // ポイントの高い順ソート
 const pntall = [];
@@ -27,18 +24,19 @@ const sortByPoint = (p) => {
 sortByPoint(pntall);
 
 // スタート時間待ち
-gameInfo = await kc.waitStart();
-cl(gameInfo);
+info = await kc.waitStart();
+cl(info);
 
-const log = [gameInfo];
-while (gameInfo) {
+// ↓ここからがAIの中身↓
+const log = [info];
+while (info) {
   // ランダムにずらしつつ置けるだけおく
   // 置いたものはランダムに8方向動かす
   // 画面外にはでない判定を追加（a1 → a2)
   const actions = [];
-  const offset = util.rnd(nplayers);
-  for (let i = 0; i < nplayers; i++) {
-    const agent = gameInfo.players[pno].agents[i];
+  const offset = util.rnd(nagents);
+  for (let i = 0; i < nagents; i++) {
+    const agent = info.players[pno].agents[i];
     cl(pno, agent);
     if (agent.x === -1) {
       const p = pntall[i + offset];
@@ -57,8 +55,8 @@ while (gameInfo) {
     }
   }
   kc.setActions(actions);
-  gameInfo = await kc.waitNextTurn();
-  log.push(gameInfo);
+  info = await kc.waitNextTurn();
+  log.push(info);
 }
 
 // ゲームデータ出力
@@ -66,6 +64,6 @@ if (!args.nolog) {
   try {
     Deno.mkdirSync("log");
   } catch (e) { }
-  const fname = `log/${gameInfo.gameId}-player${pno}.log`;
+  const fname = `log/${info.gameId}-player${pno}.log`;
   Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
 }
