@@ -227,7 +227,7 @@ export const VFieldInfo = new Vue({
         const act = {};
         Object.assign(act, log[i][pid].actions.find(e => e.agentId === aid));
         if (act) {
-          console.log(act.type);
+          //console.log(act.type);
           if (act.type === 1) act.type = "配置";
           else if (act.type === 3) act.type = "移動";
           else if (act.type === 4) act.type = "除去";
