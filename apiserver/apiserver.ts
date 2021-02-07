@@ -5,7 +5,7 @@ import {
   createRouter,
   ServerRequest,
   serveStatic,
-} from "https://servestjs.org/@v1.1.7/mod.ts";
+} from "https://servestjs.org/@v1.1.9/mod.ts";
 
 import { aiList } from "./parts/ai-list.ts";
 
