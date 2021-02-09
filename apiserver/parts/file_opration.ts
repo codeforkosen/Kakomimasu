@@ -1,8 +1,36 @@
-import { solvedPath } from "../apiserver_util.ts";
+import { pathResolver, solvedPath } from "../apiserver_util.ts";
 
 import { IBoard } from "./interface.ts";
+import { User } from "../user.ts";
 
 const logFolderPath = solvedPath(import.meta.url, "../log");
+const resolve = pathResolver(import.meta);
+
+const writeJsonFileSync = (path: string | URL, json: any) => {
+  Deno.writeTextFileSync(path, JSON.stringify(json, null, 2));
+};
+const readJsonFileSync = (path: string | URL) => {
+  return JSON.parse(Deno.readTextFileSync(path));
+};
+
+const dataDir = resolve("../data");
+
+export const userFileOp = {
+  dir: dataDir,
+  path: dataDir + "/users.json",
+  write(json: any) {
+    Deno.mkdirSync(this.dir, { recursive: true });
+    writeJsonFileSync(this.path, json);
+  },
+  read() {
+    try {
+      return readJsonFileSync(this.path) as Array<User>;
+    } catch (e) {
+      //console.log(e);
+      return new Array<User>();
+    }
+  },
+};
 
 export const saveLogFile = (data: any) => {
   Deno.mkdirSync(logFolderPath, { recursive: true });
