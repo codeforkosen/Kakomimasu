@@ -23,7 +23,7 @@ class Account {
   }
 
   read = () => this.users = userFileOp.read();
-  write = () => userFileOp.write(this.users);
+  save = () => userFileOp.save(this.users);
 
   getUsers = () => this.users;
 
@@ -34,7 +34,7 @@ class Account {
     }
     const user = new User(screenName, name, password);
     this.users.push(user);
-    this.write();
+    this.save();
     return user;
   }
 
@@ -46,7 +46,7 @@ class Account {
     if (index === -1) throw Error("Can not find user.");
     this.users.splice(index, 1);
 
-    this.write();
+    this.save();
   }
 
   /*updateUser(

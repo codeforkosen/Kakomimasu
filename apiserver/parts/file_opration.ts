@@ -16,19 +16,32 @@ const readJsonFileSync = (path: string | URL) => {
 const dataDir = resolve("../data");
 
 export const userFileOp = {
-  dir: dataDir,
-  path: dataDir + "/users.json",
-  write(json: any) {
+  dir: resolve("../data"),
+  path() {
+    return this.dir + "/users.json";
+  },
+  save(json: any) {
     Deno.mkdirSync(this.dir, { recursive: true });
-    writeJsonFileSync(this.path, json);
+    writeJsonFileSync(this.path(), json);
   },
   read() {
     try {
-      return readJsonFileSync(this.path) as Array<User>;
+      return readJsonFileSync(this.path()) as Array<User>;
     } catch (e) {
       //console.log(e);
       return new Array<User>();
     }
+  },
+};
+
+export const logFileOp = {
+  dir: resolve("../log"),
+  save(data: any) {
+    Deno.mkdirSync(this.dir, { recursive: true });
+    writeJsonFileSync(
+      `${this.dir}/${data.startedAtUnixTime}_${data.uuid}.log`,
+      data,
+    );
   },
 };
 
