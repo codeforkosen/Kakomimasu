@@ -260,27 +260,11 @@ export const match = async (req: ServerRequest) => {
 export const getGameInfo = async (req: ServerRequest) => {
   try {
     const id = req.match[1];
-    let game =
-      [...kkmm.getGames(), ...kkmm_self.getGames()].filter((item: any) =>
-        item.uuid === id
-      )[0];
+    const game = [...kkmm.getGames(), ...kkmm_self.getGames(), ...getLogGames()]
+      .find((item) => item.uuid === id);
     if (game) {
       game.updateStatus();
-    } else {
-      const logPath = resolve("./log");
-      for (const dirEntry of Deno.readDirSync(logPath)) {
-        const gameid = dirEntry.name.split(/[_.]/)[1];
-        //console.log(gameid, id);
-        if (gameid === id) {
-          game = JSON.parse(
-            Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
-          );
-          break;
-        }
-      }
-    }
 
-    if (game) {
       await req.respond({
         status: 200,
         headers: new Headers({
@@ -479,6 +463,7 @@ const getLogGames = (): any => {
   const stat = Deno.statSync(logPath);
   if (stat.isDirectory) {
     if (logFoldermtime !== stat.mtime) {
+      //logGames.length = 0;
       for (const dirEntry of Deno.readDirSync(logPath)) {
         const json = JSON.parse(
           Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
