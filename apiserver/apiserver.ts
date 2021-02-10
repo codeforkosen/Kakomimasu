@@ -27,6 +27,8 @@ const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
 
+const resolve = util.pathResolver(import.meta);
+
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
   const list = [];
@@ -195,7 +197,7 @@ export const match = async (req: ServerRequest) => {
         throw Error("Can not find Game");
       }
     } else if (reqData.useAi) {
-      const aiFolderPath = util.solvedPath(import.meta.url, "../client_deno/");
+      const aiFolderPath = resolve("../client_deno/");
       const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
       if (ai) {
         const bname = reqData.aiOption?.boardName || boardname ||
@@ -263,7 +265,7 @@ export const getGameInfo = async (req: ServerRequest) => {
     if (game) {
       game.updateStatus();
     } else {
-      const logPath = util.solvedPath(import.meta.url, "./log");
+      const logPath = resolve("./log");
       for (const dirEntry of Deno.readDirSync(logPath)) {
         const gameid = dirEntry.name.split(/[_.]/)[1];
         //console.log(gameid, id);
@@ -470,7 +472,7 @@ let logFoldermtime: (Date | null) = null;
 
 const getLogGames = (): any => {
   logGames.length = 0;
-  const logPath = util.solvedPath(import.meta.url, "./log");
+  const logPath = resolve("./log");
   Deno.mkdirSync(logPath, { recursive: true });
   const stat = Deno.statSync(logPath);
   if (stat.isDirectory) {
@@ -535,7 +537,7 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveStatic(util.solvedPath(import.meta.url, "../public")));
+app.use(serveStatic(resolve("../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());
 app.listen({ port });
@@ -554,7 +556,7 @@ const createDefaultBoard = () => {
 };
 
 const readBoard = (fileName: string) => {
-  const path = util.solvedPath(import.meta.url, `./board/${fileName}.json`);
+  const path = resolve(`./board/${fileName}.json`);
   if (Deno.statSync(path).isFile) {
     const boardJson = JSON.parse(
       Deno.readTextFileSync(path),
