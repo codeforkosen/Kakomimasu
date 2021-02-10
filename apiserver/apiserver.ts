@@ -10,6 +10,7 @@ import {
 import { aiList } from "./parts/ai-list.ts";
 
 import * as util from "./apiserver_util.ts";
+const resolve = util.pathResolver(import.meta);
 
 import { Account, User } from "./user.ts";
 const accounts = new Account();
@@ -20,14 +21,15 @@ import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 const kkmm = new ExpKakomimasu();
 const kkmm_self = new ExpKakomimasu();
 
-import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
-dotenv.config();
-const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
+import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
+const env = config({
+  path: resolve("./.env"),
+  defaults: resolve("./.env.default"),
+});
+const port = parseInt(env.port);
+const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
-
-const resolve = util.pathResolver(import.meta);
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
