@@ -1,4 +1,4 @@
-FROM hayd/deno:1.5.2
+FROM hayd/deno:1.7.2
 
 COPY . .
 
