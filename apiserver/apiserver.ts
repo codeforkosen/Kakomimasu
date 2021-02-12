@@ -12,8 +12,8 @@ import { aiList } from "./parts/ai-list.ts";
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
-import { Account, User } from "./user.ts";
-const accounts = new Account();
+import { User, Users } from "./user.ts";
+const accounts = new Users();
 
 import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
@@ -30,6 +30,7 @@ const port = parseInt(env.port);
 const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
+import { LogFileOp } from "./parts/file_opration.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -260,7 +261,11 @@ export const match = async (req: ServerRequest) => {
 export const getGameInfo = async (req: ServerRequest) => {
   try {
     const id = req.match[1];
-    const game = [...kkmm.getGames(), ...kkmm_self.getGames(), ...getLogGames()]
+    const game = [
+      ...kkmm.getGames(),
+      ...kkmm_self.getGames(),
+      ...LogFileOp.getLogGames(),
+    ]
       .find((item) => item.uuid === id);
     if (game) {
       game.updateStatus();
@@ -369,7 +374,11 @@ let socks: WebSocket[] = [];
 const ws_AllGame = async (sock: WebSocket) => {
   socks.push(sock);
   sock.send(
-    JSON.stringify([kkmm.getGames(), kkmm_self.getGames(), getLogGames()]),
+    JSON.stringify([
+      kkmm.getGames(),
+      kkmm_self.getGames(),
+      LogFileOp.getLogGames(),
+    ]),
   );
 
   for await (const msg of sock) {
@@ -386,7 +395,11 @@ const ws_AllGame = async (sock: WebSocket) => {
 
 const sendAllGame = () => {
   //console.log(socks.length);
-  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+  const games = [
+    kkmm.getGames(),
+    kkmm_self.getGames(),
+    LogFileOp.getLogGames(),
+  ];
 
   socks = socks.filter((s) => {
     try {
@@ -441,7 +454,11 @@ const sendGame = (id: string) => {
 };
 
 const getGame = (id: string): any => {
-  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+  const games = [
+    kkmm.getGames(),
+    kkmm_self.getGames(),
+    LogFileOp.getLogGames(),
+  ];
   //console.log(games);
   console.log("getGame!!", id);
   try {
@@ -451,29 +468,6 @@ const getGame = (id: string): any => {
     console.log(e);
     return undefined;
   }
-};
-
-const logGames: any[] = [];
-let logFoldermtime: (Date | null) = null;
-
-const getLogGames = (): any => {
-  logGames.length = 0;
-  const logPath = resolve("./log");
-  Deno.mkdirSync(logPath, { recursive: true });
-  const stat = Deno.statSync(logPath);
-  if (stat.isDirectory) {
-    if (logFoldermtime !== stat.mtime) {
-      //logGames.length = 0;
-      for (const dirEntry of Deno.readDirSync(logPath)) {
-        const json = JSON.parse(
-          Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
-        );
-        logGames.push(json);
-      }
-    }
-    logFoldermtime = stat.mtime;
-  }
-  return logGames;
 };
 
 const webRoutes = () => {

@@ -1,5 +1,5 @@
 import util from "../util.js";
-import { userFileOp } from "./parts/file_opration.ts";
+import { UserFileOp } from "./parts/file_opration.ts";
 
 class User {
   public screenName: string;
@@ -15,15 +15,15 @@ class User {
   }
 }
 
-class Account {
+class Users {
   private users: Array<User> = [];
 
   constructor() {
     this.read();
   }
 
-  read = () => this.users = userFileOp.read();
-  save = () => userFileOp.save(this.users);
+  read = () => this.users = UserFileOp.read();
+  save = () => UserFileOp.save(this.users);
 
   getUsers = () => this.users;
 
@@ -120,4 +120,4 @@ class Account {
   }
 }
 
-export { Account, User };
+export { User, Users };
