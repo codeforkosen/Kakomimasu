@@ -1,7 +1,7 @@
 import { v4 } from "https://deno.land/std@0.79.0/uuid/mod.ts";
 
 import { assertEquals, test } from "../../asserts.js";
-import { solvedPath } from "../apiserver_util.ts";
+import { pathResolver } from "../apiserver_util.ts";
 import {
   Action,
   createGame,
@@ -15,6 +15,8 @@ import {
   userShow,
 } from "./client_util.ts";
 
+const resolve = pathResolver(import.meta);
+
 const testScreenName = "高専太郎";
 const testName = v4.generate();
 const testPassword = "nit-taro-pw";
@@ -25,10 +27,7 @@ var accessToken = "";
 var gameId = "";
 
 Deno.test("regist user", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/userRegist_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/userRegist_sample.json");
 
   const res = await userRegist(testScreenName, testName, testPassword);
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
@@ -43,10 +42,7 @@ Deno.test("regist user", async () => {
 });
 
 Deno.test("show user", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/userShow_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/userShow_sample.json");
 
   var res = await userShow(testName);
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
@@ -59,10 +55,7 @@ Deno.test("show user", async () => {
 });
 
 Deno.test("create game", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/createGame_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/createGame_sample.json");
   const res = await createGame("test", "A-1");
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
@@ -74,10 +67,7 @@ Deno.test("create game", async () => {
 });
 
 Deno.test("match", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/match_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/match_sample.json");
 
   const res = await match(
     { name: testName, password: testPassword, spec: testSpec, gameId: gameId },
@@ -99,10 +89,7 @@ Deno.test("match", async () => {
 });
 
 Deno.test("get gameinfo", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/matchGameInfo_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/matchGameInfo_sample.json");
 
   const res = await getGameInfo(gameId);
   //console.log(JSON.stringify(res));
@@ -123,10 +110,7 @@ Deno.test("get gameinfo", async () => {
 });
 
 Deno.test("send action", async () => {
-  const sampleFilePath = solvedPath(
-    import.meta.url,
-    "./sample/afterAction_sample.json",
-  );
+  const sampleFilePath = resolve("./sample/afterAction_sample.json");
 
   const gameInfo = await getGameInfo(gameId);
   await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);

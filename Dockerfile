@@ -1,6 +1,8 @@
-FROM hayd/deno:1.5.2
+FROM hayd/deno:latest
 
 COPY . .
 
-RUN deno cache ./apiserver/apiserver.ts
-RUN nohup deno run -A ./apiserver/apiserver.ts & deno test -A
+ENTRYPOINT ["/entrypoint.sh"]
+#CMD ["deno","cache", "./apiserver/apiserver.ts"]
+#CMD ["nohup", "deno", "run", "-A", "./apiserver/apiserver.ts" ,"&"]
+#CMD deno test -A

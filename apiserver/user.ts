@@ -1,6 +1,5 @@
-import { v4 } from "https://deno.land/std@0.79.0/uuid/mod.ts";
-
-import { solvedPath } from "./apiserver_util.ts";
+import util from "../util.js";
+import { UserFileOp } from "./parts/file_opration.ts";
 
 class User {
   public screenName: string;
@@ -11,46 +10,20 @@ class User {
   constructor(screenName: string, name: string, password: string) {
     this.screenName = screenName;
     this.name = name;
-    this.id = v4.generate();
+    this.id = util.uuid();
     this.password = password;
   }
-
-  /*toJSON = () => {
-    return {
-      screenName: this.screenName,
-      name: this.name,
-      id: this.id,
-    };
-  };*/
 }
 
-class Account {
-  private users: Array<User>;
+class Users {
+  private users: Array<User> = [];
 
   constructor() {
-    this.users = new Array();
     this.read();
   }
 
-  read() {
-    const path = solvedPath(import.meta.url, "./data/users.json");
-    try {
-      if (Deno.statSync(path).isFile) {
-        this.users = JSON.parse(Deno.readTextFileSync(path)) as Array<User>;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  write() {
-    const dirName = solvedPath(import.meta.url, "./data");
-    Deno.mkdirSync(dirName, { recursive: true });
-    Deno.writeTextFileSync(
-      `${dirName}/users.json`,
-      JSON.stringify(this.users, ["screenName", "name", "id", "password"]),
-    );
-  }
+  read = () => this.users = UserFileOp.read();
+  save = () => UserFileOp.save(this.users);
 
   getUsers = () => this.users;
 
@@ -61,7 +34,7 @@ class Account {
     }
     const user = new User(screenName, name, password);
     this.users.push(user);
-    this.write();
+    this.save();
     return user;
   }
 
@@ -73,7 +46,7 @@ class Account {
     if (index === -1) throw Error("Can not find user.");
     this.users.splice(index, 1);
 
-    this.write();
+    this.save();
   }
 
   /*updateUser(
@@ -147,4 +120,4 @@ class Account {
   }
 }
 
-export { Account, User };
+export { User, Users };

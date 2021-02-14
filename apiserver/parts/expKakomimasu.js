@@ -1,6 +1,6 @@
 import util from "../../util.js";
 import { Game, Kakomimasu } from "../../Kakomimasu.js";
-import { saveLogFile } from "./file_opration.ts";
+import { LogFileOp } from "./file_opration.ts";
 
 class ExpGame extends Game {
   constructor(board, name, dummy) {
@@ -49,7 +49,8 @@ class ExpGame extends Game {
       }
     }
     if (this.ending) {
-      saveLogFile(this);
+      //saveLogFile(this);
+      LogFileOp.save(this);
 
       this.dispose();
       console.log("turn", this.turn);

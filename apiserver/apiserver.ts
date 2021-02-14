@@ -10,9 +10,10 @@ import {
 import { aiList } from "./parts/ai-list.ts";
 
 import * as util from "./apiserver_util.ts";
+const resolve = util.pathResolver(import.meta);
 
-import { Account, User } from "./user.ts";
-const accounts = new Account();
+import { User, Users } from "./user.ts";
+const accounts = new Users();
 
 import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
@@ -20,12 +21,16 @@ import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 const kkmm = new ExpKakomimasu();
 const kkmm_self = new ExpKakomimasu();
 
-import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
-dotenv.config();
-const port = parseInt((Deno.env.get("port") || "8880").toString());
-const boardname = Deno.env.get("boardname"); // || "E-1"; // "F-1" "A-1"
+import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
+const env = config({
+  path: resolve("./.env"),
+  defaults: resolve("./.env.default"),
+});
+const port = parseInt(env.port);
+const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
+import { LogFileOp } from "./parts/file_opration.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -195,7 +200,7 @@ export const match = async (req: ServerRequest) => {
         throw Error("Can not find Game");
       }
     } else if (reqData.useAi) {
-      const aiFolderPath = util.solvedPath(import.meta.url, "../client_deno/");
+      const aiFolderPath = resolve("../client_deno/");
       const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
       if (ai) {
         const bname = reqData.aiOption?.boardName || boardname ||
@@ -256,27 +261,15 @@ export const match = async (req: ServerRequest) => {
 export const getGameInfo = async (req: ServerRequest) => {
   try {
     const id = req.match[1];
-    let game =
-      [...kkmm.getGames(), ...kkmm_self.getGames()].filter((item: any) =>
-        item.uuid === id
-      )[0];
+    const game = [
+      ...kkmm.getGames(),
+      ...kkmm_self.getGames(),
+      ...LogFileOp.getLogGames(),
+    ]
+      .find((item) => item.uuid === id);
     if (game) {
       game.updateStatus();
-    } else {
-      const logPath = util.solvedPath(import.meta.url, "./log");
-      for (const dirEntry of Deno.readDirSync(logPath)) {
-        const gameid = dirEntry.name.split(/[_.]/)[1];
-        //console.log(gameid, id);
-        if (gameid === id) {
-          game = JSON.parse(
-            Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
-          );
-          break;
-        }
-      }
-    }
 
-    if (game) {
       await req.respond({
         status: 200,
         headers: new Headers({
@@ -381,7 +374,11 @@ let socks: WebSocket[] = [];
 const ws_AllGame = async (sock: WebSocket) => {
   socks.push(sock);
   sock.send(
-    JSON.stringify([kkmm.getGames(), kkmm_self.getGames(), getLogGames()]),
+    JSON.stringify([
+      kkmm.getGames(),
+      kkmm_self.getGames(),
+      LogFileOp.getLogGames(),
+    ]),
   );
 
   for await (const msg of sock) {
@@ -398,7 +395,11 @@ const ws_AllGame = async (sock: WebSocket) => {
 
 const sendAllGame = () => {
   //console.log(socks.length);
-  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+  const games = [
+    kkmm.getGames(),
+    kkmm_self.getGames(),
+    LogFileOp.getLogGames(),
+  ];
 
   socks = socks.filter((s) => {
     try {
@@ -453,7 +454,11 @@ const sendGame = (id: string) => {
 };
 
 const getGame = (id: string): any => {
-  const games = [kkmm.getGames(), kkmm_self.getGames(), getLogGames()];
+  const games = [
+    kkmm.getGames(),
+    kkmm_self.getGames(),
+    LogFileOp.getLogGames(),
+  ];
   //console.log(games);
   console.log("getGame!!", id);
   try {
@@ -463,28 +468,6 @@ const getGame = (id: string): any => {
     console.log(e);
     return undefined;
   }
-};
-
-const logGames: any[] = [];
-let logFoldermtime: (Date | null) = null;
-
-const getLogGames = (): any => {
-  logGames.length = 0;
-  const logPath = util.solvedPath(import.meta.url, "./log");
-  Deno.mkdirSync(logPath, { recursive: true });
-  const stat = Deno.statSync(logPath);
-  if (stat.isDirectory) {
-    if (logFoldermtime !== stat.mtime) {
-      for (const dirEntry of Deno.readDirSync(logPath)) {
-        const json = JSON.parse(
-          Deno.readTextFileSync(`${logPath}/${dirEntry.name}`),
-        );
-        logGames.push(json);
-      }
-    }
-    logFoldermtime = stat.mtime;
-  }
-  return logGames;
 };
 
 const webRoutes = () => {
@@ -535,7 +518,7 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveStatic(util.solvedPath(import.meta.url, "../public")));
+app.use(serveStatic(resolve("../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());
 app.listen({ port });
@@ -554,7 +537,7 @@ const createDefaultBoard = () => {
 };
 
 const readBoard = (fileName: string) => {
-  const path = util.solvedPath(import.meta.url, `./board/${fileName}.json`);
+  const path = resolve(`./board/${fileName}.json`);
   if (Deno.statSync(path).isFile) {
     const boardJson = JSON.parse(
       Deno.readTextFileSync(path),
