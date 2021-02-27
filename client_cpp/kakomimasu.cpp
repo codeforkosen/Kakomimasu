@@ -124,12 +124,11 @@ bool KakomimasuClient::getGameInfo() {
     picojson::object obj = val.get<picojson::object>();
 
     m_gameInfo = obj;
-    if (m_gameInfo["board"].is<picojson::null>()) {
-        return false;
-    } else {
+    if (!m_gameInfo["board"].is<picojson::null>()) {
         m_board = m_gameInfo["board"].get<picojson::object>();
-        return true;
     }
+
+    return m_gameInfo["gaming"].get<bool>();
 }
 
 void KakomimasuClient::waitMatching() {
