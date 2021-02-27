@@ -116,7 +116,7 @@ KakomimasuClient::KakomimasuClient(string id, string name, string spec, string p
     m_password = password;
 }
 
-void KakomimasuClient::getGameInfo() {
+bool KakomimasuClient::getGameInfo() {
     string res = curlGet("/match/" + m_game_id);
 
     picojson::value val;
@@ -124,8 +124,12 @@ void KakomimasuClient::getGameInfo() {
     picojson::object obj = val.get<picojson::object>();
 
     m_gameInfo = obj;
-    if (!m_gameInfo["board"].is<picojson::null>())
+    if (m_gameInfo["board"].is<picojson::null>()) {
+        return false;
+    } else {
         m_board = m_gameInfo["board"].get<picojson::object>();
+        return true;
+    }
 }
 
 void KakomimasuClient::waitMatching() {

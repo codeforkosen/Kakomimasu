@@ -35,7 +35,7 @@ int rnd(int n);
 class KakomimasuClient {
   public:
     KakomimasuClient(string id, string name, string spec, string password);
-    void getGameInfo();
+    bool getGameInfo();
     void waitMatching();
     int getWidth();
     int getHeight();
