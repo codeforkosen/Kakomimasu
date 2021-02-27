@@ -42,6 +42,7 @@ class KakomimasuClient {
     int getNextTurnUnixTime();
     int getTurn();
     int getTotalTurn();
+    vector<vector<int>> getPoints();
     vector<vector<Tile>> getFiled();
     vector<Agent> getAgent();
     vector<Agent> getEnemyAgent();

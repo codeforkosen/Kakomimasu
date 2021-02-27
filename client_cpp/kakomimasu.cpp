@@ -173,6 +173,22 @@ int KakomimasuClient::getTotalTurn() {
     return (int)m_gameInfo["totalTurn"].get<double>();
 };
 
+vector<vector<int>> KakomimasuClient::getPoints() {
+    int height = getHeight();
+    int width = getWidth();
+    vector<vector<int>> res(height, vector<int>(width));
+    picojson::array ary = m_board["points"].get<picojson::array>();
+    int i = 0, j = 0;
+    for (auto &val : ary) {
+        res[i][j] = val.get<double>();
+
+        j++;
+        if (j == width) j = 0, i++;
+    }
+
+    return res;
+}
+
 vector<vector<Tile>> KakomimasuClient::getFiled() {
     int height = getHeight();
     int width = getWidth();
