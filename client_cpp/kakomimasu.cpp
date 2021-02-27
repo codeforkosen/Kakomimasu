@@ -96,6 +96,12 @@ string userShow(string identifier) {
     return res;
 }
 
+random_device seed_gen;
+mt19937 engine(seed_gen());
+int rnd(int n) {
+    return engine() % n;
+}
+
 KakomimasuClient::KakomimasuClient(string id, string name, string spec, string password) {
     string res = userShow(id);
     picojson::value val;

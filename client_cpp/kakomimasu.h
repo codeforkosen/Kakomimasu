@@ -2,6 +2,7 @@
 #include <chrono>
 #include <curl/curl.h>
 #include <iostream>
+#include <random>
 #include <string>
 #include <thread>
 using namespace std;
@@ -29,6 +30,7 @@ void userRegist(string screenName, string name, string password);
 static size_t callbackWrite(char *ptr, size_t size, size_t nmemb, string *stream);
 string curlGet(string req, string token);
 string curlPost(string req, string post_data, string token);
+int rnd(int n);
 
 class KakomimasuClient {
   public:
