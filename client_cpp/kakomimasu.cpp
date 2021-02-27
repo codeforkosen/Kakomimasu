@@ -148,10 +148,9 @@ void KakomimasuClient::waitMatching() {
     m_game_id = obj["gameId"].get<string>();
     m_player_no = obj["index"].get<double>();
 
-    do {
-        getGameInfo();
+    while (!getGameInfo()) {
         this_thread::sleep_for(chrono::milliseconds(500));
-    } while (m_gameInfo["board"].is<picojson::null>());
+    }
     cout << "maching!" << endl;
 }
 
