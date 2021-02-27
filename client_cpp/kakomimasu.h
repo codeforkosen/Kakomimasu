@@ -24,6 +24,7 @@ struct Agent {
 };
 
 extern string host;
+extern const int DIR[8][2];
 void setHost(string s);
 string userShow(string identifier);
 void userRegist(string screenName, string name, string password);

@@ -1,5 +1,16 @@
 #include "kakomimasu.h"
 
+const int DIR[8][2] = {
+    {-1, -1},
+    {0, -1},
+    {1, -1},
+    {-1, 0},
+    {1, 0},
+    {-1, 1},
+    {0, 1},
+    {1, 1},
+};
+
 string host = "localhost:8880/api";
 void setHost(string s) {
     host = s;
