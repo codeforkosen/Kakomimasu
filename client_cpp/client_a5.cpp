@@ -13,7 +13,7 @@ struct Tile_info {
 };
 
 int main() {
-    KakomimasuClient kc("ai-4", "AI-4", "破壊者", "ai-4-pw");
+    KakomimasuClient kc("ai-5", "AI-5", "破壊者改", "ai-5-pw");
     kc.waitMatching();
     kc.getGameInfo();
 
