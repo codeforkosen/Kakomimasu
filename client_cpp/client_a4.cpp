@@ -41,7 +41,7 @@ int main() {
 
         auto checkFree = [&](int x, int y) -> bool {
             for (int i = 0; i < poschk.size(); i++) {
-                auto [px, py] = poschk[i];
+                const auto [px, py] = poschk[i];
                 if (px == x && py == y)
                     return false;
             }
@@ -51,15 +51,15 @@ int main() {
         for (int i = 0; i < nagents; i++) {
             const Agent agent = kc.getAgent()[i];
             if (agent.x == -1) { // 置く前
-                auto [p_point, p_x, p_y] = pntall[i + offset];
+                const auto [p_point, p_x, p_y] = pntall[i + offset];
                 actions.push_back({i, "PUT", p_x, p_y});
             } else {
                 vector<Tile_info> dirall;
-                for (auto [dx, dy] : DIR) {
+                for (const auto [dx, dy] : DIR) {
                     const int x = agent.x + dx;
                     const int y = agent.y + dy;
                     if (x >= 0 && x < w && y >= 0 && y < h && checkFree(x, y)) {
-                        const Tile f = field[y][x];
+                        Tile f = field[y][x];
                         if (f.type == 0 && f.pid != -1 && f.pid != pno) {
                             dirall.push_back({x, y, f.type, f.pid, f.point + 10});
                         } else if (f.type == 0 && f.pid == -1) {
@@ -71,7 +71,7 @@ int main() {
                 }
                 if (dirall.size() > 0) {
                     sort(dirall.rbegin(), dirall.rend());
-                    Tile_info p = dirall[0];
+                    const Tile_info p = dirall[0];
                     if (p.type == 0 || p.pid == -1) {
                         actions.push_back({i, "MOVE", p.x, p.y});
                         poschk.push_back({p.x, p.y});
@@ -82,7 +82,7 @@ int main() {
                     }
                 } else {
                     while (true) {
-                        auto [dx, dy] = DIR[rnd(8)];
+                        const auto [dx, dy] = DIR[rnd(8)];
                         const int x = agent.x + dx;
                         const int y = agent.y + dy;
                         if (x < 0 || x >= w || y < 0 || y >= h)

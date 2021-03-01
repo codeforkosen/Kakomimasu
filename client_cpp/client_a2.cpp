@@ -30,11 +30,11 @@ int main() {
         for (int i = 0; i < nagents; i++) {
             const Agent agent = kc.getAgent()[i];
             if (agent.x == -1) {
-                auto [point, x, y] = pntall[i + offset];
+                const auto [point, x, y] = pntall[i + offset];
                 action.push_back({i, "PUT", x, y});
             } else {
                 while (true) {
-                    auto [dx, dy] = DIR[rnd(8)];
+                    const auto [dx, dy] = DIR[rnd(8)];
                     const int x = agent.x + dx;
                     const int y = agent.y + dy;
                     if (x < 0 || x >= w || y < 0 || y >= h)

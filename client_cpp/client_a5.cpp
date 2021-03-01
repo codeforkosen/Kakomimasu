@@ -37,12 +37,12 @@ int main() {
     while (kc.getGameInfo()) {
         vector<Action> actions;
         vector<vector<Tile>> field = kc.getFiled();
-        int offset = rnd(nagents);
+        const int offset = rnd(nagents);
         vector<tuple<int, int>> poschk; // 動く予定の場所
 
         auto checkFree = [&](int x, int y) -> bool {
             for (int i = 0; i < poschk.size(); i++) {
-                auto [px, py] = poschk[i];
+                const auto [px, py] = poschk[i];
                 if (px == x && py == y)
                     return false;
             }
@@ -50,17 +50,17 @@ int main() {
         };
 
         for (int i = 0; i < nagents; i++) {
-            Agent agent = kc.getAgent()[i];
+            const Agent agent = kc.getAgent()[i];
             if (agent.x == -1) { // 置く前
-                auto [p_point, p_x, p_y] = pntall[i + offset];
+                const auto [p_point, p_x, p_y] = pntall[i + offset];
                 actions.push_back({i, "PUT", p_x, p_y});
             } else {
                 vector<Tile_info> dirall;
                 for (auto [dx, dy] : DIR) {
-                    int x = agent.x + dx;
-                    int y = agent.y + dy;
+                    const int x = agent.x + dx;
+                    const int y = agent.y + dy;
                     if (x >= 0 && x < w && y >= 0 && y < h && checkFree(x, y)) {
-                        Tile f = field[y][x];
+                        const Tile f = field[y][x];
                         if (f.type == 0 && f.pid != -1 && f.pid != pno && f.point > 0) { // 敵土地
                             dirall.push_back({x, y, f.type, f.pid, f.point + 10});
                         } else if (f.type == 0 && f.pid == -1 && f.point > 0) { // 空き土地
@@ -72,7 +72,7 @@ int main() {
                 }
                 if (dirall.size() > 0) {
                     sort(dirall.rbegin(), dirall.rend());
-                    Tile_info p = dirall[0];
+                    const Tile_info p = dirall[0];
                     if (p.type == 0 || p.pid == -1) {
                         actions.push_back({i, "MOVE", p.x, p.y});
                         poschk.push_back({p.x, p.y});
@@ -82,16 +82,15 @@ int main() {
                     poschk.push_back({agent.x, agent.y});
                 } else {
                     // 周りが全部埋まっていたら空いている高得点で一番近いところを目指す
-                    cout << "kitaaaa" << endl;
                     int dis = w * h;
                     tuple<int, int, int> target;
                     bool target_flag = false;
-                    for (auto p : pntall) {
-                        auto [p_point, p_x, p_y] = p;
+                    for (const auto p : pntall) {
+                        const auto [p_point, p_x, p_y] = p;
                         if (field[p_y][p_x].type == 0 && field[p_y][p_x].pid == -1) {
-                            int dx = agent.x - p_x;
-                            int dy = agent.y - p_y;
-                            int d = dx * dx + dy * dy;
+                            const int dx = agent.x - p_x;
+                            const int dy = agent.y - p_y;
+                            const int d = dx * dx + dy * dy;
                             if (d < dis) {
                                 dis = d;
                                 target = p;
@@ -106,9 +105,9 @@ int main() {
                             return 0;
                         };
                         auto [target_point, target_x, target_y] = target;
-                        int x2 = agent.x + sgn(target_x - agent.x);
-                        int y2 = agent.y + sgn(target_y - agent.y);
-                        Tile p = field[y2][x2];
+                        const int x2 = agent.x + sgn(target_x - agent.x);
+                        const int y2 = agent.y + sgn(target_y - agent.y);
+                        const Tile p = field[y2][x2];
                         if (p.type == 0 || p.pid == -1) {
                             actions.push_back({i, "MOVE", x2, y2});
                             poschk.push_back({x2, y2});
@@ -118,9 +117,9 @@ int main() {
                         poschk.push_back({agent.x, agent.y});
                     } else {
                         while (1) {
-                            auto [dx, dy] = DIR[rnd(8)];
-                            int x = agent.x + dx;
-                            int y = agent.y + dy;
+                            const auto [dx, dy] = DIR[rnd(8)];
+                            const int x = agent.x + dx;
+                            const int y = agent.y + dy;
                             if (x < 0 || x >= w || y < 0 || y >= h) {
                                 continue;
                             }
