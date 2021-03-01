@@ -225,7 +225,7 @@ vector<vector<Tile>> KakomimasuClient::getFiled() {
     ary = m_gameInfo["tiled"].get<picojson::array>();
     for (auto &val : ary) {
         int type, pid;
-        sscanf(val.serialize().c_str(), "[%d %d]", &type, &pid);
+        sscanf(val.serialize().c_str(), "[%d,%d]", &type, &pid);
         res[i][j].type = type;
         res[i][j].pid = pid;
 
