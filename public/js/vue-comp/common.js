@@ -11,6 +11,7 @@ const header = new Vue({
                 <ul>
                     <li><a href="/">TOP</a></li>
                     <li><a href="/gamelist.html">ゲーム一覧</a></li>
+                    <li><a href="/tournament/index.html">大会一覧</a></li>
                 </ul>
             </nav>
             <a href="https://github.com/codeforkosen/Kakomimasu" id="h-githubLogo"><img src="/img/GitHub-Mark-64px.png"></a>
