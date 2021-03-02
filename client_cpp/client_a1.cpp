@@ -29,10 +29,10 @@ int main() {
         for (int i = 0; i < nagents; i++) {
             const Agent agent = kc.getAgent()[i];
             if (agent.x == -1) {
-                auto [point, x, y] = pntall[i + offset];
+                const auto [point, x, y] = pntall[i + offset];
                 action.push_back({i, "PUT", x, y});
             } else {
-                auto [dx, dy] = DIR[rnd(8)];
+                const auto [dx, dy] = DIR[rnd(8)];
                 action.push_back({i, "MOVE", agent.x + dx, agent.y + dy});
             }
         }
