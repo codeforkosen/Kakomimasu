@@ -17,12 +17,19 @@ enum Result {
   Lose,
 }
 
-export interface ITournament {
+export interface ITournamentBasic {
   name: string;
   organizer: string;
   type: TournamentType;
   remarks: string;
-  users: string[];
+}
+
+export interface ITournamentReq extends ITournamentBasic {
+  participants: string[];
+}
+
+export interface ITournament extends ITournamentBasic {
+  users?: string[];
   id?: string;
   gameIds?: string[];
 }
@@ -46,10 +53,16 @@ export class Tournament implements ITournament {
     this.gameIds = a.gameIds || [];
   }
 
-  addUser(user: User) {
+  addUser(identifier: string) {
+    const user = accounts.find(identifier);
+    if (!user) throw Error("Invalid userId or userName");
+
     const some = this.users.some((e) => e === user.id);
     if (some) throw Error("User is already registered");
     else this.users.push(user.id);
+  }
+
+  static convertTournamentReq(data: ITournamentReq) {
   }
 }
 
@@ -85,11 +98,8 @@ export class Tournaments {
     const tournament = this.get(tournamentId);
     if (!tournament) throw Error("Invalid tournament id");
 
-    const user = accounts.find(identifier);
-    if (!user) throw Error("Invalid userId or userName");
-
     console.log(tournament);
-    tournament.addUser(user);
+    tournament.addUser(identifier);
     this.save();
 
     return tournament;
@@ -111,8 +121,9 @@ export const tournamentRouter = () => {
 
   router.post("/create", async (req) => {
     try {
-      const data = await req.json() as ITournament;
+      const data = await req.json() as ITournamentReq;
       const tournament = new Tournament(data);
+      data.participants.forEach((e) => tournament.addUser(e));
       tournaments.add(tournament);
 
       await req.respond({

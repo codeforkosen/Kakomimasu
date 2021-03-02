@@ -17,7 +17,7 @@
     <main>
       <h1 id="title">大会作成</h1>
       <a class="button" href="index.html">大会一覧に戻る</a>
-      <form id="tournament-form">
+      <form id="tournament-form" @input="formInput">
         <div>
           <label for="name">大会名*</label>
           <input type="text" id="name" required>
@@ -35,15 +35,24 @@
           </select>
         </div>
         <div>
-          <label for="participant">参加者(未実装)</label>
-          <input type="text" id="participant">
+          <label for="participant">参加ユーザ</label>
+          <input type="text" id="participant" @input="playerInput" autocomplete="on" list="user-list">
+          <datalist id="user-list">
+            <option v-for="s in searchUserOptions" :value="s.name">{{s.id}}</option>
+          </datalist>
+          <input type="button" value="追加" @click="addPlayer">
+        </div>
+        <div v-for="(player,n) in users" class="sub">
+          <label :for="'player' + n">ユーザ{{n+1}}</label>
+          <input type="text" :id="'player' + n" :value="player">
+          <input type="button" value="削除" @click="removePlayer(n)">
         </div>
         <div>
           <label for="remarks">備考</label>
           <textarea type="text" id="remarks"></textarea>
         </div>
 
-        <input id="create" type="button" class="button" value="大会を作成する" disabled>
+        <input id="create" type="button" class="button" value="大会を作成する" @click="send" disabled>
       </form>
 
       <div id="created-game" hidden>
@@ -54,27 +63,54 @@
     <footer id="footer"></footer>
 
     <script type="module">
-      import { createTournament } from "/js/api-util.js";
+      import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
+      import { createTournament, searchUser } from "/js/api-util.js";
 
-      const form = document.forms["tournament-form"];
-      form.onchange = () => {
-        form["create"].disabled = !form.checkValidity();
-      }
-      form["create"].onclick = async (e) => {
-        const name = form["name"].value;
-        const organizer = form["organizer"].value;
-        const type = form["type"].value;
-        const remarks = form["remarks"].value;
+      const VTournamentForm = new Vue({
+        el: "#tournament-form",
+        data: {
+          users: [],
+          searchUserOptions: []
+        },
+        methods: {
+          formInput() {
+            const form = this.$el;
+            form["create"].disabled = !form.checkValidity();
+          },
+          async send() {
+            const form = this.$el;
+            const name = form["name"].value;
+            const organizer = form["organizer"].value;
+            const type = form["type"].value;
+            const remarks = form["remarks"].value;
 
-        console.log(name, organizer, type, remarks);
+            //console.log(name, organizer, type, remarks);
 
-        const data = {
-          name, organizer, type, remarks
+            const data = {
+              name, organizer, type, remarks,
+              participants: this.users
+            }
+            await createTournament(data);
+
+            location.href = "/tournament/index.html";
+          },
+          async playerInput(e) {
+            const input = e.target;
+            const users = await searchUser(input.value);
+            //console.log(users);
+            this.searchUserOptions = users;
+          },
+          addPlayer() {
+            const p = this.$el["participant"].value;
+            this.users.push(p);
+          },
+          removePlayer(n) {
+            console.log(n);
+            this.users.splice(n, 1);
+          }
         }
-        await createTournament(data);
+      });
 
-        location.href = "/tournament/index.html";
-      }
     </script>
 
     <script type="module" src="/js/vue-comp/common.js"></script>
