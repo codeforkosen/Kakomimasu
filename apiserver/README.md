@@ -18,7 +18,7 @@ deno run -A ../client_deno/client_test1.ts
 
 ## ブラウザで見る
 
-`http://localhost:8880/game`にアクセス。
+`http://localhost:8880/gamelist.html`にアクセス。
 
 「囲みマス」のロゴが表示されたらOK
 
@@ -26,9 +26,9 @@ deno run -A ../client_deno/client_test1.ts
 
 それぞれのゲームIDをクリックすると、ゲーム詳細（フィールドの様子）も見られます。
 
-ゲーム詳細に直接アクセスするには`http://localhost:8880/game/:(ルームID)`
+ゲーム詳細に直接アクセスするには`http://localhost:8880/gamedetails.html?id=(ルームID)`
 
-また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/:(ユーザID or ユーザネーム)`
+また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user.html?id=(ユーザID or ユーザネーム)`
 
 ## API仕様
 
@@ -38,6 +38,11 @@ deno run -A ../client_deno/client_test1.ts
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
+
+#### 2020.3.3
+- create Game API
+  - リクエストデータ形式の変更
+    - gameName => name
 
 #### 2020.9.9
 
