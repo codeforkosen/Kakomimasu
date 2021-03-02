@@ -9,8 +9,14 @@ class ExpGame extends Game {
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
     this.changeFuncs = [];
+    this.reservedUsers = [];
   }
   attachPlayer(player) {
+    if (this.reservedUsers > 0) {
+      const isReservedUser = this.reservedUsers.some(e => e === player.id);
+      if (!isReservedUser) throw Error("Not allowed user");
+    }
+
     if (super.attachPlayer(player) === false) return false;
     if (this.isReady()) {
       this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
@@ -31,6 +37,15 @@ class ExpGame extends Game {
       this.nextTurnUnixTime = null;
     }
     return ret;
+  }
+
+  addReservedUser(userId) {
+    if (this.reservedUsers.some(e => e === userId)) {
+      return false;
+    } else {
+      this.reservedUsers.push(userId);
+      return true;
+    }
   }
 
   updateStatus() {
@@ -65,6 +80,7 @@ class ExpGame extends Game {
       gameName: this.name,
       startedAtUnixTime: this.startedAtUnixTime,
       nextTurnUnixTime: this.nextTurnUnixTime,
+      reservedUsers: this.reservedUsers,
     }
   }
 

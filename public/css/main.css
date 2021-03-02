@@ -1,5 +1,15 @@
 @import url(http://fonts.googleapis.com/earlyaccess/notosansjp.css);
 
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+html {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: 'Noto Sans JP', sans-serif;

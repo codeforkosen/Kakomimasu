@@ -43,7 +43,7 @@ class Users {
     const index = this.users.findIndex((e) =>
       e.password === password && (e.id === id || e.name === name)
     );
-    if (index === -1) throw Error("Can not find user.");
+    if (index === -1) throw Error("Can not find users.");
     this.users.splice(index, 1);
 
     this.save();
@@ -104,7 +104,7 @@ class Users {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
-    if (user === undefined) throw Error("Can not find user.");
+    if (user === undefined) throw Error("Can not find users.");
     return user;
   }
 
@@ -115,8 +115,18 @@ class Users {
     ) => ((e.id === identifier || e.name === identifier) &&
       e.password === password)
     );
-    if (user === undefined) throw Error("Can not find user.");
+    if (user === undefined) throw Error("Can not find users.");
     return user;
+  }
+
+  findById(id: string) {
+    return this.users.find((e) => e.id === id);
+  }
+
+  find(identifier: string) {
+    return this.users.find((e) =>
+      (e.id === identifier) || (e.name === identifier)
+    );
   }
 }
 
