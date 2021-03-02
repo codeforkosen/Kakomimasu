@@ -24,16 +24,17 @@
         margin: 2em;
       }
 
-      h2 {
+      /*h2 {
         color: #5C4C40;
         font-size: 120%;
         margin: 0 0 .5em 0;
-      }
+      }*/
 
       section {
-        border: 5px solid #F5D7AE;
+        /*border: 5px solid #F5D7AE;
         padding: 1em;
         margin: 1em;
+        */
         text-align: left;
       }
 
@@ -52,39 +53,47 @@
     <img id="title" src="/img/kakomimasu-logo.png">
 
     <main>
-      <section>
+      <section class="separation">
         <h2>Webコンテンツ</h2>
         オンラインで対戦中のゲームをリアルタイムで見ることができます。<br>
-        <a href="gamelist.html">ゲーム一覧はこちらから</a><br>
-        <a href="gamedetails.html">最新のゲームビューアはこちらから</a><br>
-        <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a><br>
-        <a href="game/create.html">フリーゲーム作成はこちらから</a>
+        <h3>ゲーム</h3>
+        <div>
+          <a href="gamelist.html">ゲーム一覧はこちらから</a><br>
+          <a href="gamedetails.html">最新のゲームビューアはこちらから</a><br>
+          <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a><br>
+          <a href="game/create.html">フリーゲーム作成はこちらから</a>
+        </div>
+        <h3>大会</h3>
+        <div>
+          <a href="tournament/index.html">大会一覧はこちらから</a><br>
+          <a href="tournament/create.html">大会作成はこちらから</a><br>
+        </div>
       </section>
 
-      <section>
+      <section class="separation">
         <h2>囲みマスとは</h2>
         囲碁と将棋とリアルタイムストラテジーゲームが混ざったような陣取りゲームです。<br>
         フィールドは、点数がついたマス目、辿ったり囲んだりして自分の陣地を広げ、点数が高いほうが勝ち！<br>
         誰でも開発に参加できる、オープンソース (<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)。
       </section>
 
-      <section>
+      <section class="separation">
         <h2>人対AI!?</h2>
         同時に動かせるエージェントの人数は最大14コマ。1ターンは最短3秒。人の判断では間に合わない？<br>
         そんな時はプログラミングしたAIにサポートしてもらいましょう！
       </section>
 
-      <section>
+      <section class="separation">
         <h2>ランクシステム</h2>
         AIを登録しておけば、勝手にリーグ戦が組まれてランキング登録されます。<br>
         囲みマス世界ランク一位には豪華賞品があるかも！？
       </section>
 
-      <section>
+      <section class="separation">
         <h2>勝手プロコン実行委員会</h2>
         中止になった第31回高専プロコン競技部門を勝手にやっちゃおうと立ち上がった、Code for KOSEN の部門のひとつ。
       </section>
-      <section>
+      <section class="separation">
         <h2>開発者用ツール</h2>
         <a href="/dev/field.html">フィールド説明用エディタ</a><br>
       </section>
@@ -95,6 +104,10 @@
     <qr-code></qr-code>
 
     <script type="module" src="js/vue-comp/common.js"></script>
+    <style>
+      @import url("/css/common.css");
+      @import url("/css/c_separation.css");
+    </style>
   </body>
 
 </html>
