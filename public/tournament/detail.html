@@ -48,31 +48,31 @@
           </div>
         </form>
 
-        <div v-if="tournament.type === 'round-robin'">
-          <table id="round-robin-table">
+        <div v-if="tournament.type === 'round-robin'" id="round-robin">
+          <table>
             <tr>
-              <th></th>
+              <th class="oblique"></th>
               <th v-for="(user ,x) in tournament.users">
                 {{user.name}}
               </th>
             </tr>
             <tr v-for="(user,y) in tournament.users">
               <th>{{user.name}}</th>
-              <td v-for="(column ,x) in tournament.users">
-                <div v-if="x === y">\</div>
+              <td v-for="(column ,x) in tournament.users" v-bind:class="[y === x ? 'oblique' : '']">
+                <div v-if="y === x"></div>
                 <div v-else-if="getResult(y,x)">
                   <div>{{getResult(y,x).resultText}}</div>
                   <div>{{getResult(y,x).pointText}}</div>
                   <a :href="getResult(y,x).url">ゲーム詳細へ</a>
                 </div>
                 <div v-else>
-                  <button @click="gameCreate(y,x)">作成</button>
+                  <button @click="gameCreate(y,x)">ゲーム作成</button>
                 </div>
               </td>
             </tr>
           </table>
         </div>
-        <canvas id="table"></canvas>
+        <!--<canvas id="table"></canvas>-->
 
       </section>
 
@@ -213,10 +213,23 @@
   @import url("/css/c_form.css");
   @import url("/css/c_separation.css");
 
-  #round-robin-table table,
+  #round-robin table {
+    margin: 0 auto;
+    width: 90%;
+  }
+
+  #round-robin table,
   td,
   th {
     border: 1px solid;
+    border-collapse: collapse;
+  }
+
+  #round-robin .oblique {
+    background-image: linear-gradient(to top right,
+        transparent, transparent 49%,
+        black 49%, black 51%,
+        transparent 51%, transparent);
   }
 
   form div input[type="submit"] {
