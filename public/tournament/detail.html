@@ -61,7 +61,9 @@
               <td v-for="(column ,x) in tournament.users">
                 <div v-if="x === y">\</div>
                 <div v-else-if="getResult(y,x)">
-                  <div>{{getResult(y,x)}}</div>
+                  <div>{{getResult(y,x).resultText}}</div>
+                  <div>{{getResult(y,x).pointText}}</div>
+                  <a :href="getResult(y,x).url">ゲーム詳細へ</a>
                 </div>
                 <div v-else>
                   <button @click="gameCreate(y,x)">作成</button>
@@ -132,21 +134,22 @@
             );
             console.log(game);
             if (game) {
-              const mIdx = game.reservedUsers[0] === users[m].id ? 0 : 1;
-              const oIdx = mIdx === 0 ? 1 : 0;
-
+              let url = `/gamedetails.html?id=` + game.gameId;
               let pointText = "";
               let resultText = "-";
               if (game.gaming || game.ending) {
                 const p = game.players;
-                const mPoint = p[mIdx].point.basepoint + p[mIdx].point.wallpoint;
-                const oPoint = p[oIdx].point.basepoint + p[oIdx].point.wallpoint;
+                const mPlayer = p.find(e => e.id === users[m].id);
+                const oPlayer = p.find(e => e.id === users[o].id);
+
+                const mPoint = mPlayer.point.basepoint + mPlayer.point.wallpoint;
+                const oPoint = oPlayer.point.basepoint + oPlayer.point.wallpoint;
                 pointText = `${mPoint} - ${oPoint}`;
                 if (mPoint > oPoint) resultText = "○";
                 else if (mPoint < oPoint) resultText = "×";
                 else resultText = "△";
               }
-              return { pointText, resultText };
+              return { pointText, resultText, url };
             } else return null;
           },
           gameCreate(m, o) {
