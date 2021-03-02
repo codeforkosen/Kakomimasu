@@ -1,5 +1,3 @@
-console.log("tournament.ts");
-
 import { createRouter } from "https://servestjs.org/@v1.1.9/mod.ts";
 
 import { errorResponse } from "./apiserver_util.ts";
@@ -60,9 +58,6 @@ export class Tournament implements ITournament {
     const some = this.users.some((e) => e === user.id);
     if (some) throw Error("User is already registered");
     else this.users.push(user.id);
-  }
-
-  static convertTournamentReq(data: ITournamentReq) {
   }
 }
 
