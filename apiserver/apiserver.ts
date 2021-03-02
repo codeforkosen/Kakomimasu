@@ -142,29 +142,33 @@ const usersSearch = async (req: ServerRequest) => {
 interface ICreateGamePost {
   name: string;
   boardName: string;
-  nPlayer: number;
-  playerIdentifiers: string[];
+  nPlayer?: number;
+  playerIdentifiers?: string[];
   tournamentId?: string;
 }
 
 const createSelfGame = async (req: ServerRequest) => {
   try {
     const reqJson = (await req.json()) as ICreateGamePost;
-    console.log(reqJson);
+    //console.log(reqJson);
     const board = readBoard(reqJson.boardName);
-    board.nplayer = reqJson.nPlayer;
+    board.nplayer = reqJson.nPlayer || 2;
 
     const game = kkmm_self.createGame(
       board,
       reqJson.name,
     );
 
-    const userIds = reqJson.playerIdentifiers.map((e) => accounts.find(e)?.id);
-    userIds.forEach((userId) => {
-      if (!game.addReservedUser(userId)) {
-        throw Error("The user is already registered");
-      }
-    });
+    if (reqJson.playerIdentifiers) {
+      const userIds = reqJson.playerIdentifiers.map((e) =>
+        accounts.find(e)?.id
+      );
+      userIds.forEach((userId) => {
+        if (!game.addReservedUser(userId)) {
+          throw Error("The user is already registered");
+        }
+      });
+    }
 
     game.changeFuncs.push(sendAllGame);
     game.changeFuncs.push(sendGame);
