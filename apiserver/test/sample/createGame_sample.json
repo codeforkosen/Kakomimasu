@@ -1,5 +1,5 @@
 {
-  "gameId": "413523dd-3e6c-46d1-b2d5-f6bf1628a638",
+  "gameId": "54133d2d-66c0-47be-a37c-05164a09d89b",
   "gaming": false,
   "ending": false,
   "board": null,
@@ -411,5 +411,6 @@
   "log": [],
   "gameName": "test",
   "startedAtUnixTime": null,
-  "nextTurnUnixTime": null
+  "nextTurnUnixTime": null,
+  "reservedUsers": []
 }
