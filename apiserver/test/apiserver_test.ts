@@ -1,4 +1,4 @@
-import { v4 } from "https://deno.land/std@0.79.0/uuid/mod.ts";
+import util from "../../util.js";
 
 import { assertEquals, test } from "../../asserts.js";
 import { pathResolver } from "../apiserver_util.ts";
@@ -18,7 +18,7 @@ import {
 const resolve = pathResolver(import.meta);
 
 const testScreenName = "高専太郎";
-const testName = v4.generate();
+const testName = util.uuid();
 const testPassword = "nit-taro-pw";
 const testSpec = "test";
 
