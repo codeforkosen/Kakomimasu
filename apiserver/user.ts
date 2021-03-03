@@ -7,17 +7,29 @@ import util from "../util.js";
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 
-class User {
+export interface IUser {
+  screenName: string;
+  name: string;
+  id?: string;
+  password: string;
+}
+
+class User implements IUser {
   public screenName: string;
   public name: string;
   public readonly id: string;
   public password: string;
 
-  constructor(screenName: string, name: string, password: string) {
-    this.screenName = screenName;
-    this.name = name;
-    this.id = util.uuid();
-    this.password = password;
+  constructor(screenName: IUser) {
+    this.screenName = screenName.screenName;
+    this.name = screenName.name;
+    this.id = screenName.id || util.uuid();
+    this.password = screenName.password;
+  }
+
+  // passwordのみ除いたオブジェクトにする
+  safe() {
+    return Object.assign({}, this, { password: undefined });
   }
 }
 
@@ -28,7 +40,10 @@ class Users {
     this.read();
   }
 
-  read = () => this.users = UserFileOp.read();
+  read = () => {
+    const usersData = UserFileOp.read();
+    this.users = usersData.map((e) => new User(e));
+  };
   save = () => UserFileOp.save(this.users);
 
   getUsers = () => this.users;
@@ -38,7 +53,7 @@ class Users {
     if (this.users.some((e) => e.name === name)) {
       throw Error("Already registered name");
     }
-    const user = new User(screenName, name, password);
+    const user = new User({ screenName, name, password });
     this.users.push(user);
     this.save();
     return user;
@@ -156,14 +171,7 @@ export const userRouter = () => {
           reqData.name,
           reqData.password,
         );
-
-        await req.respond({
-          status: 200,
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-          body: JSON.stringify(user, ["screenName", "name", "id"]),
-        });
+        await req.respond(jsonResponse(user.safe()));
       } catch (e) {
         console.log(e);
         await req.respond(errorResponse(e.message));
@@ -178,21 +186,11 @@ export const userRouter = () => {
       if (identifier !== "") {
         const user = accounts.showUser(identifier);
         if (user !== undefined) {
-          await req.respond({
-            status: 200,
-            headers: new Headers({
-              "content-type": "application/json",
-            }),
-            body: JSON.stringify(user, ["screenName", "name", "id"]),
-          });
+          await req.respond(jsonResponse(user.safe()));
         }
       } else {
         await req.respond(jsonResponse(
-          accounts.getUsers().map((u) => ({
-            screenName: u.screenName,
-            name: u.name,
-            id: u.id,
-          })),
+          accounts.getUsers().map((e) => e.safe()),
         ));
       }
     } catch (e) {
@@ -231,13 +229,7 @@ export const userRouter = () => {
       const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
       const users = [...new Set([...matchName, ...matchId])];
 
-      await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(users, ["screenName", "name", "id"]),
-      });
+      await req.respond(jsonResponse(users.map((e) => e.safe())));
     } catch (e) {
       console.log(e);
       await req.respond(errorResponse(e.message));
