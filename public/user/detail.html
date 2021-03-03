@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+        <link rel="stylesheet" href="/css/main.css">
+
+        <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+        <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+        <title>ユーザ詳細 - 囲みマス</title>
+    </head>
+
+    <body>
+        <header id="header"></header>
+        <main id="main">
+            <h1 id="title">ユーザ詳細</h1>
+
+            <section class="separation">
+                <h2>基本情報</h2>
+
+                <h3>表示名</h3>
+                <div class="screen-name">{{user.screenName}}</div>
+                <h3>ユーザネーム</h3>
+                <div class="name">{{user.name}}</div>
+                <h3>ユーザID</h3>
+                <div class="id">{{user.id}}</div>
+            </section>
+            <section class="separation">
+                <h2>参加ゲーム一覧</h2>
+
+
+            </section>
+        </main>
+        <footer id="footer"></footer>
+
+        <script type="module">
+            import { userShow, getUrlQueries } from "/js/util.js";
+
+            const main = async () => {
+
+
+                new Vue({
+                    el: "#main",
+                    data: {
+                        user: {},
+                        screenName: "",
+                        name: "",
+                        id: "",
+                    },
+                    async created() {
+                        const identifier = getUrlQueries().id;
+                        const user = await userShow(identifier);
+                        document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
+                        /*if (user.hasOwnProperty("error")) {
+                            this.screenName = "ユーザが存在しません";/
+                            this.name = "";
+                            this.id = "";
+                        } else {
+                            document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
+                            this.screenName = user.screenName;
+                            this.name = user.name;
+                            this.id = user.id;
+                        }*/
+                        console.log(user);
+                        this.user = user;
+                    }
+                });
+            };
+
+            main();
+
+        </script>
+
+        <script type="module" src="/js/vue-comp/common.js"></script>
+
+    </body>
+
+</html>
+
+<style>
+    @import url("/css/common.css");
+    @import url("/css/c_separation.css");
+</style>
