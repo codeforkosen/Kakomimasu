@@ -12,9 +12,6 @@ import { aiList } from "./parts/ai-list.ts";
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
-import { User, Users } from "./user.ts";
-export const accounts = new Users();
-
 import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 
@@ -33,6 +30,7 @@ import util2 from "../util.js";
 import { LogFileOp } from "./parts/file_opration.ts";
 
 import { tournamentRouter, tournaments } from "./tournament.ts";
+import { accounts, userRouter } from "./user.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -44,99 +42,6 @@ const getRandomBoardName = async () => {
   }
   return list[util2.rnd(list.length)];
 };
-
-//#region ユーザアカウント登録・取得・削除
-const usersRegist = async (req: ServerRequest) => {
-  const reqData = ((await req.json()) as User);
-
-  try {
-    const user = accounts.registUser(
-      reqData.screenName,
-      reqData.name,
-      reqData.password,
-    );
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(user, ["screenName", "name", "id"]),
-    });
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
-
-const usersShow = async (req: ServerRequest) => {
-  const identifier = req.match[1];
-  if (identifier !== "") {
-    try {
-      const user = accounts.showUser(identifier);
-      if (user !== undefined) {
-        await req.respond({
-          status: 200,
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-          body: JSON.stringify(user, ["screenName", "name", "id"]),
-        });
-      }
-    } catch (e) {
-      await req.respond(util.errorResponse(e.message));
-    }
-  } else {
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(
-        accounts.getUsers().map((u) => ({
-          screenName: u.screenName,
-          name: u.name,
-          id: u.id,
-        })),
-      ),
-    });
-  }
-};
-
-const usersDelete = async (req: ServerRequest) => {
-  const reqData = ((await req.json()) as User);
-
-  try {
-    const user = accounts.deleteUser(
-      { name: reqData.name, id: reqData.id, password: reqData.password },
-    );
-    await req.respond({ status: 200 });
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
-
-const usersSearch = async (req: ServerRequest) => {
-  try {
-    const query = req.query;
-    const q = query.get("q");
-    if (!q) throw Error("Nothing search query");
-
-    const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
-    const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
-    const users = [...new Set([...matchName, ...matchId])];
-
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(users, ["screenName", "name", "id"]),
-    });
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
-
-//#endregion
 
 //#region ゲーム作成API
 interface ICreateGamePost {
@@ -533,19 +438,6 @@ const apiRoutes = () => {
   const router = createRouter();
 
   router.post(
-    "users/regist",
-    contentTypeFilter("application/json"),
-    usersRegist,
-  );
-  router.get(new RegExp("^users/show/(.*)$"), usersShow);
-  router.post(
-    "users/delete",
-    contentTypeFilter("application/json"),
-    usersDelete,
-  );
-  router.get("users/search", usersSearch);
-
-  router.post(
     "game/create",
     contentTypeFilter("application/json"),
     createSelfGame,
@@ -561,6 +453,7 @@ const apiRoutes = () => {
   router.ws(new RegExp("^ws/game/(.+)$"), ws_getGame);
   //router.ws("allSelfGame", ws_AllSelfGame);
 
+  router.route("users", userRouter());
   router.route("tournament", tournamentRouter());
   return router;
 };
