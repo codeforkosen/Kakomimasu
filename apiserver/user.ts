@@ -12,6 +12,7 @@ export interface IUser {
   name: string;
   id?: string;
   password: string;
+  gamesId?: string[];
 }
 
 class User implements IUser {
@@ -19,12 +20,14 @@ class User implements IUser {
   public name: string;
   public readonly id: string;
   public password: string;
+  public gamesId: string[];
 
-  constructor(screenName: IUser) {
-    this.screenName = screenName.screenName;
-    this.name = screenName.name;
-    this.id = screenName.id || util.uuid();
-    this.password = screenName.password;
+  constructor(data: IUser) {
+    this.screenName = data.screenName;
+    this.name = data.name;
+    this.id = data.id || util.uuid();
+    this.password = data.password;
+    this.gamesId = data.gamesId || [];
   }
 
   // シリアライズする際にパスワードを返さないように
@@ -154,6 +157,14 @@ class Users {
     return this.users.find((e) =>
       (e.id === identifier) || (e.name === identifier)
     );
+  }
+
+  addGame(identifier: string, gameId: string) {
+    const user = this.find(identifier);
+    if (user) {
+      user.gamesId.push(gameId);
+    }
+    this.save();
   }
 }
 

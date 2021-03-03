@@ -148,6 +148,7 @@ export const match = async (req: ServerRequest) => {
         if (game.attachPlayer(player) === false) {
           throw Error("Game is not free");
         }
+        accounts.addGame(user.id, game.uuid);
       } else {
         throw Error("Can not find Game");
       }
@@ -162,6 +163,7 @@ export const match = async (req: ServerRequest) => {
         game.changeFuncs.push(sendAllGame);
         game.changeFuncs.push(sendGame);
         game.attachPlayer(player);
+        accounts.addGame(user.id, game.uuid);
         Deno.run(
           {
             cmd: [
