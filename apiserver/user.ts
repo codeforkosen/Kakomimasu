@@ -27,9 +27,15 @@ class User implements IUser {
     this.password = screenName.password;
   }
 
-  // passwordのみ除いたオブジェクトにする
-  safe() {
+  // シリアライズする際にパスワードを返さないように
+  // パスワードを返したい場合にはnoSafe()を用いる
+  toJSON() {
     return Object.assign({}, this, { password: undefined });
+  }
+
+  // passwordも含めたオブジェクトにする
+  noSafe() {
+    return Object.assign({}, this);
   }
 }
 
@@ -44,7 +50,7 @@ class Users {
     const usersData = UserFileOp.read();
     this.users = usersData.map((e) => new User(e));
   };
-  save = () => UserFileOp.save(this.users);
+  save = () => UserFileOp.save(this.users.map((e) => e.noSafe()));
 
   getUsers = () => this.users;
 
@@ -171,7 +177,7 @@ export const userRouter = () => {
           reqData.name,
           reqData.password,
         );
-        await req.respond(jsonResponse(user.safe()));
+        await req.respond(jsonResponse(user));
       } catch (e) {
         console.log(e);
         await req.respond(errorResponse(e.message));
@@ -186,11 +192,11 @@ export const userRouter = () => {
       if (identifier !== "") {
         const user = accounts.showUser(identifier);
         if (user !== undefined) {
-          await req.respond(jsonResponse(user.safe()));
+          await req.respond(jsonResponse(user));
         }
       } else {
         await req.respond(jsonResponse(
-          accounts.getUsers().map((e) => e.safe()),
+          accounts.getUsers(),
         ));
       }
     } catch (e) {
@@ -229,7 +235,7 @@ export const userRouter = () => {
       const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
       const users = [...new Set([...matchName, ...matchId])];
 
-      await req.respond(jsonResponse(users.map((e) => e.safe())));
+      await req.respond(jsonResponse(users));
     } catch (e) {
       console.log(e);
       await req.respond(errorResponse(e.message));
