@@ -85,3 +85,6 @@ export {
   //getAllGame,
   getGameInfo,
 };
+
+export const getUserDetailUrl = (a) => `/user/detail.html?id=${a}`;
+export const getGameDetailUrl = (a) => `/gamedetails.html?id=${a}`; 
