@@ -190,7 +190,7 @@ export const userRouter = () => {
         );
         await req.respond(jsonResponse(user));
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         await req.respond(errorResponse(e.message));
       }
     },
@@ -211,7 +211,7 @@ export const userRouter = () => {
         ));
       }
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       await req.respond(errorResponse(e.message));
     }
   });
@@ -229,7 +229,7 @@ export const userRouter = () => {
         );
         await req.respond({ status: 200 });
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         await req.respond(errorResponse(e.message));
       }
     },
@@ -248,7 +248,7 @@ export const userRouter = () => {
 
       await req.respond(jsonResponse(users));
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       await req.respond(errorResponse(e.message));
     }
   });
