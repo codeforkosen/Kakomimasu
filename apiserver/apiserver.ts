@@ -13,7 +13,7 @@ import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
 import { User, Users } from "./user.ts";
-const accounts = new Users();
+export const accounts = new Users();
 
 import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
@@ -31,6 +31,8 @@ const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
 
 import util2 from "../util.js";
 import { LogFileOp } from "./parts/file_opration.ts";
+
+import { tournamentRouter, tournaments } from "./tournament.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -112,27 +114,72 @@ const usersDelete = async (req: ServerRequest) => {
   }
 };
 
+const usersSearch = async (req: ServerRequest) => {
+  try {
+    const query = req.query;
+    const q = query.get("q");
+    if (!q) throw Error("Nothing search query");
+
+    const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
+    const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
+    const users = [...new Set([...matchName, ...matchId])];
+
+    await req.respond({
+      status: 200,
+      headers: new Headers({
+        "content-type": "application/json",
+      }),
+      body: JSON.stringify(users, ["screenName", "name", "id"]),
+    });
+  } catch (e) {
+    await req.respond(util.errorResponse(e.message));
+  }
+};
+
 //#endregion
 
 //#region ゲーム作成API
-class BoardNamePost {
-  constructor(public gameName: string, public boardName: string) {}
+interface ICreateGamePost {
+  name: string;
+  boardName: string;
+  nPlayer?: number;
+  playerIdentifiers?: string[];
+  tournamentId?: string;
 }
 
 const createSelfGame = async (req: ServerRequest) => {
   try {
-    const reqJson = (await req.json()) as BoardNamePost;
+    const reqJson = (await req.json()) as ICreateGamePost;
+    //console.log(reqJson);
+    const board = readBoard(reqJson.boardName);
+    board.nplayer = reqJson.nPlayer || 2;
+
     const game = kkmm_self.createGame(
-      readBoard(reqJson.boardName),
-      reqJson.gameName,
+      board,
+      reqJson.name,
     );
+
+    if (reqJson.playerIdentifiers) {
+      const userIds = reqJson.playerIdentifiers.map((e) =>
+        accounts.find(e)?.id
+      );
+      userIds.forEach((userId) => {
+        if (!game.addReservedUser(userId)) {
+          throw Error("The user is already registered");
+        }
+      });
+    }
+
     game.changeFuncs.push(sendAllGame);
     game.changeFuncs.push(sendGame);
     sendAllGame();
 
-    await req.respond(util.jsonResponse(JSON.stringify(game)));
+    if (reqJson.tournamentId) {
+      tournaments.addGame(reqJson.tournamentId, game.uuid);
+    }
 
-    console.log(kkmm_self);
+    await req.respond(util.jsonResponse(JSON.stringify(game)));
+    //console.log(kkmm_self);
   } catch (e) {
     await req.respond(util.errorResponse(e.message));
   }
@@ -496,6 +543,7 @@ const apiRoutes = () => {
     contentTypeFilter("application/json"),
     usersDelete,
   );
+  router.get("users/search", usersSearch);
 
   router.post(
     "game/create",
@@ -513,6 +561,7 @@ const apiRoutes = () => {
   router.ws(new RegExp("^ws/game/(.+)$"), ws_getGame);
   //router.ws("allSelfGame", ws_AllSelfGame);
 
+  router.route("tournament", tournamentRouter());
   return router;
 };
 

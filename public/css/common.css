@@ -1,0 +1,25 @@
+:root {
+  --codeforkosen-color: #58AFDA;
+  --kakomimasu-color: #FBD5A8;
+}
+
+main {
+  text-align: center;
+  width: 90%;
+  max-width: 1000px;
+  margin: 0px auto;
+}
+
+.button {
+  border: none;
+  padding: 0.7em 1em;
+  background: var(--codeforkosen-color);
+  color: #FFF;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button:disabled {
+  background-color: gray;
+}

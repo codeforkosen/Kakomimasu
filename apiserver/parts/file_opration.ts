@@ -2,6 +2,7 @@ import { pathResolver } from "../apiserver_util.ts";
 
 import { IBoard } from "./interface.ts";
 import { User } from "../user.ts";
+import { ITournament, Tournament } from "../tournament.ts";
 
 const resolve = pathResolver(import.meta);
 
@@ -30,6 +31,29 @@ export class UserFileOp {
     } catch (e) {
       //console.log(e);
       return new Array<User>();
+    }
+  }
+}
+
+export class TournamentFileOp {
+  private static dir = resolve("../data");
+  private static path = TournamentFileOp.dir + "/tournaments.json";
+
+  static staticConstructor = (() => {
+    Deno.mkdirSync(TournamentFileOp.dir, { recursive: true });
+  })();
+
+  public static save(data: Tournament[]) {
+    Deno.mkdirSync(this.dir, { recursive: true });
+    writeJsonFileSync(this.path, data);
+  }
+  public static read() {
+    try {
+      const readData = readJsonFileSync(this.path) as ITournament[];
+      return readData;
+    } catch (e) {
+      //console.log(e);
+      return new Array<ITournament>();
     }
   }
 }

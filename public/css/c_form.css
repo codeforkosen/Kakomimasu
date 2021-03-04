@@ -1,0 +1,40 @@
+@import url("/css/common.css");
+
+form div {
+  display: flex;
+  align-items: center;
+  margin: 1em 0;
+  flex-direction: row;
+}
+
+form div[class~="sub"] {
+  padding: 0 2em;
+}
+
+form div label {
+  order: 1;
+  width: 10em;
+  padding-right: 0.5em;
+  ;
+}
+
+form div input,
+textarea,
+select {
+  order: 2;
+  flex: 1 1 auto;
+  height: 2em;
+  padding: 1px;
+  border: 1px solid gray;
+  font-family: inherit;
+  box-sizing: content-box;
+}
+
+form input[type="submit"] {
+  cursor: pointer;
+}
+
+form div textarea {
+  resize: vertical;
+  min-height: 6em;
+}

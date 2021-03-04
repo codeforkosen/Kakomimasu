@@ -112,11 +112,12 @@ const createGame = async (gameName: string, boardName: string) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        gameName: gameName,
+        name: gameName,
         boardName: boardName,
       }),
     })).json(),
   );
+
   return req;
 };
 

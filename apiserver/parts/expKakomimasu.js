@@ -9,8 +9,14 @@ class ExpGame extends Game {
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
     this.changeFuncs = [];
+    this.reservedUsers = [];
   }
   attachPlayer(player) {
+    if (this.reservedUsers > 0) {
+      const isReservedUser = this.reservedUsers.some((e) => e === player.id);
+      if (!isReservedUser) throw Error("Not allowed user");
+    }
+
     if (super.attachPlayer(player) === false) return false;
     if (this.isReady()) {
       this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
@@ -19,7 +25,7 @@ class ExpGame extends Game {
       this.intervalId = setInterval(() => this.updateStatus(), 50);
       //console.log("intervalID", this.intervalId);
     }
-    this.wsSend();//this.changeFuncs.forEach((func) => func());
+    this.wsSend(); //this.changeFuncs.forEach((func) => func());
     return true;
   }
 
@@ -33,6 +39,15 @@ class ExpGame extends Game {
     return ret;
   }
 
+  addReservedUser(userId) {
+    if (this.reservedUsers.some((e) => e === userId)) {
+      return false;
+    } else {
+      this.reservedUsers.push(userId);
+      return true;
+    }
+  }
+
   updateStatus() {
     let self = this;
     if (
@@ -40,12 +55,12 @@ class ExpGame extends Game {
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
       self.start();
-      this.wsSend();//this.changeFuncs.forEach((func) => func());
+      this.wsSend(); //this.changeFuncs.forEach((func) => func());
     }
     if (self.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
         self.nextTurn();
-        this.wsSend();//this.changeFuncs.forEach((func) => func());
+        this.wsSend(); //this.changeFuncs.forEach((func) => func());
       }
     }
     if (this.ending) {
@@ -54,7 +69,7 @@ class ExpGame extends Game {
 
       this.dispose();
       console.log("turn", this.turn);
-      this.wsSend();//this.changeFuncs.forEach(func => func());
+      this.wsSend(); //this.changeFuncs.forEach(func => func());
     }
   }
 
@@ -65,7 +80,8 @@ class ExpGame extends Game {
       gameName: this.name,
       startedAtUnixTime: this.startedAtUnixTime,
       nextTurnUnixTime: this.nextTurnUnixTime,
-    }
+      reservedUsers: this.reservedUsers,
+    };
   }
 
   dispose() {
@@ -75,7 +91,7 @@ class ExpGame extends Game {
 
   wsSend() {
     console.log("expKakomimasu", this.uuid);
-    this.changeFuncs.forEach(func => func(this.uuid));
+    this.changeFuncs.forEach((func) => func(this.uuid));
   }
 }
 
