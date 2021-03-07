@@ -181,11 +181,13 @@ class KakomimasuClient {
   }
 
   saveLog() {
-    try {
-      Deno.mkdirSync("log");
-    } catch (e) { }
-    const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
-    Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    if (!args.nolog) {
+      try {
+        Deno.mkdirSync("log");
+      } catch (e) { }
+      const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
+      Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    }
   }
 }
 
