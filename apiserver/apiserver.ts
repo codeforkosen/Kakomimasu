@@ -440,8 +440,11 @@ const ws_AllGame = async (sock: WebSocket) => {
   }
 };
 
-const sendAllGame = () => {
-  //console.log(socks.length);
+let sendAllGameQue = 0;
+
+setInterval(() => {
+  if (sendAllGameQue === 0) return;
+  sendAllGameQue = 0;
   const games = [
     kkmm.getGames(),
     kkmm_self.getGames(),
@@ -461,6 +464,10 @@ const sendAllGame = () => {
     }
     return false;
   });
+}, 1000);
+
+const sendAllGame = () => {
+  sendAllGameQue++;
 };
 
 let getGameSocks: { sock: WebSocket; id: string }[] = [];
