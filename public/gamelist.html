@@ -24,117 +24,29 @@
                 <button v-on:click="nowType = 1" :disabled="nowType === 1">フリーマッチ</button>
                 <button v-on:click="nowType = 2" :disabled="nowType === 2">終了したゲーム</button>
 
-                <table>
-                    <tr>
-                        <td class="status">
-                            <div>ステータス</div>
-                            <div>ターン</div>
-                        </td>
-                        <td>
-                            <div class="players">
-                                <div class="player">
-                                    <div>
-                                        <span>プレイヤー名</span>
-                                        <br>ポイント
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="game-name">
-                            <div>ゲーム名</div>
-                            <div class="id">ゲームID</div>
-                        </td>
-                        <td>開始時間</td>
-                    </tr>
-                    <tr v-for="(game,i) in games[nowType]" @click="goGameDetail(game.url)">
-                        <td class="status">
-                            <div :class="game.status">●</div>
-                            <div>{{game.turn}}</div>
-                        </td>
-                        <td>
-                            <div class="players">
-                                <div v-for="(player,i) in game.players" class="player">
-                                    <div v-if="i !== 0">vs</div>
-                                    <div>
-                                        <span v-if="player?.screenName"><a
-                                                :href="player.url">{{player.screenName}}</a></span>
-                                        <span v-else class="un">No player</span>
-
-                                        <br>point
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="game-name">
-                            <div v-if="game.gameName">{{game.gameName}}</div>
-                            <div v-else class="un">Untitle</div>
-
-                            <div class="id">{{game.gameId}}</div>
-                        </td>
-                        <td>{{game.startTime}} 開始</td>
-                    </tr>
-                </table>
+                <games-list v-bind:games="games[nowType]"></games-list>
             </div>
         </main>
 
         <footer id="footer"></footer>
 
         <script type="module">
-            import { getUser } from "/js/api-util.js";
-            import { Game, getTurnText, getUserDetailUrl, getGameDetailUrl } from "/js/util.js";
+            import gameListComp from "/js/vue-comp/game-list.js";
 
             const gameTableVue = new Vue({
                 el: ".game-table",
                 data: {
                     games: [[], [], []],
-                    nowType: -1,
+                    nowType: 0,
+                },
+                components: {
+                    'games-list': gameListComp,
                 },
                 methods: {
                     update: async function (games) {
-                        const users = new Set();
-                        games.flat().forEach(g => {
-                            g.players.forEach(e => {
-                                users.add(e.id);
-                            });
-                        });
-
-                        const usersDetail = [];
-                        for (const user of users) {
-                            const userDetail = await getUser(user);
-                            userDetail.url = getUserDetailUrl(userDetail.id);
-                            usersDetail.push(userDetail);
-                        }
-
-                        games.forEach((game, i) => {
-                            game.reverse().forEach(async (g, j) => {
-                                //console.log(g, i, j);
-                                const [/*status*/, startTime] = Game.getGameStatus(g);
-
-                                let status = "waiting";
-                                if (g.ending) status = "ending";
-                                else if (g.gaming) status = "gaming";
-
-                                const players = g.players.map(p => {
-                                    return usersDetail.find(u => u.id === p.id)
-                                })
-                                //console.log(players);
-
-                                Vue.set(this.games[i], j, {
-                                    status,
-                                    players,
-                                    link: `gamedetails.html?id=${g.gameId}`,
-                                    gameName: g.gameName,
-                                    gameId: g.gameId,
-                                    startTime,
-                                    turn: getTurnText(g),
-                                    url: getGameDetailUrl(g.gameId),
-                                });
-                            });
-                        });
+                        this.games = games;
                     },
-                    goGameDetail(url) {
-                        location.href = url;
-                    }
+
                 },
                 created: function () {
                     this.nowType = 2;
@@ -161,17 +73,16 @@
                 data: {
                     nowTime: "",
                 },
+                created() {
+                    this.getNowTime();
+                    setInterval(this.getNowTime, 1000);
+                },
                 methods: {
-                    init: function () {
-                        this.getNowTime();
-                        setInterval(this.getNowTime, 1000);
-                    },
                     getNowTime: function () {
                         this.nowTime = new Date().toLocaleString("ja-JP");
                     },
                 },
             });
-            nowTimeVue.init();
         </script>
 
         <script type="module" src="js/vue-comp/common.js"></script>
@@ -192,12 +103,8 @@
 
     .game-table table {
         border-collapse: separate;
-        border-spacing: 0em 1em;
+        border-spacing: 0em 0.5em;
         margin: 0 auto;
-    }
-
-    .game-table tr {
-        padding: 1em;
     }
 
     .game-table td {
