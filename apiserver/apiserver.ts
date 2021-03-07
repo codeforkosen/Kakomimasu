@@ -227,7 +227,7 @@ export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
   try {
     const reqData = (await req.json()) as IMatchRequest;
-    console.log(reqData);
+    //console.log(reqData);
 
     const identifier = reqData.id || reqData.name;
     if (!identifier) throw Error("Invalid id or name.");
@@ -507,7 +507,7 @@ const getGame = (id: string): any => {
     LogFileOp.getLogGames(),
   ];
   //console.log(games);
-  console.log("getGame!!", id);
+  //console.log("getGame!!", id);
   try {
     if (id) return games.flat().find((e) => (e.uuid || e.gameId) === id);
     else return games[0].reverse()[0];
