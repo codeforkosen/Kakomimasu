@@ -90,7 +90,7 @@ class ExpGame extends Game {
   }
 
   wsSend() {
-    console.log("expKakomimasu", this.uuid);
+    //console.log("expKakomimasu", this.uuid);
     this.changeFuncs.forEach((func) => func(this.uuid));
   }
 }
