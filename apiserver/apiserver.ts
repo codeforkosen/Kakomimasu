@@ -1,4 +1,5 @@
-import type { WebSocket } from "https://deno.land/std@0.79.0/ws/mod.ts";
+//import type { WebSocket } from "https://deno.land/std@0.89.0/ws/mod.ts";
+import type { WebSocket } from "./mod.ts";
 import {
   contentTypeFilter,
   createApp,
