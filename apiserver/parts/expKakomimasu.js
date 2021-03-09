@@ -49,18 +49,17 @@ class ExpGame extends Game {
   }
 
   updateStatus() {
-    let self = this;
     if (
-      self.isReady() && !self.isGaming() && !self.ending &&
+      this.isReady() && !this.isGaming() && !this.ending &&
       (new Date().getTime() > (this.startedAtUnixTime * 1000))
     ) {
-      self.start();
-      this.wsSend(); //this.changeFuncs.forEach((func) => func());
+      this.start();
+      this.wsSend();
     }
-    if (self.isGaming()) {
+    if (this.isGaming()) {
       if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
-        self.nextTurn();
-        this.wsSend(); //this.changeFuncs.forEach((func) => func());
+        this.nextTurn();
+        this.wsSend();
       }
     }
     if (this.ending) {
@@ -69,7 +68,7 @@ class ExpGame extends Game {
 
       this.dispose();
       console.log("turn", this.turn);
-      this.wsSend(); //this.changeFuncs.forEach(func => func());
+      this.wsSend();
     }
   }
 
