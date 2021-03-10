@@ -22,10 +22,8 @@ class ExpGame extends Game {
       this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
       this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
       this.updateStatus();
-      this.intervalId = setInterval(() => this.updateStatus(), 50);
-      //console.log("intervalID", this.intervalId);
     }
-    this.wsSend(); //this.changeFuncs.forEach((func) => func());
+    this.wsSend();
     return true;
   }
 
@@ -49,27 +47,31 @@ class ExpGame extends Game {
   }
 
   updateStatus() {
-    let self = this;
-    if (
-      self.isReady() && !self.isGaming() && !self.ending &&
-      (new Date().getTime() > (this.startedAtUnixTime * 1000))
-    ) {
-      self.start();
-      this.wsSend(); //this.changeFuncs.forEach((func) => func());
-    }
-    if (self.isGaming()) {
-      if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
-        self.nextTurn();
-        this.wsSend(); //this.changeFuncs.forEach((func) => func());
+    if (this.isGaming()) { // ゲーム進行中
+      const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
+      if (diff <= 0) {
+        this.nextTurn();
+        this.wsSend();
+        this.updateStatus();
+      } else {
+        setTimeout(() => this.updateStatus(), diff);
       }
     }
-    if (this.ending) {
-      //saveLogFile(this);
+    else if (this.ending) { // ゲーム終了後
       LogFileOp.save(this);
 
-      this.dispose();
       console.log("turn", this.turn);
-      this.wsSend(); //this.changeFuncs.forEach(func => func());
+      this.wsSend();
+    } // ゲーム開始前
+    else {
+      const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
+      if (diff <= 0) {
+        this.start();
+        this.wsSend();
+        this.updateStatus();
+      } else {
+        setTimeout(() => this.updateStatus(), diff);
+      }
     }
   }
 
@@ -84,13 +86,8 @@ class ExpGame extends Game {
     };
   }
 
-  dispose() {
-    //console.log(this.intervalId);
-    clearInterval(this.intervalId);
-  }
-
   wsSend() {
-    console.log("expKakomimasu", this.uuid);
+    //console.log("expKakomimasu", this.uuid);
     this.changeFuncs.forEach((func) => func(this.uuid));
   }
 }

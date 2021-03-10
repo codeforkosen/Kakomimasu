@@ -31,17 +31,18 @@ $ deno run -A apiserver.ts
 
 ## APIクライアント for Deno (JavaScript)
 
-[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/game)を開いた状態で下記を実行する。
+[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/)を開いた状態で下記を実行する。
 
 ```
 $ cd client_deno
-$ deno run -A client_test1.js
+$ deno run -A client_a1.js --local
 ```
 別のコンソールから
 ```
 $ cd client_deno
-$ deno run -A client_test2.js
+$ deno run -A client_a2.js --local
 ```
+詳細→[Kakomimasu client for deno - README.md](https://github.com/codeforkosen/Kakomimasu/blob/master/client_deno/README.md)  
 
 ## APIクライアント for Node
 

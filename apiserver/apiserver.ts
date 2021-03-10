@@ -1,4 +1,5 @@
-import type { WebSocket } from "https://deno.land/std@0.79.0/ws/mod.ts";
+//import type { WebSocket } from "https://deno.land/std@0.89.0/ws/mod.ts";
+import type { WebSocket } from "./mod.ts";
 import {
   contentTypeFilter,
   createApp,
@@ -132,7 +133,7 @@ export const match = async (req: ServerRequest) => {
   //console.log(req, "newPlayer");
   try {
     const reqData = (await req.json()) as IMatchRequest;
-    console.log(reqData);
+    //console.log(reqData);
 
     const identifier = reqData.id || reqData.name;
     if (!identifier) throw Error("Invalid id or name.");
@@ -222,8 +223,6 @@ export const getGameInfo = async (req: ServerRequest) => {
     ]
       .find((item) => item.uuid === id);
     if (game) {
-      game.updateStatus();
-
       await req.respond({
         status: 200,
         headers: new Headers({
@@ -347,8 +346,11 @@ const ws_AllGame = async (sock: WebSocket) => {
   }
 };
 
-const sendAllGame = () => {
-  //console.log(socks.length);
+let sendAllGameQue = 0;
+
+setInterval(() => {
+  if (sendAllGameQue === 0) return;
+  sendAllGameQue = 0;
   const games = [
     kkmm.getGames(),
     kkmm_self.getGames(),
@@ -368,6 +370,10 @@ const sendAllGame = () => {
     }
     return false;
   });
+}, 1000);
+
+const sendAllGame = () => {
+  sendAllGameQue++;
 };
 
 let getGameSocks: { sock: WebSocket; id: string }[] = [];
@@ -414,7 +420,7 @@ const getGame = (id: string): any => {
     LogFileOp.getLogGames(),
   ];
   //console.log(games);
-  console.log("getGame!!", id);
+  //console.log("getGame!!", id);
   try {
     if (id) return games.flat().find((e) => (e.uuid || e.gameId) === id);
     else return games[0].reverse()[0];

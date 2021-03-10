@@ -145,9 +145,7 @@ class KakomimasuClient {
     this.gameInfo = await getGameInfo(this.gameId);
     cl(this.gameInfo);
     this.log = [this.gameInfo];
-    this.turn = 1;
-    this.totalTurn = this.gameInfo.totalTurn;
-    cl("totalTurn", this.totalTurn);
+    cl("totalTurn", this.gameInfo.board.nTurn);
     this._makeField();
     return this.gameInfo;
   }
@@ -157,7 +155,7 @@ class KakomimasuClient {
   }
 
   async waitNextTurn() { // GameInfo? (null if end)
-    if (this.turn < this.totalTurn) {
+    if (this.gameInfo.nextTurnUnixTime) {
       const bknext = this.gameInfo.nextTurnUnixTime;
       cl("nextTurnUnixTime", bknext);
       await sleep(diffTime(bknext));
@@ -174,18 +172,19 @@ class KakomimasuClient {
       return null;
     }
     this.log.push(this.gameInfo);
-    this.turn++;
-    cl("turn", this.turn);
+    cl("turn", this.gameInfo.turn);
     this._updateField();
     return this.gameInfo;
   }
 
   saveLog() {
-    try {
-      Deno.mkdirSync("log");
-    } catch (e) { }
-    const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
-    Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    if (!args.nolog) {
+      try {
+        Deno.mkdirSync("log");
+      } catch (e) { }
+      const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
+      Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    }
   }
 }
 

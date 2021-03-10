@@ -50,12 +50,3 @@ while (info) {
   info = await kc.waitNextTurn();
   log.push(info);
 }
-
-// ゲームデータ出力
-if (!args.nolog) {
-  try {
-    Deno.mkdirSync("log");
-  } catch (e) { }
-  const fname = `log/${info.gameId}-player${pno}.log`;
-  Deno.writeTextFileSync(fname, JSON.stringify(log, null, 2));
-}
