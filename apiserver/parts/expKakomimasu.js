@@ -22,10 +22,8 @@ class ExpGame extends Game {
       this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
       this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
       this.updateStatus();
-      this.intervalId = setInterval(() => this.updateStatus(), 50);
-      //console.log("intervalID", this.intervalId);
     }
-    this.wsSend(); //this.changeFuncs.forEach((func) => func());
+    this.wsSend();
     return true;
   }
 
@@ -49,26 +47,31 @@ class ExpGame extends Game {
   }
 
   updateStatus() {
-    if (
-      this.isReady() && !this.isGaming() && !this.ending &&
-      (new Date().getTime() > (this.startedAtUnixTime * 1000))
-    ) {
-      this.start();
-      this.wsSend();
-    }
-    if (this.isGaming()) {
-      if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
+    if (this.isGaming()) { // ゲーム進行中
+      const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
+      if (diff <= 0) {
         this.nextTurn();
         this.wsSend();
+        this.updateStatus();
+      } else {
+        setTimeout(() => this.updateStatus(), diff);
       }
     }
-    if (this.ending) {
-      //saveLogFile(this);
+    else if (this.ending) { // ゲーム終了後
       LogFileOp.save(this);
 
-      this.dispose();
       console.log("turn", this.turn);
       this.wsSend();
+    } // ゲーム開始前
+    else {
+      const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
+      if (diff <= 0) {
+        this.start();
+        this.wsSend();
+        this.updateStatus();
+      } else {
+        setTimeout(() => this.updateStatus(), diff);
+      }
     }
   }
 
@@ -81,11 +84,6 @@ class ExpGame extends Game {
       nextTurnUnixTime: this.nextTurnUnixTime,
       reservedUsers: this.reservedUsers,
     };
-  }
-
-  dispose() {
-    //console.log(this.intervalId);
-    clearInterval(this.intervalId);
   }
 
   wsSend() {

@@ -315,8 +315,6 @@ export const getGameInfo = async (req: ServerRequest) => {
     ]
       .find((item) => item.uuid === id);
     if (game) {
-      game.updateStatus();
-
       await req.respond({
         status: 200,
         headers: new Headers({
