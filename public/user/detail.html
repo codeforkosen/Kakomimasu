@@ -32,14 +32,15 @@
             </section>
             <section class="separation">
                 <h2>参加ゲーム一覧</h2>
-
-
+                <games-list v-bind:games="user.games"></games-list>
             </section>
         </main>
         <footer id="footer"></footer>
 
         <script type="module">
+            import { getGame } from "/js/api-util.js";
             import { userShow, getUrlQueries } from "/js/util.js";
+            import gameListComp from "/js/vue-comp/game-list.js";
 
             const main = async () => {
 
@@ -48,27 +49,23 @@
                     el: "#main",
                     data: {
                         user: {},
-                        screenName: "",
-                        name: "",
-                        id: "",
                     },
                     async created() {
                         const identifier = getUrlQueries().id;
                         const user = await userShow(identifier);
                         document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
-                        /*if (user.hasOwnProperty("error")) {
-                            this.screenName = "ユーザが存在しません";/
-                            this.name = "";
-                            this.id = "";
-                        } else {
-                            document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
-                            this.screenName = user.screenName;
-                            this.name = user.name;
-                            this.id = user.id;
-                        }*/
+
+                        user.games = [];
+                        for (const gameId of user.gamesId) {
+                            user.games.push(await getGame(gameId));
+                        }
+
                         console.log(user);
                         this.user = user;
-                    }
+                    },
+                    components: {
+                        'games-list': gameListComp,
+                    },
                 });
             };
 
@@ -85,4 +82,5 @@
 <style>
     @import url("/css/common.css");
     @import url("/css/c_separation.css");
+    @import url("/css/v_game-list.css");
 </style>

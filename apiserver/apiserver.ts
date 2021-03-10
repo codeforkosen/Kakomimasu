@@ -215,13 +215,14 @@ export const match = async (req: ServerRequest) => {
 //#region 試合状態取得API
 export const getGameInfo = async (req: ServerRequest) => {
   try {
+    //console.log(LogFileOp.getLogGames());
     const id = req.match[1];
     const game = [
       ...kkmm.getGames(),
       ...kkmm_self.getGames(),
       ...LogFileOp.getLogGames(),
     ]
-      .find((item) => item.uuid === id);
+      .find((item) => (item.uuid === id) || (item.gameId === id));
     if (game) {
       await req.respond({
         status: 200,

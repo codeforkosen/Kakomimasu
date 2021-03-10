@@ -24,7 +24,7 @@
                 <button v-on:click="nowType = 1" :disabled="nowType === 1">フリーマッチ</button>
                 <button v-on:click="nowType = 2" :disabled="nowType === 2">終了したゲーム</button>
 
-                <games-list v-bind:games="games[nowType]"></games-list>
+                <games-list v-bind:games="games[nowType]"> </games-list>
             </div>
         </main>
 
@@ -92,6 +92,7 @@
 
 <style>
     @import url("/css/common.css");
+    @import url("/css/v_game-list.css");
 
     main {
         text-align: center;
@@ -99,52 +100,5 @@
 
     #now-time {
         text-align: center;
-    }
-
-    .game-table table {
-        border-collapse: separate;
-        border-spacing: 0em 0.5em;
-        margin: 0 auto;
-    }
-
-    .game-table td {
-        border-bottom: 2px solid var(--codeforkosen-color);
-        padding: 0 0.5em;
-    }
-
-    .game-table .un {
-        color: gray;
-    }
-
-    .game-table .waiting {
-        color: yellow;
-    }
-
-    .game-table .gaming {
-        color: green;
-    }
-
-    .game-table .ending {
-        color: red;
-    }
-
-    .game-table .player>div {
-        margin: 0 0.5em;
-    }
-
-    .game-table .player,
-    .game-table .players {
-        justify-content: center;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-
-    .game-table .game-name {
-        text-align: left;
-    }
-
-    .game-table .game-name .id {
-        font-size: 0.8em;
     }
 </style>

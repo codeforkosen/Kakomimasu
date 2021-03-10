@@ -26,7 +26,8 @@ export default {
         if (g.ending) status = "ending";
         else if (g.gaming) status = "gaming";
 
-        const players = await Promise.all(g.players.map(async (p) => {
+        const players = [];
+        for (const p of g.players) {
           let user = this.users.find(u => u.id === p.id);
           if (!user) {
             user = await getUser(p.id);
@@ -34,8 +35,11 @@ export default {
             user.url = getUserDetailUrl(user.id);
             this.users.push(user);
           }
-          return user;
-        }));
+          const point = p.point.basepoint + p.point.wallpoint;
+          const player = Object.assign({ point }, user);
+          players.push(player);
+        }
+
         data.push({
           status,
           players,
@@ -51,6 +55,7 @@ export default {
     }
   },
   template: `
+  <div class="games-list">
       <table>
           <tr>
               <td class="status">
@@ -87,7 +92,7 @@ export default {
                                       :href="player.url">{{player.screenName}}</a></span>
                               <span v-else class="un">No player</span>
 
-                              <br>point
+                              <br>{{player.point}}
                           </div>
                       </div>
                   </div>
@@ -101,5 +106,6 @@ export default {
               <td>{{game.startTime}} 開始</td>
           </tr>
       </table>
+    </div>
       `,
 }
