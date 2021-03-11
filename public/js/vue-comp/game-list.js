@@ -56,6 +56,11 @@ export default {
   },
   template: `
   <div class="games-list">
+    <div>
+    <span class="waiting">●</span>：ユーザ参加待ち　
+    <span class="gaming">●</span>：ゲーム中　
+    <span class="ending">●</span>：終了　
+    </div>
       <table>
           <tr>
               <td class="status">
