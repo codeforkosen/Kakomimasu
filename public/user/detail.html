@@ -5,8 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
 
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
         <link rel="stylesheet" href="/css/main.css">
 
         <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
@@ -31,6 +30,11 @@
                 <div class="id">{{user.id}}</div>
             </section>
             <section class="separation">
+                <h2>勝敗記録</h2>
+                <div v-if="user.result">{{user.result[0]}}勝{{user.result[1]}}敗{{user.result[2]}}分</div>
+                <canvas id="resultChart"></canvas>
+            </section>
+            <section class="separation">
                 <h2>参加ゲーム一覧</h2>
                 <games-list v-bind:games="user.games"></games-list>
             </section>
@@ -38,39 +42,71 @@
         <footer id="footer"></footer>
 
         <script type="module">
+            import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js';
+
             import { getGame } from "/js/api-util.js";
             import { userShow, getUrlQueries } from "/js/util.js";
             import gameListComp from "/js/vue-comp/game-list.js";
 
-            const main = async () => {
+            new Vue({
+                el: "#main",
+                data: {
+                    user: {},
+                    resultChart: {},
+                },
+                async created() {
+                    const identifier = getUrlQueries().id;
+                    const user = await userShow(identifier);
+                    document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
 
+                    user.games = [];
+                    const gamesId = new Set(user.gamesId);
+                    for (const gameId of gamesId) {
+                        user.games.push(await getGame(gameId));
+                    }
 
-                new Vue({
-                    el: "#main",
-                    data: {
-                        user: {},
-                    },
-                    async created() {
-                        const identifier = getUrlQueries().id;
-                        const user = await userShow(identifier);
-                        document.title = `ユーザ詳細(@${user.name}) - 囲みマス`;
+                    user.result = [0, 0, 0]; // 勝ち、負け、引き分け
+                    user.games.forEach((g) => {
+                        if (g.ending === false) return;
+                        const players = g.players.map(p => {
+                            return {
+                                id: p.id, point: p.point.wallpoint + p.point.basepoint
+                            }
+                        });
+                        players.sort((a, b) => a.point - b.point);
 
-                        user.games = [];
-                        for (const gameId of user.gamesId) {
-                            user.games.push(await getGame(gameId));
+                        if (players[0].id === user.id) {
+                            if (players[0].point === players[players.length - 1].point)
+                                user.result[2]++;
+                            else user.result[1]++;
                         }
+                        if (players[players.length - 1].id === user.id) {
+                            user.result[0]++;
+                        }
+                    });
 
-                        console.log(user);
-                        this.user = user;
-                    },
-                    components: {
-                        'games-list': gameListComp,
-                    },
-                });
-            };
+                    this.resultChart = new Chart(resultChart, {
+                        type: "doughnut",
+                        data: {
+                            datasets: [{
+                                backgroundColor: [
+                                    "#D92546",
+                                    "#A7D4D9",
+                                    "#F2BB9B"
+                                ],
+                                data: user.result
+                            }],
+                            labels: ["Win", "Lose", "Even"]
+                        }
+                    })
 
-            main();
-
+                    console.log(user);
+                    this.user = user;
+                },
+                components: {
+                    'games-list': gameListComp,
+                },
+            });
         </script>
 
         <script type="module" src="/js/vue-comp/common.js"></script>
