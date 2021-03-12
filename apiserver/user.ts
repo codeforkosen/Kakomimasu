@@ -57,12 +57,14 @@ class Users {
 
   getUsers = () => this.users;
 
-  registUser(screenName: string, name: string, password: string): User {
-    if (password === "") throw Error("Not password");
-    if (this.users.some((e) => e.name === name)) {
+  registUser(data: IUser): User {
+    if (data.password === "") throw Error("Not password");
+    if (this.users.some((e) => e.name === data.name)) {
       throw Error("Already registered name");
     }
-    const user = new User({ screenName, name, password });
+    const user = new User(
+      data, /*{ data.screenName, data.name, data.password }*/
+    );
     this.users.push(user);
     this.save();
     return user;
@@ -181,13 +183,9 @@ export const userRouter = () => {
     contentTypeFilter("application/json"),
     async (req) => {
       try {
-        const reqData = ((await req.json()) as User);
+        const reqData = ((await req.json()) as IUser);
         console.log(reqData);
-        const user = accounts.registUser(
-          reqData.screenName,
-          reqData.name,
-          reqData.password,
-        );
+        const user = accounts.registUser(reqData);
         await req.respond(jsonResponse(user));
       } catch (e) {
         //console.log(e);
