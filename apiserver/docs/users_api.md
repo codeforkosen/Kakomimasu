@@ -54,7 +54,6 @@ POST /api/users/delete
 
 |Name|Type|Discription|
 |-|-|-|
-ザと表示名が被っても構いません。|
 |`name`<br>(name又はidのいずれか必須) |string |名前|
 |`id`<br>(name又はidのいずれか必須)   |string |ID|
 |`password`<br>必須                  |string |パスワード|
