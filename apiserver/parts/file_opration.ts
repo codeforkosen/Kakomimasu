@@ -1,7 +1,7 @@
 import { pathResolver } from "../apiserver_util.ts";
 
 import { IBoard } from "./interface.ts";
-import { User } from "../user.ts";
+import { IUser } from "../user.ts";
 import { ITournament, Tournament } from "../tournament.ts";
 
 const resolve = pathResolver(import.meta);
@@ -27,10 +27,10 @@ export class UserFileOp {
   }
   public static read() {
     try {
-      return readJsonFileSync(this.path) as Array<User>;
+      return readJsonFileSync(this.path) as Array<IUser>;
     } catch (e) {
       //console.log(e);
-      return new Array<User>();
+      return new Array<IUser>();
     }
   }
 }

@@ -154,7 +154,7 @@ export const VFieldInfo = new Vue({
           if (this.players[i].screenName === "") {
             const user = await userShow(game.players[i].id);
             this.players[i].screenName = user.screenName;
-            this.players[i].link = `user.html?id=${user.name}`;
+            this.players[i].link = `user/detail.html?id=${user.name}`;
             this.playerName.splice(i, 1, user.screenName);
           }
           let placedAgentNum = 0;

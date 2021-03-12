@@ -3,9 +3,7 @@ import { createRouter } from "https://servestjs.org/@v1.1.9/mod.ts";
 import { errorResponse } from "./apiserver_util.ts";
 import util from "../util.js";
 import { TournamentFileOp } from "./parts/file_opration.ts";
-import { User, Users } from "./user.ts";
-
-import { accounts } from "./apiserver.ts";
+import { accounts } from "./user.ts";
 
 type TournamentType = "round-robin" | "knockout";
 

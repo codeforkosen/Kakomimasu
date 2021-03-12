@@ -6,6 +6,8 @@ export async function getGame(gameId) {
     const resJson = await (await fetch(
         `/api/match/${gameId}`,
     )).json();
+    if (resJson.error)
+        console.log(resJson);
     return resJson;
 }
 
