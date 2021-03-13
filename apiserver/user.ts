@@ -7,6 +7,7 @@ import util from "../util.js";
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
+import { errorCodeResponse, ErrorType, ServerError } from "./error.ts";
 
 export interface IUser {
   screenName: string;
@@ -65,13 +66,15 @@ class Users {
   getUsers = () => this.users;
 
   registUser(data: IReqUser): User {
-    if (data.password === "") throw Error("Not password");
+    if (!data.screenName) throw new ServerError(ErrorType.INVALID_SCREEN_NAME);
+    if (!data.name) throw new ServerError(ErrorType.INVALID_NAME);
+    if (!data.password) throw new ServerError(ErrorType.NOT_PASSWORD);
+
     if (this.users.some((e) => e.name === data.name)) {
-      throw Error("Already registered name");
+      throw new ServerError(ErrorType.ALREADY_REGISTERED_NAME);
+      //throw Error("Already registered name");
     }
-    const user = new User(
-      data, /*{ data.screenName, data.name, data.password }*/
-    );
+    const user = new User(data);
 
     if (data.option?.dryRun !== true) {
       this.users.push(user);
@@ -194,12 +197,15 @@ export const userRouter = () => {
     async (req) => {
       try {
         const reqData = ((await req.json()) as IReqUser);
-        console.log(reqData);
+        //console.log(reqData);
         const user = accounts.registUser(reqData);
         await req.respond(jsonResponse(user));
       } catch (e) {
-        //console.log(e);
-        await req.respond(errorResponse(e.message));
+        if (e instanceof ServerError) {
+          await req.respond(errorCodeResponse(e));
+        } else {
+          await req.respond(errorResponse(e.message));
+        }
       }
     },
   );
@@ -219,8 +225,13 @@ export const userRouter = () => {
         ));
       }
     } catch (e) {
-      //console.log(e);
+      /*console.log(e);
+      if (e instanceof ServerError) {
+        console.log("Server error");
+        await req.respond(errorCodeResponse(e));
+      } else {*/
       await req.respond(errorResponse(e.message));
+      //}
     }
   });
 
