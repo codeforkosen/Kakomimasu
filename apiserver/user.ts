@@ -6,6 +6,7 @@ import {
 import util from "../util.js";
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
+import { ApiOption } from "./parts/interface.ts";
 
 export interface IUser {
   screenName: string;
@@ -13,6 +14,12 @@ export interface IUser {
   id?: string;
   password: string;
   gamesId?: string[];
+}
+
+export interface IReqUser extends ApiOption {
+  screenName: string;
+  name: string;
+  password: string;
 }
 
 class User implements IUser {
@@ -57,7 +64,7 @@ class Users {
 
   getUsers = () => this.users;
 
-  registUser(data: IUser): User {
+  registUser(data: IReqUser): User {
     if (data.password === "") throw Error("Not password");
     if (this.users.some((e) => e.name === data.name)) {
       throw Error("Already registered name");
@@ -65,8 +72,11 @@ class Users {
     const user = new User(
       data, /*{ data.screenName, data.name, data.password }*/
     );
-    this.users.push(user);
-    this.save();
+
+    if (data.option?.dryRun !== true) {
+      this.users.push(user);
+      this.save();
+    }
     return user;
   }
 
@@ -183,7 +193,7 @@ export const userRouter = () => {
     contentTypeFilter("application/json"),
     async (req) => {
       try {
-        const reqData = ((await req.json()) as IUser);
+        const reqData = ((await req.json()) as IReqUser);
         console.log(reqData);
         const user = accounts.registUser(reqData);
         await req.respond(jsonResponse(user));
