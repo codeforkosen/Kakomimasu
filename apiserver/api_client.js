@@ -4,18 +4,29 @@ export default class ApiClient {
   }
 
   async _fetchJson(path, data) {
-    const reqJson = await (await fetch(
+    const res = await fetch(
       this.baseUrl + path,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       },
-    )).json();
-    return reqJson;
+    )
+    return res;
+  }
+
+  async _fetchJsonToJson(path, data) {
+    const resJson = await (await this._fetchJson(path, data)).json();
+    return resJson;
   }
 
   async usersRegist(data) {
-    return await this._fetchJson("/users/regist", data);
+    return await this._fetchJsonToJson("/users/regist", data);
+  }
+
+  async usersDelete(data) {
+    const res = await this._fetchJsonToJson("/users/delete", data);
+    //await res.body?.cancel();
+    return res;
   }
 }

@@ -15,6 +15,10 @@ const errors = [
     code: 203,
     message: "already registered name",
   },
+  {
+    code: 204,
+    message: "can not find user",
+  },
 ];
 
 export enum ErrorType {
@@ -22,10 +26,11 @@ export enum ErrorType {
   INVALID_SCREEN_NAME = 201,
   INVALID_NAME = 202,
   ALREADY_REGISTERED_NAME = 203,
+  NOT_USER = 204,
 }
 
 export class ServerError extends Error {
-  public message: string = "";
+  //public message: string = "";
   public code: number = 0;
 
   constructor(errortype: ErrorType) {
@@ -38,12 +43,22 @@ export class ServerError extends Error {
   }
 }
 
-export const errorCodeResponse = (error: ServerError) => {
-  return {
+export const errorCodeResponse = (error: Error) => {
+  let message = "";
+  let errorCode = 0;
+  message = error.message;
+  if (error instanceof ServerError) {
+    errorCode = error.code;
+  } else {
+    errorCode = 0;
+  }
+
+  const res = {
     status: 400,
     headers: new Headers({
       "content-type": "application/json",
     }),
-    body: JSON.stringify({ message: error.message, errorCode: error.code }),
+    body: JSON.stringify({ message, errorCode }),
   };
+  return res;
 };

@@ -23,6 +23,12 @@ export interface IReqUser extends ApiOption {
   password: string;
 }
 
+export interface IReqDeleteUser extends ApiOption {
+  id?: string;
+  name?: string;
+  password: string;
+}
+
 class User implements IUser {
   public screenName: string;
   public name: string;
@@ -72,7 +78,6 @@ class Users {
 
     if (this.users.some((e) => e.name === data.name)) {
       throw new ServerError(ErrorType.ALREADY_REGISTERED_NAME);
-      //throw Error("Already registered name");
     }
     const user = new User(data);
 
@@ -83,15 +88,21 @@ class Users {
     return user;
   }
 
-  deleteUser({ name = "", id = "", password = "" }) {
-    if (password === "") throw Error("Not password");
-    const index = this.users.findIndex((e) =>
-      e.password === password && (e.id === id || e.name === name)
-    );
-    if (index === -1) throw Error("Can not find users.");
-    this.users.splice(index, 1);
+  deleteUser(data: IReqDeleteUser) {
+    if (!data.password) throw new ServerError(ErrorType.NOT_PASSWORD);
 
-    this.save();
+    const index = this.users.findIndex((e) => {
+      return e.password === data.password &&
+        (e.id === data.id || e.name === data.name);
+    });
+    if (index === -1) throw new ServerError(ErrorType.NOT_USER);
+
+    const user = new User(this.users[index]);
+    if (data.option?.dryRun !== true) {
+      this.users.splice(index, 1);
+      this.save();
+    }
+    return user;
   }
 
   /*updateUser(
@@ -201,11 +212,10 @@ export const userRouter = () => {
         const user = accounts.registUser(reqData);
         await req.respond(jsonResponse(user));
       } catch (e) {
-        if (e instanceof ServerError) {
-          await req.respond(errorCodeResponse(e));
-        } else {
+        await req.respond(errorCodeResponse(e));
+        /*} else {
           await req.respond(errorResponse(e.message));
-        }
+        }*/
       }
     },
   );
@@ -242,14 +252,10 @@ export const userRouter = () => {
     async (req) => {
       try {
         const reqData = ((await req.json()) as User);
-
-        const user = accounts.deleteUser(
-          { name: reqData.name, id: reqData.id, password: reqData.password },
-        );
-        await req.respond({ status: 200 });
+        const user = accounts.deleteUser(reqData);
+        await req.respond(jsonResponse(user));
       } catch (e) {
-        //console.log(e);
-        await req.respond(errorResponse(e.message));
+        await req.respond(errorCodeResponse(e));
       }
     },
   );
