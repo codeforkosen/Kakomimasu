@@ -1,4 +1,8 @@
 export const errors = {
+  NOTHING_SEARCH_QUERY: {
+    errorCode: 1,
+    message: "nothing search query",
+  },
   NOT_PASSWORD: {
     errorCode: 200,
     message: "not password",

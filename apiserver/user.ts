@@ -252,7 +252,9 @@ export const userRouter = () => {
     try {
       const query = req.query;
       const q = query.get("q");
-      if (!q) throw Error("Nothing search query");
+      if (!q) {
+        throw new ServerError(errors.NOTHING_SEARCH_QUERY);
+      }
 
       const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
       const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
@@ -260,8 +262,7 @@ export const userRouter = () => {
 
       await req.respond(jsonResponse(users));
     } catch (e) {
-      //console.log(e);
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
 

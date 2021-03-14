@@ -38,4 +38,9 @@ export default class ApiClient {
     const resJson = await this._fetchToJson(`/users/show/${identifier}`);
     return resJson;
   }
+
+  async usersSearch(searchText) {
+    const resJson = await this._fetchToJson(`/users/search?q=${searchText}`);
+    return resJson;
+  }
 }

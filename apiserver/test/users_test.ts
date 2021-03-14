@@ -144,6 +144,32 @@ Deno.test("users show:not user", async () => {
   assertEquals(res, errors.NOT_USER);
 });
 
+// /api/users/search Test
+// テスト項目
+// 正常(名前・ID)・クエリ無し
+Deno.test("users search:normal by name", async () => {
+  const res = await ac.usersSearch(data.name);
+  assertUser(res[0], data);
+});
+Deno.test("users search:normal by id", async () => {
+  const res = await ac.usersSearch(data.id);
+  assertUser(res[0], data);
+});
+Deno.test("users search:no query", async () => {
+  {
+    const res = await ac.usersSearch("");
+    assertEquals(res, errors.NOTHING_SEARCH_QUERY);
+  }
+  {
+    const res = await ac.usersSearch(0);
+    assertEquals(res, errors.NOTHING_SEARCH_QUERY);
+  }
+  {
+    const res = await ac._fetchToJson(`/users/search`);
+    assertEquals(res, errors.NOTHING_SEARCH_QUERY);
+  }
+});
+
 // /api/users/delete Test
 // テスト項目
 // 正常(名前で削除・IDで削除)・パスワード無し・ユーザ無し
