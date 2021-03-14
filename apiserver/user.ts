@@ -6,6 +6,8 @@ import {
 import util from "../util.js";
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
+import { ApiOption } from "./parts/interface.ts";
+import { errorCodeResponse, errors, ServerError } from "./error.ts";
 
 export interface IUser {
   screenName: string;
@@ -13,6 +15,18 @@ export interface IUser {
   id?: string;
   password: string;
   gamesId?: string[];
+}
+
+export interface IReqUser extends ApiOption {
+  screenName: string;
+  name: string;
+  password: string;
+}
+
+export interface IReqDeleteUser extends ApiOption {
+  id?: string;
+  name?: string;
+  password: string;
 }
 
 class User implements IUser {
@@ -57,26 +71,38 @@ class Users {
 
   getUsers = () => this.users;
 
-  registUser(screenName: string, name: string, password: string): User {
-    if (password === "") throw Error("Not password");
-    if (this.users.some((e) => e.name === name)) {
-      throw Error("Already registered name");
+  registUser(data: IReqUser): User {
+    if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
+    if (!data.name) throw new ServerError(errors.INVALID_NAME);
+    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
+
+    if (this.users.some((e) => e.name === data.name)) {
+      throw new ServerError(errors.ALREADY_REGISTERED_NAME);
     }
-    const user = new User({ screenName, name, password });
-    this.users.push(user);
-    this.save();
+    const user = new User(data);
+
+    if (data.option?.dryRun !== true) {
+      this.users.push(user);
+      this.save();
+    }
     return user;
   }
 
-  deleteUser({ name = "", id = "", password = "" }) {
-    if (password === "") throw Error("Not password");
-    const index = this.users.findIndex((e) =>
-      e.password === password && (e.id === id || e.name === name)
-    );
-    if (index === -1) throw Error("Can not find users.");
-    this.users.splice(index, 1);
+  deleteUser(data: IReqDeleteUser) {
+    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
 
-    this.save();
+    const index = this.users.findIndex((e) => {
+      return e.password === data.password &&
+        (e.id === data.id || e.name === data.name);
+    });
+    if (index === -1) throw new ServerError(errors.NOT_USER);
+
+    const user = new User(this.users[index]);
+    if (data.option?.dryRun !== true) {
+      this.users.splice(index, 1);
+      this.save();
+    }
+    return user;
   }
 
   /*updateUser(
@@ -134,7 +160,7 @@ class Users {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
-    if (user === undefined) throw Error("Can not find users.");
+    if (user === undefined) throw new ServerError(errors.NOT_USER);
     return user;
   }
 
@@ -181,17 +207,12 @@ export const userRouter = () => {
     contentTypeFilter("application/json"),
     async (req) => {
       try {
-        const reqData = ((await req.json()) as User);
-        console.log(reqData);
-        const user = accounts.registUser(
-          reqData.screenName,
-          reqData.name,
-          reqData.password,
-        );
+        const reqData = ((await req.json()) as IReqUser);
+        //console.log(reqData);
+        const user = accounts.registUser(reqData);
         await req.respond(jsonResponse(user));
       } catch (e) {
-        //console.log(e);
-        await req.respond(errorResponse(e.message));
+        await req.respond(errorCodeResponse(e));
       }
     },
   );
@@ -202,17 +223,12 @@ export const userRouter = () => {
       const identifier = req.match[1];
       if (identifier !== "") {
         const user = accounts.showUser(identifier);
-        if (user !== undefined) {
-          await req.respond(jsonResponse(user));
-        }
+        await req.respond(jsonResponse(user));
       } else {
-        await req.respond(jsonResponse(
-          accounts.getUsers(),
-        ));
+        await req.respond(jsonResponse(accounts.getUsers()));
       }
     } catch (e) {
-      //console.log(e);
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
 
@@ -223,14 +239,10 @@ export const userRouter = () => {
     async (req) => {
       try {
         const reqData = ((await req.json()) as User);
-
-        const user = accounts.deleteUser(
-          { name: reqData.name, id: reqData.id, password: reqData.password },
-        );
-        await req.respond({ status: 200 });
+        const user = accounts.deleteUser(reqData);
+        await req.respond(jsonResponse(user));
       } catch (e) {
-        //console.log(e);
-        await req.respond(errorResponse(e.message));
+        await req.respond(errorCodeResponse(e));
       }
     },
   );
@@ -240,7 +252,9 @@ export const userRouter = () => {
     try {
       const query = req.query;
       const q = query.get("q");
-      if (!q) throw Error("Nothing search query");
+      if (!q) {
+        throw new ServerError(errors.NOTHING_SEARCH_QUERY);
+      }
 
       const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
       const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
@@ -248,8 +262,7 @@ export const userRouter = () => {
 
       await req.respond(jsonResponse(users));
     } catch (e) {
-      //console.log(e);
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
 
