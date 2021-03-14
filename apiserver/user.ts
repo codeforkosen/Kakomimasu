@@ -160,7 +160,7 @@ class Users {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
-    if (user === undefined) throw Error("Can not find users.");
+    if (user === undefined) throw new ServerError(ErrorType.NOT_USER);
     return user;
   }
 
@@ -213,9 +213,6 @@ export const userRouter = () => {
         await req.respond(jsonResponse(user));
       } catch (e) {
         await req.respond(errorCodeResponse(e));
-        /*} else {
-          await req.respond(errorResponse(e.message));
-        }*/
       }
     },
   );
@@ -226,22 +223,12 @@ export const userRouter = () => {
       const identifier = req.match[1];
       if (identifier !== "") {
         const user = accounts.showUser(identifier);
-        if (user !== undefined) {
-          await req.respond(jsonResponse(user));
-        }
+        await req.respond(jsonResponse(user));
       } else {
-        await req.respond(jsonResponse(
-          accounts.getUsers(),
-        ));
+        await req.respond(jsonResponse(accounts.getUsers()));
       }
     } catch (e) {
-      /*console.log(e);
-      if (e instanceof ServerError) {
-        console.log("Server error");
-        await req.respond(errorCodeResponse(e));
-      } else {*/
-      await req.respond(errorResponse(e.message));
-      //}
+      await req.respond(errorCodeResponse(e));
     }
   });
 

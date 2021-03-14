@@ -46,6 +46,9 @@ const assertUser = (user: any, sample: any | undefined = undefined) => {
   assertEquals(user_, sample_);
 };
 
+// /api/users/regist Test
+// テスト項目
+// 正常・パスワード無し・表示名無し・名前無し・登録済みのユーザ
 Deno.test("users regist:normal", async () => {
   const res = await ac.usersRegist({
     ...data,
@@ -125,6 +128,25 @@ Deno.test("users regist:already registered name", async () => {
   assertEquals(res.errorCode, ErrorType.ALREADY_REGISTERED_NAME);
 });
 
+// /api/users/show Test
+// テスト項目
+// 正常(名前・ID)・ユーザ無し
+Deno.test("users show:normal by name", async () => {
+  let res = await ac.usersShow(data.name);
+  assertUser(res, data);
+});
+Deno.test("users show:normal by id", async () => {
+  let res = await ac.usersShow(data.id);
+  assertUser(res, data);
+});
+Deno.test("users show:not user", async () => {
+  let res = await ac.usersShow(v4.generate());
+  assertEquals(res.errorCode, ErrorType.NOT_USER);
+});
+
+// /api/users/delete Test
+// テスト項目
+// 正常(名前で削除・IDで削除)・パスワード無し・ユーザ無し
 Deno.test("users delete:normal by name", async () => {
   const res = await ac.usersDelete({
     name: data.name,

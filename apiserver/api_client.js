@@ -3,7 +3,12 @@ export default class ApiClient {
     this.baseUrl = host + "/api";
   }
 
-  async _fetchJson(path, data) {
+  async _fetchToJson(path) {
+    const resJson = await (await fetch(this.baseUrl + path)).json();
+    return resJson;
+  }
+
+  async _fetchPostJson(path, data) {
     const res = await fetch(
       this.baseUrl + path,
       {
@@ -15,18 +20,23 @@ export default class ApiClient {
     return res;
   }
 
-  async _fetchJsonToJson(path, data) {
-    const resJson = await (await this._fetchJson(path, data)).json();
+  async _fetchPostJsonToJson(path, data) {
+    const resJson = await (await this._fetchPostJson(path, data)).json();
     return resJson;
   }
 
   async usersRegist(data) {
-    return await this._fetchJsonToJson("/users/regist", data);
+    return await this._fetchPostJsonToJson("/users/regist", data);
   }
 
   async usersDelete(data) {
-    const res = await this._fetchJsonToJson("/users/delete", data);
-    //await res.body?.cancel();
-    return res;
+    const resJson = await this._fetchPostJsonToJson("/users/delete", data);
+    //await resJson.body?.cancel();
+    return resJson;
+  }
+
+  async usersShow(identifier) {
+    const resJson = await this._fetchToJson(`/users/show/${identifier}`);
+    return resJson;
   }
 }
