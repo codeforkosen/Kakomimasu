@@ -1,45 +1,38 @@
-const errors = [
-  {
-    code: 200,
+export const errors = {
+  NOT_PASSWORD: {
+    errorCode: 200,
     message: "not password",
   },
-  {
-    code: 201,
+  INVALID_SCREEN_NAME: {
+    errorCode: 201,
     message: "invalid screenName",
   },
-  {
-    code: 202,
+  INVALID_NAME: {
+    errorCode: 202,
     message: "invalid name",
   },
-  {
-    code: 203,
+  ALREADY_REGISTERED_NAME: {
+    errorCode: 203,
     message: "already registered name",
   },
-  {
-    code: 204,
+  NOT_USER: {
+    errorCode: 204,
     message: "can not find user",
   },
-];
+};
 
-export enum ErrorType {
-  NOT_PASSWORD = 200,
-  INVALID_SCREEN_NAME = 201,
-  INVALID_NAME = 202,
-  ALREADY_REGISTERED_NAME = 203,
-  NOT_USER = 204,
+interface IError {
+  errorCode: number;
+  message: string;
 }
 
 export class ServerError extends Error {
-  //public message: string = "";
-  public code: number = 0;
+  public errorCode: number = 0;
 
-  constructor(errortype: ErrorType) {
+  constructor(error: IError) {
     super();
-    const error = errors.find((e) => e.code === errortype);
-    if (error) {
-      this.message = error.message;
-      this.code = error.code;
-    }
+    this.message = error.message;
+    this.errorCode = error.errorCode;
   }
 }
 
@@ -48,7 +41,7 @@ export const errorCodeResponse = (error: Error) => {
   let errorCode = 0;
   message = error.message;
   if (error instanceof ServerError) {
-    errorCode = error.code;
+    errorCode = error.errorCode;
   } else {
     errorCode = 0;
   }

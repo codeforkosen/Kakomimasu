@@ -7,7 +7,7 @@ import util from "../util.js";
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
-import { errorCodeResponse, ErrorType, ServerError } from "./error.ts";
+import { errorCodeResponse, errors, ServerError } from "./error.ts";
 
 export interface IUser {
   screenName: string;
@@ -72,12 +72,12 @@ class Users {
   getUsers = () => this.users;
 
   registUser(data: IReqUser): User {
-    if (!data.screenName) throw new ServerError(ErrorType.INVALID_SCREEN_NAME);
-    if (!data.name) throw new ServerError(ErrorType.INVALID_NAME);
-    if (!data.password) throw new ServerError(ErrorType.NOT_PASSWORD);
+    if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
+    if (!data.name) throw new ServerError(errors.INVALID_NAME);
+    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
 
     if (this.users.some((e) => e.name === data.name)) {
-      throw new ServerError(ErrorType.ALREADY_REGISTERED_NAME);
+      throw new ServerError(errors.ALREADY_REGISTERED_NAME);
     }
     const user = new User(data);
 
@@ -89,13 +89,13 @@ class Users {
   }
 
   deleteUser(data: IReqDeleteUser) {
-    if (!data.password) throw new ServerError(ErrorType.NOT_PASSWORD);
+    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
 
     const index = this.users.findIndex((e) => {
       return e.password === data.password &&
         (e.id === data.id || e.name === data.name);
     });
-    if (index === -1) throw new ServerError(ErrorType.NOT_USER);
+    if (index === -1) throw new ServerError(errors.NOT_USER);
 
     const user = new User(this.users[index]);
     if (data.option?.dryRun !== true) {
@@ -160,7 +160,7 @@ class Users {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
-    if (user === undefined) throw new ServerError(ErrorType.NOT_USER);
+    if (user === undefined) throw new ServerError(errors.NOT_USER);
     return user;
   }
 

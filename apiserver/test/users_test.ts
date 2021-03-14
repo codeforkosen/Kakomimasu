@@ -10,7 +10,7 @@ const ac = new ApiClient();
 import { pathResolver } from "../apiserver_util.ts";
 const resolve = pathResolver(import.meta);
 
-import { ErrorType } from "../error.ts";
+import { errors } from "../error.ts";
 
 const save = (fileName: string, data: object) => {
   Deno.writeTextFileSync(
@@ -64,17 +64,17 @@ Deno.test("users regist:not password", async () => {
   };
   {
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
   {
     data_.password = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
   {
     data_.password = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
 });
 Deno.test("users regist:invalid screenName", async () => {
@@ -85,17 +85,17 @@ Deno.test("users regist:invalid screenName", async () => {
   };
   {
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_SCREEN_NAME);
+    assertEquals(res, errors.INVALID_SCREEN_NAME);
   }
   {
     data_.screenName = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_SCREEN_NAME);
+    assertEquals(res, errors.INVALID_SCREEN_NAME);
   }
   {
     data_.screenName = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_SCREEN_NAME);
+    assertEquals(res, errors.INVALID_SCREEN_NAME);
   }
 });
 Deno.test("users regist:invalid name", async () => {
@@ -106,17 +106,17 @@ Deno.test("users regist:invalid name", async () => {
   };
   {
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_NAME);
+    assertEquals(res, errors.INVALID_NAME);
   }
   {
     data_.name = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_NAME);
+    assertEquals(res, errors.INVALID_NAME);
   }
   {
     data_.name = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.INVALID_NAME);
+    assertEquals(res, errors.INVALID_NAME);
   }
 });
 Deno.test("users regist:already registered name", async () => {
@@ -125,7 +125,7 @@ Deno.test("users regist:already registered name", async () => {
   data.id = res.id;
 
   res = await ac.usersRegist(data);
-  assertEquals(res.errorCode, ErrorType.ALREADY_REGISTERED_NAME);
+  assertEquals(res, errors.ALREADY_REGISTERED_NAME);
 });
 
 // /api/users/show Test
@@ -141,7 +141,7 @@ Deno.test("users show:normal by id", async () => {
 });
 Deno.test("users show:not user", async () => {
   let res = await ac.usersShow(v4.generate());
-  assertEquals(res.errorCode, ErrorType.NOT_USER);
+  assertEquals(res, errors.NOT_USER);
 });
 
 // /api/users/delete Test
@@ -171,17 +171,17 @@ Deno.test("users delete:not password", async () => {
   };
   {
     const res = await ac.usersDelete(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
   {
     data_.password = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
   {
     data_.password = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res.errorCode, ErrorType.NOT_PASSWORD);
+    assertEquals(res, errors.NOT_PASSWORD);
   }
 });
 Deno.test("users delete:not user", async () => {
@@ -190,7 +190,7 @@ Deno.test("users delete:not user", async () => {
     password: data.password,
     option: { dryRun: true },
   });
-  assertEquals(res.errorCode, ErrorType.NOT_USER);
+  assertEquals(res, errors.NOT_USER);
 });
 Deno.test("users delete:normal no dryrun", async () => {
   let res;

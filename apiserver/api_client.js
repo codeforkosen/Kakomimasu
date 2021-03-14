@@ -31,7 +31,6 @@ export default class ApiClient {
 
   async usersDelete(data) {
     const resJson = await this._fetchPostJsonToJson("/users/delete", data);
-    //await resJson.body?.cancel();
     return resJson;
   }
 
