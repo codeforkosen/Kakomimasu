@@ -74,7 +74,7 @@ class Users {
   registUser(data: IReqUser): User {
     if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
     if (!data.name) throw new ServerError(errors.INVALID_NAME);
-    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
+    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
 
     if (this.users.some((e) => e.name === data.name)) {
       throw new ServerError(errors.ALREADY_REGISTERED_NAME);
@@ -89,7 +89,7 @@ class Users {
   }
 
   deleteUser(data: IReqDeleteUser) {
-    if (!data.password) throw new ServerError(errors.NOT_PASSWORD);
+    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
 
     const index = this.users.findIndex((e) => {
       return e.password === data.password &&
