@@ -27,8 +27,11 @@ string curlGet(string req, string token = "") {
     char buf[sz];
     char cmdline[sz];
     snprintf(cmdline, sz, "curl -s -H 'Authorization: %s' %s%s", token.c_str(), host.c_str(), req.c_str());
+#ifdef _MSC_VER
+    FILE *fp = _popen(cmdline, "r");
+#else
     FILE *fp = popen(cmdline, "r");
-
+#endif
     fgets(buf, sz, fp);
     string res(buf);
     return res;
@@ -38,8 +41,18 @@ string curlPost(string req, string post_data, string token = "") {
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
-    snprintf(cmdline, sz, "curl -s -H 'Authorization: %s' -H 'Content-Type: application/json' -X POST %s%s -d '%s'", token.c_str(), host.c_str(), req.c_str(), post_data.c_str());
+    for (int i = 0; i < post_data.size(); ++i) {
+        if (post_data[i] == '"') {
+            post_data.insert(i, "\\");
+            i++;
+        }
+    }
+    snprintf(cmdline, sz, "curl --request POST --header \"Authorization: %s\" --header \"Content-Type: application/json\" --data %s \"%s%s\"", token.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#ifdef _MSC_VER
+    FILE *fp = _popen(cmdline, "r");
+#else
     FILE *fp = popen(cmdline, "r");
+#endif
 
     fgets(buf, sz, fp);
     string res(buf);
