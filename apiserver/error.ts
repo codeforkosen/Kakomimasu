@@ -3,9 +3,9 @@ export const errors = {
     errorCode: 1,
     message: "nothing search query",
   },
-  NOT_PASSWORD: {
+  NOTHING_PASSWORD: {
     errorCode: 200,
-    message: "not password",
+    message: "nothing password",
   },
   INVALID_SCREEN_NAME: {
     errorCode: 201,
@@ -31,7 +31,7 @@ interface IError {
 }
 
 export class ServerError extends Error {
-  public errorCode: number = 0;
+  public errorCode: number;
 
   constructor(error: IError) {
     super();

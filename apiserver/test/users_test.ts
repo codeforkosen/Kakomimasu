@@ -64,17 +64,17 @@ Deno.test("users regist:not password", async () => {
   };
   {
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
   {
     data_.password = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
   {
     data_.password = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
 });
 Deno.test("users regist:invalid screenName", async () => {
@@ -193,17 +193,17 @@ Deno.test("users delete:not password", async () => {
   };
   {
     const res = await ac.usersDelete(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
   {
     data_.password = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
   {
     data_.password = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.NOT_PASSWORD);
+    assertEquals(res, errors.NOTHING_PASSWORD);
   }
 });
 Deno.test("users delete:not user", async () => {

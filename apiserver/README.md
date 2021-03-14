@@ -28,7 +28,7 @@ deno run -A ../client_deno/client_test1.ts
 
 ゲーム詳細に直接アクセスするには`http://localhost:8880/gamedetails.html?id=(ルームID)`
 
-また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user.html?id=(ユーザID or ユーザネーム)`
+また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/detail.html?id=(ユーザID or ユーザネーム)`
 
 ## API仕様
 
@@ -36,6 +36,11 @@ deno run -A ../client_deno/client_test1.ts
 
 かこみますネットワークプロトコルを決めようの会 
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
+
+公式APIドキュメントを作成中です。
+現在/api/users APIのドキュメントがあります。
+
+[users API](./docs/users_api.md)
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
 
