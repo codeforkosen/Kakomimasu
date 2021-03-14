@@ -23,73 +23,27 @@ static size_t callbackWrite(char *ptr, size_t size, size_t nmemb, string *stream
 }
 
 string curlGet(string req, string token = "") {
-    CURL *curl;
-    CURLcode res;
+    const int sz = 102400;
+    char buf[sz];
+    char cmdline[sz];
+    snprintf(cmdline, sz, "curl -s -H 'Authorization: %s' %s%s", token.c_str(), host.c_str(), req.c_str());
+    FILE *fp = popen(cmdline, "r");
 
-    curl = curl_easy_init();
-    string chunk;
-
-    string url_tmp = host + req;
-    const char *url = url_tmp.c_str();
-
-    if (curl) {
-        if (token != "") {
-            token = "Authorization:" + token;
-            struct curl_slist *headers = NULL;
-            headers = curl_slist_append(headers, token.c_str());
-        }
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callbackWrite);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &chunk);
-        res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-    }
-
-    if (res != CURLE_OK) {
-        cerr << "curlエラー" << endl;
-        exit(1);
-    }
-    return chunk;
+    fgets(buf, sz, fp);
+    string res(buf);
+    return res;
 }
 
 string curlPost(string req, string post_data, string token = "") {
-    CURL *curl;
-    CURLcode res;
+    const int sz = 102400;
+    char buf[sz];
+    char cmdline[sz];
+    snprintf(cmdline, sz, "curl -s -H 'Authorization: %s' -H 'Content-Type: application/json' -X POST %s%s -d '%s'", token.c_str(), host.c_str(), req.c_str(), post_data.c_str());
+    FILE *fp = popen(cmdline, "r");
 
-    curl = curl_easy_init();
-    string chunk;
-
-    string url_tmp = host + req;
-    const char *url = url_tmp.c_str();
-
-    if (curl) {
-        struct curl_slist *headers = NULL;
-        headers = curl_slist_append(headers, "Content-Type: application/json");
-        if (token != "") {
-            token = "Authorization:" + token;
-            headers = curl_slist_append(headers, token.c_str());
-        }
-
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_POST, 1);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, post_data.size());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callbackWrite);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &chunk);
-        res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-
-        curl_slist_free_all(headers);
-    }
-
-    if (res != CURLE_OK) {
-        cerr << "curlエラー" << endl;
-        exit(1);
-    }
-    return chunk;
+    fgets(buf, sz, fp);
+    string res(buf);
+    return res;
 }
 
 void userRegist(string screenName, string name, string password) {
