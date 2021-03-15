@@ -1,6 +1,5 @@
 #include "picojson.h"
 #include <chrono>
-#include <curl/curl.h>
 #include <iostream>
 #include <random>
 #include <string>
