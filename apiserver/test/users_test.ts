@@ -106,17 +106,17 @@ Deno.test("users regist:invalid name", async () => {
   };
   {
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.INVALID_NAME);
+    assertEquals(res, errors.INVALID_USER_NAME);
   }
   {
     data_.name = null;
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.INVALID_NAME);
+    assertEquals(res, errors.INVALID_USER_NAME);
   }
   {
     data_.name = "";
     const res = await ac.usersRegist(data_);
-    assertEquals(res, errors.INVALID_NAME);
+    assertEquals(res, errors.INVALID_USER_NAME);
   }
 });
 Deno.test("users regist:already registered name", async () => {

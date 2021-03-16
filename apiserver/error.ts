@@ -11,7 +11,7 @@ export const errors = {
     errorCode: 201,
     message: "invalid screenName",
   },
-  INVALID_NAME: {
+  INVALID_USER_NAME: {
     errorCode: 202,
     message: "invalid name",
   },
@@ -22,6 +22,26 @@ export const errors = {
   NOT_USER: {
     errorCode: 204,
     message: "can not find user",
+  },
+  INVALID_USER_IDENTIFIER: {
+    errorCode: 205,
+    message: "invalid id or name",
+  },
+  INVALID_TOURNAMENT_NAME: {
+    errorCode: 300,
+    message: "invalid name",
+  },
+  INVALID_TYPE: {
+    errorCode: 301,
+    message: "invalid type",
+  },
+  INVALID_TOURNAMENT_ID: {
+    errorCode: 302,
+    message: "invalid id",
+  },
+  NOTHING_TOURNAMENT_ID: {
+    errorCode: 303,
+    message: "nothing id",
   },
 };
 
