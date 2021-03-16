@@ -9,6 +9,12 @@ import { errorCodeResponse, errors, ServerError } from "./error.ts";
 
 type TournamentType = "round-robin" | "knockout";
 
+const checkType = (type: string): boolean => {
+  if (type === "round-robin") return true;
+  if (type === "knockout") return true;
+  return false;
+};
+
 export interface ITournamentBasic {
   name: string;
   organizer?: string;
@@ -124,8 +130,10 @@ export const tournamentRouter = () => {
   router.post("/create", async (req) => {
     try {
       const data = await req.json() as ITournamentReq;
-      if (data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
-      if (data.type) throw new ServerError(errors.INVALID_TYPE);
+      if (!data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
+      if (!data.type || !checkType(data.type)) {
+        throw new ServerError(errors.INVALID_TYPE);
+      }
       const tournament = new Tournament(data);
       if (data.participants) {
         data.participants.forEach((e) => tournament.addUser(e));

@@ -43,4 +43,9 @@ export default class ApiClient {
     const resJson = await this._fetchToJson(`/users/search?q=${searchText}`);
     return resJson;
   }
+
+  async tournamentsCreate(data) {
+    const resJson = await this._fetchPostJsonToJson("/tournament/create", data);
+    return resJson;
+  }
 }
