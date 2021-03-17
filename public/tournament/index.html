@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+    <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+    <title>大会一覧 - 囲みマス</title>
+  </head>
+
+  <body>
+    <header id="header"></header>
+    <main>
+      <h1 id="title">大会一覧</h1>
+      <a class="button" href="create.html">大会作成はこちらから</a>
+
+      <div id="tournament-list">
+        <div v-for="tournament in tournaments" class="tournament" v-on:click="click(tournament.id)">
+          <div class="name">{{tournament.name}}</div>
+          <div class="organizer">主催：{{tournament.organizer}}</div>
+          <div class="type">試合形式：{{getType(tournament.type)}}</div>
+          <div class="remarks">{{tournament.remarks}}</div>
+        </div>
+      </div>
+    </main>
+    <footer id="footer"></footer>
+
+    <script type="module">
+      import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
+      import { getTournament } from "/js/api-util.js";
+
+      const tournamentListVue = new Vue({
+        el: "#tournament-list",
+        data: {
+          tournaments: [],
+        },
+        methods: {
+          getType(type) {
+            if (type === "round-robin") return "総当たり戦";
+            else if (type === "knockout") return "勝ち残り戦";
+          },
+          click(id) {
+            location.href = `detail.html?id=${id}`;
+          }
+        }
+      });
+
+      async function get() {
+        const tournaments = await getTournament();
+        tournamentListVue.tournaments = tournaments;
+        console.log(tournaments);
+      }
+
+      get();
+
+
+    </script>
+
+    <script type="module" src="/js/vue-comp/common.js"></script>
+  </body>
+
+</html>
+
+<style>
+  @import url("/css/common.css");
+
+  #tournament-list {
+    display: flex;
+    padding: 50px;
+    width: 100%;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+
+  .tournament {
+    border: solid 3px var(--codeforkosen-color);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    margin: 1em;
+    width: 20em;
+  }
+
+  .tournament:hover {
+    border-color: var(--kakomimasu-color);
+  }
+
+  .tournament .name {
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+
+  .tournament .organizer {
+    text-align: left;
+  }
+
+  .tournament .type {
+    text-align: left;
+  }
+
+  .tournament .remarks {
+    font-size: 0.8em;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

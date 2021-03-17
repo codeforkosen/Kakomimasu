@@ -1,96 +1,38 @@
 <!DOCTYPE html>
 <html lang="ja">
+
   <head>
     <meta charset="utf-8">
     <title>VRTest</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.js"></script>
-    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+    <script
+      src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
   </head>
+
   <body>
     <a-scene id="scene" main>
 
-      <a-entity
-        environment="preset:forest"
-        shadow="receive:true"
-      ></a-entity>
+      <a-entity environment="preset:forest" shadow="receive:true"></a-entity>
 
-      <a-gltf-model
-        src="url(./assets/hall/model.gltf)"
-        position="-0.5 0 2"
-        scale="3 3 3"
-        rotation="0 270 0"
-      ></a-gltf-model>
+      <a-gltf-model src="url(./assets/hall/model.gltf)" position="-0.5 0 2" scale="3 3 3" rotation="0 270 0">
+      </a-gltf-model>
 
       <a-entity oculus-touch-controls="hand:left"></a-entity>
       <a-entity oculus-touch-controls="hand:right"></a-entity>
 
-      <a-light
-        type="spot"
-        castShadow="true"
-        intensity="0.5"
-        angle="90"
-        position="0 8 0"
-        rotation="-90 0 0"
-        intensity="0.1"
-      ></a-light>
+      <a-light type="spot" castShadow="true" intensity="0.5" angle="90" position="0 8 0" rotation="-90 0 0"
+        intensity="0.1"></a-light>
 
-      <a-entity
-        id="fieldTable"
-        position="0 1.25 0"
-      >
-        <a-camera
-          look-controls
-          position="0 1.6 6"
-          wasd-controls="acceleration:100"
-        ></a-camera>
+      <a-entity id="fieldTable" position="0 1.25 0">
+        <a-camera look-controls position="0 1.6 6" wasd-controls="acceleration:100"></a-camera>
 
-        <a-box
-          color="darkslategray"
-          width="5"
-          height="0.4"
-          depth="0.2"
-          position="0 0.2 -0.5"
-          shadow="receive:true"
-        >
-          <a-text
-            id="turn"
-            value="-"
-            width="8"
-            color="white"
-            position="-2.4 0 0.1"
-            align="left"
-            shadow="receive:true"
-          ></a-text>
-          <a-text
-            id="pointP1"
-            value="0"
-            width="8"
-            color="#80C9FF"
-            position="-0.15 0 0.1"
-            align="right"
-          ></a-text>
-          <a-text
-            value=":"
-            width="8"
-            color="white"
-            position="-0.1 0 0.1"
-            align="left"
-          ></a-text>
-          <a-text
-            id="pointP2"
-            color="#FE9998"
-            value="0"
-            width="8"
-            align="left"
-            position="0.1 0 0.1"
-          ></a-text>
-          <a-text
-            id="statusText"
-            color="white"
-            width="8"
-            align="right"
-            position="2.4 0 0.1"
-          ></a-text>
+        <a-box color="darkslategray" width="5" height="0.4" depth="0.2" position="0 0.2 -0.5" shadow="receive:true">
+          <a-text id="turn" value="-" width="8" color="white" position="-2.4 0 0.1" align="left" shadow="receive:true">
+          </a-text>
+          <a-text id="pointP1" value="0" width="8" color="#80C9FF" position="-0.15 0 0.1" align="right"></a-text>
+          <a-text value=":" width="8" color="white" position="-0.1 0 0.1" align="left"></a-text>
+          <a-text id="pointP2" color="#FE9998" value="0" width="8" align="left" position="0.1 0 0.1"></a-text>
+          <a-text id="statusText" color="white" width="8" align="right" position="2.4 0 0.1"></a-text>
         </a-box>
       </a-entity>
 
@@ -206,50 +148,6 @@
         }
       }
 
-      const gameId = getUrlQueries().id;
-
-      main();
-
-      async function main() {
-        game = await getGameInfo(gameId);
-
-        const waitGameStartId = setInterval(waitGameStart, 200);
-        waitGameStart();
-
-        async function waitGameStart() {
-          await getRoomInfo();
-          //game = await getGameInfo(gameId);
-          if (game.startedAtUnixTime !== null) {
-            console.log("プレイヤーそろったよ！");
-
-            clearInterval(waitGameStartId);
-            setTimeout(() => {
-              console.log("ゲームスタート！");
-              updateField();
-
-              async function updateField() {
-                console.log("フィールド更新！");
-                await getRoomInfo();
-                const diffTime = ((game.nextTurnUnixTime) * 1000) - new Date().getTime();
-                //console.log(diffTime);
-                if (game.ending) return;
-                else setTimeout(updateField, diffTime);
-              }
-            }, (game.startedAtUnixTime * 1000) - new Date().getTime());
-          }
-          return waitGameStart;
-        }
-
-        setInterval(function updateStatus() {
-          if (game.startedAtUnixTime === null) statusText.setAttribute("value", "WAIT");
-          else if (nowUnixTime() < game.startedAtUnixTime) statusText.setAttribute("value", `START ${game.startedAtUnixTime - nowUnixTime()}`);
-          else if (nowUnixTime() < game.nextTurnUnixTime) statusText.setAttribute("value", `NEXT ${game.nextTurnUnixTime - nowUnixTime()}`);
-          else if (!game.ending) statusText.setAttribute("value", "CHECK");
-          else statusText.setAttribute("value", "END");
-          return updateStatus;
-        }(), 100);
-      }
-
       async function getRoomInfo() {
         game = await getGameInfo(gameId);
 
@@ -270,6 +168,32 @@
           updateTable(game, lastFlatLog);
         }
       }
+
+      const gameId = getUrlQueries().id;
+      var socket = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/api/ws/game/" + gameId);
+      socket.onopen = (event) => {
+        setInterval(function updateStatus() {
+          if (game) {
+            if (game.startedAtUnixTime === null) statusText.setAttribute("value", "WAIT");
+            else if (nowUnixTime() < game.startedAtUnixTime) statusText.setAttribute("value", `START ${game.startedAtUnixTime - nowUnixTime()}`);
+            else if (nowUnixTime() < game.nextTurnUnixTime) statusText.setAttribute("value", `NEXT ${game.nextTurnUnixTime - nowUnixTime()}`);
+            else if (!game.ending) statusText.setAttribute("value", "CHECK");
+            else statusText.setAttribute("value", "END");
+          }
+          return updateStatus;
+        }(), 100);
+      }
+      socket.onmessage = (event) => {
+        const game = JSON.parse(event.data);
+        getRoomInfo();
+      }
+      socket.onerror = (event) => {
+        //console.log('ws wrror', event);
+      }
+      socket.onclose = (event) => {
+        //console.log('ws wrror');
+      }
     </script>
   </body>
+
 </html>

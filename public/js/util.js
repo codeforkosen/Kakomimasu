@@ -20,23 +20,9 @@ class Game {
       else if (gameJson.gaming && !gameJson.ending) status = "プレイ中";
       else if (gameJson.ending) status = "ゲーム終了";
     }
-    console.log(gameJson);
+    //console.log(gameJson);
     return [status, startTime, gameJson.board ? gameJson.board.name : null];
   }
-}
-
-function createHeader(userScreenName) {
-  const headerDiv = document.getElementsByTagName("header")[0];
-  headerDiv.innerHTML = `
-    <a href="/index.html"><img src="/img/kakomimasu-logo.png" alt="囲みますロゴ"></a>
-    <h1>${userScreenName}</h1>
-  `;
-}
-
-function createFooter() {
-  const footer = document.getElementsByTagName("footer")[0];
-  footer.innerHTML =
-    'CC BY <a href="https://codeforkosen.github.io/">Code for KOSEN</a>(<a href=https://github.com/codeforkosen/Kakomimasu>src on GitHub</a>)';
 }
 
 function getTurnText(game) {
@@ -56,21 +42,11 @@ function diffTime(unixTime) {
 }
 
 function getUrlQueries() {
-  var queryStr = window.location.search.slice(1); // 文頭?を除外
   const queries = {};
-
-  // クエリがない場合は空のオブジェクトを返す
-  if (!queryStr) {
-    return queries;
-  }
-
-  // クエリ文字列を & で分割して処理
-  queryStr.split("&").forEach(function (queryStr) {
-    // = で分割してkey,valueをオブジェクトに格納
-    var queryArr = queryStr.split("=");
-    queries[queryArr[0]] = queryArr[1];
+  const params = new URLSearchParams(window.location.search);
+  params.forEach((v, k) => {
+    queries[k] = v;
   });
-
   return queries;
 }
 
@@ -101,8 +77,6 @@ async function getGameInfo(roomid) {
 
 export {
   Game,
-  createHeader,
-  createFooter,
   getTurnText,
   nowUnixTime,
   diffTime,
@@ -111,3 +85,6 @@ export {
   //getAllGame,
   getGameInfo,
 };
+
+export const getUserDetailUrl = (a) => `/user/detail.html?id=${a}`;
+export const getGameDetailUrl = (a) => `/gamedetails.html?id=${a}`; 

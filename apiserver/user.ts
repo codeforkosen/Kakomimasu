@@ -1,77 +1,108 @@
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import {
+  contentTypeFilter,
+  createRouter,
+} from "https://servestjs.org/@v1.1.9/mod.ts";
 
-class User {
+import util from "../util.js";
+import { errorResponse, jsonResponse } from "./apiserver_util.ts";
+import { UserFileOp } from "./parts/file_opration.ts";
+import { ApiOption } from "./parts/interface.ts";
+import { errorCodeResponse, errors, ServerError } from "./error.ts";
+
+export interface IUser {
+  screenName: string;
+  name: string;
+  id?: string;
+  password: string;
+  gamesId?: string[];
+}
+
+export interface IReqUser extends ApiOption {
+  screenName: string;
+  name: string;
+  password: string;
+}
+
+export interface IReqDeleteUser extends ApiOption {
+  id?: string;
+  name?: string;
+  password: string;
+}
+
+class User implements IUser {
   public screenName: string;
   public name: string;
   public readonly id: string;
   public password: string;
+  public gamesId: string[];
 
-  constructor(screenName: string, name: string, password: string) {
-    this.screenName = screenName;
-    this.name = name;
-    this.id = v4.generate();
-    this.password = password;
+  constructor(data: IUser) {
+    this.screenName = data.screenName;
+    this.name = data.name;
+    this.id = data.id || util.uuid();
+    this.password = data.password;
+    this.gamesId = data.gamesId || [];
   }
 
-  /*toJSON = () => {
-    return {
-      screenName: this.screenName,
-      name: this.name,
-      id: this.id,
-    };
-  };*/
+  // シリアライズする際にパスワードを返さないように
+  // パスワードを返したい場合にはnoSafe()を用いる
+  toJSON() {
+    return Object.assign({}, this, { password: undefined });
+  }
+
+  // passwordも含めたオブジェクトにする
+  noSafe() {
+    return Object.assign({}, this);
+  }
 }
 
-class Account {
-  private users: Array<User>;
+class Users {
+  private users: Array<User> = [];
 
   constructor() {
-    this.users = new Array();
     this.read();
   }
 
-  read() {
-    const path = "./data/users.json";
-    try {
-      if (Deno.statSync(path).isFile) {
-        this.users = JSON.parse(Deno.readTextFileSync(path)) as Array<User>;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  write() {
-    const dirName = "./data";
-    Deno.mkdirSync(dirName, { recursive: true });
-    Deno.writeTextFileSync(
-      `${dirName}/users.json`,
-      JSON.stringify(this.users, ["screenName", "name", "id", "password"]),
-    );
-  }
+  read = () => {
+    const usersData = UserFileOp.read();
+    this.users = usersData.map((e) => new User(e));
+  };
+  save = () => UserFileOp.save(this.users.map((e) => e.noSafe()));
 
   getUsers = () => this.users;
 
-  registUser(screenName: string, name: string, password: string): User {
-    if (password === "") throw Error("Not password");
-    if (this.users.some((e) => e.name === name)) {
-      throw Error("Already registered name");
+  registUser(data: IReqUser): User {
+    if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
+    if (!data.name) throw new ServerError(errors.INVALID_NAME);
+    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
+
+    if (this.users.some((e) => e.name === data.name)) {
+      throw new ServerError(errors.ALREADY_REGISTERED_NAME);
     }
-    const user = new User(screenName, name, password);
-    this.users.push(user);
-    this.write();
+    const user = new User(data);
+
+    if (data.option?.dryRun !== true) {
+      this.users.push(user);
+      this.save();
+    }
     return user;
   }
 
-  deleteUser({ name = "", id = "", password = "" }) {
-    if (password === "") throw Error("Not password");
-    const index = this.users.findIndex((e) =>
-      e.password === password && (e.id === id || e.name === name)
-    );
-    if (index === -1) throw Error("Can not find user.");
-    this.users.splice(index, 1);
+  deleteUser(data: IReqDeleteUser) {
+    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
 
-    this.write();
+    const index = this.users.findIndex((e) => {
+      return e.password === data.password &&
+        (e.id === data.id || e.name === data.name);
+    });
+    if (index === -1) throw new ServerError(errors.NOT_USER);
+
+    const user = new User(this.users[index]);
+    if (data.option?.dryRun !== true) {
+      this.users.splice(index, 1);
+      this.save();
+    }
+    return user;
   }
 
   /*updateUser(
@@ -129,7 +160,7 @@ class Account {
     const user = this.users.find((
       e,
     ) => (e.id === identifier || e.name === identifier));
-    if (user === undefined) throw Error("Can not find user.");
+    if (user === undefined) throw new ServerError(errors.NOT_USER);
     return user;
   }
 
@@ -140,9 +171,100 @@ class Account {
     ) => ((e.id === identifier || e.name === identifier) &&
       e.password === password)
     );
-    if (user === undefined) throw Error("Can not find user.");
+    if (user === undefined) throw Error("Can not find users.");
     return user;
+  }
+
+  findById(id: string) {
+    return this.users.find((e) => e.id === id);
+  }
+
+  find(identifier: string) {
+    return this.users.find((e) =>
+      (e.id === identifier) || (e.name === identifier)
+    );
+  }
+
+  addGame(identifier: string, gameId: string) {
+    const user = this.find(identifier);
+    if (user) {
+      user.gamesId.push(gameId);
+    }
+    this.save();
   }
 }
 
-export { Account, User };
+export { User, Users };
+
+export const accounts = new Users();
+
+export const userRouter = () => {
+  const router = createRouter();
+
+  // ユーザ登録
+  router.post(
+    "/regist",
+    contentTypeFilter("application/json"),
+    async (req) => {
+      try {
+        const reqData = ((await req.json()) as IReqUser);
+        //console.log(reqData);
+        const user = accounts.registUser(reqData);
+        await req.respond(jsonResponse(user));
+      } catch (e) {
+        await req.respond(errorCodeResponse(e));
+      }
+    },
+  );
+
+  // ユーザ情報取得
+  router.get(new RegExp("^/show/(.*)$"), async (req) => {
+    try {
+      const identifier = req.match[1];
+      if (identifier !== "") {
+        const user = accounts.showUser(identifier);
+        await req.respond(jsonResponse(user));
+      } else {
+        await req.respond(jsonResponse(accounts.getUsers()));
+      }
+    } catch (e) {
+      await req.respond(errorCodeResponse(e));
+    }
+  });
+
+  // ユーザ削除
+  router.post(
+    "/delete",
+    contentTypeFilter("application/json"),
+    async (req) => {
+      try {
+        const reqData = ((await req.json()) as User);
+        const user = accounts.deleteUser(reqData);
+        await req.respond(jsonResponse(user));
+      } catch (e) {
+        await req.respond(errorCodeResponse(e));
+      }
+    },
+  );
+
+  // ユーザ検索
+  router.get("/search", async (req) => {
+    try {
+      const query = req.query;
+      const q = query.get("q");
+      if (!q) {
+        throw new ServerError(errors.NOTHING_SEARCH_QUERY);
+      }
+
+      const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
+      const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
+      const users = [...new Set([...matchName, ...matchId])];
+
+      await req.respond(jsonResponse(users));
+    } catch (e) {
+      await req.respond(errorCodeResponse(e));
+    }
+  });
+
+  return router;
+};

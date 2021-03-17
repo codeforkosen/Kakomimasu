@@ -1,20 +1,15 @@
 // だいたい点数の高い順に置き、点数の高い順に壊しながら動くアルゴリズム （KakomimasuClient版）
-import { readline } from "https://deno.land/x/readline/mod.ts";
-
-import { Action, DIR, KakomimasuClient } from "./KakomimasuClient.js";
 import util from "../util.js";
+import { Action, DIR, KakomimasuClient, cl } from "./KakomimasuClient.js";
 
-const kc = new KakomimasuClient("a5pre", "破壊者改", "", "a5-pw");
-// kc.setServerHost("http://localhost:8880"); // ローカルに接続してチェックする場合に使う
-
-kc.readGameId();
+const kc = new KakomimasuClient("ai-5", "AI-5", "破壊者改", "ai-5-pw");
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();
-const nagents = kc.getAgentCount();
 const points = kc.getPoints();
 const w = points[0].length;
 const h = points.length;
+const nagents = kc.getAgentCount();
 
 // ポイントの高い順ソート
 const pntall = [];
@@ -28,7 +23,11 @@ const sortByPoint = (p) => {
 };
 sortByPoint(pntall);
 
-info = await kc.waitStart(); // スタート時間待ち
+// スタート時間待ち
+info = await kc.waitStart();
+cl(info);
+
+// ↓ここからがAIの中身↓
 const field = kc.getField();
 while (info) {
   const actions = [];
@@ -45,7 +44,7 @@ while (info) {
   };
   for (let i = 0; i < nagents; i++) {
     const agent = info.players[pno].agents[i];
-    // console.log(field);
+    // cl(field);
     if (agent.x === -1) { // 置く前?
       const p = pntall[i + offset];
       actions.push(new Action(i, "PUT", p.x, p.y));
@@ -104,8 +103,8 @@ while (info) {
           };
           const x2 = agent.x + sgn(target.x - agent.x);
           const y2 = agent.y + sgn(target.y - agent.y);
-          console.log("x2", x2, agent.x, target.x, w);
-          console.log("y2", y2, agent.y, target.y, h);
+          cl("x2", x2, agent.x, target.x, w);
+          cl("y2", y2, agent.y, target.y, h);
           const p = field[y2][x2];
           if (p.type === 0 || p.pid === -1) {
             actions.push(new Action(i, "MOVE", x2, y2));
@@ -131,7 +130,7 @@ while (info) {
       }
     }
   }
-  console.log(actions);
+  cl(actions);
   kc.setActions(actions);
   info = await kc.waitNextTurn();
 }

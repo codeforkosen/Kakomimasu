@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+        <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+        <title>ゲーム作成 - 囲みマス</title>
+    </head>
+
+    <body>
+        <header id="header"></header>
+        <main id="main">
+            <h1 id="title">ゲーム作成</h1>
+            <form id="create-form" @input="input">
+                <div>
+                    <label for="name">ゲーム名*</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div>
+                    <label for="board-name">使用ボード*</label>
+                    <select id="board-name">
+                        <option v-for="(board,i) in boards">{{board.name}}</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="n-player">プレイヤー数*</label>
+                    <select id="n-player" v-model.number="nPlayer">
+                        <option>2</option>
+                    </select>
+                </div>
+                <div v-for="n of nPlayer" class="sub">
+                    <label :for="'player' + n">プレイヤー{{n}}</label>
+                    <input type="text" :id="'player' + n" placeholder="未指定" @input="playerIdInput" autocomplete="on"
+                        list="user-list">
+                    <datalist id="user-list">
+                        <option v-for="s in searchUserOptions" :value="s.name">{{s.id}}</option>
+                    </datalist>
+                </div>
+                <div>
+                    <label for="tournament-id">所属大会ID</label>
+                    <input type="text" id="tournament-id" placeholder="無所属">
+                </div>
+                <input id="create" type="button" class="button" @click="send" value="ゲームを作成する" disabled>
+            </form>
+
+            <section class="separation" v-if="createdGame">
+                <h2>作成したゲーム情報</h2>
+
+                <h3>ゲーム名</h3>
+                <div>{{createdGame.gameName}}</div>
+                <h3>ゲームID</h3>
+                <div id=gameId><a :href="gameHref()">{{createdGame.gameId}}</a></div>
+            </section>
+        </main>
+        <footer id="footer"></footer>
+
+        <script type="module">
+            import { searchUser, getAllBoards, createGame } from "/js/api-util.js";
+            //import * as api from "/js/api-util.js";
+            import * as util from "/js/util.js";
+
+            const VMain = new Vue({
+                el: "#main",
+                data: {
+                    boards: [],
+                    nPlayer: 2,
+                    searchUserOptions: [],
+                    createdGame: undefined,
+                },
+                created: async function () {
+                    this.boards = await getAllBoards();
+                    const query = util.getUrlQueries();
+                    const form = document.forms["create-form"];
+                    for (const [k, v] of Object.entries(query)) {
+                        if (form[k])
+                            form[k].value = v;
+                    }
+                    this.input();
+
+                },
+                methods: {
+                    async playerIdInput(e) {
+                        const users = await searchUser(e.target.value);
+                        console.log(users);
+                        this.searchUserOptions = users;
+                        console.log(e);
+                    },
+                    async send() {
+                        const form = document.forms["create-form"];
+                        const playerIdentifiers = [];
+                        for (let i = 1; i <= this.nPlayer; i++) {
+                            playerIdentifiers.push(form[`player${i}`].value);
+                        }
+                        const sendData = {
+                            name: form["name"].value,
+                            boardName: form["board-name"].value,
+                            nPlayer: this.nPlayer,
+                            playerIdentifiers,
+                            tournamentId: form["tournament-id"].value === "" ? null : form["tournament-id"].value
+                        };
+                        const req = await createGame(sendData);
+                        console.log(req);
+                        this.createdGame = req;
+                        form.reset();
+                    },
+                    input() {
+                        const form = document.forms["create-form"];
+                        form["create"].disabled = !form.checkValidity();
+                    },
+                    gameHref() {
+                        return `/gamedetails.html?id=${this.createdGame.gameId}`;
+                    }
+                }
+            });
+
+        </script>
+
+        <script type="module" src="/js/vue-comp/common.js"></script>
+    </body>
+
+</html>
+
+<style>
+    @import url("/css/common.css");
+    @import url("/css/c_form.css");
+    @import url("/css/c_separation.css");
+</style>

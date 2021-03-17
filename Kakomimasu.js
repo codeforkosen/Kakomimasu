@@ -7,7 +7,7 @@ class Board {
       this.h = w.height;
       this.points = w.points;
       this.nagent = w.nagent;
-      this.nturn = w.nturn;
+      this.nturn = w.nturn || 30;
       this.nsec = w.nsec || 3;
       this.nplayer = w.nplayer || 2;
       this.name = w.name;
@@ -23,7 +23,7 @@ class Board {
     if (this.points.length !== this.w * this.h) {
       throw new Error("points.length must be " + this.w * this.h);
     }
-    console.log("board", this, this.name);
+    //console.log("board", this, this.name);
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
@@ -368,14 +368,13 @@ Field.BASE = 0;
 Field.WALL = 1;
 
 class Game {
-  constructor(board, name, dummy) {
+  constructor(board, dummy) {
     if (dummy) {
       console.log(dummy);
       throw new Error("too much");
     }
     this.uuid = util.uuid();
     this.board = board;
-    this.name = name;
     this.players = [];
     this.nturn = board.nturn;
     this.nsec = board.nsec;
@@ -384,10 +383,7 @@ class Game {
     this.actions = [];
     this.field = new Field(board);
     this.log = [];
-    this.startedAtUnixTime = null;
-    this.nextTurnUnixTime = null;
     this.turn = 0;
-    this.changeFuncs = [];
 
     // agents
     this.agents = [];
@@ -400,25 +396,13 @@ class Game {
     }
   }
 
-  dispose() {
-    clearInterval(this.intervalId);
-  }
-
   attachPlayer(player) {
     if (!this.isFree()) return false;
     if (this.players.indexOf(player) >= 0) return false;
     player.index = this.players.length;
     this.players.push(player);
     player.setGame(this);
-    if (this.isReady()) {
-      this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
-      this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
-      this.updateStatus();
-      this.intervalId = setInterval(() => this.updateStatus(), 50);
-      //console.log("intervalID", this.intervalId);
-    }
 
-    this.changeFuncs.forEach((func) => func());
     return true;
   }
 
@@ -473,7 +457,6 @@ class Game {
 
     if (this.turn < this.nturn) {
       this.turn++;
-      this.nextTurnUnixTime = util.nowUnixTime() + this.nsec;
     } else {
       this.gaming = false;
       this.ending = true;
@@ -659,35 +642,6 @@ class Game {
     };
   }
 
-  updateStatus() {
-    let self = this;
-    if (
-      self.isReady() && !self.isGaming() && !self.ending &&
-      (new Date().getTime() > (this.startedAtUnixTime * 1000))
-    ) {
-      self.start();
-      this.changeFuncs.forEach((func) => func());
-    }
-    if (self.isGaming()) {
-      if (new Date().getTime() > (this.nextTurnUnixTime * 1000)) {
-        self.nextTurn();
-        this.changeFuncs.forEach((func) => func());
-      }
-    }
-    if (this.ending) {
-      /*const logData = {
-        gameId: this.uuid,
-        board: this.board,
-        log: this.log,
-      }*/
-      Deno.mkdirSync("./log", { recursive: true });
-      Deno.writeTextFileSync(`./log/${this.startedAtUnixTime}_${this.uuid}.log`, JSON.stringify(this, null, 2));
-
-      this.dispose();
-      this.changeFuncs.forEach(func => func());
-    }
-  }
-
   toJSON() {
     const players = [];
     this.players.forEach((p, i) => {
@@ -719,13 +673,10 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
-      gameName: this.name,
       gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
       board: board,
-      startedAtUnixTime: this.startedAtUnixTime,
-      nextTurnUnixTime: this.nextTurnUnixTime,
       turn: this.turn,
       totalTurn: this.nturn,
       tiled: this.field.field,
@@ -811,4 +762,4 @@ class Kakomimasu {
   }
 }
 
-export { Kakomimasu, Board, Action, Field };
+export { Kakomimasu, Board, Action, Field, Game };

@@ -1,6 +1,9 @@
 .vscode/
+*.code-workspace
+
 apiserver/test.ts
 log/
 *.bat
 *.env
 apiserver/data/
+*.code-workspace

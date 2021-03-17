@@ -8,6 +8,8 @@ import {
   setAction,
   diffTime,
   setHost,
+  cl,
+  args
 } from "./client_util.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
@@ -18,8 +20,9 @@ class KakomimasuClient {
     this.password = password || Deno.env.get("password");
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
-    console.log(this.id, this.password, this.name, this.spec);
-    this.setServerHost(Deno.env.get("host"));
+    cl(this.id, this.password, this.name, this.spec);
+    if (args.local) this.setServerHost("http://localhost:8880");
+    else this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
     if (host) {
@@ -30,7 +33,7 @@ class KakomimasuClient {
     }
   }
   readGameId() {
-    console.log("入室するゲームIDを入力してください。入力しないとランダムマッチを行います。");
+    cl("入室するゲームIDを入力してください。入力しないとランダムマッチを行います。");
     const stdinArray = new Uint8Array(37);
     Deno.stdin.readSync(stdinArray);
     const gameId = new TextDecoder().decode(stdinArray).match(/\S*/)[0];
@@ -46,23 +49,30 @@ class KakomimasuClient {
     }
 
     // プレイヤー登録
-    const resMatch = await match(
-      this.gameId
-        ? { id: user.id, password: this.password, spec: this.spec, gameId: this.gameId }
-        : { id: user.id, password: this.password, spec: this.spec },
-    );
+    let matchParam = { id: user.id, password: this.password, spec: this.spec };
+    if (args.useAi) {
+      matchParam.useAi = true;
+      matchParam.aiOption = {
+        aiName: args.useAi,
+        boardName: args.aiBoard,
+      }
+    } else if (args.gameId) {
+      matchParam.gameId = args.gameId;
+    }
+    cl(matchParam);
+    const resMatch = await match(matchParam);
     this.token = resMatch.accessToken;
-    this.roomid = resMatch.gameId;
+    this.gameId = resMatch.gameId;
     this.pno = resMatch.index;
-    console.log("playerid", resMatch, this.pno);
+    cl("playerid", resMatch, this.pno);
 
     do {
-      this.gameInfo = await getGameInfo(this.roomid);
+      this.gameInfo = await getGameInfo(this.gameId);
       await sleep(100);
     } while (this.gameInfo.startedAtUnixTime === null);
 
-    console.log(this.gameInfo);
-    console.log(
+    cl(this.gameInfo);
+    cl(
       "ゲーム開始時間：",
       new Date(this.gameInfo.startedAtUnixTime * 1000).toLocaleString("ja-JP"),
     );
@@ -132,27 +142,26 @@ class KakomimasuClient {
 
   async waitStart() { // GameInfo
     await sleep(diffTime(this.gameInfo.startedAtUnixTime));
-    this.gameInfo = await getGameInfo(this.roomid);
-    console.log(this.gameInfo);
+    this.gameInfo = await getGameInfo(this.gameId);
+    cl(this.gameInfo);
     this.log = [this.gameInfo];
-    this.turn = 1;
-    this.totalTurn = this.gameInfo.totalTurn;
-    console.log("totalTurn", this.totalTurn);
+    cl("totalTurn", this.gameInfo.board.nTurn);
     this._makeField();
     return this.gameInfo;
   }
 
   setActions(actions) { // void
-    setAction(this.roomid, this.token, actions);
+    setAction(this.gameId, this.token, actions);
   }
 
   async waitNextTurn() { // GameInfo? (null if end)
-    if (this.turn < this.totalTurn) {
+    if (this.gameInfo.nextTurnUnixTime) {
       const bknext = this.gameInfo.nextTurnUnixTime;
-      await sleep(diffTime(this.gameInfo.nextTurnUnixTime));
+      cl("nextTurnUnixTime", bknext);
+      await sleep(diffTime(bknext));
 
       for (; ;) {
-        this.gameInfo = await getGameInfo(this.roomid);
+        this.gameInfo = await getGameInfo(this.gameId);
         if (this.gameInfo.nextTurnUnixTime !== bknext) {
           break;
         }
@@ -163,18 +172,19 @@ class KakomimasuClient {
       return null;
     }
     this.log.push(this.gameInfo);
-    this.turn++;
-    console.log("turn", this.turn);
+    cl("turn", this.gameInfo.turn);
     this._updateField();
     return this.gameInfo;
   }
 
   saveLog() {
-    try {
-      Deno.mkdirSync("log");
-    } catch (e) { }
-    const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
-    Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    if (!args.nolog) {
+      try {
+        Deno.mkdirSync("log");
+      } catch (e) { }
+      const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
+      Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
+    }
   }
 }
 
@@ -190,4 +200,4 @@ const DIR = [
   [-1, -1],
 ];
 
-export { KakomimasuClient, Action, DIR };
+export { KakomimasuClient, Action, DIR, cl, args };

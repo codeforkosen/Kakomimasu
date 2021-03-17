@@ -1,0 +1,46 @@
+.games-list table {
+  border-collapse: separate;
+  border-spacing: 0em 0.5em;
+  margin: 0 auto;
+}
+
+.games-list td {
+  border-bottom: 2px solid var(--codeforkosen-color);
+  padding: 0 0.5em;
+}
+
+.games-list .un {
+  color: gray;
+}
+
+.games-list .waiting {
+  color: yellow;
+}
+
+.games-list .gaming {
+  color: green;
+}
+
+.games-list .ending {
+  color: red;
+}
+
+.games-list .player>div {
+  margin: 0 0.5em;
+}
+
+.games-list .player,
+.games-list .players {
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.games-list .game-name {
+  text-align: left;
+}
+
+.games-list .game-name .id {
+  font-size: 0.8em;
+}

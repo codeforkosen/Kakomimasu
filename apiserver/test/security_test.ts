@@ -4,18 +4,18 @@ const host = "http://localhost:8880";
 
 Deno.test("fetch img ok", async () => {
   const path = "/img/kakomimasu-logo.png";
-  console.log(path);
+  //console.log(path);
   const res = await fetch(host + path);
   await res.arrayBuffer();
-  // console.log("res", res);
+  //console.log("res", res);
   assertEquals(200, res.status);
 });
 
 Deno.test("fetch illegal failed", async () => {
   const path = "/img/.../img/kakomimasu-logo.png";
-  console.log(path);
+  //console.log(path);
   const res = await fetch(host + path);
-  console.log("res", res);
+  //console.log("res", res);
   await res.arrayBuffer();
-  assertEquals(500, res.status);
+  assertEquals(404, res.status);
 });

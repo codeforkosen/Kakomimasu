@@ -1,3 +1,5 @@
+import { fromFileUrl } from "https://deno.land/std@0.79.0/path/mod.ts";
+
 export const jsonResponse = (json: any) => {
   return {
     status: 200,
@@ -29,3 +31,7 @@ export const getSafePath = (fn: string) => {
 export const readJsonFileSync = (path: string | URL) => {
   return JSON.parse(Deno.readTextFileSync(path));
 };
+
+export function pathResolver(meta: ImportMeta): (p: string) => string {
+  return (p) => fromFileUrl(new URL(p, meta.url));
+}
