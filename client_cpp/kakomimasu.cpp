@@ -86,7 +86,7 @@ KakomimasuClient::KakomimasuClient(string id, string name, string spec, string p
     picojson::parse(val, res);
     picojson::object obj = val.get<picojson::object>();
 
-    if (!obj["error"].is<picojson::null>()) {
+    if (!obj["errorCode"].is<picojson::null>()) {
         userRegist(name, id, password);
         cout << "ユーザー登録しました" << endl;
     }
