@@ -39,27 +39,27 @@ const assertTournament = (tournament: any, sample: any) => {
 };
 
 const uuid = v4.generate();
-const data = {
+const data: any = {
   name: uuid,
   type: "round-robin",
 };
 
+// /api/tournament/create Test
+// テスト項目
+// 正常(round-robin・knockout)・大会名無し・大会種別無し
 Deno.test("api/tournament/create:normal", async () => {
-  {
-    const res = await ac.tournamentsCreate({
-      ...data,
-      option: { dryRun: true },
-    });
-    assertTournament(res, data);
-  }
-  {
-    const res = await ac.tournamentsCreate({
-      ...data,
-      type: "knockout",
-      option: { dryRun: true },
-    });
-    assertTournament(res, { ...data, type: "knockout" });
-  }
+  let res = await ac.tournamentsCreate({
+    ...data,
+    option: { dryRun: true },
+  });
+  assertTournament(res, data);
+
+  res = await ac.tournamentsCreate({
+    ...data,
+    type: "knockout",
+    option: { dryRun: true },
+  });
+  assertTournament(res, { ...data, type: "knockout" });
 });
 Deno.test("api/tournament/create:invalid tournament name", async () => {
   {
@@ -120,4 +120,55 @@ Deno.test("api/tournament/create:invalid tournament type", async () => {
     });
     assertEquals(res, errors.INVALID_TYPE);
   }
+});
+Deno.test("api/tournament/create:normal by no dryRun", async () => {
+  const res = await ac.tournamentsCreate(data);
+  assertTournament(res, data);
+
+  data.id = res.id;
+});
+
+// /api/tournament/delete Test
+// テスト項目
+// 正常・ID無し
+Deno.test("api/tournament/delete:normal", async () => {
+  const res = await ac.tournamentsDelete({
+    id: data.id,
+    option: { dryRun: true },
+  });
+  assertTournament(res, data);
+});
+Deno.test("api/tournament/delete:invalid tournament id", async () => {
+  {
+    const res = await ac.tournamentsDelete({
+      id: "",
+      option: { dryRun: true },
+    });
+    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+  }
+  {
+    const res = await ac.tournamentsDelete({
+      id: undefined,
+      option: { dryRun: true },
+    });
+    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+  }
+  {
+    const res = await ac.tournamentsDelete({
+      id: null,
+      option: { dryRun: true },
+    });
+    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+  }
+});
+Deno.test("api/tournament/delete:nothing tournament id", async () => {
+  const res = await ac.tournamentsDelete({
+    id: v4.generate(),
+    option: { dryRun: true },
+  });
+  assertEquals(res, errors.NOTHING_TOURNAMENT_ID);
+});
+Deno.test("api/tournament/delete:normal by no dryRun", async () => {
+  const res = await ac.tournamentsDelete({ id: data.id });
+  assertTournament(res, data);
 });
