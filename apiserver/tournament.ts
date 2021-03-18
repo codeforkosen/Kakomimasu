@@ -180,7 +180,7 @@ export const tournamentRouter = () => {
       const query = req.query;
       const id = query.get("id");
       const resData = id ? tournaments.get(id) : tournaments.getAll();
-      if (!resData) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+      if (!resData) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
 
       await req.respond(jsonResponse(resData));
       /*await req.respond({
