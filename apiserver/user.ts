@@ -4,7 +4,7 @@ import {
 } from "https://servestjs.org/@v1.1.9/mod.ts";
 
 import util from "../util.js";
-import { errorResponse, jsonResponse } from "./apiserver_util.ts";
+import { jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errorCodeResponse, errors, ServerError } from "./error.ts";
@@ -73,7 +73,7 @@ class Users {
 
   registUser(data: IReqUser): User {
     if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
-    if (!data.name) throw new ServerError(errors.INVALID_NAME);
+    if (!data.name) throw new ServerError(errors.INVALID_USER_NAME);
     if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
 
     if (this.users.some((e) => e.name === data.name)) {
