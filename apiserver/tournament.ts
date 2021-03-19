@@ -61,10 +61,10 @@ export class Tournament implements ITournament {
 
   addUser(identifier: string) {
     const user = accounts.find(identifier);
-    if (!user) throw Error("Invalid userId or userName");
+    if (!user) throw new ServerError(errors.NOT_USER);
 
     const some = this.users.some((e) => e === user.id);
-    if (some) throw Error("User is already registered");
+    if (some) throw new ServerError(errors.ALREADY_REGISTERED_USER);
     else this.users.push(user.id);
   }
 }
@@ -143,13 +143,6 @@ export const tournamentRouter = () => {
       }
 
       await req.respond(jsonResponse(tournament));
-      /*await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(tournament),
-      });*/
     } catch (e) {
       req.respond(errorCodeResponse(e));
     }
@@ -183,13 +176,6 @@ export const tournamentRouter = () => {
       if (!resData) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
 
       await req.respond(jsonResponse(resData));
-      /*await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(resData),
-      });*/
     } catch (e) {
       await req.respond(errorCodeResponse(e));
     }
@@ -200,14 +186,14 @@ export const tournamentRouter = () => {
     try {
       const query = req.query;
       const tournamentId = query.get("id");
+      console.log(tournamentId);
       if (!tournamentId) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+      let tournament = tournaments.get(tournamentId);
+      if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
       const body = await req.json() as ITournamentAddUserReq;
       const identifier = body.user;
-
       if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
-      let tournament = tournaments.get(tournamentId);
-      if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
       if (body.option?.dryRun !== true) {
         tournament = tournaments.addUser(tournamentId, identifier);
@@ -217,13 +203,6 @@ export const tournamentRouter = () => {
       }
 
       await req.respond(jsonResponse(tournament));
-      /*req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(tournament),
-      });*/
     } catch (e) {
       req.respond(errorCodeResponse(e));
     }

@@ -43,6 +43,10 @@ export const errors = {
     errorCode: 303,
     message: "nothing id",
   },
+  ALREADY_REGISTERED_USER: {
+    errorCode: 304,
+    message: "already registered user by tournament",
+  },
 };
 
 interface IError {
