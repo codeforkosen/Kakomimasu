@@ -38,9 +38,10 @@ deno run -A ../client_deno/client_test1.ts
 https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
 
 公式APIドキュメントを作成中です。
-現在/api/users APIのドキュメントがあります。
+現在以下APIのドキュメントがあります。
 
-[users API](./docs/users_api.md)
+- [users API](./docs/users_api.md)
+- [tournaments API](./docs/tournaments_api.md)
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
 
