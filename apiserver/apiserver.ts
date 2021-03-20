@@ -17,7 +17,7 @@ import { Action, Board, Game, Kakomimasu } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 
 const kkmm = new ExpKakomimasu();
-const kkmm_self = new ExpKakomimasu();
+export const kkmm_self = new ExpKakomimasu();
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({
@@ -32,6 +32,7 @@ import { LogFileOp } from "./parts/file_opration.ts";
 
 import { tournamentRouter, tournaments } from "./tournament.ts";
 import { accounts, userRouter } from "./user.ts";
+import { gameRouter } from "./game.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -43,76 +44,6 @@ const getRandomBoardName = async () => {
   }
   return list[util2.rnd(list.length)];
 };
-
-//#region ゲーム作成API
-interface ICreateGamePost {
-  name: string;
-  boardName: string;
-  nPlayer?: number;
-  playerIdentifiers?: string[];
-  tournamentId?: string;
-}
-
-const createSelfGame = async (req: ServerRequest) => {
-  try {
-    const reqJson = (await req.json()) as ICreateGamePost;
-    //console.log(reqJson);
-    const board = readBoard(reqJson.boardName);
-    board.nplayer = reqJson.nPlayer || 2;
-
-    const game = kkmm_self.createGame(
-      board,
-      reqJson.name,
-    );
-
-    if (reqJson.playerIdentifiers) {
-      const userIds = reqJson.playerIdentifiers.map((e) =>
-        accounts.find(e)?.id
-      );
-      userIds.forEach((userId) => {
-        if (!game.addReservedUser(userId)) {
-          throw Error("The user is already registered");
-        }
-      });
-    }
-
-    game.changeFuncs.push(sendAllGame);
-    game.changeFuncs.push(sendGame);
-    sendAllGame();
-
-    if (reqJson.tournamentId) {
-      tournaments.addGame(reqJson.tournamentId, game.uuid);
-    }
-
-    await req.respond(util.jsonResponse(JSON.stringify(game)));
-    //console.log(kkmm_self);
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
-
-const getAllBoards = async (req: ServerRequest) => {
-  try {
-    const boards = [];
-    if (Deno.statSync("./board").isDirectory) {
-      for (const dirEntry of Deno.readDirSync("./board")) {
-        boards.push(util.readJsonFileSync(`./board/${dirEntry.name}`));
-      }
-    }
-
-    await req.respond({
-      status: 200,
-      headers: new Headers({
-        "content-type": "application/json",
-      }),
-      body: JSON.stringify(boards),
-    });
-  } catch (e) {
-    await req.respond(util.errorResponse(e.message));
-  }
-};
-
-//#endregion
 
 //#region プレイヤー登録・ルームID取得API
 
@@ -373,7 +304,7 @@ setInterval(() => {
   });
 }, 1000);
 
-const sendAllGame = () => {
+export const sendAllGame = () => {
   sendAllGameQue++;
 };
 
@@ -395,7 +326,7 @@ const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
     sock.close();
   }
 };
-const sendGame = (id: string) => {
+export const sendGame = (id: string) => {
   const game = getGame(id);
   if (game) {
     getGameSocks = getGameSocks.filter((e) => {
@@ -446,13 +377,13 @@ const webRoutes = () => {
 const apiRoutes = () => {
   const router = createRouter();
 
-  router.post(
+  /*router.post(
     "game/create",
     contentTypeFilter("application/json"),
     createSelfGame,
   );
   router.get("game/boards", getAllBoards);
-
+  */
   router.post("match", contentTypeFilter("application/json"), match);
   router.get(new RegExp("^match/(.+)$"), getGameInfo);
   router.post(new RegExp("^match/(.+)/action$"), setAction);
@@ -462,6 +393,7 @@ const apiRoutes = () => {
   router.ws(new RegExp("^ws/game/(.+)$"), ws_getGame);
   //router.ws("allSelfGame", ws_AllSelfGame);
 
+  router.route("game", gameRouter());
   router.route("users", userRouter());
   router.route("tournament", tournamentRouter());
   return router;
@@ -487,7 +419,7 @@ const createDefaultBoard = () => {
   return new Board(w, h, points, nagent);
 };
 
-const readBoard = (fileName: string) => {
+export const readBoard = (fileName: string) => {
   const path = resolve(`./board/${fileName}.json`);
   if (Deno.statSync(path).isFile) {
     const boardJson = JSON.parse(
