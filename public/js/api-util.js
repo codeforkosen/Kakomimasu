@@ -28,12 +28,12 @@ export async function searchUser(identifier) {
 }
 
 export const createGame = async (data) => {
-    const req = JSON.parse(await (await fetch(`/api/game/create`,
+    const req = await (await fetch(`/api/game/create`,
         {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
-        })).json());
+        })).json();
     return req;
 }
 

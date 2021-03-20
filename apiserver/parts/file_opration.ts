@@ -93,6 +93,42 @@ export class LogFileOp {
     return this.logGames;
   }
 }
+
+export class BoardFileOp {
+  private static dir = resolve("../board");
+  private static boards: any[] = [];
+  private static mtime: Date | null = null;
+
+  static staticConstructor = (() => {
+    Deno.mkdirSync(BoardFileOp.dir, { recursive: true });
+    //LogFileOp.getLogGames();
+  })();
+
+  private static update() {
+    const stat = Deno.statSync(this.dir);
+    if (stat.isDirectory) {
+      if (this.mtime?.getTime() !== stat.mtime?.getTime()) {
+        this.boards.length = 0;
+        for (const dirEntry of Deno.readDirSync(this.dir)) {
+          const json = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
+          this.boards.push(json);
+        }
+        this.mtime = stat.mtime;
+      }
+    }
+    return this.boards;
+  }
+
+  public static get(boardName: string) {
+    const boards = this.update();
+    return Object.assign({}, boards.find((e) => e.name === boardName));
+  }
+
+  public static getAll() {
+    return this.update();
+  }
+}
+
 const boardFolderPath = resolve("../board");
 
 export const saveBoardFile = (board: IBoard) => {
