@@ -114,7 +114,7 @@ export class Tournaments {
 
   addGame(tournamentId: string, gameId: string) {
     const tournament = this.get(tournamentId);
-    if (!tournament) throw Error("Invalid tournament id");
+    if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
     tournament.gameIds.push(gameId);
     this.save();

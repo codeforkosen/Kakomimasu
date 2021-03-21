@@ -107,17 +107,14 @@ async function setAction(roomid: string, playerid: string, actions: Action[]) {
 }
 
 const createGame = async (gameName: string, boardName: string) => {
-  const req = JSON.parse(
-    await (await fetch(`${host}/game/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: gameName,
-        boardName: boardName,
-      }),
-    })).json(),
-  );
-
+  const req = await (await fetch(`${host}/game/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: gameName,
+      boardName: boardName,
+    }),
+  })).json();
   return req;
 };
 

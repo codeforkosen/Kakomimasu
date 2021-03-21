@@ -60,4 +60,9 @@ export default class ApiClient {
     const resJson = await this._fetchPostJsonToJson(`/tournament/add?id=${tournamentId}`, data);
     return resJson;
   }
+
+  async gameCreate(data) {
+    const resJson = await this._fetchPostJsonToJson("/game/create", data);
+    return resJson;
+  }
 }

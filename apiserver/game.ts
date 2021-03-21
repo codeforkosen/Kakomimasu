@@ -42,8 +42,12 @@ export const gameRouter = () => {
         board.nplayer = reqJson.nPlayer || 2;
 
         let game: ExpGame;
-        if (reqJson.option?.dryRun) {
+        if (!reqJson.option?.dryRun) {
           game = kkmm_self.createGame(board, reqJson.name);
+
+          game.changeFuncs.push(sendAllGame);
+          game.changeFuncs.push(sendGame);
+          sendAllGame();
         } else game = new ExpGame(board, reqJson.name);
 
         if (reqJson.playerIdentifiers) {
@@ -61,13 +65,13 @@ export const gameRouter = () => {
             throw new ServerError(errors.INVALID_PLAYER_IDENTIFIERS);
           }
         }
-
-        game.changeFuncs.push(sendAllGame);
-        game.changeFuncs.push(sendGame);
-        sendAllGame();
-
         if (reqJson.tournamentId) {
-          tournaments.addGame(reqJson.tournamentId, game.uuid);
+          const tournament = tournaments.get(reqJson.tournamentId);
+          if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+
+          if (!reqJson.option?.dryRun) {
+            tournaments.addGame(reqJson.tournamentId, game.uuid);
+          }
         }
 
         await req.respond(jsonResponse(game));

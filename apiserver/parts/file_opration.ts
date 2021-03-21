@@ -1,3 +1,5 @@
+import { Board } from "../../Kakomimasu.js";
+
 import { pathResolver } from "../apiserver_util.ts";
 
 import { IBoard } from "./interface.ts";
@@ -121,7 +123,9 @@ export class BoardFileOp {
 
   public static get(boardName: string) {
     const boards = this.update();
-    return Object.assign({}, boards.find((e) => e.name === boardName));
+    const board = boards.find((e) => e.name === boardName);
+    return new Board(board);
+    //return Object.assign({}, boards.find((e) => e.name === boardName));
   }
 
   public static getAll() {

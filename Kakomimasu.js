@@ -382,6 +382,7 @@ class Game {
     this.ending = false;
     this.actions = [];
     this.field = new Field(board);
+    console.log(this.field);
     this.log = [];
     this.turn = 0;
 
@@ -679,7 +680,7 @@ class Game {
       board: board,
       turn: this.turn,
       totalTurn: this.nturn,
-      tiled: this.field.field,
+      tiled: this.isReady() ? this.field.field : null,
       players: players,
       log: this.log,
     };
