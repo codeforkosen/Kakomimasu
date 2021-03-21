@@ -168,7 +168,7 @@ export const tournamentRouter = () => {
   });
 
   // 大会取得
-  router.get("/getAll", async (req) => {
+  router.get("/get", async (req) => {
     try {
       const query = req.query;
       const id = query.get("id");
