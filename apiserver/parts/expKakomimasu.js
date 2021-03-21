@@ -2,7 +2,7 @@ import util from "../../util.js";
 import { Game, Kakomimasu } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
-class ExpGame extends Game {
+export class ExpGame extends Game {
   constructor(board, name, dummy) {
     super(board, dummy);
     this.name = name;
