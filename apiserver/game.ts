@@ -77,7 +77,7 @@ export const gameRouter = () => {
         await req.respond(jsonResponse(game));
         //console.log(kkmm_self);
       } catch (e) {
-        console.log(e);
+        //console.log(e);
         await req.respond(errorCodeResponse(e));
       }
     },

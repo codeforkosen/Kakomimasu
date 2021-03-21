@@ -65,4 +65,9 @@ export default class ApiClient {
     const resJson = await this._fetchPostJsonToJson("/game/create", data);
     return resJson;
   }
+
+  async getBoards() {
+    const resJson = await this._fetchToJson("/game/boards");
+    return resJson;
+  }
 }

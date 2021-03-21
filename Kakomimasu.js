@@ -382,7 +382,6 @@ class Game {
     this.ending = false;
     this.actions = [];
     this.field = new Field(board);
-    console.log(this.field);
     this.log = [];
     this.turn = 0;
 

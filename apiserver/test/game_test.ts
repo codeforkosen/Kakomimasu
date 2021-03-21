@@ -33,6 +33,16 @@ const assertGame = (game: any, sample: any = {}) => {
   if (sample_.reservedUsers) assert(game_.reservedUsers, sample_.reservedUsers);
 };
 
+const assertBoard = (board: any) => {
+  assertEquals(typeof board.name, "string");
+  assertEquals(typeof board.width, "number");
+  assertEquals(typeof board.height, "number");
+  assertEquals(typeof board.nTurn, "number");
+  assertEquals(typeof board.nAgent, "number");
+  assertEquals(typeof board.nSec, "number");
+  assert(Array.isArray(board.points));
+};
+
 const data: any = {
   name: "テスト",
   boardName: "A-1",
@@ -114,4 +124,13 @@ Deno.test("api/game/create:invalid tournament id", async () => {
     option: { dryRun: true },
   });
   assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+});
+
+// /api/game/boards Test
+// テスト項目
+// 正常
+Deno.test("api/game/boards:normal", async () => {
+  const res = await ac.getBoards() as Array<any>;
+
+  res.forEach((e) => assertBoard(e));
 });

@@ -113,6 +113,7 @@ export class BoardFileOp {
         this.boards.length = 0;
         for (const dirEntry of Deno.readDirSync(this.dir)) {
           const json = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
+          json.points = json.points.flat();
           this.boards.push(json);
         }
         this.mtime = stat.mtime;
@@ -129,7 +130,8 @@ export class BoardFileOp {
   }
 
   public static getAll() {
-    return this.update();
+    const boards = this.update();
+    return boards.map((e) => new Board(e));
   }
 }
 
