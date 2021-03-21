@@ -1,0 +1,294 @@
+
+body {
+    background-color: #57AFDA;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.headpad {
+    padding: 3vh;
+    text-align: right;
+}
+
+:root {
+    --color: rgb(rgba(246,82,92,1)120, 130, 134);
+}
+.masu-line {
+    width: 90vw;
+
+    display: flex;
+    margin: auto;
+
+}
+.head-box {
+    background-color: var(--color);
+    border-color: black;
+    border: 1px solid;
+    border-left: transparent;
+    width: 9vw;
+    height: 9vw;
+    margin-right: 0;
+
+}
+.head-box-first {
+    background-color: var(--color);
+    border-color: black;
+    border: 2px solid;
+    width: 9vw;
+}
+
+
+.icon-size {
+    font-size: 6vw;
+    margin-right: 2vw;
+    text-decoration: none;
+    color:black;
+}
+
+.box {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right:0vw;
+    margin-left:5vw;
+    width: 90vw;
+    min-height: 30vh;
+    /* background-color: #79BD9A; */
+}
+.boxBack {
+    background-color: #79BD9A;
+
+}
+
+
+
+
+#headimg {
+    margin-top: 5vw;
+    margin-bottom: 5vw;
+    width:90vw;
+}
+
+#menu {
+    position: absolute;
+    top: -100vh;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    transition-duration: .5s;
+    background-color: rgba(0,0,0,0.70);
+    z-index: 1;
+}
+#drawer-check:checked ~ #menu {
+    position: fixed;
+    top: 0px;
+}
+#menu ul {
+    text-align: center;
+    list-style: none;
+    padding: 10vh;
+}
+#menu li {
+    font-size: 8vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+#menu a {
+    text-decoration: none;
+    color: white;
+
+}
+#menu a:active {
+    color: white;
+}
+#menu a:active ~ #menu {
+
+    top: -100vh;
+}
+.play-video {
+    margin: auto;
+    width: 80vw;
+    height: 47vw;
+}
+
+.subtitle {
+    background-color: #79BD9A;
+    width: 90vw;
+    height: 120px;
+    border-radius: 50% / 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.subtitle-red {
+    color: rgba(246,82,92,1);
+    font-size: min(80px, 10vw);
+    display: flex;
+    justify-content: center;
+    padding-top: 30px;
+
+}
+.subtitle-blue {
+    color: rgba(0,101,150,1);
+    font-size: min(80px, 10vw);
+    display: flex;
+    justify-content: center;
+    padding-top: 30px;
+}
+.sent1 {
+    background-color: #79BD9A;
+    margin-top:0;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5vw;
+    margin-bottom: 120px;
+    color: white;
+    font-size: max(15px, 3vw);
+    text-align: center;
+
+}
+.sent1 b {
+    font-size: min(35px, 5vw);
+}
+.sent1::after {
+    position: absolute;
+    bottom: -120px;
+    left: 0vw;
+    content: "";
+    background-color: #79BD9A;
+    width: 90vw;
+    height: 120px;
+    border-radius: 50% / 100%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+}
+
+.subicon {
+    width: 20vw;
+    display: flex;
+    justify-content: center;
+    margin:auto;
+    padding-top: 5vw;
+    padding-bottom: 5vw;
+}
+.subtitle {
+    text-align: center;
+}
+
+#ruleimg {
+    max-width: 70vw;
+
+}
+
+a {
+    font-size: max(15px, 3vw);
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: rgba(0,0,0,0.70);
+}
+a::after {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,rgba(246,82,92,1) 50%,rgba(0,101,150,1) 50%);
+    transform: scale(0, 1);
+    transform-origin: center top;
+    transition: transform .3s;
+}
+a:hover::after {
+    transform: scale(1, 1);
+}
+
+
+.topback {
+    position: fixed;
+    bottom: 2vh;
+    right: 2vh;
+    width: 10vw;
+    height: 10vw;
+    border-radius: 50%;
+    background-color: black;
+    outline:none;
+    z-index: 1;
+
+}
+
+.topback i{
+    color: white;
+    font-size:3vw;
+}
+
+
+
+
+/* x */
+.drawer-hidden {
+    display: none;
+
+  }
+
+  /* ハンバーガーアイコンの設置スペース */
+.drawer-open {
+    position: fixed;
+    top: 8vw;
+    left: 2vw;
+
+    z-index: 100;/* 重なり順を一番上に */
+    cursor: pointer;
+  }
+.drawer-open {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    margin-left: 1vw;
+
+}
+  /* ハンバーガーメニューのアイコン */
+.drawer-open span,
+.drawer-open span:before,
+.drawer-open span:after {
+    content: '';
+    display: block;
+    height: 1vw;
+    width: 10vw;
+    border-radius: 3vw;
+    background: #333;
+    border: solid white 1px;
+    transition: 0.5s;
+    position: absolute;
+  }
+
+  /* 三本線のうち一番上の棒の位置調整 */
+.drawer-open span:before {
+    bottom: 3.5vw;
+  }
+  /* 三本線のうち一番下の棒の位置調整 */
+  .drawer-open span:after {
+    top: 3.5vw;
+  }
+
+  /* アイコンがクリックされたら真ん中の線を透明にする */
+  #drawer-check:checked ~ .drawer-open span {
+    background:rgba(255, 255, 255, 0);
+    border: solid rgba(255, 255, 255, 0) 1px;
+  }
+
+  /* アイコンがクリックされたらアイコンが×印になように上下の線を回転 */
+#drawer-check:checked ~ .drawer-open span::before {
+    bottom: 0;
+    transform: rotate(45deg);
+  }
+
+#drawer-check:checked ~ .drawer-open span::after {
+    top: 0;
+    transform: rotate(-45deg);
+  }
+
+#footer {
+    width: 100vw;
+    height: 20vw;
+    margin-top: 150px;
+    background-color:#79BD9A;
+}
