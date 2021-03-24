@@ -131,6 +131,5 @@ Deno.test("api/game/create:invalid tournament id", async () => {
 // 正常
 Deno.test("api/game/boards:normal", async () => {
   const res = await ac.getBoards() as Array<any>;
-
   res.forEach((e) => assertBoard(e));
 });
