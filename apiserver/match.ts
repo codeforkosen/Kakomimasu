@@ -159,13 +159,8 @@ export const matchRouter = () => {
         }
         //console.log(player);
       }
-      await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(player.getJSON()),
-      });
+
+      await req.respond(jsonResponse(player.getJSON()));
     } catch (e) {
       await req.respond(errorCodeResponse(e));
     }
@@ -181,13 +176,7 @@ export const matchRouter = () => {
       ]
         .find((item) => (item.uuid === id) || (item.gameId === id));
       if (game) {
-        await req.respond({
-          status: 200,
-          headers: new Headers({
-            "content-type": "application/json",
-          }),
-          body: JSON.stringify(game),
-        });
+        await req.respond(jsonResponse(game));
       } else {
         throw Error("Invalid gameID.");
       }
@@ -229,15 +218,10 @@ export const matchRouter = () => {
       //if (game.nextTurnUnixTime >= reqTime) {
       //console.log(actionsAry);
       const nowTurn = player.setActions(Action.fromJSON(actionsAry));
-      await req.respond({
-        status: 200,
-        headers: new Headers({
-          "content-type": "application/json",
-        }),
-        body: JSON.stringify(
-          { receptionUnixTime: Math.floor(reqTime), turn: nowTurn },
-        ),
-      });
+
+      await req.respond(
+        jsonResponse({ receptionUnixTime: Math.floor(reqTime), turn: nowTurn }),
+      );
     } catch (e) {
       await req.respond(errorCodeResponse(e));
     }
