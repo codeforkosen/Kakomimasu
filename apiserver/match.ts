@@ -4,7 +4,6 @@ import {
 } from "https://servestjs.org/@v1.1.9/mod.ts";
 
 import {
-  errorResponse,
   jsonResponse,
   pathResolver,
   readJsonFileSync,
@@ -93,7 +92,6 @@ export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
-    //console.log(req, "newPlayer");
     try {
       const reqData = (await req.json()) as IMatchRequest;
       //console.log(reqData);
@@ -169,7 +167,7 @@ export const matchRouter = () => {
         body: JSON.stringify(player.getJSON()),
       });
     } catch (e) {
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
   router.get(new RegExp("^/(.+)$"), async (req) => {
@@ -194,7 +192,7 @@ export const matchRouter = () => {
         throw Error("Invalid gameID.");
       }
     } catch (e) {
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
   router.post(new RegExp("^/(.+)/action$"), async (req) => {
@@ -241,7 +239,7 @@ export const matchRouter = () => {
         ),
       });
     } catch (e) {
-      await req.respond(errorResponse(e.message));
+      await req.respond(errorCodeResponse(e));
     }
   });
 
