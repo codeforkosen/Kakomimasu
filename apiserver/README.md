@@ -31,17 +31,14 @@ deno run -A ../client_deno/client_test1.ts
 また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/detail.html?id=(ユーザID or ユーザネーム)`
 
 ## API仕様
-
-下記サイトを参考
-
-かこみますネットワークプロトコルを決めようの会 
-https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ
-
-公式APIドキュメントを作成中です。
-現在以下APIのドキュメントがあります。
-
+- [match API](./docs/match_api.md)
 - [users API](./docs/users_api.md)
 - [tournaments API](./docs/tournaments_api.md)
+- [game API](./docs/game_api.md)
+
+- [data dictionary](./docs/data.md)
+- [error](./docs/error.md)
+
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
 
