@@ -3,6 +3,27 @@ export const errors = {
     errorCode: 1,
     message: "nothing search query",
   },
+  NOT_GAME: {
+    errorCode: 100,
+    message: "can not find game",
+  },
+
+  NOT_FREE_GAME: {
+    errorCode: 101,
+    message: "game is not free",
+  },
+  NOT_AI: {
+    errorCode: 102,
+    message: "can not find ai",
+  },
+  INVALID_ACCESSTOKEN: {
+    errorCode: 103,
+    message: "invalid accessToken",
+  },
+  INVALID_ACTION: {
+    errorCode: 104,
+    message: "invalid action",
+  },
   NOTHING_PASSWORD: {
     errorCode: 200,
     message: "nothing password",

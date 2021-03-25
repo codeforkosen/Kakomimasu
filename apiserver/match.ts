@@ -31,7 +31,7 @@ const env = config({
   defaults: resolve("./.env.default"),
 });
 const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
-import { LogFileOp } from "./parts/file_opration.ts";
+import { BoardFileOp, LogFileOp } from "./parts/file_opration.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir("board");
@@ -44,10 +44,10 @@ const getRandomBoardName = async () => {
   return list[util.rnd(list.length)];
 };
 
-interface IMatchRequest {
+interface IMatchRequest extends ApiOption {
   name?: string;
   id?: string;
-  password: string;
+  password?: string;
   spec?: string;
   gameId?: string;
   useAi?: boolean;
@@ -81,24 +81,29 @@ class ActionPost {
     } else return true;
   }
 }
-class SetActionPost {
+
+interface SetActionPost extends ApiOption {
+  actions: ActionPost[];
+}
+/*class SetActionPost {
   constructor(
     //public time: number,
     public actions: ActionPost[],
   ) {}
-}
+}*/
 
 export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
     try {
-      const reqData = (await req.json()) as IMatchRequest;
+      const reqData = await req.json() as IMatchRequest;
       //console.log(reqData);
 
       const identifier = reqData.id || reqData.name;
-      if (!identifier) throw Error("Invalid id or name.");
+      if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
 
+      if (!reqData.password) throw new ServerError(errors.NOTHING_PASSWORD);
       const user = accounts.getUser(identifier, reqData.password);
 
       const player = kkmm.createPlayer(user.id, reqData.spec);
@@ -106,26 +111,27 @@ export const matchRouter = () => {
         const game = [...kkmm_self.getGames(), ...kkmm.getGames()].find((
           game,
         ) => game.uuid === reqData.gameId);
-        if (game) {
+        if (!game) throw new ServerError(errors.NOT_GAME);
+        if (!reqData.option?.dryRun) {
           if (game.attachPlayer(player) === false) {
-            throw Error("Game is not free");
+            throw new ServerError(errors.NOT_FREE_GAME);
+            //throw Error("Game is not free");
           }
-          accounts.addGame(user.id, game.uuid);
-        } else {
-          throw Error("Can not find Game");
         }
+        //accounts.addGame(user.id, game.uuid);
       } else if (reqData.useAi) {
         const aiFolderPath = resolve("../client_deno/");
         const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
-        if (ai) {
-          const bname = reqData.aiOption?.boardName || boardname ||
-            await getRandomBoardName();
-          const brd = readBoard(bname);
+        if (!ai) throw new ServerError(errors.NOT_AI);
+        const bname = reqData.aiOption?.boardName || boardname ||
+          await getRandomBoardName();
+        const brd = BoardFileOp.get(bname); //readBoard(bname);
+        if (!reqData.option?.dryRun) {
           const game = kkmm.createGame(brd);
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);
           game.attachPlayer(player);
-          accounts.addGame(user.id, game.uuid);
+          //accounts.addGame(user.id, game.uuid);
           Deno.run(
             {
               cmd: [
@@ -140,26 +146,23 @@ export const matchRouter = () => {
               ],
             },
           );
-        } else {
-          throw Error("Can not find AI");
         }
       } else {
         const freeGame = kkmm.getFreeGames();
-        if (freeGame.length == 0) {
-          const bname = boardname || await getRandomBoardName();
-          const brd = readBoard(bname);
-          const game = kkmm.createGame(brd);
-          game.changeFuncs.push(sendAllGame);
-          game.changeFuncs.push(sendGame);
+        if (!reqData.option?.dryRun) {
+          if (freeGame.length === 0) {
+            const bname = boardname || await getRandomBoardName();
+            const brd = BoardFileOp.get(bname); //readBoard(bname);
+            const game = kkmm.createGame(brd);
+            game.changeFuncs.push(sendAllGame);
+            game.changeFuncs.push(sendGame);
 
-          freeGame.push(game);
+            freeGame.push(game);
+          }
+          freeGame[0].attachPlayer(player);
+          //console.log(player);
         }
-        if (freeGame[0].attachPlayer(player) === false) {
-          throw Error("Can not add Player");
-        }
-        //console.log(player);
       }
-
       await req.respond(jsonResponse(player.getJSON()));
     } catch (e) {
       await req.respond(errorCodeResponse(e));
@@ -175,11 +178,8 @@ export const matchRouter = () => {
         ...LogFileOp.getLogGames(),
       ]
         .find((item) => (item.uuid === id) || (item.gameId === id));
-      if (game) {
-        await req.respond(jsonResponse(game));
-      } else {
-        throw Error("Invalid gameID.");
-      }
+      if (!game) throw new ServerError(errors.NOT_GAME);
+      await req.respond(jsonResponse(game));
     } catch (e) {
       await req.respond(errorCodeResponse(e));
     }
@@ -197,27 +197,26 @@ export const matchRouter = () => {
       const game = [...kkmm.getGames(), ...kkmm_self.getGames()].find((
         item: any,
       ) => item.uuid === gameId);
-      if (!game) throw Error("Invalid gameId");
+      if (!game) throw new ServerError(errors.NOT_GAME);
       const player = game.players.find((p: any) =>
         p.accessToken === accessToken
       );
-      if (player === undefined) {
-        throw Error("Invalid accessToken.");
-      }
+      if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
+
       const actionData = (await req.json()) as SetActionPost;
-      const isDisable = actionData.actions.some((a) => !ActionPost.isEnable(a));
-      //console.log(actionData);
-      if (isDisable) {
-        throw Error("Invalid action");
+      if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
+        throw new ServerError(errors.INVALID_ACTION);
       }
       const actionsAry: any = [];
       actionData.actions.forEach((a) => {
         actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
       });
-      //console.log(game.nextTurnUnixTime);
-      //if (game.nextTurnUnixTime >= reqTime) {
-      //console.log(actionsAry);
-      const nowTurn = player.setActions(Action.fromJSON(actionsAry));
+      let nowTurn;
+      if (!actionData.option?.dryRun) {
+        nowTurn = player.setActions(Action.fromJSON(actionsAry));
+      } else {
+        nowTurn = game.turn;
+      }
 
       await req.respond(
         jsonResponse({ receptionUnixTime: Math.floor(reqTime), turn: nowTurn }),
