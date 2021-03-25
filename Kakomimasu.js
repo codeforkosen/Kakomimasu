@@ -721,7 +721,7 @@ class Player {
       userId: this.id,
       spec: this.spec,
       accessToken: this.accessToken,
-      gameId: this.game.uuid,
+      gameId: this.game?.uuid,
       index: this.index,
     };
   }

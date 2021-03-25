@@ -3,11 +3,7 @@ import {
   createRouter,
 } from "https://servestjs.org/@v1.1.9/mod.ts";
 
-import {
-  jsonResponse,
-  pathResolver,
-  readJsonFileSync,
-} from "./apiserver_util.ts";
+import { jsonResponse, pathResolver } from "./apiserver_util.ts";
 
 const resolve = pathResolver(import.meta);
 
@@ -15,13 +11,7 @@ import util from "../util.js";
 import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errorCodeResponse, errors, ServerError } from "./error.ts";
-import {
-  kkmm,
-  kkmm_self,
-  readBoard,
-  sendAllGame,
-  sendGame,
-} from "./apiserver.ts";
+import { kkmm, kkmm_self, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "../Kakomimasu.js";
 
@@ -34,7 +24,7 @@ const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
 import { BoardFileOp, LogFileOp } from "./parts/file_opration.ts";
 
 const getRandomBoardName = async () => {
-  const bd = Deno.readDir("board");
+  const bd = Deno.readDir(resolve("./board"));
   const list = [];
   for await (const b of bd) {
     if (b.name.endsWith(".json")) {
@@ -85,12 +75,6 @@ class ActionPost {
 interface SetActionPost extends ApiOption {
   actions: ActionPost[];
 }
-/*class SetActionPost {
-  constructor(
-    //public time: number,
-    public actions: ActionPost[],
-  ) {}
-}*/
 
 export const matchRouter = () => {
   const router = createRouter();

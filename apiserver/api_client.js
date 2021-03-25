@@ -25,6 +25,17 @@ export default class ApiClient {
     return resJson;
   }
 
+  async _fetchPostJsonToJsonWithAuth(path, data, auth) {
+    const resJson = await (await fetch(
+      this.baseUrl + path,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": auth },
+        body: JSON.stringify(data),
+      },
+    )).json();
+    return resJson;
+  }
   async usersRegist(data) {
     return await this._fetchPostJsonToJson("/users/regist", data);
   }
@@ -68,6 +79,21 @@ export default class ApiClient {
 
   async getBoards() {
     const resJson = await this._fetchToJson("/game/boards");
+    return resJson;
+  }
+
+  async match(data) {
+    const resJson = await this._fetchPostJsonToJson("/match", data);
+    return resJson;
+  }
+
+  async getMatch(gameId) {
+    const resJson = await this._fetchToJson(`/match/${gameId}`);
+    return resJson;
+  }
+
+  async setAction(gameId, data, auth) {
+    const resJson = await this._fetchPostJsonToJsonWithAuth(`/match/${gameId}/action`, data, auth);
     return resJson;
   }
 }

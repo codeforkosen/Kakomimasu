@@ -102,6 +102,7 @@ export const errorCodeResponse = (error: Error) => {
     errorCode = error.errorCode;
   } else {
     errorCode = 0;
+    console.log(error);
   }
 
   const res = {
