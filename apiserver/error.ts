@@ -3,6 +3,27 @@ export const errors = {
     errorCode: 1,
     message: "nothing search query",
   },
+  NOT_GAME: {
+    errorCode: 100,
+    message: "can not find game",
+  },
+
+  NOT_FREE_GAME: {
+    errorCode: 101,
+    message: "game is not free",
+  },
+  NOT_AI: {
+    errorCode: 102,
+    message: "can not find ai",
+  },
+  INVALID_ACCESSTOKEN: {
+    errorCode: 103,
+    message: "invalid accessToken",
+  },
+  INVALID_ACTION: {
+    errorCode: 104,
+    message: "invalid action",
+  },
   NOTHING_PASSWORD: {
     errorCode: 200,
     message: "nothing password",
@@ -27,6 +48,10 @@ export const errors = {
     errorCode: 205,
     message: "invalid id or name",
   },
+  ALREADY_REGISTERED_USER: {
+    errorCode: 206,
+    message: "already registered user",
+  },
   INVALID_TOURNAMENT_NAME: {
     errorCode: 300,
     message: "invalid name",
@@ -43,9 +68,14 @@ export const errors = {
     errorCode: 303,
     message: "nothing id",
   },
-  ALREADY_REGISTERED_USER: {
-    errorCode: 304,
-    message: "already registered user by tournament",
+
+  INVALID_BOARD_NAME: {
+    errorCode: 400,
+    message: "invalid board name",
+  },
+  INVALID_PLAYER_IDENTIFIERS: {
+    errorCode: 401,
+    message: "invalid player identifiers",
   },
 };
 
@@ -72,6 +102,7 @@ export const errorCodeResponse = (error: Error) => {
     errorCode = error.errorCode;
   } else {
     errorCode = 0;
+    console.log(error);
   }
 
   const res = {

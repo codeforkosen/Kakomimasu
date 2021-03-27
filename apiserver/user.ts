@@ -165,13 +165,14 @@ class Users {
   }
 
   getUser(identifier: string, password: string) {
-    if (password === "") throw Error("Invalid password.");
+    if (!password) throw new ServerError(errors.NOTHING_PASSWORD);
+    //if (password === "") throw Error("Invalid password.");
     const user = this.users.find((
       e,
     ) => ((e.id === identifier || e.name === identifier) &&
       e.password === password)
     );
-    if (user === undefined) throw Error("Can not find users.");
+    if (!user) throw new ServerError(errors.NOT_USER);
     return user;
   }
 

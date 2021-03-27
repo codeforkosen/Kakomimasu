@@ -2,7 +2,9 @@ import util from "../../util.js";
 import { Game, Kakomimasu } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
-class ExpGame extends Game {
+import { accounts } from "../user.ts";
+
+export class ExpGame extends Game {
   constructor(board, name, dummy) {
     super(board, dummy);
     this.name = name;
@@ -23,6 +25,7 @@ class ExpGame extends Game {
       this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
       this.updateStatus();
     }
+    accounts.addGame(player.id, this.uuid);
     this.wsSend();
     return true;
   }

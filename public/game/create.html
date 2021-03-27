@@ -96,7 +96,8 @@
                         const form = document.forms["create-form"];
                         const playerIdentifiers = [];
                         for (let i = 1; i <= this.nPlayer; i++) {
-                            playerIdentifiers.push(form[`player${i}`].value);
+                            const value = form[`player${i}`].value;
+                            if (value) playerIdentifiers.push(value);
                         }
                         const sendData = {
                             name: form["name"].value,
