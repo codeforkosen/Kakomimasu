@@ -22,12 +22,20 @@ export PATH="$DENO_INSTALL/bin:$PATH"
 upstream deno {
     server 127.0.0.1:8880;
 }
+map $http_upgrade $connection_upgrade { 
+    default upgrade;
+    ''      close;
+} 
 server {
 server_name practice.kakomimasu.website; # managed by Certbot
 	# root         /usr/share/nginx/html;
 	location / {
 	    proxy_pass http://deno;
 	}
+	proxy_http_version 1.1;
+	proxy_set_header Host $host;
+	proxy_set_header Upgrade $http_upgrade; 
+	proxy_set_header Connection $connection_upgrade;
 }
 # nohup deno run -A apiserver.ts &
 ```
