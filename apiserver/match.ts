@@ -112,6 +112,9 @@ export const matchRouter = () => {
         const brd = BoardFileOp.get(bname); //readBoard(bname);
         if (!reqData.option?.dryRun) {
           const game = kkmm.createGame(brd);
+          game.name =
+            `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
+
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);
           game.attachPlayer(player);
