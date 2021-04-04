@@ -44,7 +44,7 @@ class KakomimasuClient {
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
     let user = await userShow(this.id);
-    if (user.hasOwnProperty("error")) {
+    if (user.hasOwnProperty("errorCode")) {
       user = await userRegist(this.name, this.id, this.password);
     }
 
