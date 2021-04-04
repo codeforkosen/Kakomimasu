@@ -35,24 +35,28 @@ import { matchRouter } from "./match.ts";
 let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
-  socks.push(sock);
-  sock.send(
-    JSON.stringify([
-      kkmm.getGames(),
-      kkmm_self.getGames(),
-      LogFileOp.getLogGames(),
-    ]),
-  );
+  try {
+    await sock.send(
+      JSON.stringify([
+        kkmm.getGames(),
+        kkmm_self.getGames(),
+        LogFileOp.getLogGames(),
+      ]),
+    );
+    socks.push(sock);
 
-  for await (const msg of sock) {
-    if (typeof msg === "string") {
-      //console.log(msg);
-    } else {
-      //console.log("err on ws", msg);
-      // ws { code: 0, reason: "" } -- close
-      // ws { code: 1001, reason: "" } -- 遮断
-      break;
+    for await (const msg of sock) {
+      if (typeof msg === "string") {
+        //console.log(msg);
+      } else {
+        //console.log("err on ws", msg);
+        // ws { code: 0, reason: "" } -- close
+        // ws { code: 1001, reason: "" } -- 遮断
+        break;
+      }
     }
+  } catch (e) {
+    //console.log(e);
   }
 };
 
@@ -89,19 +93,23 @@ export const sendAllGame = () => {
 let getGameSocks: { sock: WebSocket; id: string }[] = [];
 
 const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
-  const id = req.match[1];
+  try {
+    const id = req.match[1];
 
-  const game = getGame(id);
-  if (game) {
-    sock.send(JSON.stringify(game));
-    if (!game.ending) {
-      getGameSocks.push({ sock: sock, id: id });
-      for await (const msg of sock) {
+    const game = getGame(id);
+    if (game) {
+      await sock.send(JSON.stringify(game));
+      if (!game.ending) {
+        getGameSocks.push({ sock: sock, id: id });
+        for await (const msg of sock) {
+        }
       }
     }
-  }
-  if (!sock.isClosed) {
-    sock.close();
+    if (!sock.isClosed) {
+      sock.close();
+    }
+  } catch (e) {
+    //console.log(e);
   }
 };
 export const sendGame = (id: string) => {
