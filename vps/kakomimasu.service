@@ -1,0 +1,12 @@
+[Unit]
+Description = Kakomimasu apiserver
+Documentation = https://github.com/codeforkosen/Kakomimasu
+After = network.target
+
+[Service]
+Environment = PATH=/root/.deno/bin
+ExecStart = /root/.deno/bin/deno run -A /root/Kakomimasu/apiserver/apiserver.ts
+Restart=always
+
+[Install]
+WantedBy = multi-user.target

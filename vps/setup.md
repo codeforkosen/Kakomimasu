@@ -39,3 +39,10 @@ server_name practice.kakomimasu.website; # managed by Certbot
 }
 # nohup deno run -A apiserver.ts &
 ```
+
+## systemdを使用した囲みマスサービス起動
+```
+# cp vps/kakomimasu.service /etc/systemd/system/kakomimasu.service
+# systemctl daemon-reload
+# systemctl start kakomimasu
+```
