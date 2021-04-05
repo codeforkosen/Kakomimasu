@@ -27,7 +27,7 @@ $ deno run -A client_a1.js --local --useAi a4
 |--useAi|AI名|対AI戦を行うことができます。AI名については[AI名](#AI名)を参照。--aiBoardオプションにて使用ボードの指定も可
 |--aiBoard|ボード名|対AI戦に使用するボードを指定することができます。ボード名については[ボード名](#ボード名)を参照。--useAIオプションがない場合には無視されます。
 |--gameId|ゲームID|特定のゲームに参加することができます。
-|--local|-|localhostで実行されているサーバに接続します。
+|--local|-|localhostで実行されているサーバに接続します。<br>このオプションがない場合、envファイルの`host`を参照し、それもない場合は`https://practice.kakomimasu.website`に接続されます。|
 |--nolog|-|ログを出力しません。（コンソールの出力に`client_util.js`のcl関数を使用しているものに限る）|
 
 ### AI名
