@@ -66,6 +66,17 @@ class Agent {
     this.lastaction = null;
   }
 
+  static restore(data, board, field) {
+    const agent = new Agent(board, field);
+    agent.playerid = data.playerid;
+    agent.x = data.x;
+    agent.y = data.y;
+    agent.bkx = data.bkx;
+    agent.bky = data.bky;
+    agent.lastaction = data.lastaction;
+    return agent;
+  }
+
   isOnBoard() {
     return this.x !== -1;
   }
@@ -380,7 +391,7 @@ class Game {
     this.nsec = board.nsec;
     this.gaming = false;
     this.ending = false;
-    this.actions = [];
+    //this.actions = [];
     this.field = new Field(board);
     this.log = [];
     this.turn = 0;
@@ -394,6 +405,21 @@ class Game {
       }
       this.agents.push(a);
     }
+  }
+
+  static restore(data) {
+    const game = new Game(data.board);
+    game.uuid = data.uuid;
+    game.players = data.players.map(p => Player.restore(p));
+    game.gaming = data.gaming;
+    game.ending = data.ending;
+    game.field.field = data.tiled;
+    game.log = data.log;
+    game.turn = data.turn;
+    game.agents = data.players.map((p, i) => {
+      return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
+    });
+    return game;
   }
 
   attachPlayer(player) {
@@ -424,9 +450,9 @@ class Game {
     this.players.forEach((p) => p.noticeStart());
   }
 
-  setActions(player, actions) {
+  /*setActions(player, actions) {
     this.actions[player] = actions;
-  }
+  }*/
 
   nextTurn() {
     const actions = [];
@@ -696,6 +722,13 @@ class Player {
     this.index = -1;
   }
 
+  static restore(data) {
+    const player = new Player(data.id, data.spec);
+    player.accessToken = data.accessToken;
+    player.index = data.index;
+    return player;
+  }
+
   setGame(game) {
     this.game = game;
   }
@@ -762,4 +795,4 @@ class Kakomimasu {
   }
 }
 
-export { Kakomimasu, Board, Action, Field, Game };
+export { Kakomimasu, Board, Action, Field, Game, Player, Agent };
