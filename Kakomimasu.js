@@ -27,6 +27,11 @@ class Board {
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
+  static restore(data) {
+    const board = new Board(data.w, data.h, data.points, data.nagent, data.nturn, data.nsec, data.nplayer)
+    return board;
+  }
+
   getJSON() {
     return {
       name: this.name,
@@ -408,7 +413,8 @@ class Game {
   }
 
   static restore(data) {
-    const game = new Game(data.board);
+    const board = Board.restore(data.board);
+    const game = new Game(board);
     game.uuid = data.uuid;
     game.players = data.players.map(p => Player.restore(p));
     game.gaming = data.gaming;

@@ -1,5 +1,5 @@
 import util from "../../util.js";
-import { Game, Kakomimasu, Player, Agent } from "../../Kakomimasu.js";
+import { Game, Kakomimasu, Player, Agent, Board } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
@@ -15,7 +15,8 @@ export class ExpGame extends Game {
   }
 
   static restore(data) {
-    const game = new ExpGame(data.board, data.name);
+    const board = Board.restore(data.board);
+    const game = new ExpGame(board, data.name);
     game.uuid = data.uuid;
     game.players = data.players.map(p => Player.restore(p));
     game.gaming = data.gaming;
