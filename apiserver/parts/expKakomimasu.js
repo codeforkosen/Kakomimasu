@@ -1,5 +1,5 @@
 import util from "../../util.js";
-import { Game, Kakomimasu } from "../../Kakomimasu.js";
+import { Game, Kakomimasu, Field } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
@@ -13,6 +13,16 @@ export class ExpGame extends Game {
     this.changeFuncs = [];
     this.reservedUsers = [];
   }
+
+  /*static restoreGame(data) {
+    const game = new ExpGame(data.board);
+    game.uuid = data.gameId;
+    game.gaming = data.gaming;
+    game.ending = data.ending;
+    game.turn = data.turn;
+    const field = new Field(data.board);
+    game.
+  }*/
   attachPlayer(player) {
     if (this.reservedUsers > 0) {
       const isReservedUser = this.reservedUsers.some((e) => e === player.id);
@@ -61,7 +71,26 @@ export class ExpGame extends Game {
       }
     }
     else if (this.ending) { // ゲーム終了後
-      LogFileOp.save(this);
+      //LogFileOp.save(this);
+      const data = { ...this };
+      data.players = data.players.map(p => {
+        p = { ...p };
+        p.game = null;
+        return p;
+      })
+      data.field = { ...data.field };
+      data.field.board = null;
+      data.agents = data.agents.map(p => {
+        p = p.map(a => {
+          a = { ...a };
+          a.board = null;
+          a.field = null;
+          return a;
+        });
+        return p;
+      });
+      data.changeFuncs = undefined;
+      LogFileOp.save(data);
 
       console.log("turn", this.turn);
       this.wsSend();
