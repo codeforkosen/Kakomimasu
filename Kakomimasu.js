@@ -32,6 +32,10 @@ class Board {
     return board;
   }
 
+  toLogJSON() {
+    return { ...this };
+  }
+
   getJSON() {
     return {
       name: this.name,
@@ -80,6 +84,13 @@ class Agent {
     agent.bky = data.bky;
     agent.lastaction = data.lastaction;
     return agent;
+  }
+
+  toLogJSON() {
+    const a = { ...this };
+    a.board = null;
+    a.field = null;
+    return a;
   }
 
   isOnBoard() {
@@ -263,6 +274,12 @@ class Field {
     }
   }
 
+  toLogJSON() {
+    const f = { ...this };
+    f.board = null;
+    return f;
+  }
+
   set(x, y, att, playerid = -1) {
     this.field[x + y * this.board.w] = [att, playerid];
   }
@@ -426,6 +443,18 @@ class Game {
       return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
     });
     return game;
+  }
+
+  toLogJSON() {
+    const data = { ...this };
+    data.players = data.players.map(p => p.toLogJSON());
+    data.board = data.board.toLogJSON();
+    data.field = data.field.toLogJSON();
+    data.agents = data.agents.map(p => {
+      p = p.map(a => a.toLogJSON());
+      return p;
+    });
+    return data;
   }
 
   attachPlayer(player) {
@@ -733,6 +762,12 @@ class Player {
     player.accessToken = data.accessToken;
     player.index = data.index;
     return player;
+  }
+
+  toLogJSON() {
+    const p = { ...this };
+    p.game = null;
+    return p;
   }
 
   setGame(game) {

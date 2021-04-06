@@ -10,7 +10,7 @@ import { ExpGame } from "./expKakomimasu.js";
 const resolve = pathResolver(import.meta);
 
 const writeJsonFileSync = (path: string | URL, json: any) => {
-  Deno.writeTextFileSync(path, JSON.stringify(json, null, 2));
+  Deno.writeTextFileSync(path, JSON.stringify(json));
 };
 const readJsonFileSync = (path: string | URL) => {
   return JSON.parse(Deno.readTextFileSync(path));

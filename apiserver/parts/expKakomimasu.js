@@ -82,26 +82,7 @@ export class ExpGame extends Game {
       }
     }
     else if (this.ending) { // ゲーム終了後
-      //LogFileOp.save(this);
-      const data = { ...this };
-      data.players = data.players.map(p => {
-        p = { ...p };
-        p.game = null;
-        return p;
-      });
-      data.board = { ...data.board };
-      data.field = { ...data.field };
-      data.field.board = null;
-      data.agents = data.agents.map(p => {
-        p = p.map(a => {
-          a = { ...a };
-          a.board = null;
-          a.field = null;
-          return a;
-        });
-        return p;
-      });
-      data.changeFuncs = undefined;
+      const data = this.toLogJSON();
       LogFileOp.save(data);
 
       console.log("turn", this.turn);
@@ -128,6 +109,12 @@ export class ExpGame extends Game {
       nextTurnUnixTime: this.nextTurnUnixTime,
       reservedUsers: this.reservedUsers,
     };
+  }
+
+  toLogJSON() {
+    const data = { ...this, ...super.toLogJSON() };
+    data.changeFuncs = null;
+    return data;
   }
 
   wsSend() {
