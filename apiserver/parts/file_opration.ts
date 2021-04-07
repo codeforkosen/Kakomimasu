@@ -5,11 +5,12 @@ import { pathResolver } from "../apiserver_util.ts";
 import { IBoard } from "./interface.ts";
 import { IUser } from "../user.ts";
 import { ITournament, Tournament } from "../tournament.ts";
+import { ExpGame } from "./expKakomimasu.js";
 
 const resolve = pathResolver(import.meta);
 
 const writeJsonFileSync = (path: string | URL, json: any) => {
-  Deno.writeTextFileSync(path, JSON.stringify(json, null, 2));
+  Deno.writeTextFileSync(path, JSON.stringify(json));
 };
 const readJsonFileSync = (path: string | URL) => {
   return JSON.parse(Deno.readTextFileSync(path));
@@ -67,7 +68,9 @@ export class LogFileOp {
 
   static staticConstructor = (() => {
     Deno.mkdirSync(LogFileOp.dir, { recursive: true });
-    LogFileOp.getLogGames();
+    window.addEventListener("load", () => {
+      LogFileOp.getLogGames;
+    });
   })();
 
   public static save(data: any) {
@@ -77,6 +80,15 @@ export class LogFileOp {
     );
   }
 
+  static read() {
+    const games: ExpGame[] = [];
+    for (const dirEntry of Deno.readDirSync(this.dir)) {
+      const data = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
+      games.push(ExpGame.restore(data));
+    }
+    return games;
+  }
+
   public static getLogGames() {
     const stat = Deno.statSync(this.dir);
     if (stat.isDirectory) {
@@ -84,7 +96,7 @@ export class LogFileOp {
         this.logGames.length = 0;
         for (const dirEntry of Deno.readDirSync(this.dir)) {
           const json = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
-          this.logGames.push(json);
+          this.logGames.push(ExpGame.restore(json));
         }
         this.mtime = stat.mtime;
         //console.log("logGames Reflesh!");

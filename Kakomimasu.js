@@ -27,6 +27,15 @@ class Board {
     // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
+  static restore(data) {
+    const board = new Board(data.w, data.h, data.points, data.nagent, data.nturn, data.nsec, data.nplayer)
+    return board;
+  }
+
+  toLogJSON() {
+    return { ...this };
+  }
+
   getJSON() {
     return {
       name: this.name,
@@ -64,6 +73,24 @@ class Agent {
     this.bkx = -1;
     this.bky = -1;
     this.lastaction = null;
+  }
+
+  static restore(data, board, field) {
+    const agent = new Agent(board, field);
+    agent.playerid = data.playerid;
+    agent.x = data.x;
+    agent.y = data.y;
+    agent.bkx = data.bkx;
+    agent.bky = data.bky;
+    agent.lastaction = data.lastaction;
+    return agent;
+  }
+
+  toLogJSON() {
+    const a = { ...this };
+    a.board = null;
+    a.field = null;
+    return a;
   }
 
   isOnBoard() {
@@ -247,6 +274,12 @@ class Field {
     }
   }
 
+  toLogJSON() {
+    const f = { ...this };
+    f.board = null;
+    return f;
+  }
+
   set(x, y, att, playerid = -1) {
     this.field[x + y * this.board.w] = [att, playerid];
   }
@@ -380,7 +413,7 @@ class Game {
     this.nsec = board.nsec;
     this.gaming = false;
     this.ending = false;
-    this.actions = [];
+    //this.actions = [];
     this.field = new Field(board);
     this.log = [];
     this.turn = 0;
@@ -394,6 +427,34 @@ class Game {
       }
       this.agents.push(a);
     }
+  }
+
+  static restore(data) {
+    const board = Board.restore(data.board);
+    const game = new Game(board);
+    game.uuid = data.uuid;
+    game.players = data.players.map(p => Player.restore(p));
+    game.gaming = data.gaming;
+    game.ending = data.ending;
+    game.field.field = data.tiled;
+    game.log = data.log;
+    game.turn = data.turn;
+    game.agents = data.players.map((p, i) => {
+      return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
+    });
+    return game;
+  }
+
+  toLogJSON() {
+    const data = { ...this };
+    data.players = data.players.map(p => p.toLogJSON());
+    data.board = data.board.toLogJSON();
+    data.field = data.field.toLogJSON();
+    data.agents = data.agents.map(p => {
+      p = p.map(a => a.toLogJSON());
+      return p;
+    });
+    return data;
   }
 
   attachPlayer(player) {
@@ -424,9 +485,9 @@ class Game {
     this.players.forEach((p) => p.noticeStart());
   }
 
-  setActions(player, actions) {
+  /*setActions(player, actions) {
     this.actions[player] = actions;
-  }
+  }*/
 
   nextTurn() {
     const actions = [];
@@ -696,6 +757,19 @@ class Player {
     this.index = -1;
   }
 
+  static restore(data) {
+    const player = new Player(data.id, data.spec);
+    player.accessToken = data.accessToken;
+    player.index = data.index;
+    return player;
+  }
+
+  toLogJSON() {
+    const p = { ...this };
+    p.game = null;
+    return p;
+  }
+
   setGame(game) {
     this.game = game;
   }
@@ -762,4 +836,4 @@ class Kakomimasu {
   }
 }
 
-export { Kakomimasu, Board, Action, Field, Game };
+export { Kakomimasu, Board, Action, Field, Game, Player, Agent };

@@ -1,5 +1,5 @@
 import util from "../../util.js";
-import { Game, Kakomimasu } from "../../Kakomimasu.js";
+import { Game, Kakomimasu, Player, Agent, Board } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
@@ -13,6 +13,27 @@ export class ExpGame extends Game {
     this.changeFuncs = [];
     this.reservedUsers = [];
   }
+
+  static restore(data) {
+    const board = Board.restore(data.board);
+    const game = new ExpGame(board, data.name);
+    game.uuid = data.uuid;
+    game.players = data.players.map(p => Player.restore(p));
+    game.gaming = data.gaming;
+    game.ending = data.ending;
+    game.field.field = data.field.field;
+    game.log = data.log;
+    game.turn = data.turn;
+    game.agents = data.players.map((p, i) => {
+      return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
+    });
+
+    game.startedAtUnixTime = data.startedAtUnixTime;
+    game.nextTurnUnixTime = data.nextTurnUnixTime;
+    game.reservedUsers = data.reservedUsers;
+    return game;
+  }
+
   attachPlayer(player) {
     if (this.reservedUsers > 0) {
       const isReservedUser = this.reservedUsers.some((e) => e === player.id);
@@ -61,7 +82,8 @@ export class ExpGame extends Game {
       }
     }
     else if (this.ending) { // ゲーム終了後
-      LogFileOp.save(this);
+      const data = this.toLogJSON();
+      LogFileOp.save(data);
 
       console.log("turn", this.turn);
       this.wsSend();
@@ -87,6 +109,12 @@ export class ExpGame extends Game {
       nextTurnUnixTime: this.nextTurnUnixTime,
       reservedUsers: this.reservedUsers,
     };
+  }
+
+  toLogJSON() {
+    const data = { ...this, ...super.toLogJSON() };
+    data.changeFuncs = null;
+    return data;
   }
 
   wsSend() {
