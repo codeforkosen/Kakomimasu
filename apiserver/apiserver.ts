@@ -13,9 +13,6 @@ const resolve = util.pathResolver(import.meta);
 import { Board } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.js";
 
-export const kkmm = new ExpKakomimasu();
-export const kkmm_self = new ExpKakomimasu();
-
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({
   path: resolve("./.env"),
@@ -30,6 +27,9 @@ import { userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
 
+export const kkmm = new ExpKakomimasu();
+kkmm.games.push(...LogFileOp.read());
+export const kkmm_self = new ExpKakomimasu();
 //#region WebSocket
 
 let socks: WebSocket[] = [];
@@ -40,7 +40,6 @@ const ws_AllGame = async (sock: WebSocket) => {
       JSON.stringify([
         kkmm.getGames(),
         kkmm_self.getGames(),
-        LogFileOp.getLogGames(),
       ]),
     );
     socks.push(sock);
@@ -68,7 +67,6 @@ setInterval(() => {
   const games = [
     kkmm.getGames(),
     kkmm_self.getGames(),
-    LogFileOp.getLogGames(),
   ];
 
   socks = socks.filter((s) => {
@@ -135,7 +133,6 @@ const getGame = (id: string): any => {
   const games = [
     kkmm.getGames(),
     kkmm_self.getGames(),
-    LogFileOp.getLogGames(),
   ];
   //console.log(games);
   //console.log("getGame!!", id);

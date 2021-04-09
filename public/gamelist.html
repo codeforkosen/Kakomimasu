@@ -20,9 +20,8 @@
             <h1 id="title">ゲーム一覧</h1>
             <h4 id="now-time" v-cloak>現在時刻：{{nowTime}}</h4>
             <div class="game-table">
-                <button v-on:click="nowType = 0" :disabled="nowType === 0">ランダムマッチ</button>
-                <button v-on:click="nowType = 1" :disabled="nowType === 1">フリーマッチ</button>
-                <button v-on:click="nowType = 2" :disabled="nowType === 2">終了したゲーム</button>
+                <button v-on:click="nowType = 0" :disabled="nowType === 0">フリーマッチ</button>
+                <button v-on:click="nowType = 1" :disabled="nowType === 1">カスタムマッチ</button>
 
                 <games-list v-bind:games="games[nowType]"> </games-list>
             </div>
@@ -36,7 +35,7 @@
             const gameTableVue = new Vue({
                 el: ".game-table",
                 data: {
-                    games: [[], [], []],
+                    games: [[], []],
                     nowType: 0,
                 },
                 components: {
@@ -49,7 +48,7 @@
 
                 },
                 created: function () {
-                    this.nowType = 2;
+                    this.nowType = 0;
                 }
             });
 

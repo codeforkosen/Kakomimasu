@@ -82,8 +82,7 @@ export class ExpGame extends Game {
       }
     }
     else if (this.ending) { // ゲーム終了後
-      const data = this.toLogJSON();
-      LogFileOp.save(data);
+      LogFileOp.save(this);
 
       console.log("turn", this.turn);
       this.wsSend();
