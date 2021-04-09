@@ -12,6 +12,7 @@ export class ExpGame extends Game {
     this.nextTurnUnixTime = null;
     this.changeFuncs = [];
     this.reservedUsers = [];
+    this.type = "normal";
   }
 
   static restore(data) {
@@ -31,6 +32,7 @@ export class ExpGame extends Game {
     game.startedAtUnixTime = data.startedAtUnixTime;
     game.nextTurnUnixTime = data.nextTurnUnixTime;
     game.reservedUsers = data.reservedUsers;
+    game.type = data.type || "normal";
     return game;
   }
 
@@ -107,6 +109,7 @@ export class ExpGame extends Game {
       startedAtUnixTime: this.startedAtUnixTime,
       nextTurnUnixTime: this.nextTurnUnixTime,
       reservedUsers: this.reservedUsers,
+      type: this.type,
     };
   }
 
@@ -127,6 +130,11 @@ class ExpKakomimasu extends Kakomimasu {
     const game = new ExpGame(...param);
     this.games.push(game);
     return game;
+  }
+
+  getFreeGames() {
+    const games = super.getFreeGames();
+    return games.filter(game => game.type === "normal");
   }
 }
 

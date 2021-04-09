@@ -29,18 +29,14 @@ import { matchRouter } from "./match.ts";
 
 export const kkmm = new ExpKakomimasu();
 kkmm.games.push(...LogFileOp.read());
-export const kkmm_self = new ExpKakomimasu();
-//#region WebSocket
 
+//#region WebSocket
 let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
   try {
     await sock.send(
-      JSON.stringify([
-        kkmm.getGames(),
-        kkmm_self.getGames(),
-      ]),
+      JSON.stringify(kkmm.getGames()),
     );
     socks.push(sock);
 
@@ -64,10 +60,7 @@ let sendAllGameQue = 0;
 setInterval(() => {
   if (sendAllGameQue === 0) return;
   sendAllGameQue = 0;
-  const games = [
-    kkmm.getGames(),
-    kkmm_self.getGames(),
-  ];
+  const games = kkmm.getGames();
 
   socks = socks.filter((s) => {
     try {
@@ -130,10 +123,7 @@ export const sendGame = (id: string) => {
 };
 
 const getGame = (id: string): any => {
-  const games = [
-    kkmm.getGames(),
-    kkmm_self.getGames(),
-  ];
+  const games = kkmm.getGames();
   //console.log(games);
   //console.log("getGame!!", id);
   try {

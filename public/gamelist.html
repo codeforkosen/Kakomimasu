@@ -43,7 +43,8 @@
                 },
                 methods: {
                     update: async function (games) {
-                        this.games = games;
+                        console.log(games);
+                        this.games = [games.filter(game => game.type === "normal"), games.filter(game => game.type === "self")];
                     },
 
                 },

@@ -3,16 +3,11 @@ import {
   createRouter,
 } from "https://servestjs.org/@v1.1.9/mod.ts";
 
-import {
-  errorResponse,
-  jsonResponse,
-  readJsonFileSync,
-} from "./apiserver_util.ts";
-import util from "../util.js";
+import { jsonResponse } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errorCodeResponse, errors, ServerError } from "./error.ts";
-import { kkmm_self, readBoard, sendAllGame, sendGame } from "./apiserver.ts";
+import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";
 import { BoardFileOp } from "./parts/file_opration.ts";
 
@@ -43,7 +38,8 @@ export const gameRouter = () => {
 
         let game: ExpGame;
         if (!reqJson.option?.dryRun) {
-          game = kkmm_self.createGame(board, reqJson.name);
+          game = kkmm.createGame(board, reqJson.name);
+          game.type = "self";
 
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);
