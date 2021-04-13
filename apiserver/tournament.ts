@@ -1,11 +1,11 @@
 import { createRouter } from "https://deno.land/x/servest@v1.2.0/mod.ts";
 
-import { errorResponse, jsonResponse } from "./apiserver_util.ts";
+import { jsonResponse } from "./apiserver_util.ts";
 import util from "../util.js";
 import { TournamentFileOp } from "./parts/file_opration.ts";
 import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
-import { errorCodeResponse, errors, ServerError } from "./error.ts";
+import { errors, ServerError } from "./error.ts";
 
 type TournamentType = "round-robin" | "knockout";
 
@@ -128,84 +128,68 @@ export const tournamentRouter = () => {
 
   // 大会登録
   router.post("/create", async (req) => {
-    try {
-      const data = await req.json() as ITournamentReq;
-      if (!data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
-      if (!data.type || !checkType(data.type)) {
-        throw new ServerError(errors.INVALID_TYPE);
-      }
-      const tournament = new Tournament(data);
-      if (data.participants) {
-        data.participants.forEach((e) => tournament.addUser(e));
-      }
-      if (data.option?.dryRun !== true) {
-        tournaments.add(tournament);
-      }
-
-      await req.respond(jsonResponse(tournament));
-    } catch (e) {
-      req.respond(errorCodeResponse(e));
+    const data = await req.json() as ITournamentReq;
+    if (!data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
+    if (!data.type || !checkType(data.type)) {
+      throw new ServerError(errors.INVALID_TYPE);
     }
+    const tournament = new Tournament(data);
+    if (data.participants) {
+      data.participants.forEach((e) => tournament.addUser(e));
+    }
+    if (data.option?.dryRun !== true) {
+      tournaments.add(tournament);
+    }
+
+    await req.respond(jsonResponse(tournament));
   });
 
   // 大会削除
   router.post("/delete", async (req) => {
-    try {
-      const data = await req.json() as ITournamentDeleteReq;
-      if (!data.id) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+    const data = await req.json() as ITournamentDeleteReq;
+    if (!data.id) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
-      const tournament = tournaments.get(data.id);
-      if (!tournament) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
+    const tournament = tournaments.get(data.id);
+    if (!tournament) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
 
-      if (data.option?.dryRun !== true) {
-        tournaments.delete(tournament);
-      }
-
-      await req.respond(jsonResponse(tournament));
-    } catch (e) {
-      req.respond(errorCodeResponse(e));
+    if (data.option?.dryRun !== true) {
+      tournaments.delete(tournament);
     }
+
+    await req.respond(jsonResponse(tournament));
   });
 
   // 大会取得
   router.get("/get", async (req) => {
-    try {
-      const query = req.query;
-      const id = query.get("id");
-      const resData = id ? tournaments.get(id) : tournaments.getAll();
-      if (!resData) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
+    const query = req.query;
+    const id = query.get("id");
+    const resData = id ? tournaments.get(id) : tournaments.getAll();
+    if (!resData) throw new ServerError(errors.NOTHING_TOURNAMENT_ID);
 
-      await req.respond(jsonResponse(resData));
-    } catch (e) {
-      await req.respond(errorCodeResponse(e));
-    }
+    await req.respond(jsonResponse(resData));
   });
 
   // 参加者追加
   router.post("/add", async (req) => {
-    try {
-      const query = req.query;
-      const tournamentId = query.get("id");
-      console.log(tournamentId);
-      if (!tournamentId) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
-      let tournament = tournaments.get(tournamentId);
-      if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+    const query = req.query;
+    const tournamentId = query.get("id");
+    console.log(tournamentId);
+    if (!tournamentId) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
+    let tournament = tournaments.get(tournamentId);
+    if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
-      const body = await req.json() as ITournamentAddUserReq;
-      const identifier = body.user;
-      if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
+    const body = await req.json() as ITournamentAddUserReq;
+    const identifier = body.user;
+    if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
 
-      if (body.option?.dryRun !== true) {
-        tournament = tournaments.addUser(tournamentId, identifier);
-      } else {
-        tournament = new Tournament(tournament);
-        tournament.addUser(identifier);
-      }
-
-      await req.respond(jsonResponse(tournament));
-    } catch (e) {
-      req.respond(errorCodeResponse(e));
+    if (body.option?.dryRun !== true) {
+      tournament = tournaments.addUser(tournamentId, identifier);
+    } else {
+      tournament = new Tournament(tournament);
+      tournament.addUser(identifier);
     }
+
+    await req.respond(jsonResponse(tournament));
   });
 
   return router;
