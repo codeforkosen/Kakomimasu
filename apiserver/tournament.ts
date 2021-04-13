@@ -1,4 +1,4 @@
-import { createRouter } from "https://servestjs.org/@v1.1.9/mod.ts";
+import { createRouter } from "https://deno.land/x/servest@v1.2.0/mod.ts";
 
 import { errorResponse, jsonResponse } from "./apiserver_util.ts";
 import util from "../util.js";

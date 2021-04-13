@@ -1,7 +1,7 @@
 import {
   contentTypeFilter,
   createRouter,
-} from "https://servestjs.org/@v1.1.9/mod.ts";
+} from "https://deno.land/x/servest@v1.2.0/mod.ts";
 
 import { jsonResponse } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
