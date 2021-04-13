@@ -84,32 +84,35 @@ export class ExpGame extends Game {
   }
 
   updateStatus = () => {
-    if (this.isGaming()) { // ゲーム進行中
-      if (!this.nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
-      const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
-      if (diff <= 0) {
-        this.nextTurn();
-        this.wsSend();
-        this.updateStatus();
-      } else {
-        setTimeout(() => this.updateStatus(), diff);
-      }
-    } else if (this.ending) { // ゲーム終了後
-      LogFileOp.save(this);
+    try {
+      if (this.isGaming()) { // ゲーム進行中
+        if (!this.nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
+        const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
+        if (diff <= 0) {
+          this.nextTurn();
+          this.wsSend();
+          this.updateStatus();
+        } else {
+          setTimeout(() => this.updateStatus(), diff);
+        }
+      } else if (this.ending) { // ゲーム終了後
+        LogFileOp.save(this);
 
-      console.log("turn", this.turn);
-      this.wsSend();
-    } // ゲーム開始前
-    else {
-      if (!this.startedAtUnixTime) throw Error("startedAtUnixTime is null");
-      const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
-      if (diff <= 0) {
-        this.start();
+        console.log("turn", this.turn);
         this.wsSend();
-        this.updateStatus();
-      } else {
-        setTimeout(() => this.updateStatus(), diff);
+      } // ゲーム開始前
+      else {
+        if (!this.startedAtUnixTime) throw Error("startedAtUnixTime is null");
+        const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
+        if (diff <= 0) {
+          this.start();
+          this.wsSend();
+          this.updateStatus();
+        } else {
+          setTimeout(() => this.updateStatus(), diff);
+        }
       }
+    } catch (e) {
     }
   };
 
