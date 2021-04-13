@@ -95,22 +95,19 @@ export class ServerError extends Error {
 }
 
 export const errorCodeResponse = (error: Error) => {
-  let message = "";
-  let errorCode = 0;
-  message = error.message;
+  const message = error.message;
   if (error instanceof ServerError) {
-    errorCode = error.errorCode;
+    return {
+      status: 400,
+      headers: new Headers({ "content-type": "application/json" }),
+      body: JSON.stringify({ message, errorCode: error.errorCode }),
+    };
   } else {
-    errorCode = 0;
-    console.log(error);
+    console.error(error);
+    return {
+      status: 500,
+      headers: new Headers({ "content-type": "application/json" }),
+      body: JSON.stringify({ message, errorCode: 0 }),
+    };
   }
-
-  const res = {
-    status: 400,
-    headers: new Headers({
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify({ message, errorCode }),
-  };
-  return res;
 };
