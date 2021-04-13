@@ -11,7 +11,7 @@ import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";
 import { BoardFileOp } from "./parts/file_opration.ts";
 
-import { ExpGame } from "./parts/expKakomimasu.js";
+import { ExpGame } from "./parts/expKakomimasu.ts";
 
 interface ICreateGameReq extends ApiOption {
   name?: string;
@@ -51,6 +51,7 @@ export const gameRouter = () => {
             const userIds = reqJson.playerIdentifiers.map((e) => {
               const id = accounts.find(e)?.id;
               if (!id) throw new ServerError(errors.NOT_USER);
+              return id;
             });
             userIds.forEach((userId) => {
               if (!game.addReservedUser(userId)) {

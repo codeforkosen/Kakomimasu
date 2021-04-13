@@ -1,12 +1,21 @@
 import util from "../../util.js";
-import { Game, Kakomimasu, Player, Agent, Board } from "../../Kakomimasu.js";
+
+// @deno-types="../../Kakomimasu.d.ts"
+import { Agent, Board, Game, Kakomimasu, Player } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
 
 export class ExpGame extends Game {
-  constructor(board, name, dummy) {
-    super(board, dummy);
+  public name?: string;
+  public startedAtUnixTime: number | null;
+  public nextTurnUnixTime: number | null;
+  public changeFuncs: (((param?: any) => void))[];
+  public reservedUsers: string[];
+  public type: "normal" | "self";
+
+  constructor(board: Board, name?: string) {
+    super(board);
     this.name = name;
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
@@ -15,18 +24,20 @@ export class ExpGame extends Game {
     this.type = "normal";
   }
 
-  static restore(data) {
+  static restore(data: any) {
     const board = Board.restore(data.board);
     const game = new ExpGame(board, data.name);
     game.uuid = data.uuid;
-    game.players = data.players.map(p => Player.restore(p));
+    game.players = (data.players as Array<any>).map((p) => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
     game.field.field = data.field.field;
     game.log = data.log;
     game.turn = data.turn;
-    game.agents = data.players.map((p, i) => {
-      return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
+    game.agents = (data.players as Array<any>).map((p, i) => {
+      return (data.agents[i] as Array<any>).map((a) =>
+        Agent.restore(a, game.board, game.field)
+      );
     });
 
     game.startedAtUnixTime = data.startedAtUnixTime;
@@ -36,8 +47,8 @@ export class ExpGame extends Game {
     return game;
   }
 
-  attachPlayer(player) {
-    if (this.reservedUsers > 0) {
+  attachPlayer(player: Player) {
+    if (this.reservedUsers.length > 0) {
       const isReservedUser = this.reservedUsers.some((e) => e === player.id);
       if (!isReservedUser) throw Error("Not allowed user");
     }
@@ -63,7 +74,7 @@ export class ExpGame extends Game {
     return ret;
   }
 
-  addReservedUser(userId) {
+  addReservedUser(userId: string) {
     if (this.reservedUsers.some((e) => e === userId)) {
       return false;
     } else {
@@ -72,8 +83,9 @@ export class ExpGame extends Game {
     }
   }
 
-  updateStatus() {
+  updateStatus = () => {
     if (this.isGaming()) { // ゲーム進行中
+      if (!this.nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
       const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
       if (diff <= 0) {
         this.nextTurn();
@@ -82,14 +94,14 @@ export class ExpGame extends Game {
       } else {
         setTimeout(() => this.updateStatus(), diff);
       }
-    }
-    else if (this.ending) { // ゲーム終了後
+    } else if (this.ending) { // ゲーム終了後
       LogFileOp.save(this);
 
       console.log("turn", this.turn);
       this.wsSend();
     } // ゲーム開始前
     else {
+      if (!this.startedAtUnixTime) throw Error("startedAtUnixTime is null");
       const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
       if (diff <= 0) {
         this.start();
@@ -99,7 +111,7 @@ export class ExpGame extends Game {
         setTimeout(() => this.updateStatus(), diff);
       }
     }
-  }
+  };
 
   toJSON() {
     const ret = super.toJSON();
@@ -125,8 +137,8 @@ export class ExpGame extends Game {
   }
 }
 
-class ExpKakomimasu extends Kakomimasu {
-  createGame(...param) {
+class ExpKakomimasu extends Kakomimasu<ExpGame> {
+  createGame(...param: ConstructorParameters<typeof ExpGame>) {
     const game = new ExpGame(...param);
     this.games.push(game);
     return game;
@@ -134,7 +146,7 @@ class ExpKakomimasu extends Kakomimasu {
 
   getFreeGames() {
     const games = super.getFreeGames();
-    return games.filter(game => game.type === "normal");
+    return games.filter((game) => game.type === "normal");
   }
 }
 

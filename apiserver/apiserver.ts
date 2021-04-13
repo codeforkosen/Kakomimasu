@@ -11,7 +11,7 @@ import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
 import { Board } from "../Kakomimasu.js";
-import { ExpKakomimasu } from "./parts/expKakomimasu.js";
+import { ExpKakomimasu } from "./parts/expKakomimasu.ts";
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({

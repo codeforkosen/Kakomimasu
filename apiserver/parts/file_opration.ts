@@ -5,7 +5,7 @@ import { pathResolver } from "../apiserver_util.ts";
 import { IBoard } from "./interface.ts";
 import { IUser } from "../user.ts";
 import { ITournament, Tournament } from "../tournament.ts";
-import { ExpGame } from "./expKakomimasu.js";
+import { ExpGame } from "./expKakomimasu.ts";
 
 const resolve = pathResolver(import.meta);
 
