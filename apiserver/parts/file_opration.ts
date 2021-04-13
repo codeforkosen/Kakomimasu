@@ -5,7 +5,7 @@ import { pathResolver } from "../apiserver_util.ts";
 import { IBoard } from "./interface.ts";
 import { IUser } from "../user.ts";
 import { ITournament, Tournament } from "../tournament.ts";
-import { ExpGame } from "./expKakomimasu.js";
+import { ExpGame } from "./expKakomimasu.ts";
 
 const resolve = pathResolver(import.meta);
 
@@ -63,17 +63,13 @@ export class TournamentFileOp {
 
 export class LogFileOp {
   private static dir = resolve("../log");
-  private static logGames: any[] = [];
-  private static mtime: Date | null = null;
 
   static staticConstructor = (() => {
     Deno.mkdirSync(LogFileOp.dir, { recursive: true });
-    window.addEventListener("load", () => {
-      LogFileOp.getLogGames;
-    });
   })();
 
-  public static save(data: any) {
+  public static save(game: ExpGame) {
+    const data = game.toLogJSON();
     writeJsonFileSync(
       `${this.dir}/${data.startedAtUnixTime}_${data.uuid}.log`,
       data,
@@ -87,24 +83,6 @@ export class LogFileOp {
       games.push(ExpGame.restore(data));
     }
     return games;
-  }
-
-  public static getLogGames() {
-    const stat = Deno.statSync(this.dir);
-    if (stat.isDirectory) {
-      if (this.mtime?.getTime() !== stat.mtime?.getTime()) {
-        this.logGames.length = 0;
-        for (const dirEntry of Deno.readDirSync(this.dir)) {
-          const json = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
-          this.logGames.push(ExpGame.restore(json));
-        }
-        this.mtime = stat.mtime;
-        //console.log("logGames Reflesh!");
-      } else {
-        //console.log("logGames no change");
-      }
-    }
-    return this.logGames;
   }
 }
 

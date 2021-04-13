@@ -1,7 +1,7 @@
 import {
   contentTypeFilter,
   createRouter,
-} from "https://servestjs.org/@v1.1.9/mod.ts";
+} from "https://deno.land/x/servest@v1.2.0/mod.ts";
 
 import { jsonResponse, pathResolver } from "./apiserver_util.ts";
 
@@ -11,7 +11,7 @@ import util from "../util.js";
 import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errorCodeResponse, errors, ServerError } from "./error.ts";
-import { kkmm, kkmm_self, sendAllGame, sendGame } from "./apiserver.ts";
+import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "../Kakomimasu.js";
 
@@ -21,7 +21,7 @@ const env = config({
   defaults: resolve("./.env.default"),
 });
 const boardname = env.boardname; // || "E-1"; // "F-1" "A-1"
-import { BoardFileOp, LogFileOp } from "./parts/file_opration.ts";
+import { BoardFileOp } from "./parts/file_opration.ts";
 
 const getRandomBoardName = async () => {
   const bd = Deno.readDir(resolve("./board"));
@@ -92,7 +92,7 @@ export const matchRouter = () => {
 
       const player = kkmm.createPlayer(user.id, reqData.spec);
       if (reqData.gameId) {
-        const game = [...kkmm_self.getGames(), ...kkmm.getGames()].find((
+        const game = kkmm.getGames().find((
           game,
         ) => game.uuid === reqData.gameId);
         if (!game) throw new ServerError(errors.NOT_GAME);
@@ -157,14 +157,10 @@ export const matchRouter = () => {
   });
   router.get(new RegExp("^/(.+)$"), async (req) => {
     try {
-      //console.log(LogFileOp.getLogGames());
       const id = req.match[1];
-      const game = [
-        ...kkmm.getGames(),
-        ...kkmm_self.getGames(),
-        ...LogFileOp.getLogGames(),
-      ]
-        .find((item) => (item.uuid === id) || (item.gameId === id));
+      const game = kkmm.getGames().find((item) =>
+        (item.uuid === id) || (item.gameId === id)
+      );
       if (!game) throw new ServerError(errors.NOT_GAME);
       await req.respond(jsonResponse(game));
     } catch (e) {
@@ -181,9 +177,7 @@ export const matchRouter = () => {
       const gameId = req.match[1];
       const accessToken = req.headers.get("Authorization");
 
-      const game = [...kkmm.getGames(), ...kkmm_self.getGames()].find((
-        item: any,
-      ) => item.uuid === gameId);
+      const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
       if (!game) throw new ServerError(errors.NOT_GAME);
       const player = game.players.find((p: any) =>
         p.accessToken === accessToken

@@ -5,16 +5,13 @@ import {
   createRouter,
   ServerRequest,
   serveStatic,
-} from "https://servestjs.org/@v1.1.9/mod.ts";
+} from "https://deno.land/x/servest@v1.2.0/mod.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
 import { Board } from "../Kakomimasu.js";
-import { ExpKakomimasu } from "./parts/expKakomimasu.js";
-
-export const kkmm = new ExpKakomimasu();
-export const kkmm_self = new ExpKakomimasu();
+import { ExpKakomimasu } from "./parts/expKakomimasu.ts";
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({
@@ -30,18 +27,16 @@ import { userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
 
-//#region WebSocket
+export const kkmm = new ExpKakomimasu();
+kkmm.games.push(...LogFileOp.read());
 
+//#region WebSocket
 let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
   try {
     await sock.send(
-      JSON.stringify([
-        kkmm.getGames(),
-        kkmm_self.getGames(),
-        LogFileOp.getLogGames(),
-      ]),
+      JSON.stringify(kkmm.getGames()),
     );
     socks.push(sock);
 
@@ -65,11 +60,7 @@ let sendAllGameQue = 0;
 setInterval(() => {
   if (sendAllGameQue === 0) return;
   sendAllGameQue = 0;
-  const games = [
-    kkmm.getGames(),
-    kkmm_self.getGames(),
-    LogFileOp.getLogGames(),
-  ];
+  const games = kkmm.getGames();
 
   socks = socks.filter((s) => {
     try {
@@ -132,11 +123,7 @@ export const sendGame = (id: string) => {
 };
 
 const getGame = (id: string): any => {
-  const games = [
-    kkmm.getGames(),
-    kkmm_self.getGames(),
-    LogFileOp.getLogGames(),
-  ];
+  const games = kkmm.getGames();
   //console.log(games);
   //console.log("getGame!!", id);
   try {
