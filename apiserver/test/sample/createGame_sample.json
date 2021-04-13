@@ -1,5 +1,5 @@
 {
-  "gameId": "38a6aac7-96d5-4b2f-8e7b-b1d7124cc428",
+  "gameId": "0d6243ab-96cd-41a8-9c48-35ac947703b0",
   "gaming": false,
   "ending": false,
   "board": null,
@@ -11,5 +11,6 @@
   "gameName": "test",
   "startedAtUnixTime": null,
   "nextTurnUnixTime": null,
-  "reservedUsers": []
+  "reservedUsers": [],
+  "type": "self"
 }
