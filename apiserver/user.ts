@@ -7,7 +7,7 @@ import util from "../util.js";
 import { jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
-import { errorCodeResponse, errors, ServerError } from "./error.ts";
+import { errors, ServerError } from "./error.ts";
 
 export interface IUser {
   screenName: string;
@@ -207,29 +207,21 @@ export const userRouter = () => {
     "/regist",
     contentTypeFilter("application/json"),
     async (req) => {
-      try {
-        const reqData = ((await req.json()) as IReqUser);
-        //console.log(reqData);
-        const user = accounts.registUser(reqData);
-        await req.respond(jsonResponse(user));
-      } catch (e) {
-        await req.respond(errorCodeResponse(e));
-      }
+      const reqData = ((await req.json()) as IReqUser);
+      //console.log(reqData);
+      const user = accounts.registUser(reqData);
+      await req.respond(jsonResponse(user));
     },
   );
 
   // ユーザ情報取得
   router.get(new RegExp("^/show/(.*)$"), async (req) => {
-    try {
-      const identifier = req.match[1];
-      if (identifier !== "") {
-        const user = accounts.showUser(identifier);
-        await req.respond(jsonResponse(user));
-      } else {
-        await req.respond(jsonResponse(accounts.getUsers()));
-      }
-    } catch (e) {
-      await req.respond(errorCodeResponse(e));
+    const identifier = req.match[1];
+    if (identifier !== "") {
+      const user = accounts.showUser(identifier);
+      await req.respond(jsonResponse(user));
+    } else {
+      await req.respond(jsonResponse(accounts.getUsers()));
     }
   });
 
@@ -238,33 +230,25 @@ export const userRouter = () => {
     "/delete",
     contentTypeFilter("application/json"),
     async (req) => {
-      try {
-        const reqData = ((await req.json()) as User);
-        const user = accounts.deleteUser(reqData);
-        await req.respond(jsonResponse(user));
-      } catch (e) {
-        await req.respond(errorCodeResponse(e));
-      }
+      const reqData = ((await req.json()) as User);
+      const user = accounts.deleteUser(reqData);
+      await req.respond(jsonResponse(user));
     },
   );
 
   // ユーザ検索
   router.get("/search", async (req) => {
-    try {
-      const query = req.query;
-      const q = query.get("q");
-      if (!q) {
-        throw new ServerError(errors.NOTHING_SEARCH_QUERY);
-      }
-
-      const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
-      const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
-      const users = [...new Set([...matchName, ...matchId])];
-
-      await req.respond(jsonResponse(users));
-    } catch (e) {
-      await req.respond(errorCodeResponse(e));
+    const query = req.query;
+    const q = query.get("q");
+    if (!q) {
+      throw new ServerError(errors.NOTHING_SEARCH_QUERY);
     }
+
+    const matchName = accounts.getUsers().filter((e) => e.name.startsWith(q));
+    const matchId = accounts.getUsers().filter((e) => e.id.startsWith(q));
+    const users = [...new Set([...matchName, ...matchId])];
+
+    await req.respond(jsonResponse(users));
   });
 
   return router;

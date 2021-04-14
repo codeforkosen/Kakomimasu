@@ -12,6 +12,7 @@ const resolve = util.pathResolver(import.meta);
 
 import { Board } from "../Kakomimasu.js";
 import { ExpKakomimasu } from "./parts/expKakomimasu.ts";
+import { errorCodeResponse } from "./error.ts";
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({
@@ -34,24 +35,20 @@ kkmm.games.push(...LogFileOp.read());
 let socks: WebSocket[] = [];
 
 const ws_AllGame = async (sock: WebSocket) => {
-  try {
-    await sock.send(
-      JSON.stringify(kkmm.getGames()),
-    );
-    socks.push(sock);
+  await sock.send(
+    JSON.stringify(kkmm.getGames()),
+  );
+  socks.push(sock);
 
-    for await (const msg of sock) {
-      if (typeof msg === "string") {
-        //console.log(msg);
-      } else {
-        //console.log("err on ws", msg);
-        // ws { code: 0, reason: "" } -- close
-        // ws { code: 1001, reason: "" } -- 遮断
-        break;
-      }
+  for await (const msg of sock) {
+    if (typeof msg === "string") {
+      //console.log(msg);
+    } else {
+      //console.log("err on ws", msg);
+      // ws { code: 0, reason: "" } -- close
+      // ws { code: 1001, reason: "" } -- 遮断
+      break;
     }
-  } catch (e) {
-    //console.log(e);
   }
 };
 
@@ -84,23 +81,19 @@ export const sendAllGame = () => {
 let getGameSocks: { sock: WebSocket; id: string }[] = [];
 
 const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
-  try {
-    const id = req.match[1];
+  const id = req.match[1];
 
-    const game = getGame(id);
-    if (game) {
-      await sock.send(JSON.stringify(game));
-      if (!game.ending) {
-        getGameSocks.push({ sock: sock, id: id });
-        for await (const msg of sock) {
-        }
+  const game = getGame(id);
+  if (game) {
+    await sock.send(JSON.stringify(game));
+    if (!game.ending) {
+      getGameSocks.push({ sock: sock, id: id });
+      for await (const msg of sock) {
       }
     }
-    if (!sock.isClosed) {
-      sock.close();
-    }
-  } catch (e) {
-    //console.log(e);
+  }
+  if (!sock.isClosed) {
+    sock.close();
   }
 };
 export const sendGame = (id: string) => {
@@ -157,6 +150,9 @@ const apiRoutes = () => {
   router.route("game", gameRouter());
   router.route("users", userRouter());
   router.route("tournament", tournamentRouter());
+  router.catch(async (err, req) => {
+    await req.respond(errorCodeResponse(err));
+  });
   return router;
 };
 
