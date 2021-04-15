@@ -10,8 +10,7 @@ import {
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
-import { Board } from "../Kakomimasu.js";
-import { ExpKakomimasu } from "./parts/expKakomimasu.ts";
+import { Board, ExpKakomimasu } from "./parts/expKakomimasu.ts";
 import { errorCodeResponse } from "./error.ts";
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";

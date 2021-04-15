@@ -13,7 +13,7 @@ import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
-import { Action } from "../Kakomimasu.js";
+import { Action } from "./parts/expKakomimasu.ts";
 
 import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({

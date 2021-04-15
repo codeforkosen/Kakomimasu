@@ -1,4 +1,4 @@
-import { Board } from "../../Kakomimasu.js";
+import { Board } from "./expKakomimasu.ts";
 
 import { pathResolver } from "../apiserver_util.ts";
 
