@@ -1,4 +1,13 @@
 export class Board {
+  public x: number;
+  public h: number;
+  public points: number[];
+  public nagent: number;
+  public nturn: number;
+  public nsec: number;
+  public nplayer: number;
+  public name: string;
+
   constructor(
     w: number | object,
     h?: number,
