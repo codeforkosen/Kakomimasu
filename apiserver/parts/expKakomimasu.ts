@@ -1,6 +1,9 @@
 import util from "../../util.js";
 
 // @deno-types="../../Kakomimasu.d.ts"
+export * from "../../Kakomimasu.js";
+
+// @deno-types="../../Kakomimasu.d.ts"
 import { Agent, Board, Game, Kakomimasu, Player } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
