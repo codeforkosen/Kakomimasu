@@ -5,7 +5,7 @@ import {
   createRouter,
   ServerRequest,
   serveStatic,
-} from "https://deno.land/x/servest@v1.2.0/mod.ts";
+} from "https://deno.land/x/servest@v1.3.0/mod.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);

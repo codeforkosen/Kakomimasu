@@ -1,7 +1,7 @@
 import {
   contentTypeFilter,
   createRouter,
-} from "https://deno.land/x/servest@v1.2.0/mod.ts";
+} from "https://deno.land/x/servest@v1.3.0/mod.ts";
 
 import { jsonResponse, pathResolver } from "./apiserver_util.ts";
 
