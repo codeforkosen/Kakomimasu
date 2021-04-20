@@ -22,7 +22,7 @@ const port = parseInt(env.port);
 
 import { LogFileOp } from "./parts/file_opration.ts";
 
-import { tournamentRouter } from "./tournament.ts";
+import { tournamentRouter, tournaments } from "./tournament.ts";
 import { accounts, userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
@@ -31,6 +31,7 @@ export const kkmm = new ExpKakomimasu();
 kkmm.games.push(...LogFileOp.read());
 
 accounts.dataCheck(kkmm.getGames());
+tournaments.dataCheck(kkmm.getGames());
 
 //#region WebSocket
 let socks: WebSocket[] = [];
