@@ -8,6 +8,7 @@ import { jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
+import { ExpGame } from "./parts/expKakomimasu.ts";
 
 export interface IUser {
   screenName: string;
@@ -44,6 +45,12 @@ class User implements IUser {
     this.gamesId = data.gamesId || [];
   }
 
+  dataCheck(games: ExpGame[]) {
+    this.gamesId = this.gamesId.filter((gameId) => {
+      if (games.some((game) => game.uuid === gameId)) return true;
+      else return false;
+    });
+  }
   // シリアライズする際にパスワードを返さないように
   // パスワードを返したい場合にはnoSafe()を用いる
   toJSON() {
@@ -68,6 +75,11 @@ class Users {
     this.users = usersData.map((e) => new User(e));
   };
   save = () => UserFileOp.save(this.users.map((e) => e.noSafe()));
+
+  dataCheck(games: ExpGame[]) {
+    this.users.forEach((user) => user.dataCheck(games));
+    this.save();
+  }
 
   getUsers = () => this.users;
 

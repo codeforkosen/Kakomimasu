@@ -6,6 +6,7 @@ import { TournamentFileOp } from "./parts/file_opration.ts";
 import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
+import { ExpGame } from "./parts/expKakomimasu.ts";
 
 type TournamentType = "round-robin" | "knockout";
 
@@ -59,6 +60,13 @@ export class Tournament implements ITournament {
     this.gameIds = a.gameIds || [];
   }
 
+  dataCheck(games: ExpGame[]) {
+    this.gameIds = this.gameIds.filter((gameId) => {
+      if (games.some((game) => game.uuid === gameId)) return true;
+      else return false;
+    });
+  }
+
   addUser(identifier: string) {
     const user = accounts.find(identifier);
     if (!user) throw new ServerError(errors.NOT_USER);
@@ -83,6 +91,13 @@ export class Tournaments {
     });
   };
   save = () => TournamentFileOp.save(this.tournaments);
+
+  dataCheck(games: ExpGame[]) {
+    this.tournaments.forEach((tournament) => {
+      tournament.dataCheck(games);
+    });
+    this.save();
+  }
 
   get = (id: string) => {
     return this.tournaments.find((e) => e.id === id);
