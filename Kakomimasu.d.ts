@@ -266,7 +266,7 @@ export abstract class Kakomimasu<T extends Game = Game> {
   abstract createGame(
     ...param: ConstructorParameters<(new (...args: any) => {}) & T>
   ): T;
-  getGames(): typeof Kakomimasu.prototype.games;
+  getGames(): T[];
   getFreeGames(): T[];
   createPlayer(playername: string, spec?: string): Player;
 }

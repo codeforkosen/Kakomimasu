@@ -152,9 +152,7 @@ export const matchRouter = () => {
   });
   router.get(new RegExp("^/(.+)$"), async (req) => {
     const id = req.match[1];
-    const game = kkmm.getGames().find((item) =>
-      (item.uuid === id) || (item.gameId === id)
-    );
+    const game = kkmm.getGames().find((item) => item.uuid === id);
     if (!game) throw new ServerError(errors.NOT_GAME);
     await req.respond(jsonResponse(game));
   });

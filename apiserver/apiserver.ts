@@ -117,17 +117,8 @@ export const sendGame = (id: string) => {
   }
 };
 
-const getGame = (id: string): any => {
-  const games = kkmm.getGames();
-  //console.log(games);
-  //console.log("getGame!!", id);
-  try {
-    if (id) return games.flat().find((e) => (e.uuid || e.gameId) === id);
-    else return games[0].reverse()[0];
-  } catch (e) {
-    console.log(e);
-    return undefined;
-  }
+const getGame = (id: string) => {
+  return kkmm.getGames().find((e) => e.uuid === id);
 };
 
 const webRoutes = () => {
