@@ -1,4 +1,4 @@
-# VPSへのAPIサーバーの立て方
+# VPSへのAPIサーバーの立て方 
 OS: CentOS Stream8
 ```
 # yum install git
