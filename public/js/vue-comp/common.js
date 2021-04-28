@@ -16,7 +16,8 @@ const header = new Vue({
                     </ul>
                 </nav>
                 <a href="https://github.com/codeforkosen/Kakomimasu" id="h-githubLogo"><img src="/img/GitHub-Mark-64px.png"></a>
-                <a href="https://github.com/codeforkosen/Kakomimasu" id="h-user"><img id="h-userImg" src=""></a>
+                <a id="h-user"><img id="h-userImg" src=""></a>
+                <a href="user/login" id="h-login">ログイン</a>
             </div>
         </div>
     </header>`,
@@ -43,8 +44,30 @@ const header = new Vue({
                     img.src = photoUrl;
                     const a = document.getElementById("h-user");
                     a.href = "/user/detail.html?id=" + user.uid;
+
+                    const a2 = document.getElementById("h-login")
+                    a2.textContent = "ログアウト";
+                    a2.href = "";
+                    a2.onclick = this.logout;
                 }
             });
+        }
+    },
+    methods: {
+        logout() {
+            firebase.auth().onAuthStateChanged(user => {
+                firebase
+                    .auth()
+                    .signOut()
+                    .then(() => {
+                        console.log('ログアウトしました');
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.log(`ログアウト時にエラーが発生しました (${error})`);
+                    });
+            });
+
         }
     }
 });

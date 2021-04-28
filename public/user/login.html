@@ -27,74 +27,56 @@
       @import url("/css/c_separation.css");
     </style>
 
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
 
     <script type="module">
-      import { firebaseConfig } from "/js/util.js";
-      firebase.initializeApp(firebaseConfig);
-      firebase.analytics();
-
-      var ui = new firebaseui.auth.AuthUI(firebase.auth());
-      ui.start('#firebaseui-auth-container', {
-        callbacks: {
-          signInSuccessWithAuthResult: async function (authResult) {
-            return true;
+      window.onload = () => {
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        ui.start('#firebaseui-auth-container', {
+          callbacks: {
+            signInSuccessWithAuthResult: async function (authResult) {
+              return true;
+            },
+            uiShown: function () {
+              document.getElementById('loader').style.display = 'none';
+            }
           },
-          uiShown: function () {
-            document.getElementById('loader').style.display = 'none';
-          }
-        },
-        signInSuccessUrl: "login.html",
-        signInOptions: [
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        ],
-      });
+          signInSuccessUrl: "login.html",
+          signInOptions: [
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          ],
+        });
 
-      firebase.auth().onAuthStateChanged(async user => {
-        if (user) {
-          const signOutMessage = `
+        firebase.auth().onAuthStateChanged(async user => {
+          if (user) {
+            const signOutMessage = `
         <p>Hello, ${user.displayName}!<\/p>
         <button type="submit"  onClick="signOut()">サインアウト<\/button>
         `;
-          document.getElementById('auth').innerHTML = signOutMessage;
-          console.log('ログインしています');
-          const idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
-          console.log(idToken);
+            document.getElementById('auth').innerHTML = signOutMessage;
+            console.log('ログインしています');
+            const idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+            console.log(idToken);
 
-          const res = await fetch("/api/users/verify", {
-            headers: new Headers({
-              Authorization: idToken
-            })
-          });
-
-          if (res.status === 400) {
-            window.location = "signup.html";
-          }
-          else {
-            window.location = "/index.html";
-          }
-
-          //console.log(a);
-        }
-      });
-
-      function signOut() {
-        firebase.auth().onAuthStateChanged(user => {
-          firebase
-            .auth()
-            .signOut()
-            .then(() => {
-              console.log('ログアウトしました');
-              location.reload();
-            })
-            .catch((error) => {
-              console.log(`ログアウト時にエラーが発生しました (${error})`);
+            const res = await fetch("/api/users/verify", {
+              headers: new Headers({
+                Authorization: idToken
+              })
             });
+
+            if (res.status === 400) {
+              window.location = "signup.html";
+            }
+            else {
+              window.location = "/index.html";
+            }
+
+            //console.log(a);
+          }
         });
+
+
       }
 
     </script>

@@ -41,53 +41,55 @@
     <footer id="footer"></footer>
     <script type="module" src="/js/vue-comp/common.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-auth.js"></script>
-
     <script type="module">
       import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
       import { registUser } from "/js/api-util.js";
-      import { firebaseConfig } from "/js/util.js";
 
-      firebase.initializeApp(firebaseConfig);
-      firebase.analytics();
+      window.onload = async () => {
+        let idToken;
 
-      let idToken;
+        firebase.auth().onAuthStateChanged(async user => {
+          if (user) {
+            console.log('ログインしています');
+            console.log(await firebase.auth().currentUser)
+            idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+            console.log(idToken);
+            const res = await fetch("/api/users/verify", {
+              headers: new Headers({
+                Authorization: idToken
+              })
+            });
 
-      firebase.auth().onAuthStateChanged(async user => {
-        if (user) {
-          console.log('ログインしています');
-          console.log(await firebase.auth().currentUser)
-          idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
-          console.log(idToken);
-        }
-      });
+            if (res.status === 200) {
+              window.location = "/index";
+            }
+          }
+        });
 
-      const form = new Vue({
-        el: "#form",
-        data: {
-        },
-        methods: {
-          formInput() {
-            const form = this.$el;
-            form["create"].disabled = !form.checkValidity();
-            if (form["pwd"].value !== form["pwd-confim"].value) form["create"].disabled = true;
+        const form = new Vue({
+          el: "#form",
+          data: {
           },
-          async send() {
-            const form = this.$el;
-            const screenName = form["screen-name"].value;
-            const name = form["name"].value;
-            const password = form["pwd"].value;
+          methods: {
+            formInput() {
+              const form = this.$el;
+              form["create"].disabled = !form.checkValidity();
+              if (form["pwd"].value !== form["pwd-confim"].value) form["create"].disabled = true;
+            },
+            async send() {
+              const form = this.$el;
+              const screenName = form["screen-name"].value;
+              const name = form["name"].value;
+              const password = form["pwd"].value;
 
-            const data = { name, screenName, password }
-            //console.log(idToken);
-            const res = await registUser(data, idToken);
-            console.log(res);
-          },
-        }
-      });
-
+              const data = { name, screenName, password }
+              //console.log(idToken);
+              const res = await registUser(data, idToken);
+              console.log(res);
+            },
+          }
+        });
+      }
 
     </script>
   </body>
