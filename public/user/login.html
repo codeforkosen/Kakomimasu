@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>ログイン - 囲みマス</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+    <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+  </head>
+
+  <body>
+    <header id="header"></header>
+    <main>
+      <h1>ログイン</h1>
+      <div id="firebaseui-auth-container"></div>
+      <div id="loader">Loading...</div>
+      <div id="auth"></div>
+    </main>
+    <footer id="footer"></footer>
+
+    <script type="module" src="/js/vue-comp/common.js"></script>
+    <style>
+      @import url("/css/common.css");
+      @import url("/css/c_separation.css");
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
+
+    <script type="module">
+      window.onload = () => {
+        var ui = new firebaseui.auth.AuthUI(firebase.auth());
+        ui.start('#firebaseui-auth-container', {
+          callbacks: {
+            signInSuccessWithAuthResult: async function (authResult) {
+              return true;
+            },
+            uiShown: function () {
+              document.getElementById('loader').style.display = 'none';
+            }
+          },
+          signInSuccessUrl: "login.html",
+          signInOptions: [
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          ],
+        });
+
+        firebase.auth().onAuthStateChanged(async user => {
+          if (user) {
+            const signOutMessage = `
+        <p>Hello, ${user.displayName}!<\/p>
+        <button type="submit"  onClick="signOut()">サインアウト<\/button>
+        `;
+            document.getElementById('auth').innerHTML = signOutMessage;
+            console.log('ログインしています');
+            const idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+            console.log(idToken);
+
+            const res = await fetch("/api/users/verify", {
+              headers: new Headers({
+                Authorization: idToken
+              })
+            });
+
+            if (res.status === 400) {
+              window.location = "signup.html";
+            }
+            else {
+              window.location = "/index.html";
+            }
+
+            //console.log(a);
+          }
+        });
+
+
+      }
+
+    </script>
+  </body>
+
+</html>

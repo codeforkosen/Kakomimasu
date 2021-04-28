@@ -11,6 +11,18 @@ export async function getGame(gameId) {
     return resJson;
 }
 
+export async function registUser(data, idToken) {
+    const resJson = await (await fetch(
+        `/api/users/regist`, {
+        method: "POST",
+        headers: new Headers({ "Content-Type": "application/json", Authorization: idToken }),
+        body: JSON.stringify(data),
+    }
+    )).json();
+    //console.log(reqJson, "userShow");
+    return resJson;
+}
+
 export async function getUser(identifier) {
     const resJson = await (await fetch(
         `/api/users/show/${identifier}`,

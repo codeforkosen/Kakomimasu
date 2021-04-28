@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+
+    <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+    <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+    <title>新規登録 - 囲みマス</title>
+  </head>
+
+  <body>
+    <header id="header"></header>
+    <main id="main">
+      <h1 id="title">新規登録</h1>
+      <form id="form" @input="formInput">
+        <div>
+          <label for="screen-name">表示名*</label>
+          <input type="text" id="screen-name" required>
+        </div>
+        <div>
+          <label for="name">ユーザネーム*</label>
+          <input type="text" id="name" required>
+        </div>
+        <div>
+          <label for="pwd">パスワード*</label>
+          <input type="password" id="pwd" required>
+        </div>
+        <div>
+          <label for="pwd-confim">パスワード(確認用)*</label>
+          <input type="password" id="pwd-confim" required>
+        </div>
+        <input id="create" type="button" class="button" value="登録" @click="send" disabled>
+      </form>
+    </main>
+    <footer id="footer"></footer>
+    <script type="module" src="/js/vue-comp/common.js"></script>
+
+    <script type="module">
+      import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.esm.browser.js'
+      import { registUser } from "/js/api-util.js";
+
+      window.onload = async () => {
+        let idToken;
+
+        firebase.auth().onAuthStateChanged(async user => {
+          if (user) {
+            console.log('ログインしています');
+            console.log(await firebase.auth().currentUser)
+            idToken = await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true);
+            console.log(idToken);
+            const res = await fetch("/api/users/verify", {
+              headers: new Headers({
+                Authorization: idToken
+              })
+            });
+
+            if (res.status === 200) {
+              window.location = "/index";
+            }
+          }
+        });
+
+        const form = new Vue({
+          el: "#form",
+          data: {
+          },
+          methods: {
+            formInput() {
+              const form = this.$el;
+              form["create"].disabled = !form.checkValidity();
+              if (form["pwd"].value !== form["pwd-confim"].value) form["create"].disabled = true;
+            },
+            async send() {
+              const form = this.$el;
+              const screenName = form["screen-name"].value;
+              const name = form["name"].value;
+              const password = form["pwd"].value;
+
+              const data = { name, screenName, password }
+              //console.log(idToken);
+              const res = await registUser(data, idToken);
+              console.log(res);
+            },
+          }
+        });
+      }
+
+    </script>
+  </body>
+
+</html>
+
+<style>
+  @import url("/css/common.css");
+  @import url("/css/c_form.css");
+</style>

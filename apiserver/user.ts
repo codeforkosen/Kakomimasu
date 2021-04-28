@@ -9,19 +9,21 @@ import { UserFileOp } from "./parts/file_opration.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
+import { getPayload } from "./parts/jwt.ts";
 
 export interface IUser {
   screenName: string;
   name: string;
   id?: string;
-  password: string;
+  password?: string;
   gamesId?: string[];
 }
 
 export interface IReqUser extends ApiOption {
   screenName: string;
   name: string;
-  password: string;
+  password?: string; // to with password
+  id?: string; // to without password(Firebase Authorization login)
 }
 
 export interface IReqDeleteUser extends ApiOption {
@@ -41,7 +43,7 @@ class User implements IUser {
     this.screenName = data.screenName;
     this.name = data.name;
     this.id = data.id || util.uuid();
-    this.password = data.password;
+    this.password = data.password || "";
     this.gamesId = data.gamesId || [];
   }
 
@@ -83,11 +85,15 @@ class Users {
 
   getUsers = () => this.users;
 
-  registUser(data: IReqUser): User {
+  registUser(data: IReqUser, isSecure: boolean = false): User {
     if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
     if (!data.name) throw new ServerError(errors.INVALID_USER_NAME);
-    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
-
+    if (!data.password) {
+      throw new ServerError(errors.NOTHING_PASSWORD);
+    }
+    if (isSecure && this.users.some((e) => e.id === data.id)) {
+      throw new ServerError(errors.ALREADY_REGISTERED_USER);
+    }
     if (this.users.some((e) => e.name === data.name)) {
       throw new ServerError(errors.ALREADY_REGISTERED_NAME);
     }
@@ -214,6 +220,19 @@ export const accounts = new Users();
 export const userRouter = () => {
   const router = createRouter();
 
+  router.get("/verify", async (req) => {
+    const jwt = req.headers.get("Authorization");
+    if (!jwt) return;
+    const payload = await getPayload(jwt);
+    if (!payload) return;
+    console.log(payload);
+    const isUser = accounts.getUsers().some((user) =>
+      user.id === payload.user_id
+    );
+    if (!isUser) throw new ServerError(errors.NOT_USER);
+    await req.respond({ status: 200 });
+  });
+
   // ユーザ登録
   router.post(
     "/regist",
@@ -221,7 +240,17 @@ export const userRouter = () => {
     async (req) => {
       const reqData = ((await req.json()) as IReqUser);
       //console.log(reqData);
-      const user = accounts.registUser(reqData);
+      const jwt = req.headers.get("Authorization");
+      //console.log(jwt);
+      if (jwt) {
+        const payload = await getPayload(jwt);
+        //console.log(payload);
+        if (payload) {
+          reqData.id = payload.user_id;
+          //console.log("payload userId", payload.user_id);
+        }
+      }
+      const user = accounts.registUser(reqData, reqData.id !== undefined);
       await req.respond(jsonResponse(user));
     },
   );
