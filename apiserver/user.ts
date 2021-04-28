@@ -88,7 +88,7 @@ class Users {
   registUser(data: IReqUser, isSecure: boolean = false): User {
     if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
     if (!data.name) throw new ServerError(errors.INVALID_USER_NAME);
-    if (!isSecure && !data.password) {
+    if (!data.password) {
       throw new ServerError(errors.NOTHING_PASSWORD);
     }
     if (isSecure && this.users.some((e) => e.id === data.id)) {

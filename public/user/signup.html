@@ -27,6 +27,14 @@
           <label for="name">ユーザネーム*</label>
           <input type="text" id="name" required>
         </div>
+        <div>
+          <label for="pwd">パスワード*</label>
+          <input type="password" id="pwd" required>
+        </div>
+        <div>
+          <label for="pwd-confim">パスワード(確認用)*</label>
+          <input type="password" id="pwd-confim" required>
+        </div>
         <input id="create" type="button" class="button" value="登録" @click="send" disabled>
       </form>
     </main>
@@ -64,14 +72,16 @@
           formInput() {
             const form = this.$el;
             form["create"].disabled = !form.checkValidity();
+            if (form["pwd"].value !== form["pwd-confim"].value) form["create"].disabled = true;
           },
           async send() {
             const form = this.$el;
             const screenName = form["screen-name"].value;
             const name = form["name"].value;
+            const password = form["pwd"].value;
 
-            const data = { name, screenName }
-            console.log(idToken);
+            const data = { name, screenName, password }
+            //console.log(idToken);
             const res = await registUser(data, idToken);
             console.log(res);
           },
