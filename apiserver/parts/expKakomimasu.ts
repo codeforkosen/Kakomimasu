@@ -68,12 +68,12 @@ export class ExpGame extends Game {
   }
 
   nextTurn() {
-    const ret = super.nextTurn();
     if (this.turn < this.nturn) {
       this.nextTurnUnixTime = util.nowUnixTime() + this.nsec;
     } else if (this.turn == this.nturn) {
       this.nextTurnUnixTime = null;
     }
+    const ret = super.nextTurn();
     return ret;
   }
 
@@ -116,6 +116,7 @@ export class ExpGame extends Game {
         }
       }
     } catch (e) {
+      console.log(e);
     }
   };
 
