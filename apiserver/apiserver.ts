@@ -3,6 +3,7 @@ import type { WebSocket } from "./mod.ts";
 import {
   createApp,
   createRouter,
+  RoutingError,
   serveJsx,
   ServerRequest,
   serveStatic,
@@ -129,8 +130,15 @@ const webRoutes = () => {
 
   router.get("/", async (req: ServerRequest) => {
     await req.respond(
-      { headers: new Headers({ "Location": "index.html" }), status: 302 },
+      { headers: new Headers({ "Location": "index" }), status: 302 },
     );
+  });
+  router.catch(async (e, req) => {
+    if (e instanceof RoutingError) {
+      await req.respond(
+        { headers: new Headers({ "Location": "404" }), status: 302 },
+      );
+    }
   });
 
   return router;
@@ -160,6 +168,7 @@ app.use(serveJsx(resolve("../pages"), (f) => {
 app.use(serveStatic(resolve("../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());
+
 app.listen({ port });
 
 const createDefaultBoard = () => {

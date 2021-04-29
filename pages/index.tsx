@@ -2,7 +2,7 @@
 import React from "https://dev.jspm.io/react/index.js";
 import { DFC } from "https://deno.land/x/servest@v1.3.0/mod.ts";
 
-const Index: DFC<{ title: string; text: string }> = ({ title, text }) => {
+const Index: DFC<{ title: string }> = ({ title }) => {
   return (
     <div>
       <img id="title" src="/img/kakomimasu-logo.png"></img>
@@ -66,14 +66,8 @@ const Index: DFC<{ title: string; text: string }> = ({ title, text }) => {
   );
 };
 
-// getInitialProps is an asynchronous data fetcher
-// for rendering components in server side.
-// This is identical methodology to Next.js
-// It will be called exactly once for each request.
 Index.getInitialProps = async () => {
-  //const resp = await fetch("https://some-api.com");
-  const text = "hello"; //await resp.text();
-  return { title: "Index Page", text };
+  return { title: "トップ" };
 };
 
 // default export are used for Server Side Rendering.

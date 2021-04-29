@@ -16,7 +16,7 @@ export const Header: FC = () => {
       <nav id="h-tab">
         <ul>
           {nav.map((e) => {
-            return <li>
+            return <li key={e.url}>
               <a href={e.url}>{e.text}</a>
             </li>;
           })}
