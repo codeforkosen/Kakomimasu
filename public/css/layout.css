@@ -24,6 +24,13 @@ main {
   width: 90%;
   max-width: 1000px;
   padding: 50px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main h1 {
+  margin: 20px;
 }
 
 footer {

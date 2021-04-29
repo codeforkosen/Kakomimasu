@@ -11,7 +11,7 @@ const header = new Vue({
                 <nav id="h-tab">
                     <ul>
                         <li><a href="/index">TOP</a></li>
-                        <li><a href="/gamelist.html">ゲーム一覧</a></li>
+                        <li><a href="/game/index">ゲーム一覧</a></li>
                         <li><a href="/tournament/index.html">大会一覧</a></li>
                     </ul>
                 </nav>

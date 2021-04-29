@@ -11,7 +11,7 @@ const Index: DFC<{ title: string }> = ({ title }) => {
         オンラインで対戦中のゲームをリアルタイムで見ることができます。<br />
         <h3>ゲーム</h3>
         <div>
-          <a href="gamelist.html">ゲーム一覧はこちらから</a>
+          <a href="game/index">ゲーム一覧はこちらから</a>
           <br />
           <a href="gamedetails.html">最新のゲームビューアはこちらから</a>
           <br />

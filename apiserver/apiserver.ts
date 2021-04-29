@@ -162,9 +162,7 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveJsx(resolve("../pages"), (f) => {
-  return import("file:///" + f);
-}, Layout));
+app.use(serveJsx(resolve("../pages"), (f) => import("file:///" + f), Layout));
 app.use(serveStatic(resolve("../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());

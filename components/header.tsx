@@ -3,7 +3,7 @@ import React from "https://dev.jspm.io/react/index.js";
 import { FC } from "https://deno.land/x/servest@v1.3.0/types/react/index.d.ts";
 
 const nav: { text: string; url: string }[] = [
-  { text: "ゲーム一覧", url: "/gamelist" },
+  { text: "ゲーム一覧", url: "/game/index" },
   { text: "大会一覧", url: "/tournament/index" },
 ];
 

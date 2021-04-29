@@ -19,7 +19,7 @@ const styles: { [key: string]: React.CSSProperties } = {
 
 export const Layout: FC = (props) => {
   const children = props.children as ReactElement;
-  const title = children.props.title + " - 囲みマス";
+  const title = children.props.title;
   return (
     <html lang="ja">
       <head>
@@ -33,7 +33,7 @@ export const Layout: FC = (props) => {
         />
         <link rel="stylesheet" href="/css/layout.css" />
 
-        <title>{title}</title>
+        <title>{title + " - 囲みマス"}</title>
 
         <script
           src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"
@@ -48,7 +48,10 @@ export const Layout: FC = (props) => {
       </head>
       <body>
         <Header />
-        <main>{children}</main>
+        <main>
+          {title !== "トップ" && <h1>{title}</h1>}
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
