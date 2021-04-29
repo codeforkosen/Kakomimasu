@@ -1,0 +1,15 @@
+@import url(./c_separation.css);
+
+
+main>div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#title {
+  width: 60vw;
+  max-width: 500px;
+  margin: 2em;
+  display: block;
+}

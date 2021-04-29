@@ -6,7 +6,7 @@ const header = new Vue({
     template: `
     <header>
         <div id="h-wrapper">
-            <a href="/" id="h-logo"><img src="/img/kakomimasu-logo.png" alt="囲みマスロゴ"></a>
+            <a href="/index" id="h-logo"><img src="/img/kakomimasu-logo.png" alt="囲みマスロゴ"></a>
             <div id="h-navWrapper">
                 <nav id="h-tab">
                     <ul>

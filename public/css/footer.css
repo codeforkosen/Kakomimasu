@@ -1,0 +1,17 @@
+footer>div {
+  margin: 5px 0;
+}
+
+footer>#f_link img {
+  height: 1.5em;
+}
+
+
+footer a {
+  text-decoration: none;
+  color: black;
+}
+
+footer a:active {
+  color: black
+}
