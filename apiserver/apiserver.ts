@@ -3,9 +3,12 @@ import type { WebSocket } from "./mod.ts";
 import {
   createApp,
   createRouter,
+  serveJsx,
   ServerRequest,
   serveStatic,
 } from "https://deno.land/x/servest@v1.3.0/mod.ts";
+
+import { Layout } from "../components/layout.tsx";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
@@ -151,6 +154,9 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
+app.use(serveJsx(resolve("../pages"), (f) => {
+  return import("file:///" + f);
+}, Layout));
 app.use(serveStatic(resolve("../public")));
 app.route("/api/", apiRoutes());
 app.route("/", webRoutes());
