@@ -13,7 +13,7 @@ const Index: DFC<{ title: string }> = ({ title }) => {
 };
 
 Index.getInitialProps = async () => {
-  return { title: "トップ" };
+  return { title: "404 NotFound" };
 };
 
 // default export are used for Server Side Rendering.
