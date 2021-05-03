@@ -17,7 +17,7 @@ const header = new Vue({
                 </nav>
                 <a href="https://github.com/codeforkosen/Kakomimasu" id="h-githubLogo"><img src="/img/GitHub-Mark-64px.png"></a>
                 <a id="h-user"><img id="h-userImg" src=""></a>
-                <a href="user/login" id="h-login">ログイン</a>
+                <a href="/user/login" id="h-login">ログイン</a>
             </div>
         </div>
     </header>`,
