@@ -8,9 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: deploy
     steps:
-      echo ${{ secrets.VPS_SSH }} > secret
-      chmod 600 secret_key
-      ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git pull && touch hoge"
-      
+      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > secret_key && chmod 600 secret_key
+      - run: ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git pull && systemctl restart kakomimasu"
