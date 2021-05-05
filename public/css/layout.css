@@ -3,7 +3,7 @@
   --kakomimasu-color: #FBD5A8;
 }
 
-body {
+body #main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,13 +31,4 @@ main {
 
 main h1 {
   margin: 20px;
-}
-
-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  background-color: var(--kakomimasu-color);
-  width: 100%;
 }

@@ -9,8 +9,6 @@ import {
   serveStatic,
 } from "https://deno.land/x/servest@v1.3.0/mod.ts";
 
-import { Layout } from "../components/layout.tsx";
-
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
@@ -30,6 +28,7 @@ import { tournamentRouter, tournaments } from "./tournament.ts";
 import { accounts, userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
+import { viewerRoutes } from "./viewer.ts";
 
 export const kkmm = new ExpKakomimasu();
 kkmm.games.push(...LogFileOp.read());
@@ -125,25 +124,6 @@ const getGame = (id: string) => {
   return kkmm.getGames().find((e) => e.uuid === id);
 };
 
-const webRoutes = () => {
-  const router = createRouter();
-
-  router.get("/", async (req: ServerRequest) => {
-    await req.respond(
-      { headers: new Headers({ "Location": "index" }), status: 302 },
-    );
-  });
-  router.catch(async (e, req) => {
-    if (e instanceof RoutingError) {
-      await req.respond(
-        { headers: new Headers({ "Location": "404" }), status: 302 },
-      );
-    }
-  });
-
-  return router;
-};
-
 const apiRoutes = () => {
   const router = createRouter();
 
@@ -162,10 +142,9 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveJsx(resolve("../pages"), (f) => import("file:///" + f), Layout));
-app.use(serveStatic(resolve("../public")));
+//app.use(serveJsx(resolve("../pages"), (f) => import("file:///" + f), Layout));
 app.route("/api/", apiRoutes());
-app.route("/", webRoutes());
+app.route("/", viewerRoutes());
 
 app.listen({ port });
 

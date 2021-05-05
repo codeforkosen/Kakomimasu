@@ -1,35 +1,60 @@
-// @deno-types="https://deno.land/x/servest@v1.3.0/types/react/index.d.ts"
-import React from "https://dev.jspm.io/react/index.js";
-import { DFC } from "https://deno.land/x/servest@v1.3.0/mod.ts";
+/// <reference no-default-lib="true"/>
+/// <reference lib="dom"/>
+/// <reference lib="es2015"/>
+import { React } from "../components/react.ts";
+import { createStyles, makeStyles } from "../components/material-ui.ts";
 
-const Index: DFC<{ title: string }> = ({ title }) => {
+import Section, { SubSection } from "../components/section.tsx";
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    div: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      "& a": {
+        color: "#5C4C40",
+      },
+    },
+    logo: {
+      width: "60vw",
+      maxWidth: 546,
+      margin: "2em",
+    },
+  })
+);
+export default function () {
+  const classes = useStyles();
+
+  document.title = "囲みマス";
+
   return (
-    <div>
-      <img id="title" src="/img/kakomimasu-logo.png"></img>
-      <section className="separation">
-        <h2>Webコンテンツ</h2>
+    <div className={classes.div}>
+      <img className={classes.logo} id="title" src="/img/kakomimasu-logo.png" />
+      <Section title="Webコンテンツ">
         オンラインで対戦中のゲームをリアルタイムで見ることができます。<br />
-        <h3>ゲーム</h3>
-        <div>
-          <a href="game/index">ゲーム一覧はこちらから</a>
-          <br />
-          <a href="gamedetails.html">最新のゲームビューアはこちらから</a>
-          <br />
-          <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a>
-          <br />
-          <a href="game/create.html">カスタムゲーム作成はこちらから</a>
-        </div>
-        <h3>大会</h3>
-        <div>
-          <a href="tournament/index.html">大会一覧はこちらから</a>
-          <br />
-          <a href="tournament/create.html">大会作成はこちらから</a>
-          <br />
-        </div>
-      </section>
+        <SubSection title="ゲーム">
+          <div>
+            <a href="game/index">ゲーム一覧はこちらから</a>
+            <br />
+            <a href="gamedetails.html">最新のゲームビューアはこちらから</a>
+            <br />
+            <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a>
+            <br />
+            <a href="game/create.html">カスタムゲーム作成はこちらから</a>
+          </div>
+        </SubSection>
+        <SubSection title="大会">
+          <div>
+            <a href="tournament/index.html">大会一覧はこちらから</a>
+            <br />
+            <a href="tournament/create.html">大会作成はこちらから</a>
+            <br />
+          </div>
+        </SubSection>
+      </Section>
 
-      <section className="separation">
-        <h2>囲みマスとは</h2>
+      <Section title="囲みマスとは">
         囲碁と将棋とリアルタイムストラテジーゲームが混ざったような陣取りゲームです。<br />
         フィールドは、点数がついたマス目、辿ったり囲んだりして自分の陣地を広げ、点数が高いほうが勝ち！<br />
         誰でも開発に参加できる、オープンソース (<a
@@ -37,38 +62,25 @@ const Index: DFC<{ title: string }> = ({ title }) => {
         >
           src on GitHub
         </a>)。
-      </section>
+      </Section>
 
-      <section className="separation">
-        <h2>人対AI!?</h2>
+      <Section title="人対AI!?">
         同時に動かせるエージェントの人数は最大14コマ。1ターンは最短3秒。人の判断では間に合わない？<br />
         そんな時はプログラミングしたAIにサポートしてもらいましょう！
-      </section>
+      </Section>
 
-      <section className="separation">
-        <h2>ランクシステム</h2>
+      <Section title="ランクシステム">
         AIを登録しておけば、勝手にリーグ戦が組まれてランキング登録されます。<br />
         囲みマス世界ランク一位には豪華賞品があるかも！？
-      </section>
+      </Section>
 
-      <section className="separation">
-        <h2>勝手プロコン実行委員会</h2>
+      <Section title="勝手にプロコン実行委員会">
         中止になった第31回高専プロコン競技部門を勝手にやっちゃおうと立ち上がった、Code for KOSEN の部門のひとつ。
-      </section>
-      <section className="separation">
-        <h2>開発者用ツール</h2>
+      </Section>
+      <Section title="開発者用ツール">
         <a href="/dev/field.html">フィールド説明用エディタ</a>
         <br />
-      </section>
-
-      <link rel="stylesheet" href="/css/index.css" />
+      </Section>
     </div>
   );
-};
-
-Index.getInitialProps = async () => {
-  return { title: "トップ" };
-};
-
-// default export are used for Server Side Rendering.
-export default Index;
+}

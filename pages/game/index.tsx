@@ -1,15 +1,35 @@
-// @deno-types="https://deno.land/x/servest@v1.3.0/types/react/index.d.ts"
-import React from "https://dev.jspm.io/react/index.js";
-import { DFC } from "https://deno.land/x/servest@v1.3.0/mod.ts";
+/// <reference no-default-lib="true"/>
+/// <reference lib="dom"/>
+/// <reference lib="es2015"/>
+import { React } from "../../components/react.ts";
+import { Link } from "../../components/react-router-dom.ts";
 
+import Clock from "../../components/clock.tsx";
+
+export default class extends React.Component {
+  public state = { title: "ゲーム一覧" };
+
+  componentDidMount() {
+    document.title = this.state.title + " - 囲みマス";
+  }
+
+  render() {
+    return (
+      <div>
+        <link rel="stylesheet" href="/css/game/index.css" />
+        <h1>{this.state.title}</h1>
+        <Clock />
+        <link rel="stylesheet" href="/css/404.css" />
+      </div>
+    );
+  }
+}
+
+/*
 const Index: DFC<{ title: string }> = ({ title }) => {
   return (
     <div>
-      <h4
-        id="now-time"
-        v-cloak
-        dangerouslySetInnerHTML={{ __html: `現在時刻：{{nowTime}}` }}
-      />
+      
       <div
         className="game-table"
         dangerouslySetInnerHTML={{
@@ -32,3 +52,4 @@ Index.getInitialProps = async () => {
 
 // default export are used for Server Side Rendering.
 export default Index;
+*/
