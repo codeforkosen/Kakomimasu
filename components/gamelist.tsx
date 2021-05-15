@@ -149,7 +149,9 @@ const GameList: React.FC<Props> = (props) => {
                         <div>
                           {getUser(player.id)
                             ? <span>
-                              <Link to={`/user/${getUser(player.id).name}`}>
+                              <Link
+                                to={`/user/detail/${getUser(player.id).name}`}
+                              >
                                 {getUser(player.id).screenName}
                               </Link>
                             </span>

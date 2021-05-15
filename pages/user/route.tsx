@@ -33,7 +33,11 @@ const UserRoute: React.FC<Props> = (props) => {
         >
           <Login {...props} />
         </Route>
-        <Route path={`${match.path}/:id`} component={Detail} {...props}></Route>
+        <Route
+          path={`${match.path}/detail/:id`}
+          component={Detail}
+          {...props}
+        />
         <Redirect push={false} from="" to="/404" />
       </Switch>
     </Router>
