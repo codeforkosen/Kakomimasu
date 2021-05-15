@@ -2,7 +2,7 @@
 import util from "../util.js";
 import { Action, DIR, KakomimasuClient, cl } from "./KakomimasuClient.js";
 
-const kc = new KakomimasuClient("ai-5", "AI-5", "破壊者改", "ai-5-pw");
+const kc = new KakomimasuClient("suzutomo", "Tomo Suzu", "破壊者改", "Suzutomo1106");
 
 let info = await kc.waitMatching();
 const pno = kc.getPlayerNumber();

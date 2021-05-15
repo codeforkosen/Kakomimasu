@@ -1,5 +1,5 @@
-import { React } from "../components/react.ts";
-import { createStyles, makeStyles } from "../components/material-ui.ts";
+import React from "react";
+import { createStyles, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

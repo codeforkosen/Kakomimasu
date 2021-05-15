@@ -8,26 +8,12 @@ const resolve = util.pathResolver(import.meta);
 
 const emit = await Deno.emit("file:///" + resolve("../pages/route.tsx"), {
   bundle: "esm",
-  check: false,
+  importMapPath: "../pages/import-map.json",
+  //check: false,
 });
 console.log(emit);
 let bundleJs = emit.files["deno:///bundle.js"];
 //Deno.writeTextFileSync(resolve("../pages/app.bundle.js"), bundleJs);
-
-async function bundle() {
-  const watcher = Deno.watchFs(resolve("../pages"));
-  for await (const event of watcher) {
-    //console.log(">>>> event", event);
-    console.log("bundle...");
-    const emit = await Deno.emit("file:///" + resolve("../pages/route.tsx"), {
-      bundle: "esm",
-    });
-    console.log(emit);
-    bundleJs = emit.files["deno:///bundle.js"];
-    console.log("bundled");
-  }
-}
-//bundle();
 
 export const viewerRoutes = () => {
   const router = createRouter();

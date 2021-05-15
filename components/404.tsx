@@ -1,22 +1,30 @@
-/// <reference no-default-lib="true"/>
 /// <reference lib="dom"/>
-/// <reference lib="es2015"/>
-import { React } from "./react.ts";
-import { Link } from "./react-router-dom.ts";
+import React from "react";
+import { Link } from "react-router-dom";
+import { createStyles, makeStyles } from "@material-ui/core";
 
-export default class extends React.Component {
-  componentDidMount() {
-    document.title = "404 NotFound - 囲みマス";
-  }
+import Content from "./content.tsx";
 
-  render() {
-    return (
-      <div>
-        <h1>404</h1>
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    content: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+    },
+  })
+);
+
+export default function () {
+  const classes = useStyles();
+  document.title = "404 NotFound - 囲みマス";
+
+  return (
+    <Content title="404">
+      <div className={classes.content}>
         <div>このページは存在しません</div>
         <Link to="/">囲みマス トップページへ</Link>
-        <link rel="stylesheet" href="/css/404.css" />
       </div>
-    );
-  }
+    </Content>
+  );
 }

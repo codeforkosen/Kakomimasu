@@ -8,20 +8,25 @@ export default class ApiClient {
     return resJson;
   }
 
-  async _fetchPostJson(path, data) {
+  async _fetchPostJson(path, data, auth) {
     const res = await fetch(
       this.baseUrl + path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": auth },
         body: JSON.stringify(data),
       },
     )
     return res;
   }
 
-  async _fetchPostJsonToJson(path, data) {
-    const resJson = await (await this._fetchPostJson(path, data)).json();
+  async _fetch(path, init) {
+    const res = await fetch(this.baseUrl + path, init);
+    return res;
+  }
+
+  async _fetchPostJsonToJson(path, data, auth) {
+    const resJson = await (await this._fetchPostJson(path, data, auth)).json();
     return resJson;
   }
 
@@ -36,8 +41,18 @@ export default class ApiClient {
     )).json();
     return resJson;
   }
-  async usersRegist(data) {
-    return await this._fetchPostJsonToJson("/users/regist", data);
+
+  async usersVerify(idToken) {
+    const res = await this._fetch("/users/verify", {
+      headers: new Headers({
+        Authorization: idToken
+      })
+    });
+    if (res.status === 200) return true;
+    else return false;
+  }
+  async usersRegist(data, auth) {
+    return await this._fetchPostJsonToJson("/users/regist", data, auth);
   }
 
   async usersDelete(data) {

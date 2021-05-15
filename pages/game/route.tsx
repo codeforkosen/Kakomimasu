@@ -1,19 +1,19 @@
-import { React } from "../../components/react.ts";
+import React from "react";
 import {
   Redirect,
   Route,
+  RouteComponentProps,
   Router,
   Switch,
   useRouteMatch,
-} from "../../components/react-router-dom.ts";
+} from "react-router-dom";
 
-import NotFound from "../../components/404.tsx";
 import Index from "./index.tsx";
 
-export default function () {
+export default function (props: RouteComponentProps) {
   const match = useRouteMatch();
   return (
-    <Router>
+    <Router history={props.history}>
       <Switch>
         <Route exact path="/">
           <Redirect to={`${match.path}/index`} />
@@ -23,7 +23,7 @@ export default function () {
           path={`${match.path}/index`}
           component={Index}
         />
-        <Route component={NotFound} />
+        <Redirect push={false} from="" to="/404" />
       </Switch>
     </Router>
   );

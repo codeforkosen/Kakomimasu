@@ -1,28 +1,74 @@
-/// <reference no-default-lib="true"/>
-/// <reference lib="dom"/>
-/// <reference lib="es2015"/>
-import { React } from "../../components/react.ts";
-import { Link } from "../../components/react-router-dom.ts";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Button from "@material-ui/core/Button";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
 
+import Content from "../../components/content.tsx";
+import GameList from "../../components/gamelist.tsx";
 import Clock from "../../components/clock.tsx";
 
-export default class extends React.Component {
-  public state = { title: "ゲーム一覧" };
+export default function () {
+  const [games, setGames] = useState<any[]>([]);
+  let socket: WebSocket;
 
-  componentDidMount() {
-    document.title = this.state.title + " - 囲みマス";
-  }
-
-  render() {
-    return (
-      <div>
-        <link rel="stylesheet" href="/css/game/index.css" />
-        <h1>{this.state.title}</h1>
-        <Clock />
-        <link rel="stylesheet" href="/css/404.css" />
-      </div>
+  useEffect(() => {
+    socket = new WebSocket(
+      ((window.location.protocol === "https:") ? "wss://" : "ws://") +
+        window.location.host + "/api/allGame",
     );
-  }
+    socket.onopen = (event) => {
+      console.log("websocket open");
+    };
+    socket.onmessage = (event) => {
+      console.log("websocket onmessage");
+      const games = JSON.parse(event.data);
+      setGames(games);
+      //gameTableVue.update(games);
+    };
+    return () => {
+      socket.close();
+
+      console.log("websocket close");
+    };
+  }, []);
+
+  const [gameType, setGameType] = React.useState<string | null>("normal");
+
+  const handleGameType = (
+    newGameType: string | null,
+  ) => {
+    setGameType(newGameType);
+  };
+
+  const getGames = () => {
+    const games_ = games.filter((game) => game.type === gameType);
+    return games_;
+  };
+
+  return (
+    <Content title="ゲーム一覧">
+      <Clock />
+      <ButtonGroup>
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => handleGameType("normal")}
+          disabled={gameType === "normal"}
+        >
+          フリーマッチ
+        </Button>
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => handleGameType("self")}
+          disabled={gameType === "self"}
+        >
+          カスタムマッチ
+        </Button>
+      </ButtonGroup>
+      <GameList games={getGames()} />
+    </Content>
+  );
 }
 
 /*

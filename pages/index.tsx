@@ -1,8 +1,7 @@
-/// <reference no-default-lib="true"/>
 /// <reference lib="dom"/>
-/// <reference lib="es2015"/>
-import { React } from "../components/react.ts";
-import { createStyles, makeStyles } from "../components/material-ui.ts";
+import React from "react";
+import { Link } from "react-router-dom";
+import { createStyles, makeStyles } from "@material-ui/core";
 
 import Section, { SubSection } from "../components/section.tsx";
 
@@ -35,7 +34,7 @@ export default function () {
         オンラインで対戦中のゲームをリアルタイムで見ることができます。<br />
         <SubSection title="ゲーム">
           <div>
-            <a href="game/index">ゲーム一覧はこちらから</a>
+            <Link to="/game/index">ゲーム一覧はこちらから</Link>
             <br />
             <a href="gamedetails.html">最新のゲームビューアはこちらから</a>
             <br />

@@ -1,5 +1,5 @@
-import { React } from "./react.ts";
-import { createStyles, makeStyles } from "../components/material-ui.ts";
+import React from "react";
+import { createStyles, makeStyles } from "@material-ui/core";
 
 type Props = {
   children?: React.ReactNode;

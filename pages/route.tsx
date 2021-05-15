@@ -1,20 +1,16 @@
-/// <reference no-default-lib="true"/>
-/// <reference lib="dom"/>
-/// <reference lib="es2015"/>
-import { React, ReactDOM } from "../components/react.ts";
-import {
-  Redirect,
-  Route,
-  Router,
-  Switch,
-} from "../components/react-router-dom.ts";
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import {
   createMuiTheme,
   createStyles,
   CssBaseline,
   makeStyles,
   MuiThemeProvider,
-} from "../components/material-ui.ts";
+} from "@material-ui/core";
+
+import firebase, { init } from "../components/firebase.ts";
+init();
 
 import Header from "./header.tsx";
 import Footer from "./footer.tsx";
@@ -22,6 +18,7 @@ import NotFound from "../components/404.tsx";
 
 import Index from "./index.tsx";
 import Game from "./game/route.tsx";
+import User from "./user/route.tsx";
 
 const theme = createMuiTheme({
   palette: { // Material Design Color(https://material.io/resources/color/#!/?view.left=1&view.right=1&primary.color=FBD5A8&secondary.color=58AFDA)
@@ -57,25 +54,32 @@ const useStyles = makeStyles((theme) =>
 
 function Main() {
   const classes = useStyles();
+
+  //console.log(firebase, firebase.auth());
   return (
     <CssBaseline>
       <MuiThemeProvider theme={theme}>
         {/*<link rel="stylesheet" href="/css/layout.css" />*/}
-        <Router>
-          <Header />
+        <BrowserRouter>
+          <Header firebase={firebase} />
           <div className={classes.toolbar}></div>
           <main className={classes.main}>
             <Switch>
-              <Route exact path="/">
-                <Redirect to="/index" />
-              </Route>
+              <Redirect exact from="/" to="/index" />
               <Route path="/index" component={Index} />
               <Route path="/game" component={Game} />
-              <Route component={NotFound} />
+              <Route
+                path="/user"
+                render={(routeProps) =>
+                  <User firebase={firebase} {...routeProps} />}
+              >
+              </Route>
+              <Route path="/404" component={NotFound} />
+              <Redirect push={false} from="" to="/404" />
             </Switch>
           </main>
           <Footer />
-        </Router>
+        </BrowserRouter>
       </MuiThemeProvider>
     </CssBaseline>
   );
