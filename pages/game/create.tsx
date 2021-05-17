@@ -10,6 +10,7 @@ import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
 import Content from "../../components/content.tsx";
+import GameList from "../../components/gamelist.tsx";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -57,14 +58,16 @@ export default function () {
     boardName: "",
     nPlayer: 2,
     playerIdentifiers: ["", "", "", ""],
-    //tournamentId: "",
+    tournamentId: "",
   });
   const [btnStatus, setBtnStatus] = useState(false);
+  const [game, setGame] = useState<any | null>(null);
 
   const validate = (data: any) => {
     console.log(data);
     if (!data.name) return false;
     if (!data.boardName) return false;
+    if (!data.nPlayer) return false;
     //else if (!data.name) return false;
     //else if (!data.password) return false;
     //else if (!checkPassword()) return false;
@@ -95,12 +98,13 @@ export default function () {
   };
 
   const submit = async () => {
-    // const { passwordVerify, ...sendData } = data;
-    // const res = await apiClient.usersRegist(
-    //   data,
-    //   await props.user.getIdToken(),
-    // );
-    // console.log(res);
+    const sendData = { ...data };
+    sendData.playerIdentifiers = sendData.playerIdentifiers.filter((e) =>
+      Boolean(e)
+    );
+    const req = await apiClient.gameCreate(sendData);
+    setGame(req);
+    console.log(req);
   };
 
   return (<>
@@ -168,7 +172,16 @@ export default function () {
               onChange={handleChange}
             />);
           })}
-
+          <TextField
+            name="boardName"
+            label="所属大会ID"
+            variant="standard"
+            color="secondary"
+            className={classes.textField}
+            autoComplete="off"
+            value={data.tournamentId}
+            onChange={handleChange}
+          />
           <Button
             variant="contained"
             color="secondary"
@@ -179,6 +192,7 @@ export default function () {
             ゲーム作成！
           </Button>
         </form>
+        {game && <GameList games={[game]} />}
       </div>
     </Content>
   </>);

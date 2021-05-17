@@ -41,7 +41,8 @@ export default function () {
   };
 
   const getGames = () => {
-    const games_ = games.filter((game) => game.type === gameType);
+    const games_ = games.filter((game: any) => game.type === gameType)
+      .reverse();
     return games_;
   };
 

@@ -40,7 +40,7 @@ export default function () {
             <br />
             <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a>
             <br />
-            <a href="game/create.html">カスタムゲーム作成はこちらから</a>
+            <Link to="/game/index">カスタムゲーム作成はこちらから</Link>
           </div>
         </SubSection>
         <SubSection title="大会">
