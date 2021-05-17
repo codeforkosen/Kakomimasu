@@ -1,1 +1,1 @@
-deno run -A --unstable apiserver.ts
+deno run -A --unstable $@ apiserver.ts

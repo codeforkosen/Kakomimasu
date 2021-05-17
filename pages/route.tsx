@@ -9,6 +9,12 @@ import {
   MuiThemeProvider,
 } from "@material-ui/core";
 
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
+import MenuItem from "@material-ui/core/MenuItem";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormHelperText from "@material-ui/core/FormHelperText";
+
 import firebase, { init } from "../components/firebase.ts";
 init();
 
@@ -49,6 +55,10 @@ const useStyles = makeStyles((theme) =>
       flexDirection: "column",
       //align-items: center;
     },
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
   })
 );
 
@@ -59,7 +69,6 @@ function Main() {
   return (
     <CssBaseline>
       <MuiThemeProvider theme={theme}>
-        {/*<link rel="stylesheet" href="/css/layout.css" />*/}
         <BrowserRouter>
           <Header firebase={firebase} />
           <div className={classes.toolbar}></div>

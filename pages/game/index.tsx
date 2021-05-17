@@ -70,32 +70,3 @@ export default function () {
     </Content>
   );
 }
-
-/*
-const Index: DFC<{ title: string }> = ({ title }) => {
-  return (
-    <div>
-      
-      <div
-        className="game-table"
-        dangerouslySetInnerHTML={{
-          __html: `
-                <button v-on:click="nowType = 0" :disabled="nowType === 0">フリーマッチ</button>
-                <button v-on:click="nowType = 1" :disabled="nowType === 1">カスタムマッチ</button>
-
-                <games-list v-bind:games="games[nowType]"> </games-list>`,
-        }}
-      />
-      <script type="module" src="/js/game/index.js" />
-      <link rel="stylesheet" href="/css/game/index.css" />
-    </div>
-  );
-};
-
-Index.getInitialProps = async () => {
-  return { title: "ゲーム一覧" };
-};
-
-// default export are used for Server Side Rendering.
-export default Index;
-*/

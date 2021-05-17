@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import Index from "./index.tsx";
+import Create from "./create.tsx";
 
 export default function (props: RouteComponentProps) {
   const match = useRouteMatch();
@@ -22,6 +23,11 @@ export default function (props: RouteComponentProps) {
           exact
           path={`${match.path}/index`}
           component={Index}
+        />
+        <Route
+          exact
+          path={`${match.path}/create`}
+          component={Create}
         />
         <Redirect push={false} from="" to="/404" />
       </Switch>
