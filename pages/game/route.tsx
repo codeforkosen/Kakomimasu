@@ -10,6 +10,7 @@ import {
 
 import Index from "./index.tsx";
 import Create from "./create.tsx";
+import Detail from "./detail.tsx";
 
 export default function (props: RouteComponentProps) {
   const match = useRouteMatch();
@@ -28,6 +29,11 @@ export default function (props: RouteComponentProps) {
           exact
           path={`${match.path}/create`}
           component={Create}
+        />
+        <Route
+          exact
+          path={`${match.path}/detail/:id`}
+          component={Detail}
         />
         <Redirect push={false} from="" to="/404" />
       </Switch>

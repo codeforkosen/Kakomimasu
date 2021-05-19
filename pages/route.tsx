@@ -76,7 +76,11 @@ function Main() {
             <Switch>
               <Redirect exact from="/" to="/index" />
               <Route path="/index" component={Index} />
-              <Route path="/game" component={Game} />
+              <Route
+                path="/game"
+                render={(routeProps) => <Game {...routeProps} />}
+              >
+              </Route>
               <Route
                 path="/user"
                 render={(routeProps) =>

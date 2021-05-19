@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 
@@ -7,7 +7,7 @@ import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import Clock from "../../components/clock.tsx";
 
-export default function () {
+export default function (props: RouteComponentProps) {
   const [games, setGames] = useState<any[]>([]);
   let socket: WebSocket;
 
@@ -67,7 +67,7 @@ export default function () {
           カスタムマッチ
         </Button>
       </ButtonGroup>
-      <GameList games={getGames()} />
+      <GameList games={getGames()} {...props} />
     </Content>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import ApiClient from "../apiserver/api_client.js";
 const apiClient = new ApiClient("");
@@ -53,8 +53,9 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const GameList: React.FC<Props> = (props) => {
+const GameList: React.FC<Props> = (props: Props) => {
   const classes = useStyles();
+  const history = useHistory();
   const games = props.games;
   const [users, setUsers] = useState<any[] | null>();
 
@@ -104,6 +105,11 @@ const GameList: React.FC<Props> = (props) => {
     if (!users) return undefined;
     return users.find((user) => user.id === id);
   };
+
+  const toGameDetail = (id: any) => {
+    history.push("/game/detail/" + id);
+  };
+
   return (
     <div>
       <div>
@@ -135,7 +141,7 @@ const GameList: React.FC<Props> = (props) => {
         </tr>
         {games.map((game) => {
           return (
-            <tr>
+            <tr onClick={() => toGameDetail(game.gameId)}>
               <td>
                 <div className={getStatusClass(game)}>●</div>
                 <div>{game.turn}</div>
