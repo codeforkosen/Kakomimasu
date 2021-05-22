@@ -6,21 +6,17 @@ import {
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
-const emit = await Deno.emit("file:///" + resolve("../pages/route.tsx"), {
-  bundle: "module",
-  importMapPath: "../pages/import-map.json",
-  compilerOptions: {
-    lib: ["dom", "esnext"],
-  },
-  //check: false,
+import * as esbuild from "https://deno.land/x/esbuild@v0.11.17/mod.js";
+import { denoPlugin } from "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/fa2219c3df9494da6c33e3e4dffb1a33b5cc0345/mod.ts";
+
+const bundle = await esbuild.build({
+  entryPoints: ["file:///" + resolve("../pages/route.tsx")],
+  plugins: [denoPlugin({ importMapFile: "../pages/import-map.json" })],
+  bundle: true,
+  outfile: "../public/app.bundle.js",
+  minify: true,
 });
-if (emit.diagnostics.length) {
-  // there is something that impacted the emit
-  console.warn(Deno.formatDiagnostics(emit.diagnostics));
-}
-console.log(emit.stats);
-let bundleJs = emit.files["deno:///bundle.js"];
-Deno.writeTextFileSync(resolve("../public/app.bundle.js"), bundleJs);
+console.log(bundle);
 
 export const viewerRoutes = () => {
   const router = createRouter();
