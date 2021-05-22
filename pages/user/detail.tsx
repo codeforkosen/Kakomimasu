@@ -9,12 +9,12 @@ import {
 } from "@material-ui/core";
 import {
   Cell,
+  ContentRenderer,
   Pie,
   PieChart,
-  PieLabel,
+  PieLabelRenderProps,
   ResponsiveContainer,
-} from "https://cdn.esm.sh/recharts";
-
+} from "recharts";
 import firebase from "../../components/firebase.ts";
 import { Link, Redirect, RouteComponentProps } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
@@ -109,21 +109,28 @@ export default function (props: Props) {
     getUser();
   }, [props.match.params.id]);
 
-  const renderLabel: PieLabel = (
+  const renderLabel: ContentRenderer<PieLabelRenderProps> = (
     { cx, cy, midAngle, innerRadius, outerRadius, percent, index },
   ) => {
-    if (percent === 0) return (<></>);
+    const [cx_, cy_, midAngle_, innerRadius_, outerRadius_] = [
+      cx as number,
+      cy as number,
+      midAngle as number,
+      innerRadius as number,
+      outerRadius as number,
+    ];
+    if (!percent) return (<></>);
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const radius = innerRadius_ + (outerRadius_ - innerRadius_) * 0.5;
+    const x = cx_ + radius * Math.cos(-midAngle_ * RADIAN);
+    const y = cy_ + radius * Math.sin(-midAngle_ * RADIAN);
 
     return (
       <text
         x={x}
         y={y}
         fill="white"
-        textAnchor={x > cx ? "start" : "end"}
+        textAnchor={x > cx_ ? "start" : "end"}
         dominantBaseline="central"
       >
         {`${(percent * 100).toFixed(0)}%`}

@@ -5,12 +5,25 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import MenuItem from "@material-ui/core/MenuItem";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
+import datas from "../../components/player_datas.ts";
+
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
+import GameBoard from "../../components/gameBoard.tsx";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -19,6 +32,65 @@ const useStyles = makeStyles((theme) =>
     },
   })
 );
+
+function PointsGraph(props: { game: any }) {
+  const game = props.game;
+  const data: { turn: number; points: number[] }[] = [];
+
+  (game.log as any[]).forEach((turn, i) => {
+    const points = (turn as any[]).map((player) => {
+      return player.point.basepoint + player.point.wallpoint;
+    });
+    data.push({ turn: i, points });
+  });
+
+  const [users, setUsers] = useState<any[]>([]);
+
+  const getUsers = async () => {
+    const users_ = [];
+    for (const player of game.players) {
+      if (users.some((user) => user.id === player.id)) continue;
+      const user = await apiClient.usersShow(player.id);
+
+      users_.push(user);
+    }
+    setUsers([...users, ...users_]);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  return <div style={{ width: "100%", height: "300px" }}>
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        width={500}
+        height={300}
+        data={data}
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="turn" />
+        <YAxis />
+        <Tooltip labelFormatter={(props) => "Turn : " + props} />
+        <Legend />
+        {(game.players as any[]).map((_, i) => {
+          return <Line
+            type="monotone"
+            dataKey={`points[${i}]`}
+            stroke={datas[i].colors[1]}
+            name={users[i]?.screenName || "loading..."}
+          />;
+        })}
+      </LineChart>
+    </ResponsiveContainer>
+  </div>;
+}
 
 export default function (props: RouteComponentProps<{ id: string }>) {
   const classes = useStyles();
@@ -56,6 +128,8 @@ export default function (props: RouteComponentProps<{ id: string }>) {
         {game
           ? <>
             <GameList games={[game]} />
+            <GameBoard game={game} />
+            <PointsGraph game={game} />
           </>
           : <CircularProgress color="secondary" />}
       </div>

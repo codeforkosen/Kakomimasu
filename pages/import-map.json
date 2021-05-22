@@ -15,6 +15,7 @@
     "react/": "https://cdn.esm.sh/v41/@types/react@17.0.5/",
     "https://cdn.esm.sh/v41/@firebase/app@0.6.20/deno/app.js": "https://cdn.esm.sh/v41/firebase@8.5.0/deno/firebase.bundle.js",
     "https://cdn.esm.sh/v41/react-is@16.13.1/": "https://cdn.esm.sh/v41/react-is@17.0.2/",
-    "https://cdn.esm.sh/v41/react-is@16.10.2/": "https://cdn.esm.sh/v41/react-is@17.0.2/"
+    "https://cdn.esm.sh/v41/react-is@16.10.2/": "https://cdn.esm.sh/v41/react-is@17.0.2/",
+    "recharts": "https://cdn.esm.sh/recharts@1.8.5"
   }
 }
