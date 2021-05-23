@@ -188,8 +188,8 @@
         const games = JSON.parse(event.data);
         //console.log(games);
 
-        if (games[0].length > 0) {
-          game = games[0].reverse()[0];
+        if (games.length > 0) {
+          game = games.reverse()[0];
 
           if (gameId === null) {
             gameId = game.gameId;

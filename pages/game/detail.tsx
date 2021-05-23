@@ -96,6 +96,7 @@ export default function (props: RouteComponentProps<{ id?: string }>) {
   const classes = useStyles();
 
   const [game, setGame] = useState<any | null>(null);
+  const gameId = props.match.params.id;
 
   let socket: WebSocket;
   console.log("detail", props.match.params.id);
@@ -141,6 +142,9 @@ export default function (props: RouteComponentProps<{ id?: string }>) {
       <div className={classes.content}>
         {game
           ? <>
+            <a href={gameId ? `/vr/index?id=${gameId}` : "/vr/latest"}>
+              VR版はこちら
+            </a>
             <GameList games={[game]} />
             <GameBoard game={game} />
             <PointsGraph game={game} />
