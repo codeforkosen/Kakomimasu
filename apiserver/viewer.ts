@@ -11,9 +11,9 @@ import { denoPlugin } from "https://raw.githubusercontent.com/lucacasonato/esbui
 
 const bundle = await esbuild.build({
   entryPoints: ["file:///" + resolve("../pages/route.tsx")],
-  plugins: [denoPlugin({ importMapFile: "../pages/import-map.json" })],
+  plugins: [denoPlugin({ importMapFile: resolve("../pages/import-map.json") })],
   bundle: true,
-  outfile: "../public/app.bundle.js",
+  outfile: resolve("../public/app.bundle.js"),
   minify: true,
 });
 
