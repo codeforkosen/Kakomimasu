@@ -92,7 +92,7 @@ function PointsGraph(props: { game: any }) {
   </div>;
 }
 
-export default function (props: RouteComponentProps<{ id: string }>) {
+export default function (props: RouteComponentProps<{ id?: string }>) {
   const classes = useStyles();
 
   const [game, setGame] = useState<any | null>(null);
@@ -102,19 +102,33 @@ export default function (props: RouteComponentProps<{ id: string }>) {
 
   useEffect(() => {
     const gameId = props.match.params.id;
-    socket = new WebSocket(
-      ((window.location.protocol === "https:") ? "wss://" : "ws://") +
-        window.location.host + "/api/ws/game/" + gameId,
-    );
-    socket.onopen = (event) => {
-      console.log("websocket open");
-    };
-    socket.onmessage = (event) => {
-      const game = JSON.parse(event.data);
-      console.log("websocket onmessage", game);
-      setGame(game);
-      //gameTableVue.update(games);
-    };
+    if (!gameId) {
+      socket = new WebSocket(
+        ((window.location.protocol === "https:") ? "wss://" : "ws://") +
+          window.location.host + "/api/allGame",
+      );
+      socket.onopen = (event) => {
+        console.log("websocket open");
+      };
+      socket.onmessage = (event) => {
+        console.log("websocket onmessage");
+        const games = JSON.parse(event.data) as any[];
+        setGame(games.reverse()[0]);
+      };
+    } else {
+      socket = new WebSocket(
+        ((window.location.protocol === "https:") ? "wss://" : "ws://") +
+          window.location.host + "/api/ws/game/" + gameId,
+      );
+      socket.onopen = (event) => {
+        console.log("websocket open");
+      };
+      socket.onmessage = (event) => {
+        const game = JSON.parse(event.data);
+        console.log("websocket onmessage", game);
+        setGame(game);
+      };
+    }
     return () => {
       socket.close();
 

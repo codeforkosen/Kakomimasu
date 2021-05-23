@@ -16,32 +16,15 @@ const bundle = await esbuild.build({
   outfile: "../public/app.bundle.js",
   minify: true,
 });
-console.log(bundle);
 
 export const viewerRoutes = () => {
   const router = createRouter();
 
   router.use(serveStatic(resolve("../public")));
 
-  /*router.get("app.bundle.js", async (req) => {
-    await req.respond(
-      {
-        status: 200,
-        headers: new Headers({ "Content-Type": "text/javascript" }),
-        body: bundleJs,
-      },
-    );
-  });*/
   router.get(new RegExp(".*"), async (req) => {
     await req.sendFile(resolve("../pages/layout.html"));
   });
-  /*router.catch(async (e, req) => {
-    if (e instanceof RoutingError) {
-      await req.respond(
-        { headers: new Headers({ "Location": "404" }), status: 302 },
-      );
-    }
-  });*/
 
   return router;
 };

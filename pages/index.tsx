@@ -36,7 +36,7 @@ export default function () {
           <div>
             <Link to="/game/index">ゲーム一覧はこちらから</Link>
             <br />
-            <a href="gamedetails.html">最新のゲームビューアはこちらから</a>
+            <Link to="/game/detail">最新のゲームビューアはこちらから</Link>
             <br />
             <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a>
             <br />

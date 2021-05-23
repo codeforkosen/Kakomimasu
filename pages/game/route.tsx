@@ -35,6 +35,11 @@ export default function (props: RouteComponentProps) {
           path={`${match.path}/detail/:id`}
           component={Detail}
         />
+        <Route
+          exact
+          path={`${match.path}/detail`}
+          component={Detail}
+        />
         <Redirect push={false} from="" to="/404" />
       </Switch>
     </Router>
