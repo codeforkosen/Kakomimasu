@@ -255,7 +255,7 @@ export default function (props: Props) {
           {turnT && <h4>{getStatusT()}</h4>}
           </div>*/
         }
-        <table className={classes.table}>
+        {game.board && <table className={classes.table}>
           <tr>
             <th></th>
             {[...Array(game.board.width)].map((_, x) => {
@@ -340,7 +340,7 @@ export default function (props: Props) {
             })}
             <th></th>
           </tr>
-        </table>
+        </table>}
       </div>
     </div>
   );
