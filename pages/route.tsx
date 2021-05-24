@@ -9,12 +9,6 @@ import {
   MuiThemeProvider,
 } from "@material-ui/core";
 
-import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
-import MenuItem from "@material-ui/core/MenuItem";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-
 import firebase, { init } from "../components/firebase.ts";
 init();
 
@@ -25,6 +19,7 @@ import NotFound from "../components/404.tsx";
 import Index from "./index.tsx";
 import Game from "./game/route.tsx";
 import User from "./user/route.tsx";
+import Tournament from "./tournament/route.tsx";
 
 const theme = createMuiTheme({
   palette: { // Material Design Color(https://material.io/resources/color/#!/?view.left=1&view.right=1&primary.color=FBD5A8&secondary.color=58AFDA)
@@ -79,14 +74,16 @@ function Main() {
               <Route
                 path="/game"
                 render={(routeProps) => <Game {...routeProps} />}
-              >
-              </Route>
+              />
               <Route
                 path="/user"
                 render={(routeProps) =>
                   <User firebase={firebase} {...routeProps} />}
-              >
-              </Route>
+              />
+              <Route
+                path="/tournament"
+                render={(routeProps) => <Tournament {...routeProps} />}
+              />
               <Route path="/404" component={NotFound} />
               <Redirect push={false} from="" to="/404" />
             </Switch>

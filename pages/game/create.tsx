@@ -1,6 +1,6 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -41,7 +41,13 @@ const useStyles = makeStyles((theme) =>
 
 export default function () {
   const classes = useStyles();
+  const location = useLocation();
+  const history = useHistory();
   const [boards, setBoards] = useState<any[]>();
+
+  console.log(location);
+  const searchParam = new URLSearchParams(location.search);
+  console.log(searchParam);
 
   useEffect(() => {
     getBoards();
@@ -54,11 +60,16 @@ export default function () {
   }
 
   const [data, setData] = useState({
-    name: "",
-    boardName: "",
+    name: searchParam.get("name") || "",
+    boardName: searchParam.get("n-player") || "",
     nPlayer: 2,
-    playerIdentifiers: ["", "", "", ""],
-    tournamentId: "",
+    playerIdentifiers: [
+      searchParam.get("player1") || "",
+      searchParam.get("player2") || "",
+      "",
+      "",
+    ],
+    tournamentId: searchParam.get("tournament-id") || "",
   });
   const [btnStatus, setBtnStatus] = useState(false);
   const [game, setGame] = useState<any | null>(null);
@@ -103,8 +114,12 @@ export default function () {
       Boolean(e)
     );
     const req = await apiClient.gameCreate(sendData);
-    setGame(req);
     console.log(req);
+    if (searchParam.get("return")) {
+      history.push("/tournament/detail/" + searchParam.get("tournament-id"));
+    } else {
+      setGame(req);
+    }
   };
 
   return (<>
