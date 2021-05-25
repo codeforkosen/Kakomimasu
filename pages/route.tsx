@@ -20,6 +20,7 @@ import Index from "./index.tsx";
 import Game from "./game/route.tsx";
 import User from "./user/route.tsx";
 import Tournament from "./tournament/route.tsx";
+import Dev from "./dev/route.tsx";
 
 const theme = createMuiTheme({
   palette: { // Material Design Color(https://material.io/resources/color/#!/?view.left=1&view.right=1&primary.color=FBD5A8&secondary.color=58AFDA)
@@ -83,6 +84,10 @@ function Main() {
               <Route
                 path="/tournament"
                 render={(routeProps) => <Tournament {...routeProps} />}
+              />
+              <Route
+                path="/dev"
+                render={(routeProps) => <Dev {...routeProps} />}
               />
               <Route path="/404" component={NotFound} />
               <Redirect push={false} from="" to="/404" />

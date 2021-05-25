@@ -194,8 +194,13 @@ export default function (props: Props) {
     };
   };
   useEffect(() => {
+    console.log("useEffect gameBoard");
     getUsers();
   }, []);
+
+  useEffect(() => {
+    console.log("update gameBoard", game.tiled[0]);
+  });
 
   return (
     <div
@@ -255,7 +260,7 @@ export default function (props: Props) {
           {turnT && <h4>{getStatusT()}</h4>}
           </div>*/
         }
-        {game.board && <table className={classes.table}>
+        {game.board && <table id="field" className={classes.table}>
           <tr>
             <th></th>
             {[...Array(game.board.width)].map((_, x) => {
