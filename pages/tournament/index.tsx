@@ -72,7 +72,7 @@ export default function (props: RouteComponentProps) {
         variant="contained"
         style={{ width: "20em" }}
         onClick={() => {
-          history.push("/t/create");
+          history.push("/tournament/create");
         }}
       >
         大会作成はこちらから

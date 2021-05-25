@@ -47,7 +47,7 @@ export default function () {
           <div>
             <Link to="tournament/index">大会一覧はこちらから</Link>
             <br />
-            <a href="tournament/create.html">大会作成はこちらから</a>
+            <Link to="tournament/create">大会作成はこちらから</Link>
             <br />
           </div>
         </SubSection>
