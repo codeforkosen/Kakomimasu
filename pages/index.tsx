@@ -77,7 +77,7 @@ export default function () {
         中止になった第31回高専プロコン競技部門を勝手にやっちゃおうと立ち上がった、Code for KOSEN の部門のひとつ。
       </Section>
       <Section title="開発者用ツール">
-        <a href="/dev/field.html">フィールド説明用エディタ</a>
+        <Link to="/dev/field-editor">フィールド説明用エディタ</Link>
         <br />
       </Section>
     </div>
