@@ -9,11 +9,14 @@ export default class ApiClient {
   }
 
   async _fetchPostJson(path, data, auth) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    if (auth) headers.append("Authorization", auth);
     const res = await fetch(
       this.baseUrl + path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": auth },
+        headers,
         body: JSON.stringify(data),
       },
     )
@@ -31,11 +34,14 @@ export default class ApiClient {
   }
 
   async _fetchPostJsonToJsonWithAuth(path, data, auth) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    if (auth) headers.append("Authorization", auth);
     const resJson = await (await fetch(
       this.baseUrl + path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": auth },
+        headers,
         body: JSON.stringify(data),
       },
     )).json();
