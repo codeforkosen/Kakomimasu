@@ -250,7 +250,7 @@ export const userRouter = () => {
           //console.log("payload userId", payload.user_id);
         }
       }
-      const user = accounts.registUser(reqData, reqData.id !== undefined);
+      const user = accounts.registUser(reqData, jwt !== null);
       await req.respond(jsonResponse(user));
     },
   );
