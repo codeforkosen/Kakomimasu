@@ -291,15 +291,25 @@ export default function (props: Props) {
                     })()
                     : false;
 
+                  const bgColor = () => {
+                    if (cell.tiled[1] !== -1) {
+                      return datas[cell.tiled[1]].colors[cell.tiled[0]];
+                    } else if (cell.point < 0) {
+                      const l = 100 - (Math.abs(cell.point) * 50 / 16);
+                      return `hsl(0,0%,${l}%)`;
+                    } else if (cell.point > 0) {
+                      const l = 100 - (Math.abs(cell.point) * 50 / 16);
+                      return `hsl(60,100%,${l}%)`;
+                    }
+                  };
+
                   return <td
                     className={`${agent && classes.agent} ${isConflict &&
                       classes.conflict}`}
                     style={{
                       backgroundImage: agent &&
                         `url(${datas[agent.player].agentUrl})`,
-                      backgroundColor: cell.tiled[1] !== -1
-                        ? datas[cell.tiled[1]].colors[cell.tiled[0]]
-                        : undefined,
+                      backgroundColor: bgColor(),
                     }}
                   >
                     <span className={isAbs ? classes.striket : ""}>
@@ -325,7 +335,13 @@ export default function (props: Props) {
                           className={classes.detailHistory}
                         >
                           {agentHistory(agent).map((e) => {
-                            return <div>
+                            return <div
+                              style={{
+                                textDecoration: e.res > 0
+                                  ? "line-through"
+                                  : "none",
+                              }}
+                            >
                               T{e.turn}：{e.x && `x:${e.x} , y:${e.y}に`}
                               {e.type}
                             </div>;
