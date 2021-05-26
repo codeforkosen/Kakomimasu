@@ -43,13 +43,11 @@ const useStyles = makeStyles((theme) =>
     toolbar: theme.mixins.toolbar,
     main: {
       flexGrow: 1,
-      //overflow: "auto";
       width: "90%",
       maxWidth: 1000,
       padding: "50px 0",
       display: "flex",
       flexDirection: "column",
-      //align-items: center;
     },
     formControl: {
       margin: theme.spacing(1),
@@ -61,7 +59,6 @@ const useStyles = makeStyles((theme) =>
 function Main() {
   const classes = useStyles();
 
-  //console.log(firebase, firebase.auth());
   return (
     <CssBaseline>
       <MuiThemeProvider theme={theme}>

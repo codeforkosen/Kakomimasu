@@ -1,5 +1,4 @@
-/// <reference lib="dom"/>
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -18,15 +17,13 @@ const useStyles = makeStyles((theme) =>
 
 import firebase from "../components/firebase.ts";
 
+// @deno-types="../apiserver/api_client.d.ts"
 import ApiClient from "../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
-type Props = {
-  children?: React.ReactNode;
-  firebase: typeof firebase;
-};
+type Props = { firebase: typeof firebase };
 
-const Header: React.FC<Props> = (props) => {
+export default function (props: Props) {
   const location = useLocation();
   const classes = useStyles();
   const [user, setUser] = useState<firebase.User | undefined | null>(undefined);
@@ -36,22 +33,22 @@ const Header: React.FC<Props> = (props) => {
       await props.firebase.auth().signOut();
     } catch (error) {
       console.log(`ログアウト時にエラーが発生しました (${error})`);
-    } finally {
-      //location.reload();
     }
   };
-  props.firebase.auth().onAuthStateChanged(async (user) => {
-    if (user) {
-      if (await apiClient.usersVerify(await user.getIdToken()) === false) {
-        console.log(location);
-        if (location.pathname !== "/user/login") {
-          logOut();
-          return;
+
+  useEffect(() => {
+    props.firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        if (await apiClient.usersVerify(await user.getIdToken()) === false) {
+          if (location.pathname !== "/user/login") {
+            logOut();
+            return;
+          }
         }
       }
-    }
-    setUser(user);
-  });
+      setUser(user);
+    });
+  }, []);
 
   return (
     <AppBar>
@@ -81,6 +78,4 @@ const Header: React.FC<Props> = (props) => {
       </Toolbar>
     </AppBar>
   );
-};
-
-export default Header;
+}
