@@ -1,7 +1,7 @@
 /// <reference lib="dom"/>
 import React from "react";
 import { Link } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 
 import Section, { SubSection } from "../components/section.tsx";
 

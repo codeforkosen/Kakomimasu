@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Link, useHistory } from "react-router-dom";
 
 import ApiClient from "../apiserver/api_client.js";

@@ -1,23 +1,13 @@
 /// <reference lib="dom"/>
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import Toolbar from "@material-ui/core/Toolbar";
 
-import {
-  AppBar,
-  Avatar,
-  Button,
-  createStyles,
-  makeStyles,
-  Theme,
-  Toolbar,
-} from "@material-ui/core";
-
-const nav = [
-  { text: "ゲーム一覧", url: "/game/index" },
-  { text: "大会一覧", url: "/tournament/index" },
-];
-
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     toolbar: theme.mixins.toolbar,
     logo: {

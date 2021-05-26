@@ -4,10 +4,10 @@ import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import {
   createMuiTheme,
   createStyles,
-  CssBaseline,
   makeStyles,
   MuiThemeProvider,
-} from "@material-ui/core";
+} from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 import firebase, { init } from "../components/firebase.ts";
 init();

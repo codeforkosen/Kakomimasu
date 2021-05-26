@@ -1,12 +1,7 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  createStyles,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   Cell,
   ContentRenderer,

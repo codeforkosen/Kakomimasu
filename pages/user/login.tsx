@@ -1,15 +1,12 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  createStyles,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Redirect, RouteComponentProps } from "react-router-dom";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import TextField from "@material-ui/core/TextField";
 
 import firebase, { StyledFirebaseAuth } from "../../components/firebase.ts";
-import { Redirect, RouteComponentProps } from "react-router-dom";
 import Section from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 
