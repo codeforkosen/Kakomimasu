@@ -6,7 +6,8 @@ import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 
-import firebase, { StyledFirebaseAuth } from "../../components/firebase.ts";
+import firebase from "../../components/firebase.ts";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import Section from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 
