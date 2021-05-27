@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 
 import Content from "../../components/content.tsx";
 import TournamentCard from "../../components/tournament_card.tsx";
 
+// @deno-types="../../apiserver/api_client.d.ts"
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
+
+import { Tournament } from "../../apiserver/types.ts";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -18,47 +21,17 @@ const useStyles = makeStyles((theme) =>
       flexFlow: "row wrap",
       justifyContent: "center",
     },
-    /*tournament: {
-      border: "solid 3px",
-      borderColor: theme.palette.secondary.main,
-      borderRadius: 10,
-      display: "flex",
-      flexDirection: "column",
-      padding: "1em",
-      margin: "1em",
-      width: "20em",
-      "&:hover": {
-        borderColor: theme.palette.primary.main,
-      },
-    },
-    tournamentName: {
-      fontWeight: "bold",
-      fontSize: "1.5em",
-    },
-    tournamentOrganizer: {
-      textAlign: "left",
-    },
-    tournamentType: {
-      textAlign: "left",
-    },
-    tournamentRemarks: {
-      fontSize: "0.8em",
-      textAlign: "left",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-    },*/
   })
 );
 
-export default function (props: RouteComponentProps) {
+export default function () {
   const classes = useStyles();
   const history = useHistory();
-  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
 
   const getTournament = async () => {
-    const tournaments = await apiClient.tournamentsGet();
-    setTournaments(tournaments);
+    const res = await apiClient.tournamentsGet();
+    if (res.success) setTournaments(res.data);
   };
 
   useEffect(() => {

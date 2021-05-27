@@ -129,15 +129,16 @@ Deno.test("api/tournament/create:normal by no dryRun", async () => {
 // 正常（1大会・全大会）・ID無し
 Deno.test("api/tournament/get:normal by single", async () => {
   const res = await ac.tournamentsGet(data.id);
-  assertTournament(res, data);
+  assertTournament(res.data, data);
 });
 Deno.test("api/tournament/get:normal by all", async () => {
-  const res = await ac.tournamentsGet() as Array<any>;
-  res.forEach((e) => assertTournament(e));
+  const res = await ac.tournamentsGet(); // as Array<any>;
+  if (res.success === false) assert(false);
+  res.data.forEach((e: any) => assertTournament(e));
 });
 Deno.test("api/tournament/get:nothing tournament id", async () => {
   const res = await ac.tournamentsGet(v4.generate());
-  assertEquals(res, errors.NOTHING_TOURNAMENT_ID);
+  assertEquals(res.data, errors.NOTHING_TOURNAMENT_ID);
 });
 
 // /api/tournament/add Test

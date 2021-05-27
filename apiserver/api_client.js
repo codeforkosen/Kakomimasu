@@ -82,8 +82,8 @@ export default class ApiClient {
     return resJson;
   }
   async tournamentsGet(id = "") {
-    const resJson = await this._fetchToJson(`/tournament/get?id=${id}`);
-    return resJson;
+    const res = await this._fetch(`/tournament/get?id=${id}`);
+    return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsDelete(data) {
     const resJson = await this._fetchPostJsonToJson("/tournament/delete", data);

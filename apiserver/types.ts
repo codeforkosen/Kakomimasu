@@ -50,3 +50,13 @@ export interface Player {
   agents: { x: number; y: number }[];
   point: { basepoint: number; wallpoint: number };
 }
+
+export interface Tournament {
+  name: string;
+  organizer: string;
+  type: "round-robin" | "knockout";
+  remarts: string;
+  id: string;
+  users: string[];
+  gameIds: string[];
+}

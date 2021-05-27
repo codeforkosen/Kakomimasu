@@ -49,7 +49,7 @@ export default function (props: RouteComponentProps<{ id: string }>) {
 
   const getTournament = async (tournament_?: any) => {
     const tournament = tournament_ ||
-      await apiClient.tournamentsGet(tournamentId);
+      (await apiClient.tournamentsGet(tournamentId)).data;
     console.log(tournament);
     const games = [];
     for await (const gameId of tournament.gameIds) {
