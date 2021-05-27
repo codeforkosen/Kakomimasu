@@ -39,7 +39,8 @@ export default function (props: Props) {
   useEffect(() => {
     props.firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
-        if (await apiClient.usersVerify(await user.getIdToken()) === false) {
+        const idToken = await user.getIdToken();
+        if ((await apiClient.usersVerify(idToken)).success === false) {
           if (location.pathname !== "/user/login") {
             logOut();
             return;

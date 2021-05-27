@@ -37,6 +37,12 @@ const theme = createMuiTheme({
       contrastText: "#000000",
     },
   },
+  props: {
+    MuiTextField: {
+      variant: "filled",
+      color: "secondary",
+    },
+  },
 });
 const useStyles = makeStyles((theme) =>
   createStyles({

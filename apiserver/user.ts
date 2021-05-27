@@ -10,6 +10,7 @@ import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
 import { getPayload } from "./parts/jwt.ts";
+import { UserRegistReq } from "./types.ts";
 
 export interface IUser {
   screenName: string;
@@ -17,13 +18,6 @@ export interface IUser {
   id?: string;
   password?: string;
   gamesId?: string[];
-}
-
-export interface IReqUser extends ApiOption {
-  screenName: string;
-  name: string;
-  password?: string; // to with password
-  id?: string; // to without password(Firebase Authorization login)
 }
 
 export interface IReqDeleteUser extends ApiOption {
@@ -85,7 +79,10 @@ class Users {
 
   getUsers = () => this.users;
 
-  registUser(data: IReqUser, isSecure: boolean = false): User {
+  registUser(
+    data: UserRegistReq & { id?: string },
+    isSecure: boolean = false,
+  ): User {
     if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
     if (!data.name) throw new ServerError(errors.INVALID_USER_NAME);
     if (!data.password) {
@@ -238,19 +235,20 @@ export const userRouter = () => {
     "/regist",
     contentTypeFilter("application/json"),
     async (req) => {
-      const reqData = ((await req.json()) as IReqUser);
+      const reqData = ((await req.json()) as UserRegistReq);
       //console.log(reqData);
       const jwt = req.headers.get("Authorization");
       //console.log(jwt);
+      let id: string | undefined = undefined;
       if (jwt) {
         const payload = await getPayload(jwt);
         //console.log(payload);
         if (payload) {
-          reqData.id = payload.user_id;
+          id = payload.user_id;
           //console.log("payload userId", payload.user_id);
         }
       }
-      const user = accounts.registUser(reqData, jwt !== null);
+      const user = accounts.registUser({ ...reqData, id }, jwt !== null);
       await req.respond(jsonResponse(user));
     },
   );

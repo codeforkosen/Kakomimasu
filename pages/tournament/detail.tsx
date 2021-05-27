@@ -78,9 +78,11 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     event: React.ChangeEvent<{ value: string }>,
   ) => {
     const value = event.target.value;
-    let q = await apiClient.usersSearch(value);
-    console.log(q);
-    if (q.errorCode) q = [];
+    let req = await apiClient.usersSearch(value);
+    let q: any[] = [];
+    if (req.success) q = req.data;
+    //console.log(req);
+    //if (req.errorCode) req = [];
     setAddUserInput({ value, helperText: "", q });
   };
   const submit = async () => {

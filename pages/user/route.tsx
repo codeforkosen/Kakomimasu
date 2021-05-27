@@ -22,16 +22,11 @@ const UserRoute: React.FC<Props> = (props) => {
   return (
     <Router history={props.history}>
       <Switch>
-        {
-          /*<Route exact path="/">
-          <Redirect to={`${match.path}/index`} />
-  </Route>*/
-        }
         <Route
           exact
           path={`${match.path}/login`}
         >
-          <Login {...props} />
+          <Login firebase={props.firebase} />
         </Route>
         <Route
           path={`${match.path}/detail/:id`}

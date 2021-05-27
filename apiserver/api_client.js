@@ -54,11 +54,12 @@ export default class ApiClient {
         Authorization: idToken
       })
     });
-    if (res.status === 200) return true;
-    else return false;
+    if (res.status === 200) return { success: true };
+    else return { success: false, data: res };
   }
   async usersRegist(data, auth) {
-    return await this._fetchPostJsonToJson("/users/regist", data, auth);
+    const res = await this._fetchPostJson("/users/regist", data, auth);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersDelete(data) {
@@ -72,8 +73,9 @@ export default class ApiClient {
   }
 
   async usersSearch(searchText) {
-    const resJson = await this._fetchToJson(`/users/search?q=${searchText}`);
-    return resJson;
+    const res = await this._fetch(`/users/search?q=${searchText}`);
+    console.log(res.status);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async tournamentsCreate(data) {
