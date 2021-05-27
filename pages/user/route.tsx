@@ -13,11 +13,10 @@ import Login from "./login.tsx";
 import Detail from "./detail.tsx";
 
 type Props = {
-  children?: React.ReactNode;
   firebase: typeof firebase;
 } & RouteComponentProps;
 
-const UserRoute: React.FC<Props> = (props) => {
+export default function (props: Props) {
   const match = useRouteMatch();
   return (
     <Router history={props.history}>
@@ -25,9 +24,9 @@ const UserRoute: React.FC<Props> = (props) => {
         <Route
           exact
           path={`${match.path}/login`}
-        >
-          <Login firebase={props.firebase} />
-        </Route>
+          component={Login}
+          {...props}
+        />
         <Route
           path={`${match.path}/detail/:id`}
           component={Detail}
@@ -37,6 +36,4 @@ const UserRoute: React.FC<Props> = (props) => {
       </Switch>
     </Router>
   );
-};
-
-export default UserRoute;
+}

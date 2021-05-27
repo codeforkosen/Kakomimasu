@@ -68,8 +68,8 @@ export default class ApiClient {
   }
 
   async usersShow(identifier) {
-    const resJson = await this._fetchToJson(`/users/show/${identifier}`);
-    return resJson;
+    const res = await this._fetch(`/users/show/${identifier}`);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersSearch(searchText) {
@@ -110,8 +110,8 @@ export default class ApiClient {
   }
 
   async getMatch(gameId) {
-    const resJson = await this._fetchToJson(`/match/${gameId}`);
-    return resJson;
+    const res = await this._fetch(`/match/${gameId}`);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async setAction(gameId, data, auth) {

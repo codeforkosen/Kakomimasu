@@ -53,12 +53,12 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     console.log(tournament);
     const games = [];
     for await (const gameId of tournament.gameIds) {
-      const game = await apiClient.getMatch(gameId);
+      const game = (await apiClient.getMatch(gameId)).data;
       games.push(game);
     }
     const users = [];
     for await (const userId of tournament.users) {
-      const user = await apiClient.usersShow(userId);
+      const user = (await apiClient.usersShow(userId)).data;
       if (!user.errorCode) users.push(user);
       else users.push({ id: userId });
     }

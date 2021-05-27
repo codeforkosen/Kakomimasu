@@ -10,30 +10,16 @@ import {
   PieLabelRenderProps,
   ResponsiveContainer,
 } from "recharts";
-import firebase from "../../components/firebase.ts";
-import { Link, Redirect, RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 
+// @deno-types="../../apiserver/api_client.d.ts"
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
-interface User {
-  screenName: string;
-  name: string;
-  id: string;
-  gamesId: string[];
-}
-interface ExpUser extends User {
-  games: any[];
-  pieData: any[];
-}
-
-type Props = {
-  children?: React.ReactNode;
-  firebase: typeof firebase;
-} & RouteComponentProps<{ id: string }>;
+import { Game, User } from "../../apiserver/types.ts";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -48,28 +34,36 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export default function (props: Props) {
-  console.log("detail", props.match.params.id);
+export default function (props: RouteComponentProps<{ id: string }>) {
   const classes = useStyles();
 
-  const [user, setUser] = useState<ExpUser | undefined | null>(undefined);
+  const [user, setUser] = useState<
+    | ({
+      games: Game[];
+      pieData: {
+        name: string;
+        value: number;
+      }[];
+    } & User)
+    | undefined
+    | null
+  >(undefined);
 
   const getUser = async () => {
-    const res = await apiClient.usersShow(props.match.params.id) as User;
-    console.log(res);
-    if (res.hasOwnProperty("errorCode")) {
+    const res = await apiClient.usersShow(props.match.params.id);
+    if (res.success === false) {
       setUser(null);
     } else {
-      const games: any[] = [];
-      for (const gameId of res.gamesId) {
-        const game = await apiClient.getMatch(gameId);
-        games.push(game);
+      const user = res.data;
+      const games: Game[] = [];
+      for (const gameId of user.gamesId) {
+        const res = await apiClient.getMatch(gameId);
+        if (res.success) games.push(res.data);
       }
       const result = [0, 0, 0]; // 勝ち、負け、引き分け
       games.forEach((g) => {
-        console.log(g);
         if (g.ending === false) return;
-        const players = g.players.map((p: any) => {
+        const players = g.players.map((p) => {
           return {
             id: p.id,
             point: p.point.wallpoint + p.point.basepoint,
@@ -77,15 +71,15 @@ export default function (props: Props) {
         });
         players.sort((a: any, b: any) => a.point - b.point);
 
-        if (players[0].id === res.id) {
+        if (players[0].id === user.id) {
           if (players[0].point === players[players.length - 1].point) {
             result[2]++;
           } else result[1]++;
         }
-        if (players[players.length - 1].id === res.id) {
+        if (players[players.length - 1].id === user.id) {
           result[0]++;
         }
-        console.log(result);
+        //console.log(result);
       });
 
       const pieData = [
@@ -93,10 +87,7 @@ export default function (props: Props) {
         { name: "Lose", value: result[1] },
         { name: "Even", value: result[2] },
       ];
-      console.log(result, pieData);
-
-      console.log({ ...res, games, pieData });
-      setUser({ ...res, games, pieData });
+      setUser({ ...res.data, games, pieData });
     }
   };
 
@@ -105,7 +96,7 @@ export default function (props: Props) {
   }, [props.match.params.id]);
 
   const renderLabel: ContentRenderer<PieLabelRenderProps> = (
-    { cx, cy, midAngle, innerRadius, outerRadius, percent, index },
+    { cx, cy, midAngle, innerRadius, outerRadius, percent },
   ) => {
     const [cx_, cy_, midAngle_, innerRadius_, outerRadius_] = [
       cx as number,

@@ -133,15 +133,15 @@ Deno.test("users regist:already registered name", async () => {
 // 正常(名前・ID)・ユーザ無し
 Deno.test("users show:normal by name", async () => {
   let res = await ac.usersShow(data.name);
-  assertUser(res, data);
+  assertUser(res.data, data);
 });
 Deno.test("users show:normal by id", async () => {
   let res = await ac.usersShow(data.id);
-  assertUser(res, data);
+  assertUser(res.data, data);
 });
 Deno.test("users show:not user", async () => {
   let res = await ac.usersShow(v4.generate());
-  assertEquals(res, errors.NOT_USER);
+  assertEquals(res.data, errors.NOT_USER);
 });
 
 // /api/users/search Test

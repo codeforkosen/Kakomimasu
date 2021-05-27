@@ -121,7 +121,7 @@ export default function (props: Props) {
     const users_ = [];
     for (const player of game.players) {
       if (users.some((user) => user.id === player.id)) continue;
-      const user = await apiClient.usersShow(player.id);
+      const user = (await apiClient.usersShow(player.id)).data;
 
       users_.push(user);
     }

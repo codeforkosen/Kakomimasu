@@ -182,12 +182,12 @@ Deno.test("api/match/(gameId):normal", async () => {
 
   const res = await ac.getMatch(gameRes.gameId);
 
-  assertGame(res, { gameId: gameRes.gameId, name: gameData.name });
+  assertGame(res.data, { gameId: gameRes.gameId, name: gameData.name });
 });
 Deno.test("api/match/(gameId):not find game", async () => {
   const res = await ac.getMatch(v4.generate());
 
-  assertEquals(res, errors.NOT_GAME);
+  assertEquals(res.data, errors.NOT_GAME);
 });
 
 // /api/match/(gameId)/action Test

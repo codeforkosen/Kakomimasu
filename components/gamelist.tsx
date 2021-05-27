@@ -68,7 +68,7 @@ const GameList: React.FC<Props> = (props: Props) => {
         console.log("player", player);
         if (users.some((user) => user.id === player.id)) continue;
         console.log("player2", player);
-        const user = await apiClient.usersShow(player.id);
+        const user = (await apiClient.usersShow(player.id)).data;
         console.log("user", user);
         users.push(user);
       }

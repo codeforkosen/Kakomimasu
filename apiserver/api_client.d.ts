@@ -1,4 +1,4 @@
-import { Error, User, UserRegistReq } from "./types.ts";
+import { Error, Game, User, UserRegistReq } from "./types.ts";
 
 type ApiRes<T = {}> = Promise<
   { success: true; data: T } | { success: false; data: Error }
@@ -10,4 +10,7 @@ export default class ApiClient {
   usersVerify(idToken: string): ApiRes;
   usersRegist(data: UserRegistReq, auth: string): ApiRes<User[]>;
   usersSearch(searchText: string): ApiRes<User[]>;
+  usersShow(identifier: string): ApiRes<User>;
+
+  getMatch(gameId: string): ApiRes<Game>;
 }
