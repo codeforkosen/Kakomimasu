@@ -159,8 +159,6 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     <Content title="大会詳細">
       <div>
         <Button
-          color="secondary"
-          variant="contained"
           style={{ width: "20em" }}
           onClick={() => {
             history.push("/tournament/index");
@@ -210,8 +208,6 @@ export default function (props: RouteComponentProps<{ id: string }>) {
                       />}
                   />
                   <Button
-                    variant="contained"
-                    color="secondary"
                     onClick={submit}
                     disabled={!Boolean(addUserInput.value)}
                   >
@@ -241,11 +237,7 @@ export default function (props: RouteComponentProps<{ id: string }>) {
                                   <Link to={result.url}>ゲーム詳細へ</Link>
                                 </div>;
                               } else {
-                                return <Button
-                                  variant="contained"
-                                  color="secondary"
-                                  onClick={() => gameCreate(y, x)}
-                                >
+                                return <Button onClick={() => gameCreate(y, x)}>
                                   ゲーム作成
                                 </Button>;
                               }

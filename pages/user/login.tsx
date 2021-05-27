@@ -147,8 +147,6 @@ function Signup(props: { user: firebase.User }) {
         />
 
         <Button
-          variant="contained"
-          color="secondary"
           className={classes.button}
           onClick={submit}
           disabled={!validate()}

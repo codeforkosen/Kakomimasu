@@ -42,6 +42,10 @@ const theme = createMuiTheme({
       variant: "filled",
       color: "secondary",
     },
+    MuiButton: {
+      variant: "contained",
+      color: "secondary",
+    },
   },
 });
 const useStyles = makeStyles((theme) =>

@@ -51,16 +51,12 @@ export default function (props: RouteComponentProps) {
       <Clock />
       <ButtonGroup>
         <Button
-          color="secondary"
-          variant="contained"
           onClick={() => handleGameType("normal")}
           disabled={gameType === "normal"}
         >
           フリーマッチ
         </Button>
         <Button
-          color="secondary"
-          variant="contained"
           onClick={() => handleGameType("self")}
           disabled={gameType === "self"}
         >

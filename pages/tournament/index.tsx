@@ -41,8 +41,6 @@ export default function () {
   return (
     <Content title="大会一覧">
       <Button
-        color="secondary"
-        variant="contained"
         style={{ width: "20em" }}
         onClick={() => {
           history.push("/tournament/create");

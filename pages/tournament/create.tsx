@@ -103,8 +103,6 @@ export default function () {
     <Content title="大会作成">
       <div className={classes.content}>
         <Button
-          color="secondary"
-          variant="contained"
           style={{ width: "20em" }}
           onClick={() => {
             history.push("/tournament/index");
@@ -189,8 +187,6 @@ export default function () {
             onChange={handleChange}
           />
           <Button
-            variant="contained"
-            color="secondary"
             className={classes.button}
             onClick={submit}
             disabled={!btnStatus}

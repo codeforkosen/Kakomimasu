@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Button from "@material-ui/core/Button";
-import MenuItem from "@material-ui/core/MenuItem";
 import {
   CartesianGrid,
   Legend,

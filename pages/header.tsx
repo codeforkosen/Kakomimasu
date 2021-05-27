@@ -67,12 +67,17 @@ export default function (props: Props) {
           <>
             {user
               ? <>
-                <Button color="inherit" onClick={logOut}>
+                <Button variant="text" color="default" onClick={logOut}>
                   ログアウト
                 </Button>
                 <Avatar src={user.photoURL ? user.photoURL : ""} />
               </>
-              : <Button color="inherit" component={Link} to="/user/login">
+              : <Button
+                variant="text"
+                color="default"
+                component={Link}
+                to="/user/login"
+              >
                 ログイン・新規登録
               </Button>}
           </>}

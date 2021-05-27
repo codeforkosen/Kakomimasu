@@ -198,8 +198,6 @@ export default function () {
             onChange={handleChange}
           />
           <Button
-            variant="contained"
-            color="secondary"
             className={classes.button}
             onClick={submit}
             disabled={!btnStatus}
