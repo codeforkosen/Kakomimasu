@@ -60,7 +60,7 @@ Deno.test("api/game/create:normal with playerIdentifiers", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const res = await ac.gameCreate({
     ...data,
@@ -108,7 +108,7 @@ Deno.test("api/game/create:already registed user", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const res = await ac.gameCreate({
     ...data,

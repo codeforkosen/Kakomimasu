@@ -74,7 +74,6 @@ export default class ApiClient {
 
   async usersSearch(searchText) {
     const res = await this._fetch(`/users/search?q=${searchText}`);
-    console.log(res.status);
     return { success: res.status === 200, data: await res.json() };
   }
 

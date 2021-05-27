@@ -149,12 +149,12 @@ Deno.test("api/tournament/add:normal", async () => {
   const userRes = await ac.usersRegist(userData);
 
   const res = await ac.tournamentsAddUser(data.id, {
-    user: userRes.id,
+    user: userRes.data.id,
     option: { dryRun: true },
   });
 
   await ac.usersDelete(userData);
-  assertTournament(res, { ...data, users: [userRes.id] });
+  assertTournament(res, { ...data, users: [userRes.data.id] });
 });
 Deno.test("api/tournament/add:tournament that do not exist", async () => {
   {
@@ -221,8 +221,8 @@ Deno.test("api/tournament/add:already registed user", async () => {
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
 
-  await ac.tournamentsAddUser(data.id, { user: userRes.id });
-  const res = await ac.tournamentsAddUser(data.id, { user: userRes.id });
+  await ac.tournamentsAddUser(data.id, { user: userRes.data.id });
+  const res = await ac.tournamentsAddUser(data.id, { user: userRes.data.id });
 
   await ac.usersDelete(userData);
   assertEquals(res, errors.ALREADY_REGISTERED_USER);
