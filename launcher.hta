@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <title>囲みマス</title>
   <script>
-    window.resizeTo(400, 670);
+    window.moveTo(100, 100);
+    window.resizeTo(400, 730);
     var shell = new ActiveXObject("Shell.Application");
   </script>
   <style>
@@ -21,6 +22,9 @@
   </button>
   <button onclick="shell.ShellExecute('deno', 'run -A apiserver/apiserver.ts')">
     サーバの起動
+  </button>
+  <button onclick="shell.ShellExecute('chrome', 'http://localhost:8880/')">
+    対戦ページを開く
   </button>
   <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a1.js')">
     client_a1の起動
