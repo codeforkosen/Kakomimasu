@@ -1,8 +1,20 @@
-import { KakomimasuClient } from "./KakomimasuClient.js";
+import util from "../util.js";
+import { Algorithm } from "./algorithm.js";
+import { Action, DIR } from "./KakomimasuClient.js";
 
-const kc = new KakomimasuClient("ai-none", "AI-NONE", "なにもしない", "ai-none-pw");
+export class ClientNone extends Algorithm {
 
-await kc.waitMatching();
+  think(info) {
+    return [];
+  }
+}
 
-// スタート時間待ち
-await kc.waitStart();
+if (import.meta.main) {
+  let a = new ClientNone();
+  a.match({
+    id: "ai-none",
+    name: "AI-NONE",
+    spec: "なにもしない",
+    password: "ai-none-pw"
+  });
+}
