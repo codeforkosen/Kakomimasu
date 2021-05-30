@@ -14,6 +14,11 @@ import { Tournament } from "../../apiserver/types.ts";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    content: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+    },
     list: {
       display: "flex",
       padding: 50,
@@ -40,16 +45,17 @@ export default function () {
 
   return (
     <Content title="大会一覧">
-      <Button
-        style={{ width: "20em" }}
-        onClick={() => {
-          history.push("/tournament/create");
-        }}
-      >
-        大会作成はこちらから
-      </Button>
-      <div className={classes.list}>
-        {tournaments.map((t) => <TournamentCard tournament={t} />)}
+      <div className={classes.content}>
+        <Button
+          onClick={() => {
+            history.push("/tournament/create");
+          }}
+        >
+          大会作成はこちらから
+        </Button>
+        <div className={classes.list}>
+          {tournaments.map((t) => <TournamentCard tournament={t} />)}
+        </div>
       </div>
     </Content>
   );

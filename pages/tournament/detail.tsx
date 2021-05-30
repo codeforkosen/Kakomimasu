@@ -8,11 +8,13 @@ import TextField from "@material-ui/core/TextField";
 
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
+// @deno-types="../../apiserver/api_client.d.ts"
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
+import { Game, Tournament, User } from "../../apiserver/types.ts";
+
 import Content from "../../components/content.tsx";
-import GameList from "../../components/gamelist.tsx";
 import Section, { SubSection } from "../../components/section.tsx";
 
 const useStyles = makeStyles((theme) =>
@@ -39,35 +41,39 @@ export default function (props: RouteComponentProps<{ id: string }>) {
   const classes = useStyles();
   const history = useHistory();
 
-  const [tournament, setTournament] = useState<any | null>(null);
-  const [games, setGames] = useState<any[] | null>(null);
-  const [users, setUsers] = useState<any[] | null>(null);
+  const [tournament, setTournament] = useState<Tournament | null | undefined>(
+    undefined,
+  );
+  const [games, setGames] = useState<Game[] | null>(null);
+  const [users, setUsers] = useState<(User | undefined)[] | null>(null);
   const [addUserInput, setAddUserInput] = useState<
     { value: string; helperText: string; q: any[] }
   >({ value: "", helperText: "", q: [] });
   const tournamentId = props.match.params.id;
 
-  const getTournament = async (tournament_?: any) => {
-    const tournament = tournament_ ||
-      (await apiClient.tournamentsGet(tournamentId)).data;
-    console.log(tournament);
-    const games = [];
-    for await (const gameId of tournament.gameIds) {
-      const game = (await apiClient.getMatch(gameId)).data;
-      games.push(game);
-    }
-    const users = [];
-    for await (const userId of tournament.users) {
-      const user = (await apiClient.usersShow(userId)).data;
-      if (!user.errorCode) users.push(user);
-      else users.push({ id: userId });
-    }
-    console.log("games", games);
-    console.log("users", users);
-    setTournament(tournament);
-    setGames(games);
-    setUsers(users);
+  const getTournament = async () => {
+    const res = await apiClient.tournamentsGet(tournamentId);
+    if (res.success) setTournament(res.data);
+    else setTournament(null);
   };
+
+  const updateTournament = async () => {
+    if (!tournament) return;
+    const games_: typeof games = [];
+    for await (const gameId of tournament.gameIds) {
+      const res = await apiClient.getMatch(gameId);
+      if (res.success) games_.push(res.data);
+    }
+    const users_: typeof users = [];
+    for await (const userId of tournament.users) {
+      const res = await apiClient.usersShow(userId);
+      if (res.success) users_.push(res.data);
+      else users_.push(undefined);
+    }
+    setGames(games_);
+    setUsers(users_);
+  };
+
   const getType = (type: string) => {
     if (type === "round-robin") return "総当たり戦";
     else if (type === "knockout") return "勝ち残り戦";
@@ -85,6 +91,7 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     //if (req.errorCode) req = [];
     setAddUserInput({ value, helperText: "", q });
   };
+
   const submit = async () => {
     const req = await apiClient.tournamentsAddUser(
       tournamentId,
@@ -92,38 +99,33 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     );
     console.log({ user: addUserInput.value });
     console.log(req);
-    if (!req.errorCode) getTournament(req);
-    /*tournament.
-    const sendData = { ...data };
-    sendData.playerIdentifiers = sendData.playerIdentifiers.filter((e) =>
-      Boolean(e)
-    );
-    const req = await apiClient.gameCreate(sendData);
-    setGame(req);
-    console.log(req);*/
+    if (req.success) setTournament(req.data);
   };
 
   const getResult = (m: number, o: number) => {
+    if (!tournament) return;
     if (!games) return;
-    if (!users) return;
-    console.log(users, games);
+    //if (!users) return;
+    const mUserId = tournament.users[m];
+    const oUserId = tournament.users[o];
+
+    //console.log(users, games_);
 
     const game = games.find((e) =>
-      e.reservedUsers[0] === users[m].id &&
-        e.reservedUsers[1] === users[o].id ||
-      e.reservedUsers[0] === users[o].id &&
-        e.reservedUsers[1] === users[m].id
+      e.reservedUsers[0] === mUserId &&
+        e.reservedUsers[1] === oUserId ||
+      e.reservedUsers[0] === oUserId &&
+        e.reservedUsers[1] === mUserId
     );
-    console.log(game);
     if (game) {
       let url = `/game/detail/` + game.gameId;
       let pointText = "";
       let resultText = "-";
       if (game.gaming || game.ending) {
         const p = game.players;
-        const mPlayer = (p as any[]).find((e) => e.id === users[m].id);
-        const oPlayer = (p as any[]).find((e) => e.id === users[o].id);
-
+        const mPlayer = p.find((e) => e.id === mUserId);
+        const oPlayer = p.find((e) => e.id === oUserId);
+        if (!mPlayer || !oPlayer) return;
         const mPoint = mPlayer.point.basepoint + mPlayer.point.wallpoint;
         const oPoint = oPlayer.point.basepoint + oPlayer.point.wallpoint;
         pointText = `${mPoint} - ${oPoint}`;
@@ -132,20 +134,24 @@ export default function (props: RouteComponentProps<{ id: string }>) {
         else resultText = "△";
       }
       return { pointText, resultText, url };
-    } else return null;
+    } else return;
   };
 
   const gameCreate = (m: number, o: number) => {
     if (!users) return;
-    console.log("gameCreate!!!");
+    if (!tournament) return;
+    const mUser = users[m];
+    const oUser = users[o];
+    if (!mUser || !oUser) return;
+
     const params = new URLSearchParams();
     params.append(
       "name",
-      `${tournament.name}:${users[m].screenName} vs ${users[o].screenName}`,
+      `${tournament.name}:${mUser.screenName} vs ${oUser.screenName}`,
     );
     params.append("n-player", "2");
-    params.append("player1", users[m].name);
-    params.append("player2", users[o].name);
+    params.append("player1", mUser.name);
+    params.append("player2", oUser.name);
     params.append("tournament-id", tournament.id);
     params.append("return", "true");
     history.push("/game/create?" + params.toString());
@@ -155,11 +161,14 @@ export default function (props: RouteComponentProps<{ id: string }>) {
     getTournament();
   }, []);
 
+  useEffect(() => {
+    updateTournament();
+  }, [tournament]);
+
   return (
     <Content title="大会詳細">
       <div>
         <Button
-          style={{ width: "20em" }}
           onClick={() => {
             history.push("/tournament/index");
           }}
@@ -185,27 +194,28 @@ export default function (props: RouteComponentProps<{ id: string }>) {
                 <div>{tournament.remarks}</div>
               </SubSection>}
             </Section>
+
             <Section title="試合">
               <SubSection title="試合形式">
                 <div>{getType(tournament.type)}</div>
+
                 <form>
                   <Autocomplete
-                    id="combo-box-demo"
+                    color="secondary"
                     options={addUserInput.q}
                     getOptionLabel={(option) => option.name}
-                    style={{ width: 300 }}
                     onInputChange={(_, newValue) => {
                       setAddUserInput({ ...addUserInput, value: newValue });
                     }}
-                    renderInput={(params) =>
-                      <TextField
+                    renderInput={(params) => {
+                      console.log(params);
+                      return <TextField
                         {...params}
                         label="追加ユーザ"
-                        variant="standard"
                         onChange={addHandleChange}
-                        color="secondary"
                         placeholder="id"
-                      />}
+                      />;
+                    }}
                   />
                   <Button
                     onClick={submit}
@@ -214,22 +224,22 @@ export default function (props: RouteComponentProps<{ id: string }>) {
                     ユーザ追加
                   </Button>
                 </form>
+
                 {users && <div>
                   <table className={classes.table}>
                     <tr>
                       <th className={classes.oblique}></th>
-                      {users.map((user: any) => {
-                        return <th>{user.name}</th>;
+                      {users.map((user) => {
+                        return <th>{user ? user.name : "no player"}</th>;
                       })}
                     </tr>
-                    {(users as any[]).map((user, y) => {
+                    {users.map((user, y) => {
                       return <tr>
-                        <th>{user.name}</th>
-                        {(users as any[]).map((_, x) => {
+                        <th>{user ? user.name : "no player"}</th>
+                        {users.map((_, x) => {
                           return <td className={x === y ? classes.oblique : ""}>
                             {x !== y && (() => {
                               const result = getResult(y, x);
-                              console.log("result", result);
                               if (result) {
                                 return <div>
                                   <div>{result.resultText}</div>

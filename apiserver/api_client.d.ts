@@ -1,4 +1,11 @@
-import { Error, Game, Tournament, User, UserRegistReq } from "./types.ts";
+import {
+  Error,
+  Game,
+  Tournament,
+  TournamentAddUserReq,
+  User,
+  UserRegistReq,
+} from "./types.ts";
 
 type ApiRes<T = {}> = Promise<
   { success: true; data: T } | { success: false; data: Error }
@@ -16,4 +23,8 @@ export default class ApiClient {
 
   tournamentsGet(id: string): ApiRes<Tournament>;
   tournamentsGet(): ApiRes<Tournament[]>;
+  tournamentsAddUser(
+    tournamentId: string,
+    data: TournamentAddUserReq,
+  ): ApiRes<Tournament>;
 }

@@ -19,6 +19,10 @@ export interface UserRegistReq extends ApiOption, UserBase {
   password: string;
 }
 
+export interface TournamentAddUserReq extends ApiOption {
+  user: string;
+}
+
 export interface Game {
   gameId: string;
   gaming: boolean;
@@ -55,7 +59,7 @@ export interface Tournament {
   name: string;
   organizer: string;
   type: "round-robin" | "knockout";
-  remarts: string;
+  remarks: string;
   id: string;
   users: string[];
   gameIds: string[];
