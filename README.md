@@ -14,20 +14,24 @@ https://codeforkosen.github.io/Kakomimasu/
 
 http://www.procon.gr.jp/?p=77044  
 
-## プロトコル
-かこみますネットワークプロトコルを決めようの会  
-https://hackmd.io/IDgCfeQ8SqWQuK9PzkG8xQ  
-
 ## APIサーバー
 
 [apiserver/](apiserver)  
 
-## APIサーバー for Deno
-
+### 起動方法
 ```
 $ cd apiserver
 $ deno run -A apiserver.ts
 ```
+
+## APIプロトコル
+- [match API](./apiserver/docs/match_api.md)
+- [users API](./apiserver/docs/users_api.md)
+- [tournaments API](./apiserver/docs/tournaments_api.md)
+- [game API](./apiserver/docs/game_api.md)
+
+- [data dictionary](./apiserver/docs/data.md)
+- [error](./apiserver/docs/error.md)
 
 ## APIクライアント for Deno (JavaScript)
 
@@ -59,10 +63,10 @@ $ gcc action_test.c
 $ ./a.out
 ```
 
-## サポート Slack
+## サポート Discord
 
-Code for KOSEN Slack #kakomimasu チャンネル  
-https://codeforkosen.github.io/about/  
+囲みマス 公式Discord 招待リンク  
+https://discord.gg/283ZvKPcUD
 
 ## 人vs人で遊んでみる
 
