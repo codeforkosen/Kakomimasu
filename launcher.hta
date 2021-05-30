@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>囲みマス</title>
+  <script>
+    window.resizeTo(400, 650);
+    var shell = new ActiveXObject("Shell.Application");
+  </script>
+  <style>
+    button {
+      width: 100%;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <center><img src="img/kakomimasu-logo.png" width="200"></center>
+  <button onclick="shell.ShellExecute('powershell', 'iwr https://deno.land/x/install/install.ps1 -useb | iex')">
+      Denoのインストール
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A apiserver/apiserver.ts')">
+    サーバの起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a1.js')">
+    client_a1の起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a2.js')">
+    client_a2の起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a3.js')">
+    client_a3の起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a4.js')">
+    client_a4の起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_a5.js')">
+    client_a5の起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/client_none.js')">
+    client_noneの起動
+  </button>
+  <button onclick="shell.ShellExecute('deno', 'run -A client_deno/kacom.js')">
+    kacomの起動
+  </button>
+</body>
+</html>
