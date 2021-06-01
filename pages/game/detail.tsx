@@ -1,7 +1,7 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { useParams } from "react-router-dom";
+import { makeStyles } from "@material-ui/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   CartesianGrid,
@@ -23,13 +23,11 @@ import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import GameBoard from "../../components/gameBoard.tsx";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      //textAlign: "center",
-    },
-  })
-);
+const useStyles = makeStyles({
+  content: {
+    //textAlign: "center",
+  },
+});
 
 function PointsGraph(props: { game: any }) {
   const game = props.game;
@@ -73,10 +71,14 @@ function PointsGraph(props: { game: any }) {
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="turn" />
-        <YAxis />
+
+        {
+          /*<XAxis dataKey="turn" />
+        <YAxis />*/
+        }
         <Tooltip labelFormatter={(props) => "Turn : " + props} />
         <Legend />
+
         {(game.players as any[]).map((_, i) => {
           return <Line
             type="monotone"
@@ -90,17 +92,17 @@ function PointsGraph(props: { game: any }) {
   </div>;
 }
 
-export default function (props: RouteComponentProps<{ id?: string }>) {
+export default function (/*props: RouteComponentProps<{ id?: string }>*/) {
   const classes = useStyles();
+  const { id } = useParams<{ id?: string }>();
 
   const [game, setGame] = useState<any | null>(null);
-  const gameId = props.match.params.id;
+  const gameId = id; // props.match.params.id;
 
   let socket: WebSocket;
-  console.log("detail", props.match.params.id);
+  console.log("detail", gameId);
 
   useEffect(() => {
-    const gameId = props.match.params.id;
     if (!gameId) {
       socket = new WebSocket(
         ((window.location.protocol === "https:") ? "wss://" : "ws://") +
@@ -137,7 +139,7 @@ export default function (props: RouteComponentProps<{ id?: string }>) {
 
   return (
     <Content title="ゲーム詳細">
-      <div className={classes.content}>
+      {<div className={classes.content}>
         {game
           ? <>
             <a href={gameId ? `/vr/index?id=${gameId}` : "/vr/latest"}>
@@ -148,7 +150,7 @@ export default function (props: RouteComponentProps<{ id?: string }>) {
             <PointsGraph game={game} />
           </>
           : <CircularProgress color="secondary" />}
-      </div>
+      </div>}
     </Content>
   );
 }

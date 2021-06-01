@@ -1,16 +1,17 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   Cell,
-  ContentRenderer,
   Pie,
   PieChart,
+  //ContentRenderer,
+  PieLabel,
   PieLabelRenderProps,
   ResponsiveContainer,
 } from "recharts";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
@@ -21,21 +22,20 @@ const apiClient = new ApiClient("");
 
 import { Game, User } from "../../apiserver/types.ts";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-    },
-    pieGraph: {
-      height: 300,
-    },
-  })
-);
+const useStyles = makeStyles({
+  content: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  pieGraph: {
+    height: 300,
+  },
+});
 
-export default function (props: RouteComponentProps<{ id: string }>) {
+export default function () {
   const classes = useStyles();
+  const { id } = useParams<{ id: string }>();
 
   const [user, setUser] = useState<
     | ({
@@ -50,7 +50,7 @@ export default function (props: RouteComponentProps<{ id: string }>) {
   >(undefined);
 
   const getUser = async () => {
-    const res = await apiClient.usersShow(props.match.params.id);
+    const res = await apiClient.usersShow(id);
     if (res.success === false) {
       setUser(null);
     } else {
@@ -93,9 +93,9 @@ export default function (props: RouteComponentProps<{ id: string }>) {
 
   useEffect(() => {
     getUser();
-  }, [props.match.params.id]);
+  }, [id]);
 
-  const renderLabel: ContentRenderer<PieLabelRenderProps> = (
+  const renderLabel: PieLabel = (
     { cx, cy, midAngle, innerRadius, outerRadius, percent },
   ) => {
     const [cx_, cy_, midAngle_, innerRadius_, outerRadius_] = [

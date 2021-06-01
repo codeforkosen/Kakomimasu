@@ -1,13 +1,13 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 
 import firebase from "../../components/firebase.ts";
-//import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import Section from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 
@@ -15,27 +15,25 @@ import Content from "../../components/content.tsx";
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      textAlign: "center",
-    },
-    signup: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "0 20",
-    },
-    textField: {
-      marginTop: 20,
-      width: "100%",
-    },
-    button: {
-      width: "20em",
-      marginTop: 20,
-    },
-  })
-);
+const useStyles = makeStyles({
+  content: {
+    textAlign: "center",
+  },
+  signup: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "0 20",
+  },
+  textField: {
+    marginTop: 20,
+    width: "100%",
+  },
+  button: {
+    width: "20em",
+    marginTop: 20,
+  },
+});
 
 function Signup(props: { user: firebase.User }) {
   const classes = useStyles();
@@ -158,14 +156,16 @@ function Signup(props: { user: firebase.User }) {
   );
 }
 
-export default function (props: { firebase: typeof firebase }) {
+export default function () {
   const classes = useStyles();
   const history = useHistory();
 
-  const [user, setUser] = useState<firebase.User | undefined | null>(undefined);
+  const [user, setUser] = useState<firebase.User | undefined | null>(
+    undefined,
+  );
 
   useEffect(() => {
-    props.firebase.auth().onAuthStateChanged(async (user) => {
+    firebase.auth().onAuthStateChanged(async (user) => {
       if (user !== null) {
         const idToken = await user.getIdToken(true);
         if ((await apiClient.usersVerify(idToken)).success === true) { // ユーザが登録されていたらトップに戻る
@@ -179,29 +179,27 @@ export default function (props: { firebase: typeof firebase }) {
 
   return (
     <Content title="ログイン">
-      {
-        /*<div className={classes.content}>
+      {<div className={classes.content}>
         {user !== undefined
           ? <>
-            {user ? <Signup user={user} /> : <StyledFirebaseAuth
+            {(user) ? <Signup user={user} /> : <StyledFirebaseAuth
               uiConfig={{
                 signInSuccessUrl: "/user/login",
                 signInOptions: [
-                  props.firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                  //props.firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-                  props.firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-                  props.firebase.auth.GithubAuthProvider.PROVIDER_ID,
-                  props.firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                  props.firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-                  //firebase.auth.AnonymousAuthProvider.PROVIDER_ID
+                  firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                  //props.firebaseP.auth.FacebookAuthProvider.PROVIDER_ID,
+                  firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                  firebase.auth.GithubAuthProvider.PROVIDER_ID,
+                  firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                  firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                  //firebaseP.auth.AnonymousAuthProvider.PROVIDER_ID
                 ],
               }}
-              firebaseAuth={props.firebase.auth()}
+              firebaseAuth={firebase.auth()}
             />}
           </>
           : <CircularProgress color="secondary" />}
-            </div>*/
-      }
+      </div>}
     </Content>
   );
 }

@@ -1,39 +1,18 @@
 import React from "react";
-import {
-  Redirect,
-  Route,
-  RouteComponentProps,
-  Router,
-  Switch,
-  useRouteMatch,
-} from "react-router-dom";
-import firebase from "../../components/firebase.ts";
+import { Route, Switch, useRouteMatch } from "react-router-dom";
+
+import NotFound from "../../components/404.tsx";
 
 import Login from "./login.tsx";
 import Detail from "./detail.tsx";
 
-type Props = {
-  firebase: typeof firebase;
-} & RouteComponentProps;
-
-export default function (props: Props) {
+export default function () {
   const match = useRouteMatch();
   return (
-    <Router history={props.history}>
-      <Switch>
-        <Route
-          exact
-          path={`${match.path}/login`}
-          component={Login}
-          {...props}
-        />
-        <Route
-          path={`${match.path}/detail/:id`}
-          component={Detail}
-          {...props}
-        />
-        <Redirect push={false} from="" to="/404" />
-      </Switch>
-    </Router>
+    <Switch>
+      <Route exact path={`${match.path}/login`} component={Login} />
+      <Route path={`${match.path}/detail/:id`} component={Detail} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }

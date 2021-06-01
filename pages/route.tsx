@@ -50,6 +50,7 @@ const theme = createTheme({
 });
 
 function MainContents(props: { style: React.CSSProperties }) {
+  console.log("main contents", firebase);
   return (<main style={props.style}>
     <Switch>
       <Redirect exact from="/" to="/index" />
@@ -59,10 +60,8 @@ function MainContents(props: { style: React.CSSProperties }) {
         path="/game"
         render={(routeProps) => <Game />}
       />
-      <Route
-        path="/user"
-        render={(routeProps) => <User firebase={firebase} {...routeProps} />}
-      />
+
+      <Route path="/user" component={User} />
       <Route
         path="/tournament"
         render={(routeProps) => <Tournament {...routeProps} />}

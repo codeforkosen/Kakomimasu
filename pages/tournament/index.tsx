@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 
 import Content from "../../components/content.tsx";
@@ -12,22 +12,20 @@ const apiClient = new ApiClient("");
 
 import { Tournament } from "../../apiserver/types.ts";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    },
-    list: {
-      display: "flex",
-      padding: 50,
-      width: "100%",
-      flexFlow: "row wrap",
-      justifyContent: "center",
-    },
-  })
-);
+const useStyles = makeStyles({
+  content: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  list: {
+    display: "flex",
+    padding: 50,
+    width: "100%",
+    flexFlow: "row wrap",
+    justifyContent: "center",
+  },
+});
 
 export default function () {
   const classes = useStyles();

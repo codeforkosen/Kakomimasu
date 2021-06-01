@@ -1,7 +1,8 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { Theme, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -12,35 +13,34 @@ const apiClient = new ApiClient("");
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      //textAlign: "center",
-    },
-    form: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "0 20",
-    },
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
-    },
-    textField: {
-      //textAlign: "left",
-      marginTop: 20,
-      width: "100%",
-    },
-    button: {
-      width: "20em",
-      marginTop: 20,
-    },
-  })
-);
+const useStyles = makeStyles({
+  content: {
+    //textAlign: "center",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "0 20",
+  },
+  formControl: (theme: Theme) => ({
+    margin: theme.spacing(1),
+    minWidth: 120,
+  }),
+  textField: {
+    //textAlign: "left",
+    marginTop: 20,
+    width: "100%",
+  },
+  button: {
+    width: "20em",
+    marginTop: 20,
+  },
+});
 
 export default function () {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const location = useLocation();
   const history = useHistory();
   const [boards, setBoards] = useState<any[]>();

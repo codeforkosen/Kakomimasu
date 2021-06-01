@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Link, useHistory } from "react-router-dom";
 
@@ -12,87 +12,85 @@ type Props = {
   game: any;
 };
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    content: {
-      display: "grid",
-      height: "auto",
-      "&>div": {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      },
+const useStyles = makeStyles({
+  content: {
+    display: "grid",
+    height: "auto",
+    "&>div": {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
     },
-    table: { // table全体のcss
-      borderCollapse: "collapse",
-      userSelect: "none",
-      "& td,& th": {
-        padding: 5,
-      },
-      "& td": {
-        border: "1px solid",
-        width: 50,
-        height: 50,
-        textAlign: "right",
-        verticalAlign: "bottom",
-        whiteSpace: "pre-line",
-        position: "relative",
-      },
+  },
+  table: { // table全体のcss
+    borderCollapse: "collapse",
+    userSelect: "none",
+    "& td,& th": {
+      padding: 5,
     },
-    agent: { // agentがいるマスのcss
-      backgroundSize: "80%",
-      backgroundPosition: "0% 50%",
-      backgroundRepeat: "no-repeat",
+    "& td": {
+      border: "1px solid",
+      width: 50,
+      height: 50,
+      textAlign: "right",
+      verticalAlign: "bottom",
+      whiteSpace: "pre-line",
+      position: "relative",
     },
-    conflict: { // conflictしているマスのcss
-      animation: "$flash 1s linear infinite",
+  },
+  agent: { // agentがいるマスのcss
+    backgroundSize: "80%",
+    backgroundPosition: "0% 50%",
+    backgroundRepeat: "no-repeat",
+  },
+  conflict: { // conflictしているマスのcss
+    animation: "$flash 1s linear infinite",
+  },
+  "@keyframes flash": { // conflictのアニメーション
+    "0%,100%": {},
+    "50%": { backgroundColor: "#00ff00" },
+  },
+  striket: {
+    textDecoration: "line-through",
+    color: "red",
+    fontSize: "80%",
+  },
+  detail: { // agentの詳細を表示するcss
+    display: "none",
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, .7)",
+    color: "white",
+    zIndex: 1,
+    top: "50%",
+    left: "50%",
+    textAlign: "center",
+    borderRadius: "10px",
+    transform: "translate(+0%, -100%)",
+    padding: "1em",
+    filter: "drop-shadow(0 0 5px rgba(0, 0, 0, .7))",
+    width: "max-content",
+    "$td:hover &": {
+      display: "block",
     },
-    "@keyframes flash": { // conflictのアニメーション
-      "0%,100%": {},
-      "50%": { backgroundColor: "#00ff00" },
-    },
-    striket: {
-      textDecoration: "line-through",
-      color: "red",
-      fontSize: "80%",
-    },
-    detail: { // agentの詳細を表示するcss
-      display: "none",
-      position: "absolute",
-      backgroundColor: "rgba(0, 0, 0, .7)",
-      color: "white",
-      zIndex: 1,
-      top: "50%",
-      left: "50%",
-      textAlign: "center",
-      borderRadius: "10px",
-      transform: "translate(+0%, -100%)",
-      padding: "1em",
-      filter: "drop-shadow(0 0 5px rgba(0, 0, 0, .7))",
-      width: "max-content",
-      "$td:hover &": {
-        display: "block",
-      },
-    },
-    detailHistory: { // agent詳細内の履歴のスクロールcss
-      width: "13em",
-      height: "10em",
-      overflowY: "scroll",
-    },
-    playerTable: {
+  },
+  detailHistory: { // agent詳細内の履歴のスクロールcss
+    width: "13em",
+    height: "10em",
+    overflowY: "scroll",
+  },
+  playerTable: {
+    border: "1px solid black",
+    textAlign: "center",
+    borderCollapse: "collapse",
+    "& td,& th": {
       border: "1px solid black",
-      textAlign: "center",
-      borderCollapse: "collapse",
-      "& td,& th": {
-        border: "1px solid black",
-        padding: 5,
-      },
-      "& td": {
-        color: "black",
-      },
+      padding: 5,
     },
-  })
-);
+    "& td": {
+      color: "black",
+    },
+  },
+});
 
 export default function (props: Props) {
   const classes = useStyles();

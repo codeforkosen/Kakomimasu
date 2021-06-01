@@ -26,12 +26,7 @@ export default function () {
       />
       <Route
         exact
-        path={`${match.path}/detail/:id`}
-        component={Detail}
-      />
-      <Route
-        exact
-        path={`${match.path}/detail`}
+        path={[`${match.path}/detail/:id`, `${match.path}/detail`]}
         component={Detail}
       />
       <Route component={NotFound} />
