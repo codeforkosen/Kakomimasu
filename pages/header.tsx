@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    toolbar: theme.mixins.toolbar,
-    logo: {
-      flexGrow: 1,
-    },
-  })
-);
 
 import firebase from "../components/firebase.ts";
 
@@ -25,7 +15,6 @@ type Props = { firebase: typeof firebase };
 
 export default function (props: Props) {
   const location = useLocation();
-  const classes = useStyles();
   const [user, setUser] = useState<firebase.User | undefined | null>(undefined);
 
   const logOut = async () => {
@@ -52,9 +41,9 @@ export default function (props: Props) {
   }, []);
 
   return (
-    <AppBar>
-      <Toolbar>
-        <div className={classes.logo}>
+    <AppBar position="sticky">
+      <Toolbar style={{ color: "black" }}>
+        <div style={{ flexGrow: 1 }}>
           <Link to="/index">
             <img
               height={36}
@@ -67,14 +56,14 @@ export default function (props: Props) {
           <>
             {user
               ? <>
-                <Button variant="text" color="default" onClick={logOut}>
+                <Button variant="text" color="inherit" onClick={logOut}>
                   ログアウト
                 </Button>
                 <Avatar src={user.photoURL ? user.photoURL : ""} />
               </>
               : <Button
                 variant="text"
-                color="default"
+                color="inherit"
                 component={Link}
                 to="/user/login"
               >

@@ -23,11 +23,9 @@ export default function (props: RouteComponentProps) {
       console.log("websocket onmessage");
       const games = JSON.parse(event.data);
       setGames(games);
-      //gameTableVue.update(games);
     };
     return () => {
       socket.close();
-
       console.log("websocket close");
     };
   }, []);
@@ -49,7 +47,7 @@ export default function (props: RouteComponentProps) {
   return (
     <Content title="ゲーム一覧">
       <Clock />
-      <ButtonGroup>
+      <ButtonGroup color="secondary" variant="contained">
         <Button
           onClick={() => handleGameType("normal")}
           disabled={gameType === "normal"}

@@ -7,7 +7,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 
 import firebase from "../../components/firebase.ts";
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+//import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import Section from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 
@@ -179,7 +179,8 @@ export default function (props: { firebase: typeof firebase }) {
 
   return (
     <Content title="ログイン">
-      <div className={classes.content}>
+      {
+        /*<div className={classes.content}>
         {user !== undefined
           ? <>
             {user ? <Signup user={user} /> : <StyledFirebaseAuth
@@ -199,7 +200,8 @@ export default function (props: { firebase: typeof firebase }) {
             />}
           </>
           : <CircularProgress color="secondary" />}
-      </div>
+            </div>*/
+      }
     </Content>
   );
 }

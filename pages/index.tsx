@@ -1,27 +1,20 @@
 /// <reference lib="dom"/>
 import React from "react";
 import { Link } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 
 import Section, { SubSection } from "../components/section.tsx";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    div: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      "& a": {
-        color: "#5C4C40",
-      },
+const useStyles = makeStyles({
+  div: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    "& a": {
+      color: "#5C4C40",
     },
-    logo: {
-      width: "60vw",
-      maxWidth: 546,
-      margin: "2em",
-    },
-  })
-);
+  },
+});
 export default function () {
   const classes = useStyles();
 
@@ -29,7 +22,15 @@ export default function () {
 
   return (
     <div className={classes.div}>
-      <img className={classes.logo} id="title" src="/img/kakomimasu-logo.png" />
+      <img
+        style={{
+          width: "60vw",
+          maxWidth: 546,
+          margin: "2em",
+        }}
+        id="title"
+        src="/img/kakomimasu-logo.png"
+      />
       <Section title="Webコンテンツ">
         オンラインで対戦中のゲームをリアルタイムで見ることができます。<br />
         <SubSection title="ゲーム">
