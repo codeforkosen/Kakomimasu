@@ -22,6 +22,7 @@ const useStyles = makeStyles({
     width: "90%",
     border: "1px solid",
     borderCollapse: "collapse",
+    textAlign: "center",
     "& td,& th": {
       border: "1px solid",
     },
@@ -44,13 +45,15 @@ export default function () {
   );
   const [games, setGames] = useState<Game[] | null>(null);
   const [users, setUsers] = useState<(User | undefined)[] | null>(null);
+  const [addUser, setAddUser] = useState<User | null>(null);
+  const [addUserList, setAddUserList] = useState<User[]>([]);
+  const [addUserHelperText, setAddUserHelperText] = useState<string>("");
   const [addUserInput, setAddUserInput] = useState<
-    { value: string; helperText: string; q: any[] }
-  >({ value: "", helperText: "", q: [] });
-  const tournamentId = id; //props.match.params.id;
+    { value: User | null; q: User[] }
+  >({ value: null, q: [] });
 
   const getTournament = async () => {
-    const res = await apiClient.tournamentsGet(tournamentId);
+    const res = await apiClient.tournamentsGet(id);
     if (res.success) setTournament(res.data);
     else setTournament(null);
   };
@@ -78,36 +81,11 @@ export default function () {
     return "";
   };
 
-  const addHandleChange = async (
-    event: React.ChangeEvent<{ value: string }>,
-  ) => {
-    const value = event.target.value;
-    let req = await apiClient.usersSearch(value);
-    let q: any[] = [];
-    if (req.success) q = req.data;
-    //console.log(req);
-    //if (req.errorCode) req = [];
-    setAddUserInput({ value, helperText: "", q });
-  };
-
-  const submit = async () => {
-    const req = await apiClient.tournamentsAddUser(
-      tournamentId,
-      { user: addUserInput.value },
-    );
-    console.log({ user: addUserInput.value });
-    console.log(req);
-    if (req.success) setTournament(req.data);
-  };
-
   const getResult = (m: number, o: number) => {
     if (!tournament) return;
     if (!games) return;
-    //if (!users) return;
     const mUserId = tournament.users[m];
     const oUserId = tournament.users[o];
-
-    //console.log(users, games_);
 
     const game = games.find((e) =>
       e.reservedUsers[0] === mUserId &&
@@ -176,54 +154,82 @@ export default function () {
         {tournament
           ? <>
             <Section title="基本情報">
-              <SubSection title="大会名">
-                <div>{tournament.name}</div>
-              </SubSection>
-              <SubSection title="主催">
-                <div>{tournament.organizer}</div>
-              </SubSection>
-              <SubSection title="大会ID">
-                <div>{tournament.id}</div>
-              </SubSection>
-              <SubSection title="試合形式">
-                <div>{getType(tournament.type)}</div>
-              </SubSection>
-              {tournament.remarks && <SubSection title="備考">
-                <div>{tournament.remarks}</div>
-              </SubSection>}
+              <div style={{ textAlign: "center" }}>
+                <SubSection title="大会名">
+                  <div>{tournament.name}</div>
+                </SubSection>
+                <SubSection title="主催">
+                  <div>{tournament.organizer}</div>
+                </SubSection>
+                <SubSection title="大会ID">
+                  <div>{tournament.id}</div>
+                </SubSection>
+                <SubSection title="試合形式">
+                  <div>{getType(tournament.type)}</div>
+                </SubSection>
+                {tournament.remarks && <SubSection title="備考">
+                  <div>{tournament.remarks}</div>
+                </SubSection>}
+              </div>
             </Section>
 
             <Section title="試合">
-              <SubSection title="試合形式">
-                <div>{getType(tournament.type)}</div>
+              <div
+                style={{
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <SubSection title="試合形式">
+                  <div>{getType(tournament.type)}</div>
+                </SubSection>
+                <Autocomplete
+                  options={addUserList}
+                  getOptionLabel={(option) => option.name}
+                  onChange={(_, newUser) => {
+                    if (!tournament) return;
+                    if (
+                      tournament.users.some((userId) => userId === newUser?.id)
+                    ) {
+                      setAddUserHelperText("既にこのユーザは参加しています。");
+                      return;
+                    } else setAddUserHelperText("");
+                    setAddUser(newUser);
+                  }}
+                  style={{ width: "20em" }}
+                  renderInput={(params) =>
+                    <TextField
+                      {...params}
+                      label="追加ユーザ"
+                      onChange={async (event) => {
+                        const value = event.target.value;
+                        let req = await apiClient.usersSearch(value);
+                        if (!req.success) return;
+                        setAddUserList(req.data);
+                      }}
+                      placeholder="id or name"
+                      helperText={addUserHelperText}
+                      error={Boolean(addUserHelperText)}
+                    />}
+                />
+                <Button
+                  onClick={async () => {
+                    if (!addUser) return;
+                    const req = await apiClient.tournamentsAddUser(
+                      id,
+                      { user: addUser.id },
+                    );
+                    console.log(req);
+                    if (req.success) setTournament(req.data);
+                  }}
+                  disabled={!Boolean(addUser) || Boolean(addUserHelperText)}
+                >
+                  ユーザ追加
+                </Button>
 
-                <form>
-                  <Autocomplete
-                    color="secondary"
-                    options={addUserInput.q}
-                    getOptionLabel={(option) => option.name}
-                    onInputChange={(_, newValue) => {
-                      setAddUserInput({ ...addUserInput, value: newValue });
-                    }}
-                    renderInput={(params) => {
-                      console.log(params);
-                      return <TextField
-                        {...params}
-                        label="追加ユーザ"
-                        onChange={addHandleChange}
-                        placeholder="id"
-                      />;
-                    }}
-                  />
-                  <Button
-                    onClick={submit}
-                    disabled={!Boolean(addUserInput.value)}
-                  >
-                    ユーザ追加
-                  </Button>
-                </form>
-
-                {users && <div>
+                {users && <>
                   <table className={classes.table}>
                     <tr>
                       <th className={classes.oblique}></th>
@@ -245,7 +251,10 @@ export default function () {
                                   <Link to={result.url}>ゲーム詳細へ</Link>
                                 </div>;
                               } else {
-                                return <Button onClick={() => gameCreate(y, x)}>
+                                return <Button
+                                  variant="outlined"
+                                  onClick={() => gameCreate(y, x)}
+                                >
                                   ゲーム作成
                                 </Button>;
                               }
@@ -255,8 +264,8 @@ export default function () {
                       </tr>;
                     })}
                   </table>
-                </div>}
-              </SubSection>
+                </>}
+              </div>
             </Section>
           </>
           : <CircularProgress color="secondary" />}

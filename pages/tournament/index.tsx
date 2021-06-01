@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { makeStyles } from "@material-ui/styles";
+import { createStyles, makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 
 import Content from "../../components/content.tsx";
@@ -20,7 +20,6 @@ const useStyles = makeStyles({
   },
   list: {
     display: "flex",
-    padding: 50,
     width: "100%",
     flexFlow: "row wrap",
     justifyContent: "center",
@@ -51,7 +50,15 @@ export default function () {
         >
           大会作成はこちらから
         </Button>
-        <div className={classes.list}>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            flexFlow: "row wrap",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
           {tournaments.map((t) => <TournamentCard tournament={t} />)}
         </div>
       </div>

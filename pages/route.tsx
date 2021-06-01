@@ -46,6 +46,11 @@ const theme = createTheme({
         color: "secondary",
       },
     },
+    MuiAutocomplete: {
+      defaultProps: {
+        color: "secondary",
+      },
+    },
   },
 });
 
@@ -62,10 +67,7 @@ function MainContents(props: { style: React.CSSProperties }) {
       />
 
       <Route path="/user" component={User} />
-      <Route
-        path="/tournament"
-        render={(routeProps) => <Tournament {...routeProps} />}
-      />
+      <Route path="/tournament" component={Tournament} />
       <Route
         path="/dev"
         render={(routeProps) => <Dev {...routeProps} />}

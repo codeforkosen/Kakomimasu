@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import React from "react";
+import { useHistory } from "react-router-dom";
 import { Theme, useTheme } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
+import { createStyles, makeStyles } from "@material-ui/styles";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(createStyles({
   tournament: (theme: Theme) => ({
     border: "solid 3px",
     borderColor: theme.palette.secondary.main,
     borderRadius: 10,
     display: "flex",
     flexDirection: "column",
-    padding: "1em",
     margin: "1em",
     width: "20em",
     "&:hover": {
@@ -35,7 +36,7 @@ const useStyles = makeStyles({
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
-});
+}));
 
 export default function (props: { tournament: any }) {
   const theme = useTheme();
@@ -51,22 +52,26 @@ export default function (props: { tournament: any }) {
   };
 
   return (
-    <div
+    <Card
       className={classes.tournament}
       onClick={() => {
         history.push("/tournament/detail/" + tournament.id);
       }}
     >
-      <div className={classes.tournamentName}>{tournament.name}</div>
-      <div className={classes.tournamentOrganizer}>
-        主催：{tournament.organizer}
-      </div>
-      <div className={classes.tournamentType}>
-        大会形式：{getType(tournament.type)}
-      </div>
-      <div className={classes.tournamentRemarks}>
-        {tournament.remarks}
-      </div>
-    </div>
+      <CardActionArea style={{ height: "100%" }}>
+        <CardContent>
+          <div className={classes.tournamentName}>{tournament.name}</div>
+          <div className={classes.tournamentOrganizer}>
+            主催：{tournament.organizer}
+          </div>
+          <div className={classes.tournamentType}>
+            大会形式：{getType(tournament.type)}
+          </div>
+          <div className={classes.tournamentRemarks}>
+            {tournament.remarks}
+          </div>
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 }
