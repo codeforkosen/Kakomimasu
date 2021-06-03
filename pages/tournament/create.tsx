@@ -1,6 +1,6 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Theme, useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import TextField from "@material-ui/core/TextField";
@@ -8,8 +8,16 @@ import Button from "@material-ui/core/Button";
 import MenuItem from "@material-ui/core/MenuItem";
 import Autocomplete from "@material-ui/core/Autocomplete";
 
+// @deno-types=../../apiserver/api_client.d.ts
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
+
+import {
+  Tournament,
+  TournamentCreateReq,
+  TournamentType,
+  User,
+} from "../../apiserver/types.ts";
 
 import Content from "../../components/content.tsx";
 import TournamentCard from "../../components/tournament_card.tsx";
@@ -21,12 +29,7 @@ const useStyles = makeStyles({
     alignItems: "center",
     padding: "0 20",
   },
-  formControl: (theme: Theme) => ({
-    margin: theme.spacing(1),
-    minWidth: 120,
-  }),
   textField: {
-    //textAlign: "left",
     marginTop: 20,
     width: "100%",
   },
@@ -39,57 +42,42 @@ const useStyles = makeStyles({
 export default function () {
   const theme = useTheme();
   const classes = useStyles(theme);
-  const history = useHistory();
-  const [addUserInput, setAddUserInput] = useState<
-    { value: string; helperText: string; q: any[] }
-  >({ value: "", helperText: "", q: [] });
-  const [tournament, setTournament] = useState<any>();
 
-  useEffect(() => {
-  }, []);
-
-  const [data, setData] = useState({
+  const [data, setData] = useState<TournamentCreateReq>({
     name: "",
     organizer: "",
     type: "round-robin",
     remarks: "",
     participants: [] as string[],
   });
-  const [btnStatus, setBtnStatus] = useState(false);
 
-  const validate = (data: any) => {
-    console.log(data);
+  const [tournament, setTournament] = useState<Tournament>();
+
+  const [addUserInput, setAddUserInput] = useState<
+    { value: string; helperText: string; q: User[] }
+  >({ value: "", helperText: "", q: [] });
+
+  const validate = () => {
+    if (!data) return false;
     if (!data.name) return false;
     if (!data.type) return false;
     return true;
   };
 
-  const handleChange = (
-    event: React.ChangeEvent<{ name?: string; value: unknown }>,
-  ) => {
-    const value = event.target.value;
-    const name = event.target.name;
-    if (!name) return;
-    setData({ ...data, [name]: value });
-    setBtnStatus(validate({ ...data, [name]: value }));
-  };
-
   const submit = async () => {
-    const sendData = { ...data };
-    console.log(sendData);
-
     const req = await apiClient.tournamentsCreate(data);
-    if (!req.errorCode) {
-      setTournament(req);
+    if (req.success) {
+      setTournament(req.data);
     }
     console.log(req);
   };
+
   const addHandleChange = async (
     event: React.ChangeEvent<{ value: string }>,
   ) => {
     const value = event.target.value;
-    let req = await apiClient.usersSearch(value);
-    let q: any[] = [];
+    const req = await apiClient.usersSearch(value);
+    let q: typeof addUserInput.q = [];
     if (req.success) q = req.data;
     //console.log(req);
     //if (req.errorCode) req = [];
@@ -100,51 +88,42 @@ export default function () {
     <Content title="大会作成">
       <div>
         <Button
-          style={{ width: "20em" }}
-          onClick={() => {
-            history.push("/tournament/index");
-          }}
+          component={Link}
+          to={"/tournament/index"}
         >
           大会一覧に戻る
         </Button>
         <form autoComplete="off" className={classes.form}>
           <TextField
             required
-            name="name"
             label="大会名"
-            variant="standard"
-            color="secondary"
             placeholder="〇〇大会"
             className={classes.textField}
-            autoComplete="off"
             value={data.name}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, name: value });
+            }}
             error={!Boolean(data.name)}
             helperText={Boolean(data.name) ? "" : "入力必須項目です"}
           />
           <TextField
-            required
-            name="organizer"
             label="主催"
-            variant="standard"
-            color="secondary"
             placeholder="Code for KOSEN"
             className={classes.textField}
-            autoComplete="off"
             value={data.organizer}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, organizer: value });
+            }}
           />
           <TextField
             required
             select
-            name="type"
             label="試合形式"
-            variant="standard"
-            color="secondary"
             className={classes.textField}
-            autoComplete="off"
             value={data.type}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, type: value as TournamentType });
+            }}
             error={!Boolean(data.type)}
             helperText={Boolean(data.type) ? "" : "入力必須項目です"}
           >
@@ -165,28 +144,24 @@ export default function () {
             renderInput={(params) => (
               <TextField
                 {...params}
-                variant="standard"
-                color="secondary"
                 label="参加ユーザ"
-                placeholder="ユーザネーム"
+                placeholder="name"
                 onChange={addHandleChange}
               />
             )}
           />
           <TextField
-            name="remarks"
             label="備考"
-            variant="standard"
-            color="secondary"
             className={classes.textField}
-            autoComplete="off"
             value={data.remarks}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, remarks: value });
+            }}
           />
           <Button
             className={classes.button}
             onClick={submit}
-            disabled={!btnStatus}
+            disabled={!validate()}
           >
             ゲーム作成！
           </Button>

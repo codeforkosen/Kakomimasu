@@ -3,6 +3,7 @@ import {
   Game,
   Tournament,
   TournamentAddUserReq,
+  TournamentCreateReq,
   User,
   UserRegistReq,
 } from "./types.ts";
@@ -21,6 +22,7 @@ export default class ApiClient {
 
   getMatch(gameId: string): ApiRes<Game>;
 
+  tournamentsCreate(data: TournamentCreateReq): ApiRes<Tournament>;
   tournamentsGet(id: string): ApiRes<Tournament>;
   tournamentsGet(): ApiRes<Tournament[]>;
   tournamentsAddUser(

@@ -19,6 +19,6 @@
     "recharts": "https://cdn.esm.sh/recharts@2.0.9",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
     "https://cdn.esm.sh/v41/@popperjs/core@2.9.2/deno/core.js": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/cjs/popper.min.js",
-    "https://cdn.esm.sh/v41/@popperjs/core@2.9.2/dist/cjs/popper.d.ts": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/index.d.ts"
+    "https://cdn.esm.sh/v41/@popperjs/core@2.9.2/dist/cjs/popper.d.ts": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/lib/index.d.ts"
   }
 }

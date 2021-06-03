@@ -48,14 +48,14 @@ Deno.test("api/tournament/create:normal", async () => {
     ...data,
     option: { dryRun: true },
   });
-  assertTournament(res, data);
+  assertTournament(res.data, data);
 
   res = await ac.tournamentsCreate({
     ...data,
     type: "knockout",
     option: { dryRun: true },
   });
-  assertTournament(res, { ...data, type: "knockout" });
+  assertTournament(res.data, { ...data, type: "knockout" });
 });
 Deno.test("api/tournament/create:invalid tournament name", async () => {
   {
@@ -64,7 +64,7 @@ Deno.test("api/tournament/create:invalid tournament name", async () => {
       name: "",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_NAME);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_NAME);
   }
   {
     const res = await ac.tournamentsCreate({
@@ -72,7 +72,7 @@ Deno.test("api/tournament/create:invalid tournament name", async () => {
       name: undefined,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_NAME);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_NAME);
   }
   {
     const res = await ac.tournamentsCreate({
@@ -80,7 +80,7 @@ Deno.test("api/tournament/create:invalid tournament name", async () => {
       name: null,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_NAME);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_NAME);
   }
 });
 Deno.test("api/tournament/create:invalid tournament type", async () => {
@@ -90,7 +90,7 @@ Deno.test("api/tournament/create:invalid tournament type", async () => {
       type: "",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TYPE);
+    assertEquals(res.data, errors.INVALID_TYPE);
   }
   {
     const res = await ac.tournamentsCreate({
@@ -98,7 +98,7 @@ Deno.test("api/tournament/create:invalid tournament type", async () => {
       type: undefined,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TYPE);
+    assertEquals(res.data, errors.INVALID_TYPE);
   }
   {
     const res = await ac.tournamentsCreate({
@@ -106,7 +106,7 @@ Deno.test("api/tournament/create:invalid tournament type", async () => {
       type: null,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TYPE);
+    assertEquals(res.data, errors.INVALID_TYPE);
   }
   {
     const res = await ac.tournamentsCreate({
@@ -114,14 +114,14 @@ Deno.test("api/tournament/create:invalid tournament type", async () => {
       type: "round-robins",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TYPE);
+    assertEquals(res.data, errors.INVALID_TYPE);
   }
 });
 Deno.test("api/tournament/create:normal by no dryRun", async () => {
   const res = await ac.tournamentsCreate(data);
-  assertTournament(res, data);
+  assertTournament(res.data, data);
 
-  data.id = res.id;
+  data.id = res.data.id;
 });
 
 // /api/tournament/get Test
@@ -155,14 +155,14 @@ Deno.test("api/tournament/add:normal", async () => {
   });
 
   await ac.usersDelete(userData);
-  assertTournament(res, { ...data, users: [userRes.data.id] });
+  assertTournament(res.data, { ...data, users: [userRes.data.id] });
 });
 Deno.test("api/tournament/add:tournament that do not exist", async () => {
   {
     const res = await ac.tournamentsAddUser(v4.generate(), {
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
 });
 Deno.test("api/tournament/add:invalid tournament id", async () => {
@@ -170,19 +170,19 @@ Deno.test("api/tournament/add:invalid tournament id", async () => {
     const res = await ac.tournamentsAddUser("", {
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
   {
     const res = await ac.tournamentsAddUser(undefined, {
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
   {
     const res = await ac.tournamentsAddUser(null, {
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
 });
 Deno.test("api/tournament/add:nothing user", async () => {
@@ -191,21 +191,21 @@ Deno.test("api/tournament/add:nothing user", async () => {
       user: "",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_USER_IDENTIFIER);
+    assertEquals(res.data, errors.INVALID_USER_IDENTIFIER);
   }
   {
     const res = await ac.tournamentsAddUser(data.id, {
       user: undefined,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_USER_IDENTIFIER);
+    assertEquals(res.data, errors.INVALID_USER_IDENTIFIER);
   }
   {
     const res = await ac.tournamentsAddUser(data.id, {
       user: null,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_USER_IDENTIFIER);
+    assertEquals(res.data, errors.INVALID_USER_IDENTIFIER);
   }
 });
 Deno.test("api/tournament/add:user that do not exist", async () => {
@@ -214,7 +214,7 @@ Deno.test("api/tournament/add:user that do not exist", async () => {
       user: v4.generate(),
       option: { dryRun: true },
     });
-    assertEquals(res, errors.NOT_USER);
+    assertEquals(res.data, errors.NOT_USER);
   }
 });
 Deno.test("api/tournament/add:already registed user", async () => {
@@ -226,7 +226,7 @@ Deno.test("api/tournament/add:already registed user", async () => {
   const res = await ac.tournamentsAddUser(data.id, { user: userRes.data.id });
 
   await ac.usersDelete(userData);
-  assertEquals(res, errors.ALREADY_REGISTERED_USER);
+  assertEquals(res.data, errors.ALREADY_REGISTERED_USER);
 });
 
 // /api/tournament/delete Test

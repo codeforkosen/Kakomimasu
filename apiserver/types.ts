@@ -23,6 +23,10 @@ export interface TournamentAddUserReq extends ApiOption {
   user: string;
 }
 
+export interface TournamentCreateReq extends TournamentBasic, ApiOption {
+  participants?: string[];
+}
+
 export interface Game {
   gameId: string;
   gaming: boolean;
@@ -55,7 +59,22 @@ export interface Player {
   point: { basepoint: number; wallpoint: number };
 }
 
-export interface Tournament {
+export type TournamentType = "round-robin" | "knockout";
+
+interface TournamentBasic {
+  name: string;
+  organizer?: string;
+  type: TournamentType;
+  remarks?: string;
+}
+
+export interface Tournament extends TournamentBasic {
+  users?: string[];
+  id?: string;
+  gameIds?: string[];
+}
+
+/*export interface Tournament {
   name: string;
   organizer: string;
   type: "round-robin" | "knockout";
@@ -63,4 +82,4 @@ export interface Tournament {
   id: string;
   users: string[];
   gameIds: string[];
-}
+}*/

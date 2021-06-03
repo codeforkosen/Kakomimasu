@@ -7,8 +7,12 @@ import { accounts } from "./user.ts";
 import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
-
-type TournamentType = "round-robin" | "knockout";
+import {
+  Tournament as ITournament,
+  TournamentAddUserReq,
+  TournamentCreateReq,
+  TournamentType,
+} from "./types.ts";
 
 const checkType = (type: string): boolean => {
   if (type === "round-robin") return true;
@@ -16,29 +20,8 @@ const checkType = (type: string): boolean => {
   return false;
 };
 
-export interface ITournamentBasic {
-  name: string;
-  organizer?: string;
-  type: TournamentType;
-  remarks?: string;
-}
-
-export interface ITournamentReq extends ITournamentBasic, ApiOption {
-  participants?: string[];
-}
-
-export interface ITournament extends ITournamentBasic {
-  users?: string[];
-  id?: string;
-  gameIds?: string[];
-}
-
 export interface ITournamentDeleteReq extends ApiOption {
   id: string;
-}
-
-export interface ITournamentAddUserReq extends ApiOption {
-  user: string;
 }
 
 export class Tournament implements ITournament {
@@ -143,7 +126,7 @@ export const tournamentRouter = () => {
 
   // 大会登録
   router.post("/create", async (req) => {
-    const data = await req.json() as ITournamentReq;
+    const data = await req.json() as TournamentCreateReq;
     if (!data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
     if (!data.type || !checkType(data.type)) {
       throw new ServerError(errors.INVALID_TYPE);
@@ -193,7 +176,7 @@ export const tournamentRouter = () => {
     let tournament = tournaments.get(tournamentId);
     if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
-    const body = await req.json() as ITournamentAddUserReq;
+    const body = await req.json() as TournamentAddUserReq;
     const identifier = body.user;
     if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
 
