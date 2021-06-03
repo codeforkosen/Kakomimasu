@@ -40,6 +40,7 @@ export interface Game {
   startedAtUnixTime: number;
   nextTurnUnixTime: number;
   reservedUsers: string[];
+  type: string;
 }
 
 export interface Board {

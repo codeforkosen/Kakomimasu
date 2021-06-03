@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import ToggleButtonGroup from "@material-ui/core/ToggleButtonGroup";
+import ToggleButton from "@material-ui/core/ToggleButton";
 
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import Clock from "../../components/clock.tsx";
 
-export default function (props: RouteComponentProps) {
-  const [games, setGames] = useState<any[]>([]);
+import { Game } from "../../apiserver/types.ts";
+
+export default function () {
+  const [games, setGames] = useState<Game[]>([]);
   let socket: WebSocket;
 
   useEffect(() => {
@@ -21,7 +24,7 @@ export default function (props: RouteComponentProps) {
     };
     socket.onmessage = (event) => {
       console.log("websocket onmessage");
-      const games = JSON.parse(event.data);
+      const games = JSON.parse(event.data) as Game[];
       setGames(games);
     };
     return () => {
@@ -30,38 +33,28 @@ export default function (props: RouteComponentProps) {
     };
   }, []);
 
-  const [gameType, setGameType] = React.useState<string | null>("normal");
-
-  const handleGameType = (
-    newGameType: string | null,
-  ) => {
-    setGameType(newGameType);
-  };
+  const [gameType, setGameType] = React.useState<string>("normal");
 
   const getGames = () => {
-    const games_ = games.filter((game: any) => game.type === gameType)
+    const games_ = games.filter((game) => game.type === gameType)
       .reverse();
     return games_;
   };
 
   return (
     <Content title="ゲーム一覧">
-      <Clock />
-      <ButtonGroup color="secondary" variant="contained">
-        <Button
-          onClick={() => handleGameType("normal")}
-          disabled={gameType === "normal"}
+      <div style={{ textAlign: "center" }}>
+        <Clock />
+        <ToggleButtonGroup
+          value={gameType}
+          exclusive
+          onChange={(_, value) => setGameType(value)}
         >
-          フリーマッチ
-        </Button>
-        <Button
-          onClick={() => handleGameType("self")}
-          disabled={gameType === "self"}
-        >
-          カスタムマッチ
-        </Button>
-      </ButtonGroup>
-      <GameList games={getGames()} {...props} />
+          <ToggleButton value="normal">フリーマッチ</ToggleButton>
+          <ToggleButton value="self">カスタムマッチ</ToggleButton>
+        </ToggleButtonGroup>
+        <GameList games={getGames()} />
+      </div>
     </Content>
   );
 }

@@ -51,6 +51,11 @@ const theme = createTheme({
         color: "secondary",
       },
     },
+    MuiToggleButtonGroup: {
+      defaultProps: {
+        color: "secondary",
+      },
+    },
   },
 });
 
