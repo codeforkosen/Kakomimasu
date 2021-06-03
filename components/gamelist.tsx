@@ -44,10 +44,17 @@ const useStyles = makeStyles({
     alignItems: "center",
     flexDirection: "row",
   },
-  gameName: {
+  gameNameId: {
+    maxWidth: "30em",
     textAlign: "left",
   },
-  gameNameId: {
+  gameName: {
+    maxWidth: "30em",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  gameId: {
     fontSize: "0.8em",
   },
 });
@@ -133,9 +140,9 @@ const GameList: React.FC<Props> = (props: Props) => {
               </div>
             </div>
           </td>
-          <td className={classes.gameName}>
-            <div>ゲーム名</div>
-            <div>ゲームID</div>
+          <td className={classes.gameNameId}>
+            <div className={classes.gameName}>ゲーム名</div>
+            <div className={classes.gameId}>ゲームID</div>
           </td>
           <td>開始時間</td>
         </tr>
@@ -171,11 +178,13 @@ const GameList: React.FC<Props> = (props: Props) => {
                   })}
                 </div>
               </td>
-              <td className={classes.gameName}>
+              <td className={classes.gameNameId}>
                 {game.gameName
-                  ? <div>{game.gameName}</div>
-                  : <div className={classes.un}>Untitle</div>}
-                <div className={classes.gameNameId}>{game.gameId}</div>
+                  ? <div className={classes.gameName}>{game.gameName}</div>
+                  : <div className={`${classes.un} ${classes.gameName}`}>
+                    Untitle
+                  </div>}
+                <div className={classes.gameId}>{game.gameId}</div>
               </td>
               <td>{getStartTime(game)} 開始</td>
             </tr>
