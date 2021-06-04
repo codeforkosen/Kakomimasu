@@ -147,12 +147,12 @@ Deno.test("api/match:normal by selfGame", async () => {
   const data = {
     id: userData.id,
     password: userData.password,
-    gameId: gameRes.gameId,
+    gameId: gameRes.data.gameId,
   };
   const res = await ac.match(data);
   await ac.usersDelete(userData);
 
-  assertMatch(res, { userId: userData.id, gameId: gameRes.gameId });
+  assertMatch(res, { userId: userData.id, gameId: gameRes.data.gameId });
 });
 Deno.test("api/match:normal by useAi", async () => {
   const uuid = v4.generate();
@@ -180,9 +180,9 @@ Deno.test("api/match/(gameId):normal", async () => {
   const gameData = { name: "テスト", boardName: "A-1" };
   const gameRes = await ac.gameCreate(gameData);
 
-  const res = await ac.getMatch(gameRes.gameId);
+  const res = await ac.getMatch(gameRes.data.gameId);
 
-  assertGame(res.data, { gameId: gameRes.gameId, name: gameData.name });
+  assertGame(res.data, { gameId: gameRes.data.gameId, name: gameData.name });
 });
 Deno.test("api/match/(gameId):not find game", async () => {
   const res = await ac.getMatch(v4.generate());
