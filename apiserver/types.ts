@@ -19,6 +19,8 @@ export interface UserRegistReq extends ApiOption, UserBase {
   password: string;
 }
 
+export type TournamentRes = Required<Tournament>;
+
 export interface TournamentAddUserReq extends ApiOption {
   user: string;
 }

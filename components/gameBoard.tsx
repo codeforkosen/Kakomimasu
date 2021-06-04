@@ -196,9 +196,9 @@ export default function (props: Props) {
     getUsers();
   }, []);
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("update gameBoard", game.tiled[0]);
-  });
+  });*/
 
   return (
     <div

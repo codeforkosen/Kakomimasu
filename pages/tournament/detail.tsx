@@ -11,7 +11,11 @@ import Autocomplete from "@material-ui/core/Autocomplete";
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
-import { Game, Tournament, User } from "../../apiserver/types.ts";
+import {
+  Game,
+  TournamentRes as Tournament,
+  User,
+} from "../../apiserver/types.ts";
 
 import Content from "../../components/content.tsx";
 import Section, { SubSection } from "../../components/section.tsx";
@@ -48,9 +52,6 @@ export default function () {
   const [addUser, setAddUser] = useState<User | null>(null);
   const [addUserList, setAddUserList] = useState<User[]>([]);
   const [addUserHelperText, setAddUserHelperText] = useState<string>("");
-  const [addUserInput, setAddUserInput] = useState<
-    { value: User | null; q: User[] }
-  >({ value: null, q: [] });
 
   const getTournament = async () => {
     const res = await apiClient.tournamentsGet(id);
@@ -126,8 +127,8 @@ export default function () {
       `${tournament.name}:${mUser.screenName} vs ${oUser.screenName}`,
     );
     params.append("n-player", "2");
-    params.append("player1", mUser.name);
-    params.append("player2", oUser.name);
+    params.append("player", mUser.name);
+    params.append("player", oUser.name);
     params.append("tournament-id", tournament.id);
     params.append("return", "true");
     history.push("/game/create?" + params.toString());
