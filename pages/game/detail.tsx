@@ -1,8 +1,8 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/styles";
+import { Link, useParams } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Button from "@material-ui/core/Button";
 import {
   CartesianGrid,
   Legend,
@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
+// @deno-types=../../apiserver/api_client.d.ts
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
 
@@ -23,45 +24,38 @@ import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import GameBoard from "../../components/gameBoard.tsx";
 
-const useStyles = makeStyles({
-  content: {
-    //textAlign: "center",
-  },
-});
+import { Game, User } from "../../apiserver/types.ts";
 
-function PointsGraph(props: { game: any }) {
+function PointsGraph(props: { game: Game }) {
   const game = props.game;
   const data: { turn: number; points: number[] }[] = [];
 
-  (game.log as any[]).forEach((turn, i) => {
-    const points = (turn as any[]).map((player) => {
+  game.log.forEach((turn, i) => {
+    const points = turn.map((player) => {
       return player.point.basepoint + player.point.wallpoint;
     });
     data.push({ turn: i, points });
   });
 
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   const getUsers = async () => {
-    const users_ = [];
+    const users_: typeof users = [];
     for (const player of game.players) {
       if (users.some((user) => user.id === player.id)) continue;
-      const user = (await apiClient.usersShow(player.id)).data;
-
-      users_.push(user);
+      const res = await apiClient.usersShow(player.id);
+      if (res.success) users_.push(res.data);
     }
     setUsers([...users, ...users_]);
   };
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [game.gameId]);
 
   return <div style={{ width: "100%", height: "300px" }}>
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
-        width={500}
-        height={300}
         data={data}
         margin={{
           top: 5,
@@ -79,7 +73,7 @@ function PointsGraph(props: { game: any }) {
         <Tooltip labelFormatter={(props) => "Turn : " + props} />
         <Legend />
 
-        {(game.players as any[]).map((_, i) => {
+        {game.players.map((_, i) => {
           return <Line
             type="monotone"
             dataKey={`points[${i}]`}
@@ -92,65 +86,64 @@ function PointsGraph(props: { game: any }) {
   </div>;
 }
 
-export default function (/*props: RouteComponentProps<{ id?: string }>*/) {
-  const classes = useStyles();
+export default function () {
   const { id } = useParams<{ id?: string }>();
 
-  const [game, setGame] = useState<any | null>(null);
-  const gameId = id; // props.match.params.id;
+  const [game, setGame] = useState<Game | null | undefined>(undefined);
 
   let socket: WebSocket;
-  console.log("detail", gameId);
+  //console.log("detail", id);
 
   useEffect(() => {
-    if (!gameId) {
+    if (!id) {
       socket = new WebSocket(
         ((window.location.protocol === "https:") ? "wss://" : "ws://") +
           window.location.host + "/api/allGame",
       );
-      socket.onopen = (event) => {
-        console.log("websocket open");
-      };
       socket.onmessage = (event) => {
         console.log("websocket onmessage");
-        const games = JSON.parse(event.data) as any[];
-        setGame(games.reverse()[0]);
+        const games = JSON.parse(event.data) as Game[];
+        if (games.length === 0) setGame(null);
+        else setGame(games.reverse()[0]);
       };
     } else {
       socket = new WebSocket(
         ((window.location.protocol === "https:") ? "wss://" : "ws://") +
-          window.location.host + "/api/ws/game/" + gameId,
+          window.location.host + "/api/ws/game/" + id,
       );
-      socket.onopen = (event) => {
-        console.log("websocket open");
-      };
       socket.onmessage = (event) => {
-        const game = JSON.parse(event.data);
+        const game = JSON.parse(event.data) as Game;
         console.log("websocket onmessage", game);
         setGame(game);
       };
     }
+    socket.onopen = (event) => {
+      console.log("websocket open");
+    };
     return () => {
       socket.close();
-
       console.log("websocket close");
     };
-  }, []);
+  }, [id]);
 
   return (
     <Content title="ゲーム詳細">
-      {<div className={classes.content}>
+      <div>
         {game
           ? <>
-            <a href={gameId ? `/vr/index?id=${gameId}` : "/vr/latest"}>
+            <Button
+              component={Link}
+              to={id ? `/vr/index?id=${id}` : "/vr/latest"}
+              target="_blank"
+            >
               VR版はこちら
-            </a>
+            </Button>
             <GameList games={[game]} />
             <GameBoard game={game} />
             <PointsGraph game={game} />
           </>
           : <CircularProgress color="secondary" />}
-      </div>}
+      </div>
     </Content>
   );
 }

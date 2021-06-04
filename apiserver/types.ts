@@ -35,7 +35,16 @@ export interface Game {
   turn: number;
   tiled: Array<[0 | 1, number]>;
   players: Player[];
-  log: [];
+  log: {
+    point: { basepoint: number; wallpoint: number };
+    actions: {
+      agentId: number;
+      type: number;
+      x: number;
+      y: number;
+      res: number;
+    }[];
+  }[][];
   gameName: string;
   startedAtUnixTime: number;
   nextTurnUnixTime: number;
