@@ -8,36 +8,58 @@ export default class ApiClient {
     return resJson;
   }
 
-  async _fetchPostJson(path, data) {
+  async _fetchPostJson(path, data, auth) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    if (auth) headers.append("Authorization", auth);
     const res = await fetch(
       this.baseUrl + path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(data),
       },
     )
     return res;
   }
 
-  async _fetchPostJsonToJson(path, data) {
-    const resJson = await (await this._fetchPostJson(path, data)).json();
+  async _fetch(path, init) {
+    const res = await fetch(this.baseUrl + path, init);
+    return res;
+  }
+
+  async _fetchPostJsonToJson(path, data, auth) {
+    const resJson = await (await this._fetchPostJson(path, data, auth)).json();
     return resJson;
   }
 
   async _fetchPostJsonToJsonWithAuth(path, data, auth) {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    if (auth) headers.append("Authorization", auth);
     const resJson = await (await fetch(
       this.baseUrl + path,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": auth },
+        headers,
         body: JSON.stringify(data),
       },
     )).json();
     return resJson;
   }
-  async usersRegist(data) {
-    return await this._fetchPostJsonToJson("/users/regist", data);
+
+  async usersVerify(idToken) {
+    const res = await this._fetch("/users/verify", {
+      headers: new Headers({
+        Authorization: idToken
+      })
+    });
+    if (res.status === 200) return { success: true };
+    else return { success: false, data: res };
+  }
+  async usersRegist(data, auth) {
+    const res = await this._fetchPostJson("/users/regist", data, auth);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersDelete(data) {
@@ -46,40 +68,40 @@ export default class ApiClient {
   }
 
   async usersShow(identifier) {
-    const resJson = await this._fetchToJson(`/users/show/${identifier}`);
-    return resJson;
+    const res = await this._fetch(`/users/show/${identifier}`);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersSearch(searchText) {
-    const resJson = await this._fetchToJson(`/users/search?q=${searchText}`);
-    return resJson;
+    const res = await this._fetch(`/users/search?q=${searchText}`);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async tournamentsCreate(data) {
-    const resJson = await this._fetchPostJsonToJson("/tournament/create", data);
-    return resJson;
+    const res = await this._fetchPostJson("/tournament/create", data);
+    return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsGet(id = "") {
-    const resJson = await this._fetchToJson(`/tournament/get?id=${id}`);
-    return resJson;
+    const res = await this._fetch(`/tournament/get?id=${id}`);
+    return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsDelete(data) {
     const resJson = await this._fetchPostJsonToJson("/tournament/delete", data);
     return resJson;
   }
   async tournamentsAddUser(tournamentId, data) {
-    const resJson = await this._fetchPostJsonToJson(`/tournament/add?id=${tournamentId}`, data);
-    return resJson;
+    const res = await this._fetchPostJson(`/tournament/add?id=${tournamentId}`, data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async gameCreate(data) {
-    const resJson = await this._fetchPostJsonToJson("/game/create", data);
-    return resJson;
+    const res = await this._fetchPostJson("/game/create", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async getBoards() {
-    const resJson = await this._fetchToJson("/game/boards");
-    return resJson;
+    const res = await this._fetch("/game/boards");
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async match(data) {
@@ -88,8 +110,8 @@ export default class ApiClient {
   }
 
   async getMatch(gameId) {
-    const resJson = await this._fetchToJson(`/match/${gameId}`);
-    return resJson;
+    const res = await this._fetch(`/match/${gameId}`);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async setAction(gameId, data, auth) {

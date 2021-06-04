@@ -54,13 +54,13 @@ const data: any = {
 // 存在しないトーナメントID
 Deno.test("api/game/create:normal", async () => {
   const res = await ac.gameCreate({ ...data, option: { dryRun: true } });
-  assertGame(res, data);
+  assertGame(res.data, data);
 });
 Deno.test("api/game/create:normal with playerIdentifiers", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const res = await ac.gameCreate({
     ...data,
@@ -68,7 +68,7 @@ Deno.test("api/game/create:normal with playerIdentifiers", async () => {
     option: { dryRun: true },
   });
 
-  assertGame(res, { ...data, reservedUsers: [userData.id] });
+  assertGame(res.data, { ...data, reservedUsers: [userData.id] });
 });
 Deno.test("api/game/create:invalid boardName", async () => {
   {
@@ -77,7 +77,7 @@ Deno.test("api/game/create:invalid boardName", async () => {
       boardName: "",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_BOARD_NAME);
+    assertEquals(res.data, errors.INVALID_BOARD_NAME);
   }
   {
     const res = await ac.gameCreate({
@@ -85,7 +85,7 @@ Deno.test("api/game/create:invalid boardName", async () => {
       boardName: undefined,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_BOARD_NAME);
+    assertEquals(res.data, errors.INVALID_BOARD_NAME);
   }
   {
     const res = await ac.gameCreate({
@@ -93,7 +93,7 @@ Deno.test("api/game/create:invalid boardName", async () => {
       boardName: null,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_BOARD_NAME);
+    assertEquals(res.data, errors.INVALID_BOARD_NAME);
   }
 });
 Deno.test("api/game/create:not user", async () => {
@@ -102,20 +102,20 @@ Deno.test("api/game/create:not user", async () => {
     playerIdentifiers: [v4.generate()],
     option: { dryRun: true },
   });
-  assertEquals(res, errors.NOT_USER);
+  assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("api/game/create:already registed user", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const res = await ac.gameCreate({
     ...data,
     playerIdentifiers: [userData.id, userData.id],
     option: { dryRun: true },
   });
-  assertEquals(res, errors.ALREADY_REGISTERED_USER);
+  assertEquals(res.data, errors.ALREADY_REGISTERED_USER);
 });
 Deno.test("api/game/create:invalid tournament id", async () => {
   const res = await ac.gameCreate({
@@ -123,13 +123,13 @@ Deno.test("api/game/create:invalid tournament id", async () => {
     tournamentId: v4.generate(),
     option: { dryRun: true },
   });
-  assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+  assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
 });
 
 // /api/game/boards Test
 // テスト項目
 // 正常
 Deno.test("api/game/boards:normal", async () => {
-  const res = await ac.getBoards() as Array<any>;
-  res.forEach((e) => assertBoard(e));
+  const res = await ac.getBoards();
+  (res.data as any[]).forEach((e) => assertBoard(e));
 });

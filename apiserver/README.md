@@ -18,7 +18,7 @@ deno run -A ../client_deno/client_test1.ts
 
 ## ブラウザで見る
 
-`http://localhost:8880/gamelist.html`にアクセス。
+`http://localhost:8880/game/index`にアクセス。
 
 「囲みマス」のロゴが表示されたらOK
 

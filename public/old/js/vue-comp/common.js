@@ -6,12 +6,12 @@ const header = new Vue({
     template: `
     <header>
         <div id="h-wrapper">
-            <a href="/" id="h-logo"><img src="/img/kakomimasu-logo.png" alt="囲みマスロゴ"></a>
+            <a href="/index" id="h-logo"><img src="/img/kakomimasu-logo.png" alt="囲みマスロゴ"></a>
             <div id="h-navWrapper">
                 <nav id="h-tab">
                     <ul>
-                        <li><a href="/">TOP</a></li>
-                        <li><a href="/gamelist.html">ゲーム一覧</a></li>
+                        <li><a href="/index">TOP</a></li>
+                        <li><a href="/game/index">ゲーム一覧</a></li>
                         <li><a href="/tournament/index.html">大会一覧</a></li>
                     </ul>
                 </nav>

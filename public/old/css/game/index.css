@@ -1,0 +1,9 @@
+@import url("/css/v_game-list.css");
+
+main>div {
+  text-align: center;
+}
+
+#now-time {
+  text-align: center;
+}

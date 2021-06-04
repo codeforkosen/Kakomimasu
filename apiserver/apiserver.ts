@@ -3,6 +3,8 @@ import type { WebSocket } from "./mod.ts";
 import {
   createApp,
   createRouter,
+  RoutingError,
+  serveJsx,
   ServerRequest,
   serveStatic,
 } from "https://deno.land/x/servest@v1.3.0/mod.ts";
@@ -26,6 +28,7 @@ import { tournamentRouter, tournaments } from "./tournament.ts";
 import { accounts, userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
+import { viewerRoutes } from "./viewer.ts";
 
 export const kkmm = new ExpKakomimasu();
 kkmm.games.push(...LogFileOp.read());
@@ -121,18 +124,6 @@ const getGame = (id: string) => {
   return kkmm.getGames().find((e) => e.uuid === id);
 };
 
-const webRoutes = () => {
-  const router = createRouter();
-
-  router.get("/", async (req: ServerRequest) => {
-    await req.respond(
-      { headers: new Headers({ "Location": "index.html" }), status: 302 },
-    );
-  });
-
-  return router;
-};
-
 const apiRoutes = () => {
   const router = createRouter();
 
@@ -151,9 +142,10 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-app.use(serveStatic(resolve("../public")));
+//app.use(serveJsx(resolve("../pages"), (f) => import("file:///" + f), Layout));
 app.route("/api/", apiRoutes());
-app.route("/", webRoutes());
+app.route("/", viewerRoutes());
+
 app.listen({ port });
 
 const createDefaultBoard = () => {

@@ -72,7 +72,7 @@ Deno.test("api/match:nothing password", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = { id: userData.id, option: { dryRun: true } };
   const res = await ac.match(data);
@@ -89,7 +89,7 @@ Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
@@ -105,7 +105,7 @@ Deno.test("api/match:can not find ai", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
@@ -124,7 +124,7 @@ Deno.test("api/match:normal", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
@@ -139,7 +139,7 @@ Deno.test("api/match:normal by selfGame", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const gameData = { name: "テスト", boardName: "A-1" };
   const gameRes = await ac.gameCreate(gameData);
@@ -147,18 +147,18 @@ Deno.test("api/match:normal by selfGame", async () => {
   const data = {
     id: userData.id,
     password: userData.password,
-    gameId: gameRes.gameId,
+    gameId: gameRes.data.gameId,
   };
   const res = await ac.match(data);
   await ac.usersDelete(userData);
 
-  assertMatch(res, { userId: userData.id, gameId: gameRes.gameId });
+  assertMatch(res, { userId: userData.id, gameId: gameRes.data.gameId });
 });
 Deno.test("api/match:normal by useAi", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
@@ -180,14 +180,14 @@ Deno.test("api/match/(gameId):normal", async () => {
   const gameData = { name: "テスト", boardName: "A-1" };
   const gameRes = await ac.gameCreate(gameData);
 
-  const res = await ac.getMatch(gameRes.gameId);
+  const res = await ac.getMatch(gameRes.data.gameId);
 
-  assertGame(res, { gameId: gameRes.gameId, name: gameData.name });
+  assertGame(res.data, { gameId: gameRes.data.gameId, name: gameData.name });
 });
 Deno.test("api/match/(gameId):not find game", async () => {
   const res = await ac.getMatch(v4.generate());
 
-  assertEquals(res, errors.NOT_GAME);
+  assertEquals(res.data, errors.NOT_GAME);
 });
 
 // /api/match/(gameId)/action Test
@@ -197,7 +197,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
@@ -227,7 +227,7 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.id;
+  userData.id = userRes.data.id;
 
   const data = {
     id: userData.id,
