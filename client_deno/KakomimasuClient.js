@@ -20,7 +20,6 @@ class KakomimasuClient {
     this.password = password || Deno.env.get("password");
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
-    cl(this.id, this.password, this.name, this.spec);
     if (args.local) this.setServerHost("http://localhost:8880");
     else this.setServerHost(Deno.env.get("host"));
   }

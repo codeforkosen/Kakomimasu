@@ -4,6 +4,7 @@ Documentation = https://github.com/codeforkosen/Kakomimasu
 After = network.target
 
 [Service]
+Environment = HOME=/root
 Environment = PATH=/root/.deno/bin
 ExecStart = /root/.deno/bin/deno run -A /root/Kakomimasu/apiserver/apiserver.ts
 Restart=always
