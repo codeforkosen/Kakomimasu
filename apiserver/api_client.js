@@ -95,13 +95,13 @@ export default class ApiClient {
   }
 
   async gameCreate(data) {
-    const resJson = await this._fetchPostJsonToJson("/game/create", data);
-    return resJson;
+    const res = await this._fetchPostJson("/game/create", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async getBoards() {
-    const resJson = await this._fetchToJson("/game/boards");
-    return resJson;
+    const res = await this._fetch("/game/boards");
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async match(data) {

@@ -27,6 +27,14 @@ export interface TournamentCreateReq extends TournamentBasic, ApiOption {
   participants?: string[];
 }
 
+export interface GameCreateReq extends ApiOption {
+  name?: string;
+  boardName?: string; // 必須
+  nPlayer?: number;
+  playerIdentifiers?: string[];
+  tournamentId?: string;
+}
+
 export interface Game {
   gameId: string;
   gaming: boolean;

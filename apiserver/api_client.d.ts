@@ -1,6 +1,8 @@
 import {
+  Board,
   Error,
   Game,
+  GameCreateReq,
   Tournament,
   TournamentAddUserReq,
   TournamentCreateReq,
@@ -29,4 +31,8 @@ export default class ApiClient {
     tournamentId: string,
     data: TournamentAddUserReq,
   ): ApiRes<Tournament>;
+
+  gameCreate(data: GameCreateReq): ApiRes<Game>;
+
+  getBoards(): ApiRes<Board[]>;
 }

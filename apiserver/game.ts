@@ -10,16 +10,9 @@ import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";
 import { BoardFileOp } from "./parts/file_opration.ts";
+import { GameCreateReq } from "./types.ts";
 
 import { ExpGame } from "./parts/expKakomimasu.ts";
-
-interface ICreateGameReq extends ApiOption {
-  name?: string;
-  boardName?: string; // 必須
-  nPlayer?: number;
-  playerIdentifiers?: string[];
-  tournamentId?: string;
-}
 
 export const gameRouter = () => {
   const router = createRouter();
@@ -28,7 +21,7 @@ export const gameRouter = () => {
     "/create",
     contentTypeFilter("application/json"),
     async (req) => {
-      const reqJson = (await req.json()) as ICreateGameReq;
+      const reqJson = (await req.json()) as GameCreateReq;
       if (!reqJson.boardName) {
         throw new ServerError(errors.INVALID_BOARD_NAME);
       }

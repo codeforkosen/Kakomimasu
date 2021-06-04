@@ -6,9 +6,13 @@ import { makeStyles } from "@material-ui/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import MenuItem from "@material-ui/core/MenuItem";
+import Autocomplete from "@material-ui/core/Autocomplete";
 
+// @deno-types=../../apiserver/api_client.d.ts
 import ApiClient from "../../apiserver/api_client.js";
 const apiClient = new ApiClient("");
+
+import { Board, Game, User } from "../../apiserver/types.ts";
 
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
@@ -43,69 +47,40 @@ export default function () {
   const classes = useStyles(theme);
   const location = useLocation();
   const history = useHistory();
-  const [boards, setBoards] = useState<any[]>();
+  const [boards, setBoards] = useState<Board[]>();
 
-  console.log(location);
   const searchParam = new URLSearchParams(location.search);
-  console.log(searchParam);
-
-  useEffect(() => {
-    getBoards();
-  }, []);
+  const fixedUsers = searchParam.getAll("player");
 
   async function getBoards() {
-    const boards_ = await apiClient.getBoards();
-    console.log(boards_);
-    setBoards(boards_);
+    const res = await apiClient.getBoards();
+    if (res.success) setBoards(res.data);
   }
 
   const [data, setData] = useState({
     name: searchParam.get("name") || "",
-    boardName: searchParam.get("n-player") || "",
-    nPlayer: 2,
-    playerIdentifiers: [
-      searchParam.get("player1") || "",
-      searchParam.get("player2") || "",
-      "",
-      "",
-    ],
+    boardName: "",
+    nPlayer: (searchParam.get("n-player") || 2) as number,
+    playerIdentifiers: fixedUsers,
     tournamentId: searchParam.get("tournament-id") || "",
   });
   const [btnStatus, setBtnStatus] = useState(false);
-  const [game, setGame] = useState<any | null>(null);
+  const [game, setGame] = useState<Game>();
 
-  const validate = (data: any) => {
+  const validate = () => {
     console.log(data);
+    if (data.playerIdentifiers.length > data.nPlayer) {
+      const helperText = "プレイヤー数を超えています";
+      setAddUserInput({ ...addUserInput, helperText });
+      return false;
+    } else {
+      setAddUserInput({ ...addUserInput, helperText: "" });
+    }
     if (!data.name) return false;
     if (!data.boardName) return false;
     if (!data.nPlayer) return false;
-    //else if (!data.name) return false;
-    //else if (!data.password) return false;
-    //else if (!checkPassword()) return false;
-    return true;
-  };
 
-  const handleChange = (
-    event: React.ChangeEvent<{ name?: string; value: unknown }>,
-  ) => {
-    const value = event.target.value;
-    const name = event.target.name;
-    if (!name) return;
-    console.log(value, name, name.startsWith("player"));
-    if (name === "nPlayer") {
-      setData({
-        ...data,
-        nPlayer: value as number,
-        //playerIdentifiers: new Array(value as number),
-      });
-    } else if (name.startsWith("player")) {
-      const i = parseInt(name.slice(6));
-      console.log(name, i);
-      const data_ = { ...data };
-      data_.playerIdentifiers[i] = value as string;
-      setData(data_);
-    } else setData({ ...data, [name]: value });
-    setBtnStatus(validate({ ...data, [name]: value }));
+    return true;
   };
 
   const submit = async () => {
@@ -113,13 +88,38 @@ export default function () {
     sendData.playerIdentifiers = sendData.playerIdentifiers.filter((e) =>
       Boolean(e)
     );
-    const req = await apiClient.gameCreate(sendData);
-    console.log(req);
+    const res = await apiClient.gameCreate(sendData);
+    console.log(res);
+    if (!res.success) return;
     if (searchParam.get("return")) {
       history.push("/tournament/detail/" + searchParam.get("tournament-id"));
     } else {
-      setGame(req);
+      setGame(res.data);
     }
+  };
+  useEffect(() => {
+    getBoards();
+  }, []);
+
+  useEffect(() => {
+    setBtnStatus(validate());
+  }, [data]);
+
+  const [addUserInput, setAddUserInput] = useState<
+    { value: string; helperText: string; q: string[] }
+  >({
+    value: "",
+    helperText: "",
+    q: fixedUsers,
+  });
+  const addHandleChange = async (
+    event: React.ChangeEvent<{ value: string }>,
+  ) => {
+    const value = event.target.value;
+    const req = await apiClient.usersSearch(value);
+    let q: typeof addUserInput.q = [];
+    if (req.success) q = req.data.map((user) => user.name);
+    setAddUserInput({ value, helperText: "", q });
   };
 
   return (<>
@@ -130,13 +130,12 @@ export default function () {
             required
             name="name"
             label="ゲーム名"
-            variant="standard"
-            color="secondary"
             placeholder="〇〇大会 予選Aグループ 〇〇vs△△"
             className={classes.textField}
-            autoComplete="off"
             value={data.name}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, name: value });
+            }}
             error={!Boolean(data.name)}
             helperText={Boolean(data.name) ? "" : "入力必須項目です"}
           />
@@ -145,12 +144,11 @@ export default function () {
             select
             name="boardName"
             label="使用ボード"
-            variant="standard"
-            color="secondary"
             className={classes.textField}
-            autoComplete="off"
             value={data.boardName}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, boardName: value });
+            }}
             error={!Boolean(data.boardName)}
             helperText={Boolean(data.boardName) ? "" : "入力必須項目です"}
           >
@@ -163,40 +161,51 @@ export default function () {
             select
             name="nPlayer"
             label="プレイヤー数"
-            variant="standard"
-            color="secondary"
             className={classes.textField}
-            autoComplete="off"
             value={data.nPlayer}
-            onChange={handleChange}
+            onChange={({ target: { value } }) => {
+              setData({ ...data, nPlayer: parseInt(value) });
+            }}
           >
             <MenuItem value={2}>2</MenuItem>;
-            <MenuItem value={3}>3</MenuItem>;
           </TextField>
-          {data.playerIdentifiers.map((playerIdentifier, i) => {
-            console.log(playerIdentifier);
-            if (i >= data.nPlayer) return;
-            return (<TextField
-              name={"player" + i}
-              label={"プレイヤー" + (i + 1) + " ユーザネーム or ユーザID"}
-              variant="standard"
-              color="secondary"
-              className={classes.textField}
-              autoComplete="off"
-              value={playerIdentifier}
-              onChange={handleChange}
-            />);
-          })}
-          <TextField
+          <Autocomplete
+            multiple
+            id="tags-standard"
+            options={addUserInput.q}
+            getOptionLabel={(option) => option}
+            value={data.playerIdentifiers}
+            onChange={(_, newValue) => {
+              console.log("onInputChange", newValue);
+              setAddUserInput({ ...addUserInput, q: [] });
+              setData({
+                ...data,
+                playerIdentifiers: newValue,
+              });
+            }}
+            disabled={Boolean(fixedUsers.length > 0)}
+            className={classes.textField}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="参加ユーザ"
+                placeholder="name"
+                onChange={addHandleChange}
+                helperText={addUserInput.helperText}
+                error={Boolean(addUserInput.helperText)}
+              />
+            )}
+          />
+          {data.tournamentId && <TextField
             name="boardName"
             label="所属大会ID"
-            variant="standard"
-            color="secondary"
+            disabled
             className={classes.textField}
-            autoComplete="off"
             value={data.tournamentId}
-            onChange={handleChange}
-          />
+            onChange={({ target: { value } }) => {
+              setData({ ...data, tournamentId: value });
+            }}
+          />}
           <Button
             className={classes.button}
             onClick={submit}
