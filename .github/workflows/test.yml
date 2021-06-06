@@ -7,7 +7,7 @@
 # For more information see: https://github.com/denolib/setup-deno
 
 
-on: [push,pull_request]
+on: [push]
 
 jobs:
   deno_test:
