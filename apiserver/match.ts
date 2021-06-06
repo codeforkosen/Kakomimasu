@@ -15,7 +15,7 @@ import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
 
-import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
+import { config } from "./deps.ts";
 const env = config({
   path: resolve("./.env"),
   defaults: resolve("./.env.default"),
