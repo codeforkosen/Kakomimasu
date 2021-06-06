@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.67.0/testing/asserts.ts";
+import { assertEquals } from "../deps.ts";
 
 import * as util from "../apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);

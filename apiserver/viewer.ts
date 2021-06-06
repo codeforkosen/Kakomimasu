@@ -1,4 +1,4 @@
-import { parse } from "https://deno.land/std@0.84.0/flags/mod.ts";
+import { parse } from "./deps.ts";
 const args = parse(Deno.args);
 import { createRouter, serveStatic } from "./deps.ts";
 

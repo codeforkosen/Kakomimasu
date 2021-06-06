@@ -1,4 +1,4 @@
-import { fromFileUrl } from "https://deno.land/std@0.79.0/path/mod.ts";
+import { fromFileUrl } from "./deps.ts";
 
 export const jsonResponse = (json: any) => {
   return {
