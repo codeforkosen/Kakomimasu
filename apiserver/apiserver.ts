@@ -7,7 +7,7 @@ import {
   serveJsx,
   ServerRequest,
   serveStatic,
-} from "https://deno.land/x/servest@v1.3.0/mod.ts";
+} from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);

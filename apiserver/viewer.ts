@@ -1,9 +1,6 @@
 import { parse } from "https://deno.land/std@0.84.0/flags/mod.ts";
 const args = parse(Deno.args);
-import {
-  createRouter,
-  serveStatic,
-} from "https://deno.land/x/servest@v1.3.0/mod.ts";
+import { createRouter, serveStatic } from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
