@@ -16,7 +16,7 @@
     "https://cdn.esm.sh/v41/@firebase/app@0.6.20/deno/app.js": "https://cdn.esm.sh/v41/firebase@8.5.0/deno/firebase.bundle.js",
     "https://cdn.esm.sh/v41/react-is@16.13.1/": "https://cdn.esm.sh/v41/react-is@17.0.2/",
     "https://cdn.esm.sh/v41/react-is@16.10.2/": "https://cdn.esm.sh/v41/react-is@17.0.2/",
-    "recharts": "https://cdn.esm.sh/recharts@1.8.4",
+    "recharts": "https://cdn.esm.sh/recharts@1.8.5",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
     "https://cdn.esm.sh/v41/@popperjs/core@2.9.2/deno/core.js": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/cjs/popper.min.js",
     "https://cdn.esm.sh/v41/@popperjs/core@2.9.2/dist/cjs/popper.d.ts": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/lib/index.d.ts"
