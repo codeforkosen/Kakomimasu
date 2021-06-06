@@ -1,4 +1,4 @@
-import { contentTypeFilter, createRouter } from "./deps.ts";
+import { config, contentTypeFilter, createRouter } from "./deps.ts";
 
 import { jsonResponse, pathResolver } from "./apiserver_util.ts";
 
@@ -12,7 +12,6 @@ import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
 
-import { config } from "./deps.ts";
 const env = config({
   path: resolve("./.env"),
   defaults: resolve("./.env.default"),

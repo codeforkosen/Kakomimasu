@@ -2,7 +2,6 @@ import { contentTypeFilter, createRouter } from "./deps.ts";
 
 import { jsonResponse } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
-import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";

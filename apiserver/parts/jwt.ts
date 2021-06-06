@@ -1,7 +1,7 @@
 import { decode } from "../deps.ts";
 
 export async function getPayload(jwt: string) {
-  const [header, payload, signature] = decode(jwt);
+  const [header, payload] = decode(jwt);
 
   //console.log(payload, signature, header);
   if (header && typeof header === "object") {

@@ -1,11 +1,14 @@
-import { parse } from "./deps.ts";
+import {
+  createRouter,
+  denoPlugin,
+  esbuild,
+  parse,
+  serveStatic,
+} from "./deps.ts";
 const args = parse(Deno.args);
-import { createRouter, serveStatic } from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
-
-import { denoPlugin, esbuild } from "./deps.ts";
 
 if (!args.noViewer) {
   const bundle = await esbuild.build({
