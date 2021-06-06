@@ -1,4 +1,4 @@
-import { decode } from "https://deno.land/x/djwt@v2.2/mod.ts";
+import { decode } from "../deps.ts";
 
 export async function getPayload(jwt: string) {
   const [header, payload, signature] = decode(jwt);
