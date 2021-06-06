@@ -66,10 +66,8 @@ function PointsGraph(props: { game: Game }) {
       >
         <CartesianGrid strokeDasharray="3 3" />
 
-        {
-          /*<XAxis dataKey="turn" />
-        <YAxis />*/
-        }
+        <XAxis dataKey="turn" />
+        <YAxis />
         <Tooltip labelFormatter={(props) => "Turn : " + props} />
         <Legend />
 
