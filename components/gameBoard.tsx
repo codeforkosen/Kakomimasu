@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Link, useHistory } from "react-router-dom";
 
-import ApiClient from "../apiserver/api_client.js";
+import ApiClient from "../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 import datas from "./player_datas.ts";

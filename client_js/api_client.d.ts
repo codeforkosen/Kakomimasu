@@ -9,7 +9,7 @@ import {
   TournamentRes,
   User,
   UserRegistReq,
-} from "./types.ts";
+} from "../apiserver/types.ts";
 
 type ApiRes<T = {}> = Promise<
   { success: true; data: T } | { success: false; data: Error }

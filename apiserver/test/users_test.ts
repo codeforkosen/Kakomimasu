@@ -1,6 +1,6 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
 
-import ApiClient from "../api_client.js";
+import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
 
 import { pathResolver } from "../apiserver_util.ts";

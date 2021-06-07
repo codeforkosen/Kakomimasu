@@ -3,7 +3,7 @@ import { Theme, useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import { Link, useHistory } from "react-router-dom";
 
-import ApiClient from "../apiserver/api_client.js";
+import ApiClient from "../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 type Props = {

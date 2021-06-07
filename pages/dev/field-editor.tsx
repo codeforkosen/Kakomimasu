@@ -8,7 +8,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Content from "../../components/content.tsx";
 import GameBoard from "../../components/gameBoard.tsx";
 
-import ApiClient from "../../apiserver/api_client.js";
+// @deno-types=../../client_js/api_client.d.ts
+import ApiClient from "../../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 import { Board } from "../../apiserver/types.ts";
