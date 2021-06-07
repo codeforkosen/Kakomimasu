@@ -1,8 +1,4 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.90.0/testing/asserts.ts";
-import { v4 } from "https://deno.land/std@0.89.0/uuid/mod.ts";
+import { assert, assertEquals, v4 } from "../deps.ts";
 
 import ApiClient from "../api_client.js";
 const ac = new ApiClient();

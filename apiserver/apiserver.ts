@@ -1,13 +1,6 @@
-//import type { WebSocket } from "https://deno.land/std@0.89.0/ws/mod.ts";
+//import type { WebSocket } from "./deps.ts";
 import type { WebSocket } from "./mod.ts";
-import {
-  createApp,
-  createRouter,
-  RoutingError,
-  serveJsx,
-  ServerRequest,
-  serveStatic,
-} from "https://deno.land/x/servest@v1.3.0/mod.ts";
+import { config, createApp, createRouter, ServerRequest } from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
@@ -15,7 +8,6 @@ const resolve = util.pathResolver(import.meta);
 import { Board, ExpKakomimasu } from "./parts/expKakomimasu.ts";
 import { errorCodeResponse } from "./error.ts";
 
-import { config } from "https://deno.land/x/dotenv@v2.0.0/mod.ts";
 const env = config({
   path: resolve("./.env"),
   defaults: resolve("./.env.default"),
