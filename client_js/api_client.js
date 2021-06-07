@@ -63,8 +63,8 @@ export default class ApiClient {
   }
 
   async usersDelete(data) {
-    const resJson = await this._fetchPostJsonToJson("/users/delete", data);
-    return resJson;
+    const res = await this._fetchPostJson("/users/delete", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersShow(identifier) {

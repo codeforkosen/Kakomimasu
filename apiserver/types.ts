@@ -19,6 +19,12 @@ export interface UserRegistReq extends ApiOption, UserBase {
   password: string;
 }
 
+export interface UserDeleteReq extends ApiOption {
+  name?: string;
+  id?: string;
+  password: string;
+}
+
 export type TournamentRes = Required<Tournament>;
 
 export interface TournamentAddUserReq extends ApiOption {

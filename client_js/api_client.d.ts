@@ -8,6 +8,7 @@ import {
   TournamentCreateReq,
   TournamentRes,
   User,
+  UserDeleteReq,
   UserRegistReq,
 } from "../apiserver/types.ts";
 
@@ -22,6 +23,7 @@ export default class ApiClient {
   usersRegist(data: UserRegistReq, auth: string): ApiRes<User[]>;
   usersSearch(searchText: string): ApiRes<User[]>;
   usersShow(identifier: string): ApiRes<User>;
+  usersDelete(data: UserDeleteReq): ApiRes<User>;
 
   getMatch(gameId: string): ApiRes<Game>;
 
