@@ -6,12 +6,16 @@ const resolve = pathResolver(import.meta);
 
 import util from "../util.js";
 import { accounts } from "./user.ts";
-import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
-import { MatchReq } from "./types.ts";
+import {
+  ActionPost as IActionPost,
+  ActionReq,
+  ActionRes,
+  MatchReq,
+} from "./types.ts";
 
 const env = config({
   path: resolve("./.env"),
@@ -31,7 +35,7 @@ const getRandomBoardName = async () => {
   return list[util.rnd(list.length)];
 };
 
-class ActionPost {
+class ActionPost implements IActionPost {
   constructor(
     public agentId: number,
     public type: string,
@@ -54,10 +58,6 @@ class ActionPost {
       return false;
     } else return true;
   }
-}
-
-interface SetActionPost extends ApiOption {
-  actions: ActionPost[];
 }
 
 export const matchRouter = () => {
@@ -154,7 +154,7 @@ export const matchRouter = () => {
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
 
-    const actionData = (await req.json()) as SetActionPost;
+    const actionData = (await req.json()) as ActionReq;
     if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
       throw new ServerError(errors.INVALID_ACTION);
     }
@@ -169,8 +169,13 @@ export const matchRouter = () => {
       nowTurn = game.turn;
     }
 
+    const resData: ActionRes = {
+      receptionUnixTime: Math.floor(reqTime),
+      turn: nowTurn,
+    };
+
     await req.respond(
-      jsonResponse({ receptionUnixTime: Math.floor(reqTime), turn: nowTurn }),
+      jsonResponse(resData),
     );
   });
 

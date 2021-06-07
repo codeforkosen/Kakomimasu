@@ -1,4 +1,7 @@
 import {
+  ActionPost,
+  ActionReq,
+  ActionRes,
   Board,
   Error,
   Game,
@@ -30,6 +33,8 @@ export default class ApiClient {
 
   getMatch(gameId: string): ApiRes<Game>;
   match(data: MatchReq): ApiRes<MatchRes>;
+
+  setAction(gameId: string, data, auth: string): ApiRes<ActionRes>;
 
   tournamentsCreate(data: TournamentCreateReq): ApiRes<TournamentRes>;
   tournamentsGet(id: string): ApiRes<TournamentRes>;

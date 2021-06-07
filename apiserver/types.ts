@@ -68,6 +68,22 @@ export interface MatchRes {
   index: number;
 }
 
+export interface ActionPost {
+  agentId: number;
+  type: string;
+  x: number;
+  y: number;
+}
+
+export interface ActionReq extends ApiOption {
+  actions: ActionPost[];
+}
+
+export interface ActionRes {
+  receptionUnixTime: number;
+  turn: number;
+}
+
 export interface Game {
   gameId: string;
   gaming: boolean;

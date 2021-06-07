@@ -217,7 +217,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   );
   await ac.usersDelete(userData);
 
-  assertAction(res);
+  assertAction(res.data);
 });
 Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
   const uuid = v4.generate();
@@ -246,5 +246,5 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
   );
   await ac.usersDelete(userData);
 
-  assertEquals(res, errors.INVALID_ACCESSTOKEN);
+  assertEquals(res.data, errors.INVALID_ACCESSTOKEN);
 });

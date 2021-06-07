@@ -115,7 +115,7 @@ export default class ApiClient {
   }
 
   async setAction(gameId, data, auth) {
-    const resJson = await this._fetchPostJsonToJsonWithAuth(`/match/${gameId}/action`, data, auth);
-    return resJson;
+    const res = await this._fetchPostJson(`/match/${gameId}/action`, data, auth);
+    return { success: res.status === 200, data: await res.json() };
   }
 }
