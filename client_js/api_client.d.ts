@@ -6,6 +6,7 @@ import {
   Tournament,
   TournamentAddUserReq,
   TournamentCreateReq,
+  TournamentDeleteReq,
   TournamentRes,
   User,
   UserDeleteReq,
@@ -34,6 +35,7 @@ export default class ApiClient {
     tournamentId: string,
     data: TournamentAddUserReq,
   ): ApiRes<TournamentRes>;
+  tournamentsDelete(data: TournamentDeleteReq): ApiClient<TournamentRes>;
 
   gameCreate(data: GameCreateReq): ApiRes<Game>;
 

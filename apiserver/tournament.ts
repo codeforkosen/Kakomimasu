@@ -11,6 +11,7 @@ import {
   Tournament as ITournament,
   TournamentAddUserReq,
   TournamentCreateReq,
+  TournamentDeleteReq,
   TournamentType,
 } from "./types.ts";
 
@@ -19,10 +20,6 @@ const checkType = (type: string): boolean => {
   if (type === "knockout") return true;
   return false;
 };
-
-export interface ITournamentDeleteReq extends ApiOption {
-  id: string;
-}
 
 export class Tournament implements ITournament {
   public id: string;
@@ -144,7 +141,7 @@ export const tournamentRouter = () => {
 
   // 大会削除
   router.post("/delete", async (req) => {
-    const data = await req.json() as ITournamentDeleteReq;
+    const data = await req.json() as TournamentDeleteReq;
     if (!data.id) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
     const tournament = tournaments.get(data.id);

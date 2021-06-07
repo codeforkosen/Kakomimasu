@@ -233,7 +233,7 @@ Deno.test("api/tournament/delete:normal", async () => {
     id: data.id,
     option: { dryRun: true },
   });
-  assertTournament(res, data);
+  assertTournament(res.data, data);
 });
 Deno.test("api/tournament/delete:invalid tournament id", async () => {
   {
@@ -241,21 +241,21 @@ Deno.test("api/tournament/delete:invalid tournament id", async () => {
       id: "",
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
   {
     const res = await ac.tournamentsDelete({
       id: undefined,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
   {
     const res = await ac.tournamentsDelete({
       id: null,
       option: { dryRun: true },
     });
-    assertEquals(res, errors.INVALID_TOURNAMENT_ID);
+    assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
   }
 });
 Deno.test("api/tournament/delete:nothing tournament id", async () => {
@@ -263,9 +263,9 @@ Deno.test("api/tournament/delete:nothing tournament id", async () => {
     id: v4.generate(),
     option: { dryRun: true },
   });
-  assertEquals(res, errors.NOTHING_TOURNAMENT_ID);
+  assertEquals(res.data, errors.NOTHING_TOURNAMENT_ID);
 });
 Deno.test("api/tournament/delete:normal by no dryRun", async () => {
   const res = await ac.tournamentsDelete({ id: data.id });
-  assertTournament(res, data);
+  assertTournament(res.data, data);
 });
