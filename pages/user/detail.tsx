@@ -4,10 +4,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   Cell,
+  ContentRenderer,
   Pie,
   PieChart,
-  //ContentRenderer,
-  PieLabel,
   PieLabelRenderProps,
   ResponsiveContainer,
 } from "recharts";
@@ -95,7 +94,7 @@ export default function () {
     getUser();
   }, [id]);
 
-  const renderLabel: PieLabel = (
+  const renderLabel: ContentRenderer<PieLabelRenderProps> = (
     { cx, cy, midAngle, innerRadius, outerRadius, percent },
   ) => {
     const [cx_, cy_, midAngle_, innerRadius_, outerRadius_] = [
