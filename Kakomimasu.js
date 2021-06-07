@@ -721,10 +721,7 @@ class Game {
       const player = {
         id: id,
         agents: agents,
-        // don't need point, need tile&areaPoint
         point: this.field.getPoints()[i],
-        tilePoint: null,
-        areaPoint: null,
       };
       players.push(player);
     });
