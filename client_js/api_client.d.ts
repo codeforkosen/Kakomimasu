@@ -3,6 +3,8 @@ import {
   Error,
   Game,
   GameCreateReq,
+  MatchReq,
+  MatchRes,
   Tournament,
   TournamentAddUserReq,
   TournamentCreateReq,
@@ -27,6 +29,7 @@ export default class ApiClient {
   usersDelete(data: UserDeleteReq): ApiRes<User>;
 
   getMatch(gameId: string): ApiRes<Game>;
+  match(data: MatchReq): ApiRes<MatchRes>;
 
   tournamentsCreate(data: TournamentCreateReq): ApiRes<TournamentRes>;
   tournamentsGet(id: string): ApiRes<TournamentRes>;

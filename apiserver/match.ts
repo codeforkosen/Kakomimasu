@@ -11,6 +11,7 @@ import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
+import { MatchReq } from "./types.ts";
 
 const env = config({
   path: resolve("./.env"),
@@ -29,19 +30,6 @@ const getRandomBoardName = async () => {
   }
   return list[util.rnd(list.length)];
 };
-
-interface IMatchRequest extends ApiOption {
-  name?: string;
-  id?: string;
-  password?: string;
-  spec?: string;
-  gameId?: string;
-  useAi?: boolean;
-  aiOption?: {
-    aiName: string;
-    boardName?: string;
-  };
-}
 
 class ActionPost {
   constructor(
@@ -76,7 +64,7 @@ export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
-    const reqData = await req.json() as IMatchRequest;
+    const reqData = await req.json() as MatchReq;
     //console.log(reqData);
 
     const identifier = reqData.id || reqData.name;

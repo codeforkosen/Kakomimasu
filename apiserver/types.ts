@@ -47,6 +47,27 @@ export interface GameCreateReq extends ApiOption {
   tournamentId?: string;
 }
 
+export interface MatchReq extends ApiOption {
+  name?: string;
+  id?: string;
+  password?: string;
+  spec?: string;
+  gameId?: string;
+  useAi?: boolean;
+  aiOption?: {
+    aiName: string;
+    boardName?: string;
+  };
+}
+
+export interface MatchRes {
+  userId: string;
+  spec: string;
+  accessToken: string;
+  gameId: string;
+  index: number;
+}
+
 export interface Game {
   gameId: string;
   gaming: boolean;

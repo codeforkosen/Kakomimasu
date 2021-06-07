@@ -105,8 +105,8 @@ export default class ApiClient {
   }
 
   async match(data) {
-    const resJson = await this._fetchPostJsonToJson("/match", data);
-    return resJson;
+    const res = await this._fetchPostJson("/match", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async getMatch(gameId) {

@@ -4,7 +4,6 @@ import { jsonResponse } from "./apiserver_util.ts";
 import util from "../util.js";
 import { TournamentFileOp } from "./parts/file_opration.ts";
 import { accounts } from "./user.ts";
-import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
 import {
