@@ -6,8 +6,8 @@ const cl = (...param) => {
 }
 
 
-// const defaulthost = "http://localhost:8880/api";
-const defaulthost = "https://practice.kakomimasu.website/api";
+const defaulthost = "http://localhost:8880/api";
+// const defaulthost = "https://practice.kakomimasu.website/api";
 let host = defaulthost;
 const setHost = (s) => {
   host = s || defaulthost;
