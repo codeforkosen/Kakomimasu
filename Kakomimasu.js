@@ -707,7 +707,7 @@ class Game {
     const players = [];
     this.players.forEach((p, i) => {
       const id = p.id;
-      let agents = null;
+      let agents = [];
       if (this.isReady()) {
         agents = [];
         this.agents[i].forEach((a) => {
