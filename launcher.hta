@@ -9,9 +9,11 @@
     var shell = new ActiveXObject("Shell.Application");
     
     function battle() {
-		  shell.ShellExecute('deno', 'run -A client_deno/' + p1.value);
-			shell.ShellExecute('deno', 'run -A client_deno/' + p2.value);
-	    shell.ShellExecute('chrome', 'http://localhost:8880/game/detail');
+      shell.ShellExecute('deno', 'run -A client_deno/' + p1.value + ' --local');
+      setTimeout(function() {
+        shell.ShellExecute('deno', 'run -A client_deno/' + p2.value + ' --local');
+      },100);
+      shell.ShellExecute('chrome', 'http://localhost:8880/game/detail');
     }
   </script>
   <style>
