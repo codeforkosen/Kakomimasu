@@ -3,11 +3,10 @@ import { contentTypeFilter, createRouter } from "./deps.ts";
 import util from "../util.js";
 import { jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
-import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
 import { getPayload } from "./parts/jwt.ts";
-import { UserRegistReq } from "./types.ts";
+import { UserDeleteReq, UserRegistReq } from "./types.ts";
 
 export interface IUser {
   screenName: string;
@@ -15,12 +14,6 @@ export interface IUser {
   id?: string;
   password?: string;
   gamesId?: string[];
-}
-
-export interface IReqDeleteUser extends ApiOption {
-  id?: string;
-  name?: string;
-  password: string;
 }
 
 class User implements IUser {
@@ -100,7 +93,7 @@ class Users {
     return user;
   }
 
-  deleteUser(data: IReqDeleteUser) {
+  deleteUser(data: UserDeleteReq) {
     if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
 
     const index = this.users.findIndex((e) => {
@@ -266,7 +259,7 @@ export const userRouter = () => {
     "/delete",
     contentTypeFilter("application/json"),
     async (req) => {
-      const reqData = ((await req.json()) as User);
+      const reqData = ((await req.json()) as UserDeleteReq);
       const user = accounts.deleteUser(reqData);
       await req.respond(jsonResponse(user));
     },

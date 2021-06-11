@@ -1,25 +1,24 @@
 import {
   Action,
   sleep,
-  userRegist,
-  userShow,
-  match,
-  getGameInfo,
-  setAction,
   diffTime,
-  setHost,
   cl,
   args
 } from "./client_util.js";
+
+import ApiClient from "../client_js/api_client.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
 class KakomimasuClient {
+  apiClient = new ApiClient("https://practice.kakomimasu.website");
+
   constructor(id, name, spec, password) {
     dotenv.config();
     this.id = id || Deno.env.get("id");
     this.password = password || Deno.env.get("password");
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
+    console.log(args.local);
     if (args.local) this.setServerHost("http://localhost:8880");
     else this.setServerHost(Deno.env.get("host"));
   }
@@ -28,7 +27,8 @@ class KakomimasuClient {
       if (host.endsWith("/")) {
         host = host.substring(0, host.length - 1);
       }
-      setHost(`${host}/api`);
+      //setHost(`${host}/api`);
+      this.apiClient = new ApiClient(host)
     }
   }
   readGameId() {
@@ -42,10 +42,15 @@ class KakomimasuClient {
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
-    let user = await userShow(this.id);
-    if (user.hasOwnProperty("errorCode")) {
-      user = await userRegist(this.name, this.id, this.password);
+    const userRes = await this.apiClient.usersShow(this.id);
+    let user;
+    if (userRes.success) user = userRes.data;
+    else {
+      const res = await this.apiClient.usersRegist({ screenName: this.name, name: this.id, password: this.password });
+      if (res.success) user = res.data;
+      else throw Error("User Regist Error");
     }
+    cl(user);
 
     // プレイヤー登録
     let matchParam = { id: user.id, password: this.password, spec: this.spec };
@@ -58,15 +63,21 @@ class KakomimasuClient {
     } else if (args.gameId) {
       matchParam.gameId = args.gameId;
     }
-    cl(matchParam);
-    const resMatch = await match(matchParam);
-    this.token = resMatch.accessToken;
-    this.gameId = resMatch.gameId;
-    this.pno = resMatch.index;
-    cl("playerid", resMatch, this.pno);
+    //cl(matchParam);
+    const MatchRes = await this.apiClient.match(matchParam);
+    //cl(MatchRes);
+    if (MatchRes.success) {
+      const matchGame = MatchRes.data;
+      this.token = matchGame.accessToken;
+      this.gameId = matchGame.gameId;
+      this.pno = matchGame.index;
+      cl("playerid", matchGame, this.pno);
+    } else throw Error("Match Error");
 
     do {
-      this.gameInfo = await getGameInfo(this.gameId);
+      const gameRes = await this.apiClient.getMatch(this.gameId);
+      if (gameRes.success) this.gameInfo = gameRes.data;
+      else throw Error("Get Match Error");
       await sleep(100);
     } while (this.gameInfo.startedAtUnixTime === null);
 
@@ -141,7 +152,9 @@ class KakomimasuClient {
 
   async waitStart() { // GameInfo
     await sleep(diffTime(this.gameInfo.startedAtUnixTime));
-    this.gameInfo = await getGameInfo(this.gameId);
+    const res = await this.apiClient.getMatch(this.gameId);
+    if (res.success) this.gameInfo = res.data;
+    else throw Error("Get Match Error");
     cl(this.gameInfo);
     this.log = [this.gameInfo];
     cl("totalTurn", this.gameInfo.board.nTurn);
@@ -149,8 +162,10 @@ class KakomimasuClient {
     return this.gameInfo;
   }
 
-  setActions(actions) { // void
-    setAction(this.gameId, this.token, actions);
+  async setActions(actions) { // void
+    const res = await this.apiClient.setAction(this.gameId, { actions }, this.token);
+    console.log("setActions", res);
+    if (res.success === false) throw Error("Set Action Error");
   }
 
   async waitNextTurn() { // GameInfo? (null if end)
@@ -160,7 +175,9 @@ class KakomimasuClient {
       await sleep(diffTime(bknext));
 
       for (; ;) {
-        this.gameInfo = await getGameInfo(this.gameId);
+        const res = await this.apiClient.getMatch(this.gameId);
+        if (res.success) this.gameInfo = res.data;
+        else throw Error("Get Match Error");
         if (this.gameInfo.nextTurnUnixTime !== bknext) {
           break;
         }

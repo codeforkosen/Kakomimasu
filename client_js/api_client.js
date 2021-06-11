@@ -63,8 +63,8 @@ export default class ApiClient {
   }
 
   async usersDelete(data) {
-    const resJson = await this._fetchPostJsonToJson("/users/delete", data);
-    return resJson;
+    const res = await this._fetchPostJson("/users/delete", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async usersShow(identifier) {
@@ -86,8 +86,8 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsDelete(data) {
-    const resJson = await this._fetchPostJsonToJson("/tournament/delete", data);
-    return resJson;
+    const res = await this._fetchPostJson("/tournament/delete", data);
+    return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsAddUser(tournamentId, data) {
     const res = await this._fetchPostJson(`/tournament/add?id=${tournamentId}`, data);
@@ -105,8 +105,8 @@ export default class ApiClient {
   }
 
   async match(data) {
-    const resJson = await this._fetchPostJsonToJson("/match", data);
-    return resJson;
+    const res = await this._fetchPostJson("/match", data);
+    return { success: res.status === 200, data: await res.json() };
   }
 
   async getMatch(gameId) {
@@ -115,7 +115,7 @@ export default class ApiClient {
   }
 
   async setAction(gameId, data, auth) {
-    const resJson = await this._fetchPostJsonToJsonWithAuth(`/match/${gameId}/action`, data, auth);
-    return resJson;
+    const res = await this._fetchPostJson(`/match/${gameId}/action`, data, auth);
+    return { success: res.status === 200, data: await res.json() };
   }
 }

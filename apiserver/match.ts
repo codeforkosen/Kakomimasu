@@ -6,11 +6,16 @@ const resolve = pathResolver(import.meta);
 
 import util from "../util.js";
 import { accounts } from "./user.ts";
-import { ApiOption } from "./parts/interface.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
+import {
+  ActionPost as IActionPost,
+  ActionReq,
+  ActionRes,
+  MatchReq,
+} from "./types.ts";
 
 const env = config({
   path: resolve("./.env"),
@@ -30,20 +35,7 @@ const getRandomBoardName = async () => {
   return list[util.rnd(list.length)];
 };
 
-interface IMatchRequest extends ApiOption {
-  name?: string;
-  id?: string;
-  password?: string;
-  spec?: string;
-  gameId?: string;
-  useAi?: boolean;
-  aiOption?: {
-    aiName: string;
-    boardName?: string;
-  };
-}
-
-class ActionPost {
+class ActionPost implements IActionPost {
   constructor(
     public agentId: number,
     public type: string,
@@ -68,15 +60,11 @@ class ActionPost {
   }
 }
 
-interface SetActionPost extends ApiOption {
-  actions: ActionPost[];
-}
-
 export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
-    const reqData = await req.json() as IMatchRequest;
+    const reqData = await req.json() as MatchReq;
     //console.log(reqData);
 
     const identifier = reqData.id || reqData.name;
@@ -166,7 +154,7 @@ export const matchRouter = () => {
     const player = game.players.find((p: any) => p.accessToken === accessToken);
     if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
 
-    const actionData = (await req.json()) as SetActionPost;
+    const actionData = (await req.json()) as ActionReq;
     if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
       throw new ServerError(errors.INVALID_ACTION);
     }
@@ -181,8 +169,13 @@ export const matchRouter = () => {
       nowTurn = game.turn;
     }
 
+    const resData: ActionRes = {
+      receptionUnixTime: Math.floor(reqTime),
+      turn: nowTurn,
+    };
+
     await req.respond(
-      jsonResponse({ receptionUnixTime: Math.floor(reqTime), turn: nowTurn }),
+      jsonResponse(resData),
     );
   });
 

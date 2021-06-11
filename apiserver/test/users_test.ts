@@ -1,6 +1,6 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
 
-import ApiClient from "../api_client.js";
+import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
 
 import { pathResolver } from "../apiserver_util.ts";
@@ -171,7 +171,7 @@ Deno.test("users delete:normal by name", async () => {
     password: data.password,
     option: { dryRun: true },
   });
-  assertUser(res, data);
+  assertUser(res.data, data);
 });
 Deno.test("users delete:normal by id", async () => {
   const res = await ac.usersDelete({
@@ -179,7 +179,7 @@ Deno.test("users delete:normal by id", async () => {
     password: data.password,
     option: { dryRun: true },
   });
-  assertUser(res, data);
+  assertUser(res.data, data);
 });
 Deno.test("users delete:not password", async () => {
   const data_: any = {
@@ -189,7 +189,7 @@ Deno.test("users delete:not password", async () => {
   };
   {
     const res = await ac.usersDelete(data_);
-    assertEquals(res, errors.NOTHING_PASSWORD);
+    assertEquals(res.data, errors.NOTHING_PASSWORD);
   }
   {
     data_.password = null;
@@ -208,10 +208,10 @@ Deno.test("users delete:not user", async () => {
     password: data.password,
     option: { dryRun: true },
   });
-  assertEquals(res, errors.NOT_USER);
+  assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("users delete:normal no dryrun", async () => {
   let res;
   res = await ac.usersDelete({ ...data });
-  assertUser(res, data);
+  assertUser(res.data, data);
 });
