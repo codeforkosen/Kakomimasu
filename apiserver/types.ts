@@ -19,6 +19,12 @@ export interface UserRegistReq extends ApiOption, UserBase {
   password: string;
 }
 
+export interface UserDeleteReq extends ApiOption {
+  name?: string;
+  id?: string;
+  password: string;
+}
+
 export type TournamentRes = Required<Tournament>;
 
 export interface TournamentAddUserReq extends ApiOption {
@@ -29,12 +35,53 @@ export interface TournamentCreateReq extends TournamentBasic, ApiOption {
   participants?: string[];
 }
 
+export interface TournamentDeleteReq extends ApiOption {
+  id: string;
+}
+
 export interface GameCreateReq extends ApiOption {
   name?: string;
   boardName?: string; // 必須
   nPlayer?: number;
   playerIdentifiers?: string[];
   tournamentId?: string;
+}
+
+export interface MatchReq extends ApiOption {
+  name?: string;
+  id?: string;
+  password?: string;
+  spec?: string;
+  gameId?: string;
+  useAi?: boolean;
+  aiOption?: {
+    aiName: string;
+    boardName?: string;
+  };
+}
+
+export interface MatchRes {
+  userId: string;
+  spec: string;
+  accessToken: string;
+  gameId: string;
+  index: number;
+}
+
+export interface ActionPost {
+  agentId: number;
+  type: string;
+  x: number;
+  y: number;
+}
+
+export interface ActionReq extends ApiOption {
+  actions: ActionPost[];
+}
+
+export interface ActionRes {
+  receptionUnixTime: number;
+  turn: number;
 }
 
 export interface Game {

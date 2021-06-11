@@ -11,8 +11,8 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import Section from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 
-// @deno-types="../../apiserver/api_client.d.ts"
-import ApiClient from "../../apiserver/api_client.js";
+// @deno-types="../../client_js/api_client.d.ts"
+import ApiClient from "../../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 const useStyles = makeStyles({
