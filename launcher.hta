@@ -1,19 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta charset="utf-8">
   <title>囲みマス</title>
   <script>
-    window.moveTo(100, 100);
-    window.resizeTo(400, 430);
-    var shell = new ActiveXObject("Shell.Application");
-    
+    moveTo(100, 100);
+    resizeTo(400, 430);
+    const shell = new ActiveXObject("Shell.Application");
+
+    function exec(cmd, param) {
+      shell.ShellExecute(cmd, param);
+    }
+
+    function installDeno() {
+      exec("powershell", "iwr https://deno.land/x/install/install.ps1 -useb | iex");
+    }
+
+    function runServer() {
+      exec("deno", "run -A apiserver/apiserver.ts");
+    }
+
+    function runClient(name) {
+      exec('deno', 'run -A client_deno/' + name + ' --local');
+    }
+
     function battle() {
-      shell.ShellExecute('deno', 'run -A client_deno/' + p1.value + ' --local');
+      runClient(p1.value);
       setTimeout(function() {
-        shell.ShellExecute('deno', 'run -A client_deno/' + p2.value + ' --local');
-      },100);
-      shell.ShellExecute('chrome', 'http://localhost:8880/game/detail');
+        runClient(p2.value);
+      }, 100);
+      exec("http://localhost:8880/game/detail");
     }
   </script>
   <style>
@@ -25,10 +42,10 @@
 </head>
 <body>
   <center><img src="img/kakomimasu-logo.png" width="200"></center>
-  <button onclick="shell.ShellExecute('powershell', 'iwr https://deno.land/x/install/install.ps1 -useb | iex')">
+  <button onclick="installDeno()">
       Denoのインストール
   </button>
-  <button onclick="shell.ShellExecute('deno', 'run -A apiserver/apiserver.ts')">
+  <button onclick="runServer()">
     サーバの起動
   </button>
   <select name="p1">
