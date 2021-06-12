@@ -23,8 +23,12 @@ export default class ApiClient {
     return res;
   }
 
-  async _fetch(path, init) {
-    const res = await fetch(this.baseUrl + path, init);
+  async _fetch(path, auth) {
+    const res = await fetch(this.baseUrl + path, auth ? {
+      headers: new Headers({
+        Authorization: auth
+      })
+    } : {});
     return res;
   }
 
@@ -49,11 +53,7 @@ export default class ApiClient {
   }
 
   async usersVerify(idToken) {
-    const res = await this._fetch("/users/verify", {
-      headers: new Headers({
-        Authorization: idToken
-      })
-    });
+    const res = await this._fetch("/users/verify", idToken);
     if (res.status === 200) return { success: true };
     else return { success: false, data: res };
   }
@@ -67,8 +67,8 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
 
-  async usersShow(identifier) {
-    const res = await this._fetch(`/users/show/${identifier}`);
+  async usersShow(identifier, idToken) {
+    const res = await this._fetch(`/users/show/${identifier}`, idToken);
     return { success: res.status === 200, data: await res.json() };
   }
 

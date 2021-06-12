@@ -13,6 +13,7 @@ interface UserBase {
 export interface User extends UserBase {
   id: string;
   gamesId: string[];
+  accessToken?: string;
 }
 
 export interface UserRegistReq extends ApiOption, UserBase {
