@@ -14,6 +14,7 @@ export interface IUser {
   id?: string;
   password?: string;
   gamesId?: string[];
+  accessToken?: string;
 }
 
 class User implements IUser {
@@ -22,6 +23,7 @@ class User implements IUser {
   public readonly id: string;
   public password: string;
   public gamesId: string[];
+  public readonly accessToken: string;
 
   constructor(data: IUser) {
     this.screenName = data.screenName;
@@ -29,6 +31,7 @@ class User implements IUser {
     this.id = data.id || util.uuid();
     this.password = data.password || "";
     this.gamesId = data.gamesId || [];
+    this.accessToken = data.accessToken || util.uuid();
   }
 
   dataCheck(games: ExpGame[]) {
@@ -40,13 +43,12 @@ class User implements IUser {
   // シリアライズする際にパスワードを返さないように
   // パスワードを返したい場合にはnoSafe()を用いる
   toJSON() {
-    return Object.assign({}, this, { password: undefined });
+    const { password, accessToken, ...data } = { ...this };
+    return data;
   }
 
-  // passwordも含めたオブジェクトにする
-  noSafe() {
-    return Object.assign({}, this);
-  }
+  // password,accessTokenも含めたオブジェクトにする
+  noSafe = () => ({ ...this });
 }
 
 class Users {
