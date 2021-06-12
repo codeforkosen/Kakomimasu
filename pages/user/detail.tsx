@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
+import firebase from "../../components/firebase.ts";
 
 // @deno-types="../../client_js/api_client.d.ts"
 import ApiClient from "../../client_js/api_client.js";
@@ -48,8 +49,8 @@ export default function () {
     | null
   >(undefined);
 
-  const getUser = async () => {
-    const res = await apiClient.usersShow(id);
+  const getUser = async (idToken?: string) => {
+    const res = await apiClient.usersShow(id, idToken);
     if (res.success === false) {
       setUser(null);
     } else {
@@ -91,7 +92,10 @@ export default function () {
   };
 
   useEffect(() => {
-    getUser();
+    firebase.auth().onAuthStateChanged(async (user) => {
+      const idToken = await user?.getIdToken(true);
+      getUser(idToken);
+    });
   }, [id]);
 
   const renderLabel: ContentRenderer<PieLabelRenderProps> = (
@@ -134,6 +138,10 @@ export default function () {
                   <SubSection title="表示名">{user.screenName}</SubSection>
                   <SubSection title="ユーザネーム">{user.name}</SubSection>
                   <SubSection title="ユーザID">{user.id}</SubSection>
+                  {user.accessToken &&
+                    <SubSection title="アクセストークン(この値は他人に教えないようにしてください)">
+                      {user.accessToken}
+                    </SubSection>}
                 </div>
               </Section>
               <Section title="勝敗記録">

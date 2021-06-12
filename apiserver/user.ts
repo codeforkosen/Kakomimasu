@@ -248,8 +248,20 @@ export const userRouter = () => {
   // ユーザ情報取得
   router.get(new RegExp("^/show/(.*)$"), async (req) => {
     const identifier = req.match[1];
+
     if (identifier !== "") {
       const user = accounts.showUser(identifier);
+
+      const jwt = req.headers.get("Authorization");
+      if (jwt) {
+        const payload = await getPayload(jwt);
+        if (payload) {
+          if (user.id === payload.user_id) {
+            await req.respond(jsonResponse(user.noSafe()));
+            return;
+          }
+        }
+      }
       await req.respond(jsonResponse(user));
     } else {
       await req.respond(jsonResponse(accounts.getUsers()));
