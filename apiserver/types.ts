@@ -49,9 +49,6 @@ export interface GameCreateReq extends ApiOption {
 }
 
 export interface MatchReq extends ApiOption {
-  name?: string;
-  id?: string;
-  password?: string;
   spec?: string;
   gameId?: string;
   useAi?: boolean;

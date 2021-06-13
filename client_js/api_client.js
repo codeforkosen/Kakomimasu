@@ -104,8 +104,8 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
 
-  async match(data) {
-    const res = await this._fetchPostJson("/match", data);
+  async match(data, accessToken) {
+    const res = await this._fetchPostJson("/match", data, accessToken);
     return { success: res.status === 200, data: await res.json() };
   }
 

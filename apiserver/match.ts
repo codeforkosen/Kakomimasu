@@ -10,6 +10,7 @@ import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
+import { getPayload } from "./parts/jwt.ts";
 import {
   ActionPost as IActionPost,
   ActionReq,
@@ -64,14 +65,13 @@ export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
-    const reqData = await req.json() as MatchReq;
+    const reqData = await req.json() as Partial<MatchReq>;
     //console.log(reqData);
-
-    const identifier = reqData.id || reqData.name;
-    if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
-
-    if (!reqData.password) throw new ServerError(errors.NOTHING_PASSWORD);
-    const user = accounts.getUser(identifier, reqData.password);
+    const accessToken = req.headers.get("Authorization");
+    const user = accounts.getUsers().find((user) =>
+      user.accessToken === accessToken
+    );
+    if (!user) throw new ServerError(errors.NOT_USER);
 
     const player = kkmm.createPlayer(user.id, reqData.spec);
     if (reqData.gameId) {
@@ -85,7 +85,7 @@ export const matchRouter = () => {
           //throw Error("Game is not free");
         }
       }
-      //accounts.addGame(user.id, game.uuid);
+      //accounts.addGame(user.userId, game.uuid);
     } else if (reqData.useAi) {
       const aiFolderPath = resolve("../client_deno/");
       const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
@@ -100,7 +100,7 @@ export const matchRouter = () => {
         game.changeFuncs.push(sendAllGame);
         game.changeFuncs.push(sendGame);
         game.attachPlayer(player);
-        //accounts.addGame(user.id, game.uuid);
+        //accounts.addGame(user.userId, game.uuid);
         Deno.run(
           {
             cmd: [

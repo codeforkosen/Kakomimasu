@@ -37,7 +37,7 @@ export default class ApiClient {
   usersDelete(data: UserDeleteReq): ApiRes<User>;
 
   getMatch(gameId: string): ApiRes<Game>;
-  match(data: MatchReq): ApiRes<MatchRes>;
+  match(data: MatchReq, accessToken: string): ApiRes<MatchRes>;
 
   setAction(gameId: string, data: ActionReq, auth: string): ApiRes<ActionRes>;
 

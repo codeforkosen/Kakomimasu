@@ -28,17 +28,19 @@ const data: any = {
 };
 
 const assertUser = (user: any, sample: any | undefined = undefined) => {
-  let user_ = Object.assign({}, user);
-  let sample_ = Object.assign({}, sample);
+  let user_ = { ...user };
+  let sample_ = { ...sample };
   assert(v4.validate(user_.id));
+  assert(v4.validate(user_.accessToken));
   if (!sample_) {
     //save("usersRegist", res);
     sample_ = read("usersRegist");
   } else {
-    delete sample_.password;
+    //delete sample_.password;
     sample_.gamesId = [];
   }
   user_.id = sample_.id = undefined;
+  user_.accessToken = sample_.accessToken = undefined;
   assertEquals(user_, sample_);
 };
 
@@ -128,7 +130,7 @@ Deno.test("users regist:already registered name", async () => {
 // テスト項目
 // 正常(名前・ID)・ユーザ無し
 Deno.test("users show:normal by name", async () => {
-  let res = await ac.usersShow(data.name);
+  let res = await ac.usersShow(data.name, data.password);
   assertUser(res.data, data);
 });
 Deno.test("users show:normal by id", async () => {
