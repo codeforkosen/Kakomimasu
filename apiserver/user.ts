@@ -255,17 +255,29 @@ export const userRouter = () => {
     if (identifier !== "") {
       const user = accounts.showUser(identifier);
 
-      const jwt = req.headers.get("Authorization");
-      if (jwt) {
-        const payload = await getPayload(jwt);
-        if (payload) {
-          if (user.id === payload.user_id) {
-            await req.respond(jsonResponse(user.noSafe()));
-            return;
+      const auth = req.headers.get("Authorization");
+      console.log("user show", auth);
+      let isAuthenticated = false;
+      if (auth) {
+        const a = auth.split(" ");
+        if (a[0] === "Basic") {
+          const [username, password] = a[1].split(":");
+          if (
+            user.password === password &&
+            (user.id === username || user.name === username)
+          ) {
+            isAuthenticated = true;
+          }
+        } else {
+          const payload = await getPayload(auth);
+          if (payload) {
+            if (user.id === payload.user_id) {
+              isAuthenticated = true;
+            }
           }
         }
       }
-      await req.respond(jsonResponse(user));
+      await req.respond(jsonResponse(isAuthenticated ? user.noSafe() : user));
     } else {
       await req.respond(jsonResponse(accounts.getUsers()));
     }
