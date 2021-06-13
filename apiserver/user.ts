@@ -21,7 +21,7 @@ class User implements IUser {
   public screenName: string;
   public name: string;
   public readonly id: string;
-  public password: string;
+  public password?: string;
   public gamesId: string[];
   public readonly accessToken: string;
 
@@ -29,7 +29,7 @@ class User implements IUser {
     this.screenName = data.screenName;
     this.name = data.name;
     this.id = data.id || util.uuid();
-    this.password = data.password || "";
+    this.password = data.password;
     this.gamesId = data.gamesId || [];
     this.accessToken = data.accessToken || util.uuid();
   }
@@ -70,30 +70,6 @@ class Users {
   }
 
   getUsers = () => this.users;
-
-  registUser(
-    data: UserRegistReq & { id?: string },
-    isSecure: boolean = false,
-  ): User {
-    if (!data.screenName) throw new ServerError(errors.INVALID_SCREEN_NAME);
-    if (!data.name) throw new ServerError(errors.INVALID_USER_NAME);
-    if (!data.password) {
-      throw new ServerError(errors.NOTHING_PASSWORD);
-    }
-    if (isSecure && this.users.some((e) => e.id === data.id)) {
-      throw new ServerError(errors.ALREADY_REGISTERED_USER);
-    }
-    if (this.users.some((e) => e.name === data.name)) {
-      throw new ServerError(errors.ALREADY_REGISTERED_NAME);
-    }
-    const user = new User(data);
-
-    if (data.option?.dryRun !== true) {
-      this.users.push(user);
-      this.save();
-    }
-    return user;
-  }
 
   deleteUser(data: UserDeleteReq) {
     if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
@@ -227,21 +203,48 @@ export const userRouter = () => {
     "/regist",
     contentTypeFilter("application/json"),
     async (req) => {
-      const reqData = ((await req.json()) as UserRegistReq);
+      const reqData = (await req.json()) as Partial<UserRegistReq>;
       //console.log(reqData);
-      const jwt = req.headers.get("Authorization");
-      //console.log(jwt);
+
+      if (!reqData.screenName) {
+        throw new ServerError(errors.INVALID_SCREEN_NAME);
+      }
+
+      if (!reqData.name) throw new ServerError(errors.INVALID_USER_NAME);
+      else if (accounts.getUsers().some((e) => e.name === reqData.name)) {
+        throw new ServerError(errors.ALREADY_REGISTERED_NAME);
+      }
+
+      const idToken = req.headers.get("Authorization");
       let id: string | undefined = undefined;
-      if (jwt) {
-        const payload = await getPayload(jwt);
-        //console.log(payload);
+      if (idToken) {
+        const payload = await getPayload(idToken);
         if (payload) {
           id = payload.user_id;
-          //console.log("payload userId", payload.user_id);
+          if (accounts.getUsers().some((e) => e.id === id)) {
+            throw new ServerError(errors.ALREADY_REGISTERED_USER);
+          }
+        } else throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+      } else {
+        if (!reqData.password) {
+          throw new ServerError(errors.NOTHING_PASSWORD);
         }
       }
-      const user = accounts.registUser({ ...reqData, id }, jwt !== null);
-      await req.respond(jsonResponse(user));
+
+      const user = new User({
+        name: reqData.name,
+        screenName: reqData.screenName,
+        password: reqData.password,
+        id,
+      });
+
+      if (reqData.option?.dryRun !== true) {
+        accounts.getUsers().push(user);
+        accounts.save();
+      }
+      //return user;
+      //const user = accounts.registUser({ ...reqData, id }, jwt !== null);
+      await req.respond(jsonResponse(user.noSafe()));
     },
   );
 

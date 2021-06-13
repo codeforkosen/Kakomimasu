@@ -42,8 +42,6 @@ function Signup(props: { user: firebase.User }) {
   const [data, setData] = useState({
     screenName: props.user.displayName || "",
     name: "",
-    password: "",
-    passwordVerify: "",
   });
   const [nameHelperText, setNameHelperText] = useState("");
 
@@ -65,20 +63,15 @@ function Signup(props: { user: firebase.User }) {
     return true;
   };
 
-  const checkPassword = () => data.password === data.passwordVerify;
-
   const validate = () => {
     if (!data.screenName) return false;
     else if (nameHelperText) return false;
-    else if (!data.password) return false;
-    else if (!checkPassword()) return false;
     return true;
   };
 
   const submit = async () => {
-    const { passwordVerify, ...sendData } = data;
     const res = await apiClient.usersRegist(
-      sendData,
+      data,
       await props.user.getIdToken(),
     );
     if (res.success) {
@@ -121,29 +114,6 @@ function Signup(props: { user: firebase.User }) {
           error={Boolean(nameHelperText)}
           helperText={nameHelperText}
         />
-        <TextField
-          required
-          name="password"
-          label="パスワード"
-          type="password"
-          className={classes.textField}
-          value={data.password}
-          onChange={handleChange}
-          error={!Boolean(data.password)}
-          helperText={Boolean(data.password) ? "" : "入力必須項目です"}
-        />
-        <TextField
-          required
-          name="passwordVerify"
-          label="パスワード(確認用)"
-          type="password"
-          className={classes.textField}
-          value={data.passwordVerify}
-          error={!checkPassword()}
-          helperText={checkPassword() ? "" : "パスワードと確認用パスワードが一致しません"}
-          onChange={handleChange}
-        />
-
         <Button
           className={classes.button}
           onClick={submit}

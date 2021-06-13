@@ -52,6 +52,10 @@ export const errors = {
     errorCode: 206,
     message: "already registered user",
   },
+  INVALID_USER_AUTHORIZATION: {
+    errorCode: 207,
+    message: "invalid firebase idtoken",
+  },
   INVALID_TOURNAMENT_NAME: {
     errorCode: 300,
     message: "invalid name",
