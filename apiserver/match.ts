@@ -71,10 +71,10 @@ export const matchRouter = () => {
     if (!auth || !auth.startsWith("Bearer ")) {
       throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
     }
-    const accessToken = auth.split(" ")[1];
-    console.log(auth, accessToken);
+    const bearerToken = auth.split(" ")[1];
+    console.log(auth, bearerToken);
     const user = accounts.getUsers().find((user) =>
-      user.accessToken === accessToken
+      user.bearerToken === bearerToken
     );
     if (!user) throw new ServerError(errors.NOT_USER);
 

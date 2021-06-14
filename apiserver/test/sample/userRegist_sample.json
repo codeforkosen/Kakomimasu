@@ -1,1 +1,8 @@
-{"screenName":"高専太郎","name":"88066d69-6b62-4c51-b13f-d1eca29926a9","id":"9b10841f-c184-4f32-ba89-5fb61d9e953c","password":"nit-taro-pw","gamesId":[],"accessToken":"956cedc0-3360-4d3e-9a44-54ba933dfffa"}
+{
+  "screenName": "高専太郎",
+  "name": "88066d69-6b62-4c51-b13f-d1eca29926a9",
+  "id": "9b10841f-c184-4f32-ba89-5fb61d9e953c",
+  "password": "nit-taro-pw",
+  "gamesId": [],
+  "bearerToken": "956cedc0-3360-4d3e-9a44-54ba933dfffa"
+}

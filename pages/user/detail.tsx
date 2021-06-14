@@ -138,9 +138,9 @@ export default function () {
                   <SubSection title="表示名">{user.screenName}</SubSection>
                   <SubSection title="ユーザネーム">{user.name}</SubSection>
                   <SubSection title="ユーザID">{user.id}</SubSection>
-                  {user.accessToken &&
-                    <SubSection title="アクセストークン(この値は他人に教えないようにしてください)">
-                      {user.accessToken}
+                  {user.bearerToken &&
+                    <SubSection title="BearerToken(この値は他人に教えないようにしてください)">
+                      {user.bearerToken}
                     </SubSection>}
                 </div>
               </Section>

@@ -35,14 +35,14 @@ Deno.test("regist user", async () => {
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
 
   userId = res.data.id;
-  bearerToken = res.data.accessToken;
+  bearerToken = res.data.bearerToken;
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
   v4.validate(res.data.id);
-  v4.validate(res.data.accessToken);
+  v4.validate(res.data.bearerToken);
   res.data.id = sample.id = "";
-  res.data.accessToken = sample.accessToken = "";
+  res.data.bearerToken = sample.bearerToken = "";
   assertEquals(sample, res.data);
 });
 
@@ -58,9 +58,9 @@ Deno.test("show user", async () => {
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
   v4.validate(res.data.id);
-  res.data.accessToken && v4.validate(res.data.accessToken);
+  res.data.bearerToken && v4.validate(res.data.bearerToken);
   res.data.id = sample.id = "";
-  res.data.accessToken = sample.accessToken = "";
+  res.data.bearerToken = sample.bearerToken = "";
   assertEquals(sample, res.data);
 });
 

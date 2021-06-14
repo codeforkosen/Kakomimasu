@@ -14,7 +14,7 @@ export interface IUser {
   id?: string;
   password?: string;
   gamesId?: string[];
-  accessToken?: string;
+  bearerToken?: string;
 }
 
 class User implements IUser {
@@ -23,7 +23,7 @@ class User implements IUser {
   public readonly id: string;
   public password?: string;
   public gamesId: string[];
-  public readonly accessToken: string;
+  public readonly bearerToken: string;
 
   constructor(data: IUser) {
     this.screenName = data.screenName;
@@ -31,7 +31,7 @@ class User implements IUser {
     this.id = data.id || util.uuid();
     this.password = data.password;
     this.gamesId = data.gamesId || [];
-    this.accessToken = data.accessToken || util.uuid();
+    this.bearerToken = data.bearerToken || util.uuid();
   }
 
   dataCheck(games: ExpGame[]) {
@@ -43,7 +43,7 @@ class User implements IUser {
   // シリアライズする際にパスワードを返さないように
   // パスワードを返したい場合にはnoSafe()を用いる
   toJSON() {
-    const { password, accessToken, ...data } = { ...this };
+    const { password, bearerToken, ...data } = { ...this };
     return data;
   }
 

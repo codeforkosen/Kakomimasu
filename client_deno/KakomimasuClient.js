@@ -50,7 +50,7 @@ class KakomimasuClient {
       if (res.success) user = res.data;
       else throw Error("User Regist Error");
     }
-    this.bearerToken = user.accessToken;
+    this.bearerToken = user.bearerToken;
     cl(user);
 
     // プレイヤー登録

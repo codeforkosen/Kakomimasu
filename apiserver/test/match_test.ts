@@ -59,7 +59,7 @@ const assertAction = (actionRes: any) => {
 // ユーザ識別子無効、パスワード無効、ユーザ無し
 // gameID有：ゲーム無し
 // useAi：AI無し
-Deno.test("api/match:invalid accessToken", async () => {
+Deno.test("api/match:invalid bearerToken", async () => {
   const data = { option: { dryRun: true } };
   const res = await ac.match(data);
   assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
@@ -73,7 +73,7 @@ Deno.test("api/match:can not find game", async () => {
     gameId: v4.generate(),
     option: { dryRun: true },
   };
-  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
   await ac.usersDelete(userData);
   assertEquals(res.data, errors.NOT_GAME);
 });
@@ -90,7 +90,7 @@ Deno.test("api/match:can not find ai", async () => {
     },
     option: { dryRun: true },
   };
-  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
   await ac.usersDelete(userData);
   assertEquals(res.data, errors.NOT_AI);
 });
@@ -100,7 +100,7 @@ Deno.test("api/match:normal", async () => {
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
-  const res = await ac.match({}, "Bearer " + userRes.data.accessToken);
+  const res = await ac.match({}, "Bearer " + userRes.data.bearerToken);
   await ac.usersDelete(userData);
 
   assertMatch(res.data, { userId: userData.id });
@@ -117,7 +117,7 @@ Deno.test("api/match:normal by selfGame", async () => {
   const data = {
     gameId: gameRes.data.gameId,
   };
-  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
   await ac.usersDelete(userData);
 
   assertMatch(res.data, { userId: userData.id, gameId: gameRes.data.gameId });
@@ -134,7 +134,7 @@ Deno.test("api/match:normal by useAi", async () => {
       aiName: "a1",
     },
   };
-  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
   await ac.usersDelete(userData);
   assertMatch(res.data, { userId: userData.id });
 });
@@ -171,7 +171,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.bearerToken);
 
   const actionData = {
     actions: [
@@ -199,7 +199,7 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data, "Bearer " + userRes.data.accessToken);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.bearerToken);
 
   const actionData = {
     actions: [

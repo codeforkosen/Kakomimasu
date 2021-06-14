@@ -43,12 +43,12 @@ const assertUser = (
     sample_.gamesId = [];
   }
   if (noSafe) {
-    assert(v4.validate(user_.accessToken));
+    assert(v4.validate(user_.bearerToken));
   } else {
     delete sample_.password;
   }
   user_.id = sample_.id = undefined;
-  user_.accessToken = sample_.accessToken = undefined;
+  user_.bearerToken = sample_.bearerToken = undefined;
   assertEquals(user_, sample_);
 };
 
