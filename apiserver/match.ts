@@ -152,11 +152,21 @@ export const matchRouter = () => {
     const reqTime = new Date().getTime() / 1000;
 
     const gameId = req.match[1];
-    const accessToken = req.headers.get("Authorization");
+    const auth = req.headers.get("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+    }
+    const bearerToken = auth.split(" ")[1];
+    //console.log(auth, bearerToken);
+    //const accessToken = req.headers.get("Authorization");
 
     const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
     if (!game) throw new ServerError(errors.NOT_GAME);
-    const player = game.players.find((p: any) => p.accessToken === accessToken);
+    const player = game.players.find((p) => {
+      const user = accounts.getUsers().find((user) => user.id === p.id);
+      if (user?.bearerToken === bearerToken) return true;
+      return false;
+    });
     if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
 
     const actionData = (await req.json()) as ActionReq;
