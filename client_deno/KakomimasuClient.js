@@ -69,7 +69,6 @@ class KakomimasuClient {
     //cl(MatchRes);
     if (MatchRes.success) {
       const matchGame = MatchRes.data;
-      this.token = matchGame.accessToken;
       this.gameId = matchGame.gameId;
       this.pno = matchGame.index;
       cl("playerid", matchGame, this.pno);
@@ -166,7 +165,7 @@ class KakomimasuClient {
   }
 
   async setActions(actions) { // void
-    const res = await this.apiClient.setAction(this.gameId, { actions }, this.token);
+    const res = await this.apiClient.setAction(this.gameId, { actions }, "Bearer " + this.bearerToken);
     console.log("setActions", res);
     if (res.success === false) throw Error("Set Action Error");
   }

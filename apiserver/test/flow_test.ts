@@ -140,7 +140,7 @@ Deno.test("send action", async () => {
   await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
   await ac.setAction(gameId, {
     actions: [{ agentId: 0, type: "PUT", x: 1, y: 1 }],
-  }, accessToken);
+  }, "Bearer " + bearerToken);
   //console.log(reqJson);
 
   await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);

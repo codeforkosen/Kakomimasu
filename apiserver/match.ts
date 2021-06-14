@@ -167,7 +167,7 @@ export const matchRouter = () => {
       if (user?.bearerToken === bearerToken) return true;
       return false;
     });
-    if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
+    if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
     const actionData = (await req.json()) as ActionReq;
     if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {

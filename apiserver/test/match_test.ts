@@ -181,7 +181,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   const res = await ac.setAction(
     matchRes.data.gameId,
     actionData,
-    matchRes.data.accessToken,
+    "Bearer " + userRes.data.bearerToken,
   );
   await ac.usersDelete(userData);
 
@@ -212,5 +212,5 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
   );
   await ac.usersDelete(userData);
 
-  assertEquals(res.data, errors.INVALID_ACCESSTOKEN);
+  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });
