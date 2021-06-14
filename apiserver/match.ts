@@ -67,7 +67,12 @@ export const matchRouter = () => {
   router.post("/", contentTypeFilter("application/json"), async (req) => {
     const reqData = await req.json() as Partial<MatchReq>;
     //console.log(reqData);
-    const accessToken = req.headers.get("Authorization");
+    const auth = req.headers.get("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+    }
+    const accessToken = auth.split(" ")[1];
+    console.log(auth, accessToken);
     const user = accounts.getUsers().find((user) =>
       user.accessToken === accessToken
     );

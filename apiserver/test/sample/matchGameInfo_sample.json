@@ -1,5 +1,5 @@
 {
-  "gameId": "0e135484-f3ba-47a0-8655-d74bd7abb2bf",
+  "gameId": "4a052e72-70a8-48dd-99f9-b9e97de868cd",
   "gaming": false,
   "ending": false,
   "board": {
@@ -519,7 +519,7 @@
   ],
   "players": [
     {
-      "id": "983177e0-beb9-4d19-8a75-3ac23cf5b5d7",
+      "id": "f77c5892-d6be-4d9d-9dca-3eb2788579b4",
       "agents": [
         {
           "x": -1,
@@ -560,7 +560,7 @@
       }
     },
     {
-      "id": "983177e0-beb9-4d19-8a75-3ac23cf5b5d7",
+      "id": "f77c5892-d6be-4d9d-9dca-3eb2788579b4",
       "agents": [
         {
           "x": -1,
@@ -603,8 +603,8 @@
   ],
   "log": [],
   "gameName": "test",
-  "startedAtUnixTime": 1623071465,
-  "nextTurnUnixTime": 1623071466,
+  "startedAtUnixTime": 1623679583,
+  "nextTurnUnixTime": 1623679584,
   "reservedUsers": [],
   "type": "self"
 }

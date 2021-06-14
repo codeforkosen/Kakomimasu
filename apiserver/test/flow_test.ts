@@ -1,19 +1,13 @@
 import util from "../../util.js";
+import { assertEquals, v4 } from "../deps.ts";
 
-import { assertEquals, test } from "../../asserts.js";
+//import { assert, assertEquals, test } from "../../asserts.js";
 import { pathResolver } from "../apiserver_util.ts";
-import {
-  Action,
-  createGame,
-  diffTime,
-  getGameInfo,
-  match,
-  setAction,
-  sleep,
-  userDelete,
-  userRegist,
-  userShow,
-} from "./client_util.ts";
+import { diffTime, sleep } from "./client_util.ts";
+
+// @deno-types=../../client_js/api_client.d.ts
+import ApiClient from "../../client_js/api_client.js";
+const ac = new ApiClient();
 
 const resolve = pathResolver(import.meta);
 
@@ -22,6 +16,7 @@ const testName = util.uuid();
 const testPassword = "nit-taro-pw";
 const testSpec = "test";
 
+var bearerToken = "";
 var userId = "";
 var accessToken = "";
 var gameId = "";
@@ -29,128 +24,150 @@ var gameId = "";
 Deno.test("regist user", async () => {
   const sampleFilePath = resolve("./sample/userRegist_sample.json");
 
-  const res = await userRegist(testScreenName, testName, testPassword);
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
+  const res = await ac.usersRegist({
+    screenName: testScreenName,
+    name: testName,
+    password: testPassword,
+  });
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
 
-  userId = res.id;
+  userId = res.data.id;
+  bearerToken = res.data.accessToken;
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
-  tokenCheck(res.id);
-  res.id = sample.id = "";
-  assertEquals(sample, res);
+  v4.validate(res.data.id);
+  v4.validate(res.data.accessToken);
+  res.data.id = sample.id = "";
+  res.data.accessToken = sample.accessToken = "";
+  assertEquals(sample, res.data);
 });
 
 Deno.test("show user", async () => {
   const sampleFilePath = resolve("./sample/userShow_sample.json");
 
-  var res = await userShow(testName);
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res));
+  const res = await ac.usersShow(testName, `Basic ${testName}:${testPassword}`);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
-  tokenCheck(res.id);
-  res.id = sample.id = "";
-  assertEquals(sample, res);
+  v4.validate(res.data.id);
+  res.data.accessToken && v4.validate(res.data.accessToken);
+  res.data.id = sample.id = "";
+  res.data.accessToken = sample.accessToken = "";
+  assertEquals(sample, res.data);
 });
 
 Deno.test("create game", async () => {
   const sampleFilePath = resolve("./sample/createGame_sample.json");
-  const res = await createGame("test", "A-1");
+  const res = await ac.gameCreate({ name: "test", boardName: "A-1" });
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  tokenCheck(res.gameId);
-  gameId = res.gameId;
-  res.gameId = sample.gameId = "";
-  assertEquals(sample, res);
+  v4.validate(res.data.gameId);
+  gameId = res.data.gameId;
+  res.data.gameId = sample.gameId = "";
+  assertEquals(sample, res.data);
 });
 
 Deno.test("match", async () => {
   const sampleFilePath = resolve("./sample/match_sample.json");
 
-  const res = await match(
-    { name: testName, password: testPassword, spec: testSpec, gameId: gameId },
+  const res = await ac.match(
+    { spec: testSpec, gameId },
+    `Bearer ${bearerToken}`,
   );
-  await match(
-    { id: userId, password: testPassword, spec: testSpec, gameId: gameId },
-  );
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
-  accessToken = res.accessToken;
+  if (res.success === false) {
+    throw Error(
+      "Response Error. ErrorCode:" + res.data.errorCode + " " +
+        res.data.message,
+    );
+  }
+  await ac.match({ spec: testSpec, gameId: gameId }, `Bearer ${bearerToken}`);
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
+  accessToken = res.data.accessToken;
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  tokenCheck(res.accessToken);
-  tokenCheck(res.gameId);
-  sample.accessToken = res.accessToken = "";
-  sample.gameId = res.gameId = "";
+  v4.validate(res.data.accessToken);
+  v4.validate(res.data.gameId);
+  sample.accessToken = res.data.accessToken = "";
+  sample.gameId = res.data.gameId = "";
   sample.userId = userId;
-  assertEquals(sample, res);
+  assertEquals(sample, res.data);
 });
 
 Deno.test("get gameinfo", async () => {
   const sampleFilePath = resolve("./sample/matchGameInfo_sample.json");
 
-  const res = await getGameInfo(gameId);
+  const res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
   //console.log(JSON.stringify(res));
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
+  Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+  v4.validate(res.data.gameId);
+  v4.validate(res.data.players[0].id);
+  v4.validate(res.data.players[1].id);
+  sample.gameId = res.data.gameId = "";
+  sample.players[0].id = res.data.players[0].id = "";
+  sample.players[1].id = res.data.players[1].id = "";
+  sample.startedAtUnixTime = res.data.startedAtUnixTime = 0;
+  sample.nextTurnUnixTime = res.data.nextTurnUnixTime = 0;
 
-  tokenCheck(res.gameId);
-  tokenCheck(res.players[0].id);
-  tokenCheck(res.players[1].id);
-  sample.gameId = res.gameId = "";
-  sample.players[0].id = res.players[0].id = "";
-  sample.players[1].id = res.players[1].id = "";
-  sample.startedAtUnixTime = res.startedAtUnixTime = 0;
-  sample.nextTurnUnixTime = res.nextTurnUnixTime = 0;
-
-  assertEquals(sample, res);
+  assertEquals(sample, res.data);
 });
 
 Deno.test("send action", async () => {
   const sampleFilePath = resolve("./sample/afterAction_sample.json");
 
-  const gameInfo = await getGameInfo(gameId);
+  let res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  const gameInfo = res.data;
   await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
-  await setAction(
-    gameId,
-    accessToken,
-    [new Action(0, "PUT", 1, 1)],
-  );
+  await ac.setAction(gameId, {
+    actions: [{ agentId: 0, type: "PUT", x: 1, y: 1 }],
+  }, accessToken);
   //console.log(reqJson);
 
   await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
-  const res = await getGameInfo(gameId);
-  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
+  res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
 
   //console.log(res);
   //console.log(JSON.stringify(reqJson, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  tokenCheck(res.gameId);
-  tokenCheck(res.players[0].id);
-  tokenCheck(res.players[1].id);
-  sample.gameId = res.gameId = "";
-  sample.players[0].id = res.players[0].id = "";
-  sample.players[1].id = res.players[1].id = "";
-  sample.startedAtUnixTime = res.startedAtUnixTime = 0;
-  sample.nextTurnUnixTime = res.nextTurnUnixTime = 0;
+  v4.validate(res.data.gameId);
+  v4.validate(res.data.players[0].id);
+  v4.validate(res.data.players[1].id);
+  sample.gameId = res.data.gameId = "";
+  sample.players[0].id = res.data.players[0].id = "";
+  sample.players[1].id = res.data.players[1].id = "";
+  sample.startedAtUnixTime = res.data.startedAtUnixTime = 0;
+  sample.nextTurnUnixTime = res.data.nextTurnUnixTime = 0;
 
-  assertEquals(sample, res);
+  assertEquals(sample, res.data);
 });
 
 Deno.test("delete user", async () => {
-  const res = await userDelete({ name: testName, password: testPassword });
+  const res = await ac.usersDelete({ name: testName, password: testPassword });
   //console.log(res);
-  assertEquals(res.status, 200);
-  await res.body?.cancel();
+  assertEquals(res.success, true);
 });
-
-function tokenCheck(token: string) {
-  const tokenRegExp = new RegExp("^(.{8}-.{4}-.{4}-.{4}-.{12})$");
-  if (!tokenRegExp.test(token)) {
-    throw new Error(`Different format token "${token}"`);
-  }
-}

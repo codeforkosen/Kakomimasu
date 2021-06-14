@@ -27,17 +27,25 @@ const data: any = {
   password: uuid,
 };
 
-const assertUser = (user: any, sample: any | undefined = undefined) => {
+const assertUser = (
+  user: any,
+  sample: any | undefined = undefined,
+  noSafe = false,
+) => {
   let user_ = { ...user };
   let sample_ = { ...sample };
+  //console.log("assert user", user_, sample_);
   assert(v4.validate(user_.id));
-  assert(v4.validate(user_.accessToken));
   if (!sample_) {
     //save("usersRegist", res);
     sample_ = read("usersRegist");
   } else {
-    //delete sample_.password;
     sample_.gamesId = [];
+  }
+  if (noSafe) {
+    assert(v4.validate(user_.accessToken));
+  } else {
+    delete sample_.password;
   }
   user_.id = sample_.id = undefined;
   user_.accessToken = sample_.accessToken = undefined;
@@ -52,7 +60,7 @@ Deno.test("users regist:normal", async () => {
     ...data,
     option: { dryRun: true },
   });
-  assertUser(res.data, data);
+  assertUser(res.data, data, true);
 });
 Deno.test("users regist:not password", async () => {
   const data_: any = {
@@ -119,7 +127,7 @@ Deno.test("users regist:invalid name", async () => {
 });
 Deno.test("users regist:already registered name", async () => {
   let res = await ac.usersRegist(data);
-  assertUser(res.data, data);
+  assertUser(res.data, data, true);
   data.id = res.data.id;
 
   res = await ac.usersRegist(data);
@@ -128,9 +136,9 @@ Deno.test("users regist:already registered name", async () => {
 
 // /api/users/show Test
 // テスト項目
-// 正常(名前・ID)・ユーザ無し
+// 正常(名前・ID)・ユーザ無し・認証済み(名前・ID)
 Deno.test("users show:normal by name", async () => {
-  let res = await ac.usersShow(data.name, data.password);
+  let res = await ac.usersShow(data.name);
   assertUser(res.data, data);
 });
 Deno.test("users show:normal by id", async () => {
@@ -140,6 +148,20 @@ Deno.test("users show:normal by id", async () => {
 Deno.test("users show:not user", async () => {
   let res = await ac.usersShow(v4.generate());
   assertEquals(res.data, errors.NOT_USER);
+});
+Deno.test("users show:normal with auth by name", async () => {
+  let res = await ac.usersShow(
+    data.name,
+    `Basic ${data.name}:${data.password}`,
+  );
+  assertUser(res.data, data, true);
+});
+Deno.test("users show:normal with auth by id", async () => {
+  let res = await ac.usersShow(
+    data.name,
+    `Basic ${data.id}:${data.password}`,
+  );
+  assertUser(res.data, data, true);
 });
 
 // /api/users/search Test
@@ -183,27 +205,34 @@ Deno.test("users delete:normal by id", async () => {
   });
   assertUser(res.data, data);
 });
-Deno.test("users delete:not password", async () => {
-  const data_: any = {
+Deno.test("users delete:not password by undefined", async () => {
+  const data_ = {
     ...data,
     password: undefined,
     option: { dryRun: true },
   };
-  {
-    const res = await ac.usersDelete(data_);
-    assertEquals(res.data, errors.NOTHING_PASSWORD);
-  }
-  {
-    data_.password = null;
-    const res = await ac.usersRegist(data_);
-    assertEquals(res.data, errors.NOTHING_PASSWORD);
-  }
-  {
-    data_.password = "";
-    const res = await ac.usersRegist(data_);
-    assertEquals(res.data, errors.NOTHING_PASSWORD);
-  }
+  const res = await ac.usersDelete(data_);
+  assertEquals(res.data, errors.NOTHING_PASSWORD);
 });
+Deno.test("users delete:not password by null", async () => {
+  const data_ = {
+    ...data,
+    password: null,
+    option: { dryRun: true },
+  };
+  const res = await ac.usersDelete(data_);
+  assertEquals(res.data, errors.NOTHING_PASSWORD);
+});
+Deno.test("users delete:not password by empty string", async () => {
+  const data_ = {
+    ...data,
+    password: "",
+    option: { dryRun: true },
+  };
+  const res = await ac.usersDelete(data_);
+  assertEquals(res.data, errors.NOTHING_PASSWORD);
+});
+
 Deno.test("users delete:not user", async () => {
   let res;
   res = await ac.usersDelete({

@@ -59,41 +59,21 @@ const assertAction = (actionRes: any) => {
 // ユーザ識別子無効、パスワード無効、ユーザ無し
 // gameID有：ゲーム無し
 // useAi：AI無し
-Deno.test("api/match:invalid id or name", async () => {
+Deno.test("api/match:invalid accessToken", async () => {
   const data = { option: { dryRun: true } };
   const res = await ac.match(data);
-  assertEquals(res.data, errors.INVALID_USER_IDENTIFIER);
-});
-Deno.test("api/match:nothing password", async () => {
-  const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
-  const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.data.id;
-
-  const data = { id: userData.id, option: { dryRun: true } };
-  const res = await ac.match(data);
-
-  await ac.usersDelete(userData);
-  assertEquals(res.data, errors.NOTHING_PASSWORD);
-});
-Deno.test("api/match:can not find user", async () => {
-  const data = { id: v4.generate(), password: "pw", option: { dryRun: true } };
-  const res = await ac.match(data);
-  assertEquals(res.data, errors.NOT_USER);
+  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });
 Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
-
   const data = {
-    id: userData.id,
-    password: userData.password,
     gameId: v4.generate(),
     option: { dryRun: true },
   };
-  const res = await ac.match(data);
+  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
   await ac.usersDelete(userData);
   assertEquals(res.data, errors.NOT_GAME);
 });
@@ -104,15 +84,13 @@ Deno.test("api/match:can not find ai", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "",
     },
     option: { dryRun: true },
   };
-  const res = await ac.match(data);
+  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
   await ac.usersDelete(userData);
   assertEquals(res.data, errors.NOT_AI);
 });
@@ -122,11 +100,7 @@ Deno.test("api/match:normal", async () => {
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
-  const data = {
-    id: userData.id,
-    password: userData.password,
-  };
-  const res = await ac.match(data);
+  const res = await ac.match({}, "Bearer " + userRes.data.accessToken);
   await ac.usersDelete(userData);
 
   assertMatch(res.data, { userId: userData.id });
@@ -141,11 +115,9 @@ Deno.test("api/match:normal by selfGame", async () => {
   const gameRes = await ac.gameCreate(gameData);
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     gameId: gameRes.data.gameId,
   };
-  const res = await ac.match(data);
+  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
   await ac.usersDelete(userData);
 
   assertMatch(res.data, { userId: userData.id, gameId: gameRes.data.gameId });
@@ -157,14 +129,12 @@ Deno.test("api/match:normal by useAi", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const res = await ac.match(data);
+  const res = await ac.match(data, "Bearer " + userRes.data.accessToken);
   await ac.usersDelete(userData);
   assertMatch(res.data, { userId: userData.id });
 });
@@ -196,14 +166,12 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.accessToken);
 
   const actionData = {
     actions: [
@@ -226,14 +194,12 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.accessToken);
 
   const actionData = {
     actions: [
