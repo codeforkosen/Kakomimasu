@@ -158,9 +158,8 @@ export const matchRouter = () => {
     }
     const bearerToken = auth.split(" ")[1];
     //console.log(auth, bearerToken);
-    //const accessToken = req.headers.get("Authorization");
 
-    const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
+    const game = kkmm.getGames().find((item) => item.uuid === gameId);
     if (!game) throw new ServerError(errors.NOT_GAME);
     const player = game.players.find((p) => {
       const user = accounts.getUsers().find((user) => user.id === p.id);

@@ -12,7 +12,6 @@ const assertMatch = (match: any, sample: any = {}) => {
   assert(v4.validate(match_.userId));
   if (sample_.userId) assertEquals(match_.userId, sample_.userId);
   assertEquals(match_.spec, sample_.spec || "");
-  assert(v4.validate(match_.accessToken));
   assert(v4.validate(match_.gameId));
   if (sample_.gameId) assertEquals(match_.gameId, sample_.gameId);
   assertEquals(typeof match_.index, "number");
@@ -187,7 +186,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
 
   assertAction(res.data);
 });
-Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
+Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);

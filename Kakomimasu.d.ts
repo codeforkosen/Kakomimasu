@@ -223,7 +223,6 @@ export class Game {
 }
 
 export class Player {
-  public accessToken: string;
   public id: string;
   public spec: string;
   public game: Game | null;
@@ -244,7 +243,6 @@ export class Player {
   getJSON(): {
     userId: typeof Player.prototype.id;
     spec: typeof Player.prototype.spec;
-    accessToken: typeof Player.prototype.accessToken;
     gameId: null | typeof Game.prototype.uuid;
     index: typeof Player.prototype.index;
   };

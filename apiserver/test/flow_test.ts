@@ -1,5 +1,5 @@
 import util from "../../util.js";
-import { assertEquals, v4 } from "../deps.ts";
+import { assert, assertEquals, v4 } from "../deps.ts";
 
 //import { assert, assertEquals, test } from "../../asserts.js";
 import { pathResolver } from "../apiserver_util.ts";
@@ -18,7 +18,6 @@ const testSpec = "test";
 
 var bearerToken = "";
 var userId = "";
-var accessToken = "";
 var gameId = "";
 
 Deno.test("regist user", async () => {
@@ -39,8 +38,8 @@ Deno.test("regist user", async () => {
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
-  v4.validate(res.data.id);
-  v4.validate(res.data.bearerToken);
+  assert(v4.validate(res.data.id));
+  assert(v4.validate(res.data.bearerToken));
   res.data.id = sample.id = "";
   res.data.bearerToken = sample.bearerToken = "";
   assertEquals(sample, res.data);
@@ -57,7 +56,7 @@ Deno.test("show user", async () => {
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
   sample.name = testName;
-  v4.validate(res.data.id);
+  assert(v4.validate(res.data.id));
   res.data.bearerToken && v4.validate(res.data.bearerToken);
   res.data.id = sample.id = "";
   res.data.bearerToken = sample.bearerToken = "";
@@ -73,7 +72,7 @@ Deno.test("create game", async () => {
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  v4.validate(res.data.gameId);
+  assert(v4.validate(res.data.gameId));
   gameId = res.data.gameId;
   res.data.gameId = sample.gameId = "";
   assertEquals(sample, res.data);
@@ -94,13 +93,9 @@ Deno.test("match", async () => {
   }
   await ac.match({ spec: testSpec, gameId: gameId }, `Bearer ${bearerToken}`);
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
-  accessToken = res.data.accessToken;
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
-
-  v4.validate(res.data.accessToken);
-  v4.validate(res.data.gameId);
-  sample.accessToken = res.data.accessToken = "";
+  assert(v4.validate(res.data.gameId));
   sample.gameId = res.data.gameId = "";
   sample.userId = userId;
   assertEquals(sample, res.data);
@@ -114,12 +109,12 @@ Deno.test("get gameinfo", async () => {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
   }
   //console.log(JSON.stringify(res));
-  Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
 
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
-  v4.validate(res.data.gameId);
-  v4.validate(res.data.players[0].id);
-  v4.validate(res.data.players[1].id);
+  assert(v4.validate(res.data.gameId));
+  assert(v4.validate(res.data.players[0].id));
+  assert(v4.validate(res.data.players[1].id));
   sample.gameId = res.data.gameId = "";
   sample.players[0].id = res.data.players[0].id = "";
   sample.players[1].id = res.data.players[1].id = "";
@@ -154,9 +149,9 @@ Deno.test("send action", async () => {
   //console.log(JSON.stringify(reqJson, null, 2));
   const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
 
-  v4.validate(res.data.gameId);
-  v4.validate(res.data.players[0].id);
-  v4.validate(res.data.players[1].id);
+  assert(v4.validate(res.data.gameId));
+  assert(v4.validate(res.data.players[0].id));
+  assert(v4.validate(res.data.players[1].id));
   sample.gameId = res.data.gameId = "";
   sample.players[0].id = res.data.players[0].id = "";
   sample.players[1].id = res.data.players[1].id = "";
@@ -169,5 +164,5 @@ Deno.test("send action", async () => {
 Deno.test("delete user", async () => {
   const res = await ac.usersDelete({ name: testName, password: testPassword });
   //console.log(res);
-  assertEquals(res.success, true);
+  assert(res.success);
 });
