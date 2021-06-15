@@ -61,7 +61,6 @@ export interface MatchReq extends ApiOption {
 export interface MatchRes {
   userId: string;
   spec: string;
-  accessToken: string;
   gameId: string;
   index: number;
 }

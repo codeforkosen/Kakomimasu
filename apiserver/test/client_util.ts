@@ -75,7 +75,7 @@ async function match(sendJson: object) {
     },
   )).json();
   //console.log(resJson, "match");
-  return resJson; //[reqJson.accessToken, reqJson.roomId];
+  return resJson;
 }
 
 async function getGameInfo(roomid: string) {
