@@ -62,8 +62,8 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
 
-  async usersDelete(data) {
-    const res = await this._fetchPostJson("/users/delete", data);
+  async usersDelete(data, auth) {
+    const res = await this._fetchPostJson("/users/delete", data, auth);
     return { success: res.status === 200, data: await res.json() };
   }
 
@@ -104,8 +104,8 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
 
-  async match(data) {
-    const res = await this._fetchPostJson("/match", data);
+  async match(data, auth) {
+    const res = await this._fetchPostJson("/match", data, auth);
     return { success: res.status === 200, data: await res.json() };
   }
 

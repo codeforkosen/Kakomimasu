@@ -12,7 +12,6 @@ const assertMatch = (match: any, sample: any = {}) => {
   assert(v4.validate(match_.userId));
   if (sample_.userId) assertEquals(match_.userId, sample_.userId);
   assertEquals(match_.spec, sample_.spec || "");
-  assert(v4.validate(match_.accessToken));
   assert(v4.validate(match_.gameId));
   if (sample_.gameId) assertEquals(match_.gameId, sample_.gameId);
   assertEquals(typeof match_.index, "number");
@@ -59,42 +58,22 @@ const assertAction = (actionRes: any) => {
 // ユーザ識別子無効、パスワード無効、ユーザ無し
 // gameID有：ゲーム無し
 // useAi：AI無し
-Deno.test("api/match:invalid id or name", async () => {
+Deno.test("api/match:invalid bearerToken", async () => {
   const data = { option: { dryRun: true } };
   const res = await ac.match(data);
-  assertEquals(res.data, errors.INVALID_USER_IDENTIFIER);
-});
-Deno.test("api/match:nothing password", async () => {
-  const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
-  const userRes = await ac.usersRegist(userData);
-  userData.id = userRes.data.id;
-
-  const data = { id: userData.id, option: { dryRun: true } };
-  const res = await ac.match(data);
-
-  await ac.usersDelete(userData);
-  assertEquals(res.data, errors.NOTHING_PASSWORD);
-});
-Deno.test("api/match:can not find user", async () => {
-  const data = { id: v4.generate(), password: "pw", option: { dryRun: true } };
-  const res = await ac.match(data);
-  assertEquals(res.data, errors.NOT_USER);
+  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });
 Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
-
   const data = {
-    id: userData.id,
-    password: userData.password,
     gameId: v4.generate(),
     option: { dryRun: true },
   };
-  const res = await ac.match(data);
-  await ac.usersDelete(userData);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertEquals(res.data, errors.NOT_GAME);
 });
 Deno.test("api/match:can not find ai", async () => {
@@ -104,16 +83,14 @@ Deno.test("api/match:can not find ai", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "",
     },
     option: { dryRun: true },
   };
-  const res = await ac.match(data);
-  await ac.usersDelete(userData);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertEquals(res.data, errors.NOT_AI);
 });
 Deno.test("api/match:normal", async () => {
@@ -122,12 +99,8 @@ Deno.test("api/match:normal", async () => {
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
-  const data = {
-    id: userData.id,
-    password: userData.password,
-  };
-  const res = await ac.match(data);
-  await ac.usersDelete(userData);
+  const res = await ac.match({}, "Bearer " + userRes.data.bearerToken);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertMatch(res.data, { userId: userData.id });
 });
@@ -141,12 +114,10 @@ Deno.test("api/match:normal by selfGame", async () => {
   const gameRes = await ac.gameCreate(gameData);
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     gameId: gameRes.data.gameId,
   };
-  const res = await ac.match(data);
-  await ac.usersDelete(userData);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertMatch(res.data, { userId: userData.id, gameId: gameRes.data.gameId });
 });
@@ -157,15 +128,13 @@ Deno.test("api/match:normal by useAi", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const res = await ac.match(data);
-  await ac.usersDelete(userData);
+  const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertMatch(res.data, { userId: userData.id });
 });
 
@@ -196,14 +165,12 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.bearerToken);
 
   const actionData = {
     actions: [
@@ -213,27 +180,25 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   const res = await ac.setAction(
     matchRes.data.gameId,
     actionData,
-    matchRes.data.accessToken,
+    "Bearer " + userRes.data.bearerToken,
   );
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertAction(res.data);
 });
-Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
+Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
   const uuid = v4.generate();
   const userData: any = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
   const data = {
-    id: userData.id,
-    password: userData.password,
     useAi: true,
     aiOption: {
       aiName: "a1",
     },
   };
-  const matchRes = await ac.match(data);
+  const matchRes = await ac.match(data, "Bearer " + userRes.data.bearerToken);
 
   const actionData = {
     actions: [
@@ -244,7 +209,7 @@ Deno.test("api/match/(gameId)/action:invalid accessToken", async () => {
     matchRes.data.gameId,
     actionData,
   );
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
-  assertEquals(res.data, errors.INVALID_ACCESSTOKEN);
+  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });

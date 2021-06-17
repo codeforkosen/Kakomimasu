@@ -26,13 +26,18 @@ export default class ApiClient {
   constructor(host?: string);
 
   usersVerify(idToken: string): ApiRes;
-  usersRegist(data: UserRegistReq, auth: string): ApiRes<User[]>;
+  usersRegist(data: UserRegistReq, auth?: string): ApiRes<Required<User>>;
+  usersRegist(data: UserRegistReq): ApiRes<Required<User>>;
+  usersRegist(
+    data: Omit<UserRegistReq, "password">,
+    auth: string,
+  ): ApiRes<Required<User>>;
   usersSearch(searchText: string): ApiRes<User[]>;
   usersShow(identifier: string, idToken?: string): ApiRes<User>;
-  usersDelete(data: UserDeleteReq): ApiRes<User>;
+  usersDelete(data: UserDeleteReq, auth: string): ApiRes<User>;
 
   getMatch(gameId: string): ApiRes<Game>;
-  match(data: MatchReq): ApiRes<MatchRes>;
+  match(data: MatchReq, auth: string): ApiRes<MatchRes>;
 
   setAction(gameId: string, data: ActionReq, auth: string): ApiRes<ActionRes>;
 

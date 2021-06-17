@@ -16,10 +16,6 @@ export const errors = {
     errorCode: 102,
     message: "can not find ai",
   },
-  INVALID_ACCESSTOKEN: {
-    errorCode: 103,
-    message: "invalid accessToken",
-  },
   INVALID_ACTION: {
     errorCode: 104,
     message: "invalid action",
@@ -51,6 +47,10 @@ export const errors = {
   ALREADY_REGISTERED_USER: {
     errorCode: 206,
     message: "already registered user",
+  },
+  INVALID_USER_AUTHORIZATION: {
+    errorCode: 207,
+    message: "invalid firebase idtoken",
   },
   INVALID_TOURNAMENT_NAME: {
     errorCode: 300,

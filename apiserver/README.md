@@ -6,14 +6,12 @@
 deno run -A apiserver.ts
 ```
 
-## サンプル対戦
+## サンプル対戦（AI戦）
 
-サーバを起動した状態で、`client_deno`フォルダ内の`client_test1.ts`,`client_test2.ts`をそれぞれ実行
-
-### 例
+ローカルでサーバを起動した状態で、`client_deno`フォルダ内の`client_a1.js`を以下のように実行
 
 ```
-deno run -A ../client_deno/client_test1.ts
+deno run -A ../client_deno/client_a1.js --local --useAi a5
 ```
 
 ## ブラウザで見る
@@ -26,23 +24,20 @@ deno run -A ../client_deno/client_test1.ts
 
 それぞれのゲームIDをクリックすると、ゲーム詳細（フィールドの様子）も見られます。
 
-ゲーム詳細に直接アクセスするには`http://localhost:8880/gamedetails.html?id=(ルームID)`
+ゲーム詳細に直接アクセスするには`http://localhost:8880/game/detail/(ゲームID)`
 
-また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/detail.html?id=(ユーザID or ユーザネーム)`
+また、ユーザ詳細に直接アクセスするには`http://localhost:8880/user/detail/(ユーザID or ユーザネーム)`
 
 ## API仕様
-- [match API](./docs/match_api.md)
-- [users API](./docs/users_api.md)
-- [tournaments API](./docs/tournaments_api.md)
-- [game API](./docs/game_api.md)
 
-- [data dictionary](./docs/data.md)
-- [error](./docs/error.md)
+APIのドキュメントをご覧ください。
 
+[API Document](./docs/index.md)
 
 ## 変更点（APIを使用するにあたって影響する部分のみ）
 
 #### 2020.3.3
+
 - create Game API
   - リクエストデータ形式の変更
     - gameName => name

@@ -10,6 +10,7 @@ import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
+import { getPayload } from "./parts/jwt.ts";
 import {
   ActionPost as IActionPost,
   ActionReq,
@@ -64,14 +65,18 @@ export const matchRouter = () => {
   const router = createRouter();
 
   router.post("/", contentTypeFilter("application/json"), async (req) => {
-    const reqData = await req.json() as MatchReq;
+    const reqData = await req.json() as Partial<MatchReq>;
     //console.log(reqData);
-
-    const identifier = reqData.id || reqData.name;
-    if (!identifier) throw new ServerError(errors.INVALID_USER_IDENTIFIER);
-
-    if (!reqData.password) throw new ServerError(errors.NOTHING_PASSWORD);
-    const user = accounts.getUser(identifier, reqData.password);
+    const auth = req.headers.get("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+    }
+    const bearerToken = auth.split(" ")[1];
+    console.log(auth, bearerToken);
+    const user = accounts.getUsers().find((user) =>
+      user.bearerToken === bearerToken
+    );
+    if (!user) throw new ServerError(errors.NOT_USER);
 
     const player = kkmm.createPlayer(user.id, reqData.spec);
     if (reqData.gameId) {
@@ -85,7 +90,7 @@ export const matchRouter = () => {
           //throw Error("Game is not free");
         }
       }
-      //accounts.addGame(user.id, game.uuid);
+      //accounts.addGame(user.userId, game.uuid);
     } else if (reqData.useAi) {
       const aiFolderPath = resolve("../client_deno/");
       const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
@@ -100,7 +105,7 @@ export const matchRouter = () => {
         game.changeFuncs.push(sendAllGame);
         game.changeFuncs.push(sendGame);
         game.attachPlayer(player);
-        //accounts.addGame(user.id, game.uuid);
+        //accounts.addGame(user.userId, game.uuid);
         Deno.run(
           {
             cmd: [
@@ -147,12 +152,21 @@ export const matchRouter = () => {
     const reqTime = new Date().getTime() / 1000;
 
     const gameId = req.match[1];
-    const accessToken = req.headers.get("Authorization");
+    const auth = req.headers.get("Authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
+      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+    }
+    const bearerToken = auth.split(" ")[1];
+    //console.log(auth, bearerToken);
 
-    const game = kkmm.getGames().find((item: any) => item.uuid === gameId);
+    const game = kkmm.getGames().find((item) => item.uuid === gameId);
     if (!game) throw new ServerError(errors.NOT_GAME);
-    const player = game.players.find((p: any) => p.accessToken === accessToken);
-    if (!player) throw new ServerError(errors.INVALID_ACCESSTOKEN);
+    const player = game.players.find((p) => {
+      const user = accounts.getUsers().find((user) => user.id === p.id);
+      if (user?.bearerToken === bearerToken) return true;
+      return false;
+    });
+    if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
     const actionData = (await req.json()) as ActionReq;
     if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {

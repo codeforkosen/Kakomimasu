@@ -746,7 +746,6 @@ class Game {
 
 class Player {
   constructor(id, spec = "") {
-    this.accessToken = util.uuid(); //accessToken;
     this.id = id;
     this.spec = spec;
     this.game = null;
@@ -756,7 +755,6 @@ class Player {
 
   static restore(data) {
     const player = new Player(data.id, data.spec);
-    player.accessToken = data.accessToken;
     player.index = data.index;
     return player;
   }
@@ -791,7 +789,6 @@ class Player {
     return {
       userId: this.id,
       spec: this.spec,
-      accessToken: this.accessToken,
       gameId: this.game?.uuid,
       index: this.index,
     };

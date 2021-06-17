@@ -13,18 +13,14 @@ interface UserBase {
 export interface User extends UserBase {
   id: string;
   gamesId: string[];
-  accessToken?: string;
+  bearerToken?: string;
 }
 
 export interface UserRegistReq extends ApiOption, UserBase {
   password: string;
 }
 
-export interface UserDeleteReq extends ApiOption {
-  name?: string;
-  id?: string;
-  password: string;
-}
+export type UserDeleteReq = ApiOption;
 
 export type TournamentRes = Required<Tournament>;
 
@@ -49,9 +45,6 @@ export interface GameCreateReq extends ApiOption {
 }
 
 export interface MatchReq extends ApiOption {
-  name?: string;
-  id?: string;
-  password?: string;
   spec?: string;
   gameId?: string;
   useAi?: boolean;
@@ -64,7 +57,6 @@ export interface MatchReq extends ApiOption {
 export interface MatchRes {
   userId: string;
   spec: string;
-  accessToken: string;
   gameId: string;
   index: number;
 }

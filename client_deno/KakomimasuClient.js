@@ -42,7 +42,7 @@ class KakomimasuClient {
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
-    const userRes = await this.apiClient.usersShow(this.id);
+    const userRes = await this.apiClient.usersShow(this.id, `Basic ${this.id}:${this.password}`);
     let user;
     if (userRes.success) user = userRes.data;
     else {
@@ -50,6 +50,7 @@ class KakomimasuClient {
       if (res.success) user = res.data;
       else throw Error("User Regist Error");
     }
+    this.bearerToken = user.bearerToken;
     cl(user);
 
     // プレイヤー登録
@@ -64,16 +65,17 @@ class KakomimasuClient {
       matchParam.gameId = args.gameId;
     }
     //cl(matchParam);
-    const MatchRes = await this.apiClient.match(matchParam);
+    const MatchRes = await this.apiClient.match(matchParam, `Bearer ${this.bearerToken}`);
     //cl(MatchRes);
     if (MatchRes.success) {
       const matchGame = MatchRes.data;
-      this.token = matchGame.accessToken;
       this.gameId = matchGame.gameId;
       this.pno = matchGame.index;
       cl("playerid", matchGame, this.pno);
-    } else throw Error("Match Error");
-
+    } else {
+      console.log(MatchRes.data);
+      throw Error("Match Error");
+    }
     do {
       const gameRes = await this.apiClient.getMatch(this.gameId);
       if (gameRes.success) this.gameInfo = gameRes.data;
@@ -163,7 +165,7 @@ class KakomimasuClient {
   }
 
   async setActions(actions) { // void
-    const res = await this.apiClient.setAction(this.gameId, { actions }, this.token);
+    const res = await this.apiClient.setAction(this.gameId, { actions }, "Bearer " + this.bearerToken);
     console.log("setActions", res);
     if (res.success === false) throw Error("Set Action Error");
   }
