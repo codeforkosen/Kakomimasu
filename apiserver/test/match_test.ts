@@ -73,7 +73,7 @@ Deno.test("api/match:can not find game", async () => {
     option: { dryRun: true },
   };
   const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertEquals(res.data, errors.NOT_GAME);
 });
 Deno.test("api/match:can not find ai", async () => {
@@ -90,7 +90,7 @@ Deno.test("api/match:can not find ai", async () => {
     option: { dryRun: true },
   };
   const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertEquals(res.data, errors.NOT_AI);
 });
 Deno.test("api/match:normal", async () => {
@@ -100,7 +100,7 @@ Deno.test("api/match:normal", async () => {
   userData.id = userRes.data.id;
 
   const res = await ac.match({}, "Bearer " + userRes.data.bearerToken);
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertMatch(res.data, { userId: userData.id });
 });
@@ -117,7 +117,7 @@ Deno.test("api/match:normal by selfGame", async () => {
     gameId: gameRes.data.gameId,
   };
   const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertMatch(res.data, { userId: userData.id, gameId: gameRes.data.gameId });
 });
@@ -134,7 +134,7 @@ Deno.test("api/match:normal by useAi", async () => {
     },
   };
   const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
   assertMatch(res.data, { userId: userData.id });
 });
 
@@ -182,7 +182,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
     actionData,
     "Bearer " + userRes.data.bearerToken,
   );
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertAction(res.data);
 });
@@ -209,7 +209,7 @@ Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
     matchRes.data.gameId,
     actionData,
   );
-  await ac.usersDelete(userData);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 
   assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });

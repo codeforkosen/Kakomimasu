@@ -65,6 +65,7 @@ Deno.test("api/game/create:normal with playerIdentifiers", async () => {
   });
 
   assertGame(res.data, { ...data, reservedUsers: [userData.id] });
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 });
 Deno.test("api/game/create:invalid boardName", async () => {
   {
@@ -112,6 +113,7 @@ Deno.test("api/game/create:already registed user", async () => {
     option: { dryRun: true },
   });
   assertEquals(res.data, errors.ALREADY_REGISTERED_USER);
+  await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
 });
 Deno.test("api/game/create:invalid tournament id", async () => {
   const res = await ac.gameCreate({

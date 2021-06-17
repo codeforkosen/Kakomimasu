@@ -162,7 +162,7 @@ Deno.test("send action", async () => {
 });
 
 Deno.test("delete user", async () => {
-  const res = await ac.usersDelete({ name: testName, password: testPassword });
+  const res = await ac.usersDelete({}, `Bearer ${bearerToken}`);
   //console.log(res);
   assert(res.success);
 });

@@ -43,7 +43,7 @@ class User implements IUser {
   // シリアライズする際にパスワードを返さないように
   // パスワードを返したい場合にはnoSafe()を用いる
   toJSON() {
-    const { password, bearerToken, ...data } = { ...this };
+    const { password: _p, bearerToken: _b, ...data } = { ...this };
     return data;
   }
 
@@ -71,21 +71,14 @@ class Users {
 
   getUsers = () => this.users;
 
-  deleteUser(data: UserDeleteReq) {
-    if (!data.password) throw new ServerError(errors.NOTHING_PASSWORD);
-
-    const index = this.users.findIndex((e) => {
-      return e.password === data.password &&
-        (e.id === data.id || e.name === data.name);
-    });
+  deleteUser(userId: string, dryRun = false) {
+    const index = this.users.findIndex((u) => u.id === userId);
     if (index === -1) throw new ServerError(errors.NOT_USER);
 
-    const user = new User(this.users[index]);
-    if (data.option?.dryRun !== true) {
+    if (dryRun !== true) {
       this.users.splice(index, 1);
       this.save();
     }
-    return user;
   }
 
   /*updateUser(
@@ -289,7 +282,26 @@ export const userRouter = () => {
     contentTypeFilter("application/json"),
     async (req) => {
       const reqData = ((await req.json()) as UserDeleteReq);
-      const user = accounts.deleteUser(reqData);
+      const auth = req.headers.get("Authorization");
+      let user: User | undefined = undefined;
+      if (auth) {
+        const a = auth.split(" ");
+        if (a[0] === "Bearer") {
+          console.log(a);
+          user = accounts.getUsers().find((u) => u.bearerToken === a[1]);
+          console.log(user);
+        } else {
+          const payload = await getPayload(auth);
+          if (payload) {
+            user = accounts.getUsers().find((u) => u.id === payload.user_id);
+          }
+        }
+      } else {
+        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+      }
+      if (!user) throw new ServerError(errors.NOT_USER);
+      user = new User(user);
+      accounts.deleteUser(user.id, reqData.option?.dryRun);
       await req.respond(jsonResponse(user));
     },
   );

@@ -27,6 +27,8 @@ const data: any = {
   password: uuid,
 };
 
+let bearerToken: string | undefined = undefined;
+
 const assertUser = (
   user: any,
   sample: any | undefined = undefined,
@@ -129,6 +131,7 @@ Deno.test("users regist:already registered name", async () => {
   let res = await ac.usersRegist(data);
   assertUser(res.data, data, true);
   data.id = res.data.id;
+  bearerToken = res.data.bearerToken;
 
   res = await ac.usersRegist(data);
   assertEquals(res.data, errors.ALREADY_REGISTERED_NAME);
@@ -189,60 +192,30 @@ Deno.test("users search:no query", async () => {
 // /api/users/delete Test
 // テスト項目
 // 正常(名前で削除・IDで削除)・パスワード無し・ユーザ無し
-Deno.test("users delete:normal by name", async () => {
+Deno.test("users delete:normal by bearerToken", async () => {
   const res = await ac.usersDelete({
-    name: data.name,
-    password: data.password,
     option: { dryRun: true },
-  });
+  }, `Bearer ${bearerToken}`);
+  console.log(res.data, data);
   assertUser(res.data, data);
 });
-Deno.test("users delete:normal by id", async () => {
-  const res = await ac.usersDelete({
-    id: data.id,
-    password: data.password,
-    option: { dryRun: true },
-  });
-  assertUser(res.data, data);
-});
-Deno.test("users delete:not password by undefined", async () => {
+Deno.test("users delete:invalid bearerToken", async () => {
   const data_ = {
-    ...data,
-    password: undefined,
     option: { dryRun: true },
   };
-  const res = await ac.usersDelete(data_);
-  assertEquals(res.data, errors.NOTHING_PASSWORD);
-});
-Deno.test("users delete:not password by null", async () => {
-  const data_ = {
-    ...data,
-    password: null,
-    option: { dryRun: true },
-  };
-  const res = await ac.usersDelete(data_);
-  assertEquals(res.data, errors.NOTHING_PASSWORD);
-});
-Deno.test("users delete:not password by empty string", async () => {
-  const data_ = {
-    ...data,
-    password: "",
-    option: { dryRun: true },
-  };
-  const res = await ac.usersDelete(data_);
-  assertEquals(res.data, errors.NOTHING_PASSWORD);
+  const res = await ac.usersDelete(data_, "");
+  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });
 
 Deno.test("users delete:not user", async () => {
   let res;
   res = await ac.usersDelete({
-    password: data.password,
     option: { dryRun: true },
-  });
+  }, `Bearer ${v4.generate()}`);
   assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("users delete:normal no dryrun", async () => {
   let res;
-  res = await ac.usersDelete({ ...data });
+  res = await ac.usersDelete({ ...data }, `Bearer ${bearerToken}`);
   assertUser(res.data, data);
 });
