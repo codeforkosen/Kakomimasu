@@ -13,7 +13,7 @@ export class ExpGame extends Game {
   public name?: string;
   public startedAtUnixTime: number | null;
   public nextTurnUnixTime: number | null;
-  public changeFuncs: (((id?: string) => void))[];
+  public changeFuncs: (((id: string) => void) | (() => void))[];
   public reservedUsers: string[];
   public type: "normal" | "self";
 
