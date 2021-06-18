@@ -90,6 +90,7 @@ export const matchRouter = () => {
       const bname = reqData.aiOption?.boardName || boardname ||
         await getRandomBoardName();
       const brd = BoardFileOp.get(bname); //readBoard(bname);
+      if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
       if (!reqData.option?.dryRun) {
         const game = kkmm.createGame(brd);
         game.name = `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
@@ -119,6 +120,7 @@ export const matchRouter = () => {
         if (freeGame.length === 0) {
           const bname = boardname || await getRandomBoardName();
           const brd = BoardFileOp.get(bname); //readBoard(bname);
+          if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
           const game = kkmm.createGame(brd);
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);

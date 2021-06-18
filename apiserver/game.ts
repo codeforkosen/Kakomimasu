@@ -22,6 +22,7 @@ export const gameRouter = () => {
         throw new ServerError(errors.INVALID_BOARD_NAME);
       }
       const board = BoardFileOp.get(reqJson.boardName);
+      if (!board) throw new ServerError(errors.INVALID_BOARD_NAME);
       board.nplayer = reqJson.nPlayer || 2;
 
       let game: ExpGame;

@@ -32,7 +32,7 @@ export class UserFileOp {
   public static read() {
     try {
       return readJsonFileSync(this.path) as Array<IUser>;
-    } catch (e) {
+    } catch (_e) {
       //console.log(e);
       return new Array<IUser>();
     }
@@ -55,7 +55,7 @@ export class TournamentFileOp {
     try {
       const readData = readJsonFileSync(this.path) as ITournament[];
       return readData;
-    } catch (e) {
+    } catch (_e) {
       //console.log(e);
       return new Array<ITournament>();
     }
@@ -89,7 +89,7 @@ export class LogFileOp {
 
 export class BoardFileOp {
   private static dir = resolve("../board");
-  private static boards: any[] = [];
+  private static boards: Board[] = [];
   private static mtime: Date | null = null;
 
   static staticConstructor = (() => {
@@ -105,7 +105,7 @@ export class BoardFileOp {
         for (const dirEntry of Deno.readDirSync(this.dir)) {
           const json = readJsonFileSync(`${this.dir}/${dirEntry.name}`);
           json.points = json.points.flat();
-          this.boards.push(json);
+          this.boards.push(new Board(json));
         }
         this.mtime = stat.mtime;
       }
@@ -116,13 +116,13 @@ export class BoardFileOp {
   public static get(boardName: string) {
     const boards = this.update();
     const board = boards.find((e) => e.name === boardName);
-    return new Board(board);
+    return board;
     //return Object.assign({}, boards.find((e) => e.name === boardName));
   }
 
   public static getAll() {
     const boards = this.update();
-    return boards.map((e) => new Board(e));
+    return boards;
   }
 }
 
@@ -135,7 +135,8 @@ export const saveBoardFile = (board: IBoard) => {
   let stat;
   try {
     stat = Deno.statSync(filePath);
-  } catch (e) {
+  } catch (_e) {
+    //
   }
   if (stat === undefined) {
     Deno.writeTextFileSync(filePath, JSON.stringify(board, null, 2));
