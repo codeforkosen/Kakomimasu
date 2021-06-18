@@ -3,14 +3,14 @@ import { Board } from "./expKakomimasu.ts";
 import { pathResolver } from "../apiserver_util.ts";
 
 import { IBoard } from "./interface.ts";
-import { IUser } from "../user.ts";
+import type { IUser, User } from "../user.ts";
 import { Tournament } from "../tournament.ts";
 import { ExpGame } from "./expKakomimasu.ts";
 import { Tournament as ITournament } from "../types.ts";
 
 const resolve = pathResolver(import.meta);
 
-const writeJsonFileSync = (path: string | URL, json: any) => {
+const writeJsonFileSync = <T>(path: string | URL, json: T) => {
   Deno.writeTextFileSync(path, JSON.stringify(json));
 };
 const readJsonFileSync = (path: string | URL) => {
@@ -25,7 +25,7 @@ export class UserFileOp {
     Deno.mkdirSync(UserFileOp.dir, { recursive: true });
   })();
 
-  public static save(json: any) {
+  public static save(json: User[]) {
     Deno.mkdirSync(this.dir, { recursive: true });
     writeJsonFileSync(this.path, json);
   }
