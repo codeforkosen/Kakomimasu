@@ -31,7 +31,7 @@ tournaments.dataCheck(kkmm.getGames());
 //#region WebSocket
 let socks: WebSocket[] = [];
 
-const ws_AllGame = async (sock: WebSocket) => {
+const wsAllGame = async (sock: WebSocket) => {
   await sock.send(
     JSON.stringify(kkmm.getGames()),
   );
@@ -77,7 +77,7 @@ export const sendAllGame = () => {
 
 let getGameSocks: { sock: WebSocket; id: string }[] = [];
 
-const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
+const wsGetGame = async (sock: WebSocket, req: ServerRequest) => {
   const id = req.match[1];
 
   const game = getGame(id);
@@ -85,7 +85,8 @@ const ws_getGame = async (sock: WebSocket, req: ServerRequest) => {
     await sock.send(JSON.stringify(game));
     if (!game.ending) {
       getGameSocks.push({ sock: sock, id: id });
-      for await (const msg of sock) {
+      for await (const _msg of sock) {
+        //
       }
     }
   }
@@ -119,8 +120,8 @@ const getGame = (id: string) => {
 const apiRoutes = () => {
   const router = createRouter();
 
-  router.ws("allGame", ws_AllGame);
-  router.ws(new RegExp("^ws/game/(.+)$"), ws_getGame);
+  router.ws("allGame", wsAllGame);
+  router.ws(new RegExp("^ws/game/(.+)$"), wsGetGame);
 
   router.route("match", matchRouter());
   router.route("game", gameRouter());
@@ -139,19 +140,6 @@ app.route("/api/", apiRoutes());
 app.route("/", viewerRoutes());
 
 app.listen({ port });
-
-const createDefaultBoard = () => {
-  const w = 8;
-  const h = 8;
-  const points = [];
-  for (let i = 0; i < w * h; i++) {
-    points[i] = i;
-    // points[i] = i % (16 * 2 + 1) - 16;
-    // util.rnd(16 * 2 + 1) - 16;
-  }
-  const nagent = 6;
-  return new Board(w, h, points, nagent);
-};
 
 export const readBoard = (fileName: string) => {
   const path = resolve(`./board/${fileName}.json`);
