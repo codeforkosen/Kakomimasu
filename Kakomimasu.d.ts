@@ -180,7 +180,7 @@ export class Game {
 
   static restore(data: any): Game;
 
-  toLogJSON(): any;
+  toLogJSON(): Game;
   attachPlayer(player: Player): boolean;
   isReady(): boolean;
   isFree(): boolean;

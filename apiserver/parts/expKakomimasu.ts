@@ -13,7 +13,7 @@ export class ExpGame extends Game {
   public name?: string;
   public startedAtUnixTime: number | null;
   public nextTurnUnixTime: number | null;
-  public changeFuncs: (((param?: any) => void))[];
+  public changeFuncs: (((id?: string) => void))[];
   public reservedUsers: string[];
   public type: "normal" | "self";
 
@@ -27,22 +27,19 @@ export class ExpGame extends Game {
     this.type = "normal";
   }
 
-  static restore(data: any) {
+  static restore(data: ExpGame) {
     const board = Board.restore(data.board);
     const game = new ExpGame(board, data.name);
     game.uuid = data.uuid;
-    game.players = (data.players as Array<any>).map((p) => Player.restore(p));
+    game.players = data.players.map((p) => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
     game.field.field = data.field.field;
     game.log = data.log;
     game.turn = data.turn;
-    game.agents = (data.players as Array<any>).map((p, i) => {
-      return (data.agents[i] as Array<any>).map((a) =>
-        Agent.restore(a, game.board, game.field)
-      );
-    });
-
+    game.agents = data.agents.map((agents) =>
+      agents.map((agent) => Agent.restore(agent, game.board, game.field))
+    );
     game.startedAtUnixTime = data.startedAtUnixTime;
     game.nextTurnUnixTime = data.nextTurnUnixTime;
     game.reservedUsers = data.reservedUsers;
@@ -134,7 +131,7 @@ export class ExpGame extends Game {
 
   toLogJSON() {
     const data = { ...this, ...super.toLogJSON() };
-    data.changeFuncs = null;
+    data.changeFuncs = [];
     return data;
   }
 
