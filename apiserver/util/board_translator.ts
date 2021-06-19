@@ -9,7 +9,7 @@ interface IBoard2019 {
   height: number;
   points: number[][];
   teams: {
-    agents: object[];
+    agents: Record<string, unknown>[];
   }[];
 }
 
