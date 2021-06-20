@@ -9,5 +9,3 @@ apiserver/data/
 *.code-workspace
 .idea/
 public/app.bundle.js
-
-.actrc
