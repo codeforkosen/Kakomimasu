@@ -11,7 +11,7 @@ import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
 if (!args.noViewer) {
-  const bundle = await esbuild.build({
+  const _bundle = await esbuild.build({
     entryPoints: ["file:///" + resolve("../pages/route.tsx")],
     plugins: [
       denoPlugin({ importMapFile: resolve("../pages/import-map.json") }),
