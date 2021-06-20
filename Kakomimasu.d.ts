@@ -265,7 +265,9 @@ export abstract class Kakomimasu<T extends Game = Game> {
 
   appendBoard(board: Board): void;
   getBoards(): typeof Kakomimasu.prototype.boards;
-  abstract createGame(...param: ConstructorParameters<new () => T>): T;
+  abstract createGame( // deno-lint-ignore no-explicit-any ban-types
+    ...param: ConstructorParameters<(new (...args: any) => {}) & T>
+  ): T;
   getGames(): T[];
   getFreeGames(): T[];
   createPlayer(playername: string, spec?: string): Player;

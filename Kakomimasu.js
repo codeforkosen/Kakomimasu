@@ -124,7 +124,7 @@ class Agent {
     return true;
   }
 
-  checkNone(x, y) {
+  checkNone(_x, _y) {
     if (!this.isOnBoard()) return false;
     return true;
   }
@@ -140,7 +140,7 @@ class Agent {
     if (!this.isOnBoard()) return false;
     if (!this.checkOnBoard(x, y)) return false;
     if (!this.checkDir(x, y)) return false;
-    const n = x + y * this.board.w;
+    //const _n = x + y * this.board.w;
     if (this.field.get(x, y)[0] !== Field.WALL) return false;
     return true;
   }
@@ -439,7 +439,7 @@ class Game {
     game.field.field = data.tiled;
     game.log = data.log;
     game.turn = data.turn;
-    game.agents = data.players.map((p, i) => {
+    game.agents = data.players.map((_p, i) => {
       return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
     });
     return game;
@@ -592,7 +592,7 @@ class Game {
     }
     this.agents.flat().forEach((agent) => {
       if (agent.x === -1) return;
-      const act = agent.lastaction;
+      const _act = agent.lastaction;
       const n = agent.x + agent.y * this.board.w;
       chkfield[n].push(agent);
       // console.log("agent", agent.playerid, agent.x, agent.y);
