@@ -5,7 +5,7 @@ while (true) {
   try {
     await Deno.connectTls({ port: 8880, hostname: "localhost" });
     break;
-  } catch (e) {
+  } catch (_e) {
     console.log(".");
     await sleep(1000);
   }
