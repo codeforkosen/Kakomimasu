@@ -1,7 +1,6 @@
 // 大きく囲む戦略
-import util from "../util.js";
 import { Algorithm } from "./algorithm.js";
-import { Action, DIR } from "./KakomimasuClient.js";
+import { Action } from "./KakomimasuClient.js";
 
 export class Kacom extends Algorithm {
 
@@ -15,10 +14,10 @@ export class Kacom extends Algorithm {
     const line = [];
     for (let i = 0; i < w; i++) { line.push([i, 0]); }
     for (let i = 1; i < h; i++) { line.push([w - 1, i]); }
-    for (let i = w - 2; i >= 0; i--) { line.push([i, h - 1 ]); }
+    for (let i = w - 2; i >= 0; i--) { line.push([i, h - 1]); }
     for (let i = h - 2; i >= 1; i--) { line.push([0, i]); }
 
-    const field = this.getField();
+    const _field = this.getField();
     const actions = [];
     for (let i = 0; i < nagents; i++) {
       const agent = info.players[pno].agents[i];
@@ -39,7 +38,7 @@ export class Kacom extends Algorithm {
 }
 
 if (import.meta.main) {
-  let a = new Kacom();
+  const a = new Kacom();
   a.match({
     id: "taisukef_kacom",
     name: "kacom",

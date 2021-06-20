@@ -8,33 +8,27 @@ const resolve = pathResolver(import.meta);
 
 import { errors } from "../error.ts";
 
-const save = (fileName: string, data: object) => {
-  Deno.writeTextFileSync(
-    resolve(`./sample_/${fileName}.json`),
-    JSON.stringify(data),
-  );
-};
-const read = (fileName: string) => {
+const read = (fileName) => {
   return JSON.parse(
     Deno.readTextFileSync(resolve(`./sample_/${fileName}.json`)),
   );
 };
 
 const uuid = v4.generate();
-const data: any = {
+const data = {
   screenName: uuid,
   name: uuid,
   password: uuid,
 };
 
-let bearerToken: string | undefined = undefined;
+let bearerToken = undefined;
 
 const assertUser = (
-  user: any,
-  sample: any | undefined = undefined,
+  user,
+  sample = undefined,
   noSafe = false,
 ) => {
-  let user_ = { ...user };
+  const user_ = { ...user };
   let sample_ = { ...sample };
   //console.log("assert user", user_, sample_);
   assert(v4.validate(user_.id));
@@ -65,7 +59,7 @@ Deno.test("users regist:normal", async () => {
   assertUser(res.data, data, true);
 });
 Deno.test("users regist:not password", async () => {
-  const data_: any = {
+  const data_ = {
     ...data,
     password: undefined,
     option: { dryRun: true },
@@ -86,7 +80,7 @@ Deno.test("users regist:not password", async () => {
   }
 });
 Deno.test("users regist:invalid screenName", async () => {
-  const data_: any = {
+  const data_ = {
     ...data,
     screenName: undefined,
     option: { dryRun: true },
@@ -107,7 +101,7 @@ Deno.test("users regist:invalid screenName", async () => {
   }
 });
 Deno.test("users regist:invalid name", async () => {
-  const data_: any = {
+  const data_ = {
     ...data,
     name: undefined,
     option: { dryRun: true },
@@ -141,26 +135,26 @@ Deno.test("users regist:already registered name", async () => {
 // テスト項目
 // 正常(名前・ID)・ユーザ無し・認証済み(名前・ID)
 Deno.test("users show:normal by name", async () => {
-  let res = await ac.usersShow(data.name);
+  const res = await ac.usersShow(data.name);
   assertUser(res.data, data);
 });
 Deno.test("users show:normal by id", async () => {
-  let res = await ac.usersShow(data.id);
+  const res = await ac.usersShow(data.id);
   assertUser(res.data, data);
 });
 Deno.test("users show:not user", async () => {
-  let res = await ac.usersShow(v4.generate());
+  const res = await ac.usersShow(v4.generate());
   assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("users show:normal with auth by name", async () => {
-  let res = await ac.usersShow(
+  const res = await ac.usersShow(
     data.name,
     `Basic ${data.name}:${data.password}`,
   );
   assertUser(res.data, data, true);
 });
 Deno.test("users show:normal with auth by id", async () => {
-  let res = await ac.usersShow(
+  const res = await ac.usersShow(
     data.name,
     `Basic ${data.id}:${data.password}`,
   );
@@ -208,14 +202,12 @@ Deno.test("users delete:invalid bearerToken", async () => {
 });
 
 Deno.test("users delete:not user", async () => {
-  let res;
-  res = await ac.usersDelete({
+  const res = await ac.usersDelete({
     option: { dryRun: true },
   }, `Bearer ${v4.generate()}`);
   assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("users delete:normal no dryrun", async () => {
-  let res;
-  res = await ac.usersDelete({ ...data }, `Bearer ${bearerToken}`);
+  const res = await ac.usersDelete({ ...data }, `Bearer ${bearerToken}`);
   assertUser(res.data, data);
 });

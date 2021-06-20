@@ -5,12 +5,7 @@ const ac = new ApiClient();
 
 import { errors } from "../error.ts";
 
-const typelist = ["round-robin", "knockout"];
-const assertType = (type: string) => {
-  return typelist.some((e) => e === type);
-};
-
-const assertGame = (game: any, sample: any = {}) => {
+const assertGame = (game, sample = {}) => {
   const game_ = Object.assign({}, game);
   const sample_ = Object.assign({}, sample);
   assert(v4.validate(game_.gameId));
@@ -29,7 +24,7 @@ const assertGame = (game: any, sample: any = {}) => {
   if (sample_.reservedUsers) assert(game_.reservedUsers, sample_.reservedUsers);
 };
 
-const assertBoard = (board: any) => {
+const assertBoard = (board) => {
   assertEquals(typeof board.name, "string");
   assertEquals(typeof board.width, "number");
   assertEquals(typeof board.height, "number");
@@ -39,7 +34,7 @@ const assertBoard = (board: any) => {
   assert(Array.isArray(board.points));
 };
 
-const data: any = {
+const data = {
   name: "テスト",
   boardName: "A-1",
 };
@@ -54,7 +49,7 @@ Deno.test("api/game/create:normal", async () => {
 });
 Deno.test("api/game/create:normal with playerIdentifiers", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -103,7 +98,7 @@ Deno.test("api/game/create:not user", async () => {
 });
 Deno.test("api/game/create:already registed user", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -129,5 +124,5 @@ Deno.test("api/game/create:invalid tournament id", async () => {
 // 正常
 Deno.test("api/game/boards:normal", async () => {
   const res = await ac.getBoards();
-  (res.data as any[]).forEach((e) => assertBoard(e));
+  res.data.forEach((e) => assertBoard(e));
 });

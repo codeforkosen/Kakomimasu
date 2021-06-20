@@ -12,7 +12,7 @@ import GameBoard from "../../components/gameBoard.tsx";
 import ApiClient from "../../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
-import { Board } from "../../apiserver/types.ts";
+import { Board, Game } from "../../apiserver/types.ts";
 
 const useStyles = makeStyles(
   createStyles({
@@ -27,10 +27,17 @@ const useStyles = makeStyles(
   }),
 );
 
+type NestedPartial<T> = {
+  [K in keyof T]?: T[K] extends Array<infer R> ? Array<NestedPartial<R>>
+    : NestedPartial<T[K]>;
+};
+
 export default function () {
   const classes = useStyles();
   const [boards, setBoards] = useState<Board[]>();
-  const [game, setGame] = useState<any>();
+  const [game, setGame] = useState<
+    Pick<Game, "board" | "tiled" | "players" | "log">
+  >();
 
   useEffect(() => {
     getBoards();
@@ -53,18 +60,25 @@ export default function () {
     for (let i = 0; i < tiled.length; i++) {
       tiled[i] = [0, -1];
     }
-    const game = {
+    const game: Pick<Game, "board" | "tiled" | "players" | "log"> = {
       board,
       tiled,
-      players: [{ agents: [] }, { agents: [] }],
+      players: [{ id: "", agents: [], point: { basepoint: 0, wallpoint: 0 } }, {
+        id: "",
+        agents: [],
+        point: { basepoint: 0, wallpoint: 0 },
+      }],
+      log: [],
     };
     setGame(game);
   };
 
   useEffect(() => {
+    if (!game) return;
     const table = document.querySelector("#game-board #field");
     if (!table) return;
     const board = game.board;
+    if (!board) return;
     const tds = table.getElementsByTagName("td");
 
     for (let i = 0; i < tds.length; i++) {
@@ -77,8 +91,8 @@ export default function () {
 
         const isAgent = (x: number, y: number) => {
           if (game.players) {
-            const agent = (game.players as any[]).map((e: any, i) =>
-              (e.agents as any[]).map((e_, j) => {
+            const agent = game.players.map((e, i) =>
+              e.agents.map((e_, j) => {
                 return { agent: e_, player: i, n: j };
               })
             ).flat().find((e) => e.agent.x === x && e.agent.y === y);
@@ -91,7 +105,7 @@ export default function () {
             let t = tiled[i];
             let a = (t[0] * 2 + t[1]) + 1;
             a = (a + 1) % 5;
-            t = [Math.trunc((a - 1) / 2), (a - 1) % 2];
+            t = [Math.trunc((a - 1) / 2) as 0 | 1, (a - 1) % 2];
             tiled[i] = t;
 
             const agent = isAgent(x, y);
@@ -101,7 +115,7 @@ export default function () {
             break;
           }
           case 2: {
-            let t = tiled[i];
+            const t = tiled[i];
             if (t[0] === 1) {
               const a = isAgent(x, y);
               if (a) players[a.player].agents.splice(a.n, 1);

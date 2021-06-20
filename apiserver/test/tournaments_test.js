@@ -6,11 +6,11 @@ const ac = new ApiClient();
 import { errors } from "../error.ts";
 
 const typelist = ["round-robin", "knockout"];
-const assertType = (type: string) => {
+const assertType = (type) => {
   return typelist.some((e) => e === type);
 };
 
-const assertTournament = (tournament: any, sample: any = {}) => {
+const assertTournament = (tournament, sample = {}) => {
   const tournament_ = Object.assign({}, tournament);
   const sample_ = Object.assign({}, sample);
   assert(v4.validate(tournament_.id));
@@ -31,7 +31,7 @@ const assertTournament = (tournament: any, sample: any = {}) => {
 
 const uuid = v4.generate();
 
-const data: any = {
+const data = {
   name: uuid,
   type: "round-robin",
 };
@@ -130,7 +130,7 @@ Deno.test("api/tournament/get:normal by single", async () => {
 Deno.test("api/tournament/get:normal by all", async () => {
   const res = await ac.tournamentsGet(); // as Array<any>;
   if (res.success === false) assert(false);
-  res.data.forEach((e: any) => assertTournament(e));
+  res.data.forEach((e) => assertTournament(e));
 });
 Deno.test("api/tournament/get:nothing tournament id", async () => {
   const res = await ac.tournamentsGet(v4.generate());

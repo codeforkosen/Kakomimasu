@@ -10,7 +10,6 @@ import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
 import { Action } from "./parts/expKakomimasu.ts";
-import { getPayload } from "./parts/jwt.ts";
 import {
   ActionPost as IActionPost,
   ActionReq,
@@ -43,13 +42,6 @@ class ActionPost implements IActionPost {
     public x: number,
     public y: number,
   ) {}
-
-  static getType(type: string) {
-    if (type === "PUT") return Action.PUT;
-    else if (type === "NONE") return Action.NONE;
-    else if (type === "MOVE") return Action.MOVE;
-    else if (type === "REMOVE") return Action.REMOVE;
-  }
 
   static isEnable(a: ActionPost) {
     if (
@@ -98,6 +90,7 @@ export const matchRouter = () => {
       const bname = reqData.aiOption?.boardName || boardname ||
         await getRandomBoardName();
       const brd = BoardFileOp.get(bname); //readBoard(bname);
+      if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
       if (!reqData.option?.dryRun) {
         const game = kkmm.createGame(brd);
         game.name = `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
@@ -127,6 +120,7 @@ export const matchRouter = () => {
         if (freeGame.length === 0) {
           const bname = boardname || await getRandomBoardName();
           const brd = BoardFileOp.get(bname); //readBoard(bname);
+          if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
           const game = kkmm.createGame(brd);
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);
@@ -172,10 +166,17 @@ export const matchRouter = () => {
     if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
       throw new ServerError(errors.INVALID_ACTION);
     }
-    const actionsAry: any = [];
-    actionData.actions.forEach((a) => {
-      actionsAry.push([a.agentId, ActionPost.getType(a.type), a.x, a.y]);
-    });
+
+    const getType = (type: string) => {
+      if (type === "PUT") return Action.PUT;
+      else if (type === "NONE") return Action.NONE;
+      else if (type === "MOVE") return Action.MOVE;
+      else if (type === "REMOVE") return Action.REMOVE;
+      return Action.NONE;
+    };
+
+    const actionsAry: [number, ReturnType<typeof getType>, number, number][] =
+      actionData.actions.map((a) => [a.agentId, getType(a.type), a.x, a.y]);
     let nowTurn;
     if (!actionData.option?.dryRun) {
       nowTurn = player.setActions(Action.fromJSON(actionsAry));

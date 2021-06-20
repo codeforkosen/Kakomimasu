@@ -43,7 +43,7 @@ export class ClientA3 extends Algorithm {
 }
 
 if (import.meta.main) {
-  let a = new ClientA3();
+  const a = new ClientA3();
   a.match({
     id: "ai-3",
     name: "AI-3",

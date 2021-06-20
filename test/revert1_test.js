@@ -1,4 +1,4 @@
-import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 import { assert, assertEquals, AssertionError } from "../asserts.js";
 
 const cl = (...a) => { a; };//console.log(...a);

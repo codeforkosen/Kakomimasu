@@ -5,18 +5,18 @@ import { Board, Game, Player, Action } from "../Kakomimasu.js";
 import { KakomimasuClient } from "./KakomimasuClient.js";
 
 // ボード名、アルゴリズム実装、対戦回数を設定する
-let BOARD_NAME = "A-1";
-let ALGORITHMS = [
+const BOARD_NAME = "A-1";
+const ALGORITHMS = [
   new ClientA1(),
   new ClientA4(),
 ];
-let BATTLE_NUM = 10;
+const BATTLE_NUM = 10;
 
-let board = new Board(JSON.parse(Deno.readTextFileSync(`../apiserver/board/${BOARD_NAME}.json`)));
-let win = new Array(ALGORITHMS.length).fill(0);
+const board = new Board(JSON.parse(Deno.readTextFileSync(`../apiserver/board/${BOARD_NAME}.json`)));
+const win = new Array(ALGORITHMS.length).fill(0);
 
 for (let i = 0; i < BATTLE_NUM; i++) {
-  let game = new Game(board);
+  const game = new Game(board);
   for (let j = 0; j < ALGORITHMS.length; j++) {
     game.attachPlayer(new Player(j));
   }
@@ -29,7 +29,7 @@ for (let i = 0; i < BATTLE_NUM; i++) {
   }
   while (!game.ending) {
     for (let j = 0; j < ALGORITHMS.length; j++) {
-      let kact = ALGORITHMS[j].think(info);
+      const kact = ALGORITHMS[j].think(info);
       game.players[j].setActions(kact.map(a => convertGameAction(a)));
     }
     game.nextTurn();
@@ -39,13 +39,13 @@ for (let i = 0; i < BATTLE_NUM; i++) {
       ALGORITHMS[j].kc._updateField();
     }
   }
-  let points = game.field.getPoints();
+  const points = game.field.getPoints();
   let maxPoint = Number.MIN_VALUE;
   let maxPlayer = [];
   let str = `試合数:${i + 1} `;
   str += "ポイント:";
   for (let j = 0; j < ALGORITHMS.length; j++) {
-    let p = points[j].basepoint + points[j].wallpoint;
+    const p = points[j].basepoint + points[j].wallpoint;
     if (p >= maxPoint) {
       if (p > maxPoint) {
         maxPlayer = [];
@@ -81,9 +81,9 @@ for (let i = 0; i < BATTLE_NUM; i++) {
 function convertGameAction(a) {
   let type;
   switch (a.type) {
-    case "PUT":    type = Action.PUT;    break;
-    case "NONE":   type = Action.NONE;   break;
-    case "MOVE":   type = Action.MOVE;   break;
+    case "PUT": type = Action.PUT; break;
+    case "NONE": type = Action.NONE; break;
+    case "MOVE": type = Action.MOVE; break;
     case "REMOVE": type = Action.REMOVE; break;
   }
   return new Action(a.agentId, type, a.x, a.y);

@@ -1,11 +1,18 @@
 // Copyright 2018-2021 the Deno authors. All rights reserved. MIT license.
 import { hasOwnProperty } from "https://deno.land/std@0.89.0/_util/has_own_property.ts";
 import { BufReader, BufWriter } from "https://deno.land/std@0.89.0/io/bufio.ts";
-import { readLong, readShort, sliceLongToBytes } from "https://deno.land/std@0.89.0/io/ioutil.ts";
+import {
+  readLong,
+  readShort,
+  sliceLongToBytes,
+} from "https://deno.land/std@0.89.0/io/ioutil.ts";
 import { Sha1 } from "https://deno.land/std@0.89.0/hash/sha1.ts";
 import { writeResponse } from "https://deno.land/std@0.89.0/http/_io.ts";
 import { TextProtoReader } from "https://deno.land/std@0.89.0/textproto/mod.ts";
-import { Deferred, deferred } from "https://deno.land/std@0.89.0/async/deferred.ts";
+import {
+  Deferred,
+  deferred,
+} from "https://deno.land/std@0.89.0/async/deferred.ts";
 import { assert } from "https://deno.land/std@0.89.0/_util/assert.ts";
 import { concat } from "https://deno.land/std@0.89.0/bytes/mod.ts";
 
@@ -296,7 +303,7 @@ class WebSocketImpl implements WebSocket {
         try {
           this.dequeue();
         } catch (e) {
-          console.log("err in dequeue finally!!");
+          console.log("err in dequeue finally!!", e);
         }
       });
   }

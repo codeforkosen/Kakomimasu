@@ -3,13 +3,16 @@ import { makeStyles } from "@material-ui/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { Link, useHistory } from "react-router-dom";
 
+import { Game, User } from "../apiserver/types.ts";
+
+// @deno-types=../client_js/api_client.d.ts
 import ApiClient from "../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 import datas from "./player_datas.ts";
 
 type Props = {
-  game: any;
+  game: Pick<Game, "board" | "tiled" | "players" | "log">;
 };
 
 const useStyles = makeStyles({
@@ -98,7 +101,7 @@ export default function (props: Props) {
   const game = props.game;
   //console.log("gameBoard", game);
 
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   /*const turnT = (game.gaming || game.ending)
     ? `${game.turn}/${game.totalTurn}`
@@ -119,23 +122,26 @@ export default function (props: Props) {
     const users_ = [];
     for (const player of game.players) {
       if (users.some((user) => user.id === player.id)) continue;
-      const user = (await apiClient.usersShow(player.id)).data;
+      const res = await apiClient.usersShow(player.id);
+      if (res.success) {
+        const user = res.data;
 
-      users_.push(user);
+        users_.push(user);
+      }
     }
     setUsers([...users, ...users_]);
   };
 
   const getPlacedAgentNum = (i: number) => {
     let num = 0;
-    (game.players[i].agents as any[]).forEach((agent) => {
+    game.players[i].agents.forEach((agent) => {
       if (agent.x !== -1) num++;
     });
     return num;
   };
   const getNotPlacedAgentNum = (i: number) => {
     let num = 0;
-    (game.players[i].agents as any[]).forEach((agent) => {
+    game.players[i].agents.forEach((agent) => {
       if (agent.x === -1) num++;
     });
     return num;
@@ -145,8 +151,8 @@ export default function (props: Props) {
   };
   const isAgent = (x: number, y: number) => {
     if (game.players) {
-      const agent = (game.players as any[]).map((e: any, i) =>
-        (e.agents as any[]).map((e_, j) => {
+      const agent = game.players.map((e, i) =>
+        e.agents.map((e_, j) => {
           return { agent: e_, player: i, n: j };
         })
       ).flat().find((e) => e.agent.x === x && e.agent.y === y);
@@ -161,24 +167,24 @@ export default function (props: Props) {
 
     const history = [];
     for (let i = 0; i < log.length; i++) {
-      const act: any = {};
-      Object.assign(
-        act,
-        log[i][pid].actions.find((e: any) => e.agentId === aid),
+      const act = Object.assign(
+        {},
+        log[i][pid].actions.find((e) => e.agentId === aid),
       );
+      let type = "";
       if (act) {
-        if (act.type === 1) act.type = "配置";
-        else if (act.type === 3) act.type = "移動";
-        else if (act.type === 4) act.type = "除去";
+        if (act.type === 1) type = "配置";
+        else if (act.type === 3) type = "移動";
+        else if (act.type === 4) type = "除去";
         else {
-          act.type = "停留";
-          act.x = act.y = undefined;
+          type = "停留";
+          //act.x = act.y = undefined;
         }
       } else {
-        act.type = "停留";
+        type = "停留";
       }
-      act.turn = i;
-      history.push(act);
+      //act.turn = i;
+      history.push({ ...act, type, turn: i });
     }
     return history.reverse();
   };
@@ -277,10 +283,9 @@ export default function (props: Props) {
                     cell.tiled[0] === 0;
                   const isConflict = game.log
                     ? (() => {
-                      const lastActLog =
-                        (game.log[game.log.length - 1] as any[])?.map((e) =>
-                          e.actions
-                        ).flat();
+                      const lastActLog = game.log[game.log.length - 1]?.map((
+                        e,
+                      ) => e.actions).flat();
                       const isConflict = lastActLog?.some(
                         (a) => ((a.res > 0 && a.res < 3) && a.x === x &&
                           a.y === y),
@@ -340,7 +345,8 @@ export default function (props: Props) {
                                   : "none",
                               }}
                             >
-                              T{e.turn}：{e.x && `x:${e.x} , y:${e.y}に`}
+                              T{e.turn}：{e.type !== "停留" &&
+                                `x:${e.x} , y:${e.y}に`}
                               {e.type}
                             </div>;
                           })}

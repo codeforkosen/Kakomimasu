@@ -6,6 +6,8 @@ import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 
+import { Tournament } from "../apiserver/types.ts";
+
 const useStyles = makeStyles(createStyles({
   tournament: (theme: Theme) => ({
     border: "solid 3px",
@@ -38,7 +40,7 @@ const useStyles = makeStyles(createStyles({
   },
 }));
 
-export default function (props: { tournament: any }) {
+export default function (props: { tournament: Tournament }) {
   const theme = useTheme();
   const classes = useStyles(theme);
   const history = useHistory();

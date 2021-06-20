@@ -54,7 +54,7 @@ class KakomimasuClient {
     cl(user);
 
     // プレイヤー登録
-    let matchParam = { id: user.id, password: this.password, spec: this.spec };
+    const matchParam = { id: user.id, password: this.password, spec: this.spec };
     if (args.useAi) {
       matchParam.useAi = true;
       matchParam.aiOption = {
@@ -199,7 +199,9 @@ class KakomimasuClient {
     if (!args.nolog) {
       try {
         Deno.mkdirSync("log");
-      } catch (e) { }
+      } catch (_e) {
+        //
+      }
       const fname = `log/${this.gameInfo.gameId}-player${this.pno}.log`;
       Deno.writeTextFileSync(fname, JSON.stringify(this.log, null, 2));
     }

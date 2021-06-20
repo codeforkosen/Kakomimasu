@@ -1,5 +1,4 @@
 import {
-  ActionPost,
   ActionReq,
   ActionRes,
   Board,
@@ -8,7 +7,6 @@ import {
   GameCreateReq,
   MatchReq,
   MatchRes,
-  Tournament,
   TournamentAddUserReq,
   TournamentCreateReq,
   TournamentDeleteReq,
@@ -18,14 +16,14 @@ import {
   UserRegistReq,
 } from "../apiserver/types.ts";
 
-type ApiRes<T = {}> = Promise<
+type ApiRes<T> = Promise<
   { success: true; data: T } | { success: false; data: Error }
 >;
 
 export default class ApiClient {
   constructor(host?: string);
 
-  usersVerify(idToken: string): ApiRes;
+  usersVerify(idToken: string): ApiRes<never>;
   usersRegist(data: UserRegistReq, auth?: string): ApiRes<Required<User>>;
   usersRegist(data: UserRegistReq): ApiRes<Required<User>>;
   usersRegist(

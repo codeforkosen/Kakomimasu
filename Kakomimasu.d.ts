@@ -9,7 +9,16 @@ export class Board {
   public name: string;
 
   constructor(
-    w: number | object,
+    w: number | {
+      width: string;
+      height: string;
+      points: number[];
+      nagent: number;
+      nturn: number;
+      nsec: number;
+      nplayer: number;
+      name: string;
+    },
     h?: number,
     points?: number[],
     nagent?: number,
@@ -18,9 +27,9 @@ export class Board {
     nplayer?: number,
   );
 
-  static restore(data: any): Board;
+  static restore(data: Board): Board;
 
-  toLogJSON(): object;
+  toLogJSON(): Board;
   getJSON(): {
     name: string;
     w: number;
@@ -57,9 +66,9 @@ export class Agent {
   public lastaction: Action;
   constructor(board: Board, field: Field, playerid: number);
 
-  static restore(data: any, board: Board, field: Field): Agent;
+  static restore(data: Agent, board: Board, field: Field): Agent;
 
-  toLogJSON(): any;
+  toLogJSON(): Agent & { board: null; field: null };
 
   isOnBoard(): boolean;
 
@@ -150,7 +159,7 @@ export class Field {
 
   constructor(board: Board);
 
-  toLogJSON(): any;
+  toLogJSON(): Field & { board: null };
 
   set(x: number, y: number, att: FieldType, playerid: number): void;
   get(x: number, y: number): FieldCell;
@@ -178,9 +187,9 @@ export class Game {
 
   constructor(board: Board);
 
-  static restore(data: any): Game;
+  static restore(data: Game): Game;
 
-  toLogJSON(): any;
+  toLogJSON(): Game;
   attachPlayer(player: Player): boolean;
   isReady(): boolean;
   isFree(): boolean;
@@ -231,9 +240,9 @@ export class Player {
 
   constructor(id: string, spec: string);
 
-  static restore(data: any): Player;
+  static restore(data: Player): Player;
 
-  toLogJSON(): any;
+  toLogJSON(): Player & { game: null };
 
   setGame(game: Game): void;
   noticeStart(): void;
@@ -248,11 +257,6 @@ export class Player {
   };
 }
 
-type AbstractConstructorHelper<T> = (new (...args: any) => {}) & T;
-type AbstractContructorParameters<T> = ConstructorParameters<
-  AbstractConstructorHelper<T>
->;
-
 export abstract class Kakomimasu<T extends Game = Game> {
   public games: T[];
   public boards: Board[];
@@ -261,7 +265,7 @@ export abstract class Kakomimasu<T extends Game = Game> {
 
   appendBoard(board: Board): void;
   getBoards(): typeof Kakomimasu.prototype.boards;
-  abstract createGame(
+  abstract createGame( // deno-lint-ignore no-explicit-any ban-types
     ...param: ConstructorParameters<(new (...args: any) => {}) & T>
   ): T;
   getGames(): T[];

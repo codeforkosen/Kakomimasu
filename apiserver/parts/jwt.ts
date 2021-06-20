@@ -3,12 +3,13 @@ import { decode } from "../deps.ts";
 export async function getPayload(jwt: string) {
   const [header, payload] = decode(jwt);
 
-  //console.log(payload, signature, header);
-  if (header && typeof header === "object") {
+  const kid = (header as { kid: string }).kid;
+
+  if (kid) {
     const pKey = await getPublicKey();
-    const a = pKey[(header as any).kid];
+    const a = pKey[kid];
     //console.log(a);
-    if (a) return payload as any;
+    if (a) return payload as { user_id: string };
   }
   return undefined;
 }

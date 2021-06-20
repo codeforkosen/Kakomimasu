@@ -21,7 +21,7 @@ const test = async (s, f) => {
   try {
     if (f.constructor.name === "AsyncFunction") await f();
     else f();
-  } catch (e) {
+  } catch (_e) {
     res = "err";
   }
   console.log("test " + s, res);

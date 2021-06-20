@@ -19,8 +19,8 @@ const p2 = kkmm.createPlayer("test2");
 game.attachPlayer(p1);
 game.attachPlayer(p2);
 game.start();
-for (;;) {
-  const st = game.getStatusJSON();
+for (; ;) {
+  const _st = game.getStatusJSON();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 1, 1],
     [0, Action.MOVE, 2, 2],

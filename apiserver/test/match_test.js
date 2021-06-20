@@ -5,7 +5,7 @@ const ac = new ApiClient();
 
 import { errors } from "../error.ts";
 
-const assertMatch = (match: any, sample: any = {}) => {
+const assertMatch = (match, sample = {}) => {
   const match_ = Object.assign({}, match);
   const sample_ = Object.assign({}, sample);
 
@@ -18,7 +18,7 @@ const assertMatch = (match: any, sample: any = {}) => {
   if (sample_.index) assertEquals(match_.index, sample_.index);
 };
 
-const assertGame = (game: any, sample: any = {}) => {
+const assertGame = (game, sample = {}) => {
   const game_ = Object.assign({}, game);
   const sample_ = Object.assign({}, sample);
   assert(v4.validate(game_.gameId));
@@ -38,7 +38,7 @@ const assertGame = (game: any, sample: any = {}) => {
   if (sample_.reservedUsers) assert(game_.reservedUsers, sample_.reservedUsers);
 };
 
-const assertBoard = (board: any) => {
+const assertBoard = (board) => {
   assertEquals(typeof board.name, "string");
   assertEquals(typeof board.width, "number");
   assertEquals(typeof board.height, "number");
@@ -48,7 +48,7 @@ const assertBoard = (board: any) => {
   assert(Array.isArray(board.points));
 };
 
-const assertAction = (actionRes: any) => {
+const assertAction = (actionRes) => {
   assertEquals(typeof actionRes.receptionUnixTime, "number");
   assertEquals(typeof actionRes.turn, "number");
 };
@@ -65,7 +65,7 @@ Deno.test("api/match:invalid bearerToken", async () => {
 });
 Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
   const data = {
@@ -78,7 +78,7 @@ Deno.test("api/match:can not find game", async () => {
 });
 Deno.test("api/match:can not find ai", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -95,7 +95,7 @@ Deno.test("api/match:can not find ai", async () => {
 });
 Deno.test("api/match:normal", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -106,7 +106,7 @@ Deno.test("api/match:normal", async () => {
 });
 Deno.test("api/match:normal by selfGame", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -123,7 +123,7 @@ Deno.test("api/match:normal by selfGame", async () => {
 });
 Deno.test("api/match:normal by useAi", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -160,7 +160,7 @@ Deno.test("api/match/(gameId):not find game", async () => {
 // 正常、アクセストークン無効
 Deno.test("api/match/(gameId)/action:normal", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 
@@ -188,7 +188,7 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
 });
 Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
   const uuid = v4.generate();
-  const userData: any = { screenName: uuid, name: uuid, password: uuid };
+  const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
 

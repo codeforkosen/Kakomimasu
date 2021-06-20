@@ -1,16 +1,14 @@
-import util from "../util.js";
 import { Algorithm } from "./algorithm.js";
-import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientNone extends Algorithm {
 
-  think(info) {
+  think(_info) {
     return [];
   }
 }
 
 if (import.meta.main) {
-  let a = new ClientNone();
+  const a = new ClientNone();
   a.match({
     id: "ai-none",
     name: "AI-NONE",

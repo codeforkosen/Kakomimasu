@@ -128,7 +128,7 @@ export class ClientA5 extends Algorithm {
 }
 
 if (import.meta.main) {
-  let a = new ClientA5();
+  const a = new ClientA5();
   a.match({
     id: "ai-5",
     name: "AI-5",
