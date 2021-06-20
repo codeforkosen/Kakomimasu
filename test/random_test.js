@@ -1,5 +1,5 @@
-import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
-import { assert, assertEquals, AssertionError } from "../asserts.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
+import { assert, AssertionError } from "../asserts.js";
 //import util from "../util.js";
 //import util from "./nornd.js";
 import util from "./mtrnd.js";
@@ -79,9 +79,7 @@ Deno.test("random", () => {
     return res.join("\n");
   };
   const checkAgent = () => {
-    const res = [];
     for (let i = 0; i < h; i++) {
-      const s = [];
       for (let j = 0; j < w; j++) {
         const n = field.field[j + i * w];
         const a0 = isOnAgent(0, j, i);
@@ -97,7 +95,7 @@ Deno.test("random", () => {
     }
   };
   const p = () => {
-    const ret = tos();
+    const _ret = tos();
     //console.log(ret);
   };
   const chk = () => {
