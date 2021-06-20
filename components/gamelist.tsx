@@ -3,12 +3,14 @@ import { Theme, useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import { Link, useHistory } from "react-router-dom";
 
+import { Game, Player, User } from "../apiserver/types.ts";
+
+// @deno-types=../client_js/api_client.d.ts
 import ApiClient from "../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
 type Props = {
-  children?: React.ReactNode;
-  games: any[];
+  games: Game[];
 };
 
 const useStyles = makeStyles({
@@ -64,10 +66,10 @@ const GameList: React.FC<Props> = (props: Props) => {
   const classes = useStyles(theme);
   const history = useHistory();
   const games = props.games;
-  const [users, setUsers] = useState<any[] | null>();
+  const [users, setUsers] = useState<User[] | null>();
 
   const getUsers = async () => {
-    const users: any[] = [];
+    const users: User[] = [];
     console.log("getUsers", games);
     for (const game of games) {
       console.log("game", game);
@@ -75,9 +77,12 @@ const GameList: React.FC<Props> = (props: Props) => {
         console.log("player", player);
         if (users.some((user) => user.id === player.id)) continue;
         console.log("player2", player);
-        const user = (await apiClient.usersShow(player.id)).data;
-        console.log("user", user);
-        users.push(user);
+        const res = await apiClient.usersShow(player.id);
+        if (res.success) {
+          const user = res.data;
+          console.log("user", user);
+          users.push(user);
+        }
       }
     }
     console.log("users", users);
@@ -88,13 +93,13 @@ const GameList: React.FC<Props> = (props: Props) => {
     getUsers();
   }, []);
 
-  const getStatusClass = (game: any) => {
+  const getStatusClass = (game: Game) => {
     if (game.ending) return classes.ending;
     else if (game.gaming) return classes.gaming;
     else return classes.waiting;
   };
 
-  const getStartTime = (game: any) => {
+  const getStartTime = (game: Game) => {
     if (game.startedAtUnixTime === null) {
       return "-";
     } else {
@@ -104,16 +109,16 @@ const GameList: React.FC<Props> = (props: Props) => {
     }
   };
 
-  const getPoint = (player: any) => {
+  const getPoint = (player: Player) => {
     return player.point.basepoint + player.point.wallpoint;
   };
 
-  const getUser = (id: any) => {
+  const getUser = (id: string) => {
     if (!users) return undefined;
     return users.find((user) => user.id === id);
   };
 
-  const toGameDetail = (id: any) => {
+  const toGameDetail = (id: string) => {
     history.push("/game/detail/" + id);
   };
 
@@ -155,21 +160,23 @@ const GameList: React.FC<Props> = (props: Props) => {
               </td>
               <td>
                 <div className={classes.player}>
-                  {(game.players as any[]).map((player, i) => {
+                  {game.players.map((player, i) => {
                     return (
                       <div className={classes.player + " " + classes.playerDiv}>
                         {i !== 0 && <div className={classes.playerDiv}>vs</div>}
                         <div>
-                          {getUser(player.id)
-                            ? <span>
-                              <Link
-                                to={`/user/detail/${getUser(player.id).name}`}
-                              >
-                                {getUser(player.id).screenName}
-                              </Link>
-                            </span>
-                            : <span className={classes.un}>No player</span>}
-
+                          {(() => {
+                            const user = getUser(player.id);
+                            return user
+                              ? <span>
+                                <Link
+                                  to={`/user/detail/${user.name}`}
+                                >
+                                  {user.screenName}
+                                </Link>
+                              </span>
+                              : <span className={classes.un}>No player</span>;
+                          })()}
                           <br />
                           {getPoint(player)}
                         </div>

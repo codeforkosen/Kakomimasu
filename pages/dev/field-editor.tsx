@@ -35,7 +35,9 @@ type NestedPartial<T> = {
 export default function () {
   const classes = useStyles();
   const [boards, setBoards] = useState<Board[]>();
-  const [game, setGame] = useState<Pick<Game, "board" | "tiled" | "players">>();
+  const [game, setGame] = useState<
+    Pick<Game, "board" | "tiled" | "players" | "log">
+  >();
 
   useEffect(() => {
     getBoards();
@@ -58,7 +60,7 @@ export default function () {
     for (let i = 0; i < tiled.length; i++) {
       tiled[i] = [0, -1];
     }
-    const game: Pick<Game, "board" | "tiled" | "players"> = {
+    const game: Pick<Game, "board" | "tiled" | "players" | "log"> = {
       board,
       tiled,
       players: [{ id: "", agents: [], point: { basepoint: 0, wallpoint: 0 } }, {
@@ -66,6 +68,7 @@ export default function () {
         agents: [],
         point: { basepoint: 0, wallpoint: 0 },
       }],
+      log: [],
     };
     setGame(game);
   };
