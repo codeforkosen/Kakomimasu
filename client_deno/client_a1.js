@@ -4,7 +4,7 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA1 extends Algorithm {
-  
+
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
@@ -43,7 +43,7 @@ export class ClientA1 extends Algorithm {
 }
 
 if (import.meta.main) {
-  let a = new ClientA1();
+  const a = new ClientA1();
   a.match({
     id: "ai-1",
     name: "AI-1",

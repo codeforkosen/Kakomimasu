@@ -15,12 +15,12 @@ export class Algorithm {
     let info = await this.kc.waitMatching();
     info = await this.kc.waitStart();
     while (info) {
-      let actions = this.think(info);
+      const actions = this.think(info);
       this.kc.setActions(actions);
       info = await this.kc.waitNextTurn();
     }
   }
-  
+
   getPlayerNumber() {
     return this.kc.getPlayerNumber();
   }

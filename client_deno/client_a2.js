@@ -4,14 +4,14 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA2 extends Algorithm {
-  
+
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
     const w = points[0].length;
     const h = points.length;
     const nagents = this.getAgentCount();
-    
+
     // ポイントの高い順ソート
     const pntall = [];
     for (let i = 0; i < h; i++) {
@@ -51,7 +51,7 @@ export class ClientA2 extends Algorithm {
 }
 
 if (import.meta.main) {
-  let a = new ClientA2();
+  const a = new ClientA2();
   a.match({
     id: "ai-2",
     name: "AI-2",
