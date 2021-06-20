@@ -10,6 +10,16 @@
 on: [push]
 
 jobs:
+  deno_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v1
+      - uses: denoland/setup-deno@v1
+        with: 
+          deno-version: v1.x
+      - name: Deno lint
+        run: deno lint --ignore=./act
   deno_test:
     runs-on: ubuntu-latest
     name: Deno test by Docker
@@ -17,5 +27,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Deno test
-        uses: ./
+        uses: ./ 
+  
             
