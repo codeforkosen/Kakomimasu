@@ -136,8 +136,8 @@ export default function () {
             onChange={({ target: { value } }) => {
               setData({ ...data, name: value });
             }}
-            error={!Boolean(data.name)}
-            helperText={Boolean(data.name) ? "" : "入力必須項目です"}
+            error={!data.name}
+            helperText={data.name ? "" : "入力必須項目です"}
           />
           <TextField
             required
@@ -149,8 +149,8 @@ export default function () {
             onChange={({ target: { value } }) => {
               setData({ ...data, boardName: value });
             }}
-            error={!Boolean(data.boardName)}
-            helperText={Boolean(data.boardName) ? "" : "入力必須項目です"}
+            error={!data.boardName}
+            helperText={data.boardName ? "" : "入力必須項目です"}
           >
             {boards?.map((board) => {
               return <MenuItem value={board.name}>{board.name}</MenuItem>;

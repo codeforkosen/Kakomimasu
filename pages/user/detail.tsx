@@ -69,7 +69,7 @@ export default function () {
             point: p.point.wallpoint + p.point.basepoint,
           };
         });
-        players.sort((a: any, b: any) => a.point - b.point);
+        players.sort((a, b) => a.point - b.point);
 
         if (players[0].id === user.id) {
           if (players[0].point === players[players.length - 1].point) {

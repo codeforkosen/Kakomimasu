@@ -100,8 +100,8 @@ function Signup(props: { user: firebase.User }) {
           className={classes.textField}
           value={data.screenName}
           onChange={handleChange}
-          error={!Boolean(data.screenName)}
-          helperText={Boolean(data.screenName) ? "" : "入力必須項目です"}
+          error={!data.screenName}
+          helperText={data.screenName ? "" : "入力必須項目です"}
         />
         <TextField
           required

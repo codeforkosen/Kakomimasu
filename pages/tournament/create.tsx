@@ -103,8 +103,8 @@ export default function () {
             onChange={({ target: { value } }) => {
               setData({ ...data, name: value });
             }}
-            error={!Boolean(data.name)}
-            helperText={Boolean(data.name) ? "" : "入力必須項目です"}
+            error={!data.name}
+            helperText={data.name ? "" : "入力必須項目です"}
           />
           <TextField
             label="主催"
@@ -124,8 +124,8 @@ export default function () {
             onChange={({ target: { value } }) => {
               setData({ ...data, type: value as TournamentType });
             }}
-            error={!Boolean(data.type)}
-            helperText={Boolean(data.type) ? "" : "入力必須項目です"}
+            error={!data.type}
+            helperText={data.type ? "" : "入力必須項目です"}
           >
             <MenuItem value="round-robin">グループトーナメント</MenuItem>
             {/*<MenuItem value="knockout">勝ち残り式トーナメント</MenuItem>;*/}

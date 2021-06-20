@@ -95,7 +95,7 @@ export default function () {
         e.reservedUsers[1] === mUserId
     );
     if (game) {
-      let url = `/game/detail/` + game.gameId;
+      const url = `/game/detail/` + game.gameId;
       let pointText = "";
       let resultText = "-";
       if (game.gaming || game.ending) {
@@ -206,7 +206,7 @@ export default function () {
                       label="追加ユーザ"
                       onChange={async (event) => {
                         const value = event.target.value;
-                        let req = await apiClient.usersSearch(value);
+                        const req = await apiClient.usersSearch(value);
                         if (!req.success) return;
                         setAddUserList(req.data);
                       }}
@@ -225,7 +225,7 @@ export default function () {
                     console.log(req);
                     if (req.success) setTournament(req.data);
                   }}
-                  disabled={!Boolean(addUser) || Boolean(addUserHelperText)}
+                  disabled={!addUser || Boolean(addUserHelperText)}
                 >
                   ユーザ追加
                 </Button>
