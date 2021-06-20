@@ -1,3 +1,4 @@
+/// <reference types="./Kakomimasu.d.ts" />
 import util from "./util.js";
 
 class Board {
