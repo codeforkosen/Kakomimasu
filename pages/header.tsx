@@ -4,6 +4,8 @@ import AppBar from "@material-ui/core/AppBar";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import firebase from "../components/firebase.ts";
 
@@ -16,6 +18,15 @@ type Props = { firebase: typeof firebase };
 export default function (props: Props) {
   const location = useLocation();
   const [user, setUser] = useState<firebase.User | undefined | null>(undefined);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const logOut = async () => {
     try {
@@ -59,7 +70,26 @@ export default function (props: Props) {
                 <Button variant="text" color="inherit" onClick={logOut}>
                   ログアウト
                 </Button>
-                <Avatar src={user.photoURL ? user.photoURL : ""} />
+                <div
+                  aria-controls="user-icon"
+                  onClick={handleClick}
+                  style={{ cursor: "pointer" }}
+                >
+                  <Avatar src={user.photoURL ? user.photoURL : ""} />
+                </div>
+                <Menu
+                  id="user-icon"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleClose}>
+                    <Link to="/user/detail" style={{ textDecoration: "none" }}>
+                      マイページ
+                    </Link>
+                  </MenuItem>
+                </Menu>
               </>
               : <Button
                 variant="text"
