@@ -1,8 +1,6 @@
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
-import { test, assertEquals } from "../asserts.js";
+import { assertEquals } from "../asserts.js";
 // import util from "../util.mjs";
-
-const cl = (...a) => { a; };//console.log(...a);
 
 const prepare = () => {
   const w = 3;
