@@ -11,7 +11,10 @@ export default function () {
   return (
     <Switch>
       <Route exact path={`${match.path}/login`} component={Login} />
-      <Route path={`${match.path}/detail/:id`} component={Detail} />
+      <Route
+        path={[`${match.path}/detail/:id`, `${match.path}/detail`]}
+        component={Detail}
+      />
       <Route component={NotFound} />
     </Switch>
   );

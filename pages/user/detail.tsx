@@ -1,6 +1,6 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   Cell,
@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 
 export default function () {
   const classes = useStyles();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id?: string }>();
 
   const [user, setUser] = useState<
     | ({
@@ -49,7 +49,7 @@ export default function () {
     | null
   >(undefined);
 
-  const getUser = async (idToken?: string) => {
+  const getUser = async (id: string, idToken?: string) => {
     const res = await apiClient.usersShow(id, idToken);
     if (res.success === false) {
       setUser(null);
@@ -92,9 +92,12 @@ export default function () {
   };
 
   useEffect(() => {
+    console.log("id", id);
     firebase.auth().onAuthStateChanged(async (user) => {
       const idToken = await user?.getIdToken(true);
-      getUser(idToken);
+      const userId = id || user?.uid;
+      if (!userId) setUser(null);
+      else getUser(userId, idToken);
     });
   }, [id]);
 
