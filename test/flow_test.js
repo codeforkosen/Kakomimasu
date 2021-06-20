@@ -1,5 +1,5 @@
 import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
-import { test, assertEquals } from "../asserts.js";
+import { assertEquals } from "../asserts.js";
 // import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 //import util from "../util.mjs";
 
@@ -29,7 +29,7 @@ Deno.test("flow", () => {
   game.attachPlayer(p2);
   game.start();
   for (; ;) {
-    const st = game.getStatusJSON();
+    const _st = game.getStatusJSON();
     // console.log(st);
     p1.setActions(Action.fromJSON([
       [0, Action.PUT, 1, 1],

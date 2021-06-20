@@ -1,4 +1,4 @@
-import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 import { assert, assertEquals, AssertionError } from "../asserts.js";
 
 Deno.test("conflict4", () => {
@@ -22,7 +22,7 @@ Deno.test("conflict4", () => {
 
   const cl = (...a) => { a; };//console.log(...a);
 
-  const showAgents = () => {
+  const _showAgents = () => {
     let i = 0;
     for (const agent of game.agents) {
       let j = 0;

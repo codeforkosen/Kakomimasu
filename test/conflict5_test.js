@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.67.0/testing/asserts.ts";
-import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 
 const assert = (b) => {
   assertEquals(true, b);
@@ -34,7 +34,7 @@ Deno.test("conflict5 test", () => {
 
   const cl = (...a) => { a; };//console.log(...a);
 
-  const showAgents = () => {
+  const _showAgents = () => {
     let i = 0;
     for (const agent of game.agents) {
       let j = 0;
