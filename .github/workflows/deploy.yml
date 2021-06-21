@@ -9,5 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > secret_key && chmod 600 secret_key
-      - run: ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git pull && systemctl restart kakomimasu"
+      - if: ${{ !env.ACT }}
+        run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > secret_key && chmod 600 secret_key
+      - if: ${{ !env.ACT }}
+        run: ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git pull && systemctl restart kakomimasu"

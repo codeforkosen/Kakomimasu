@@ -1,30 +1,34 @@
 # Kakomimasu
- #procon31 競技部門 コアモジュール for [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web  
- <img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.png">  
+
+#procon31 競技部門 コアモジュール for
+[Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web\
+<img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.png">
 
 ![.github/workflows/test.yml](https://github.com/codeforkosen/Kakomimasu/workflows/.github/workflows/test.yml/badge.svg)
-[![deno](https://taisukef.github.com/denolib/denobadge@1.3.3.svg)](https://deno.land/)  
+[![deno](https://taisukef.github.com/denolib/denobadge@1.3.3.svg)](https://deno.land/)
 
-<!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->  
-https://github.com/codeforkosen/Kakomimasu/edit/master/README.md
-囲みマス  
-https://codeforkosen.github.io/Kakomimasu/  
+<!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->
 
-## 競技部門ルール  
+https://github.com/codeforkosen/Kakomimasu/edit/master/README.md 囲みマス\
+https://codeforkosen.github.io/Kakomimasu/
 
-http://www.procon.gr.jp/?p=77044  
+## 競技部門ルール
+
+http://www.procon.gr.jp/?p=77044
 
 ## APIサーバー
 
-[apiserver/](apiserver)  
+[apiserver/](apiserver)
 
 ### 起動方法
+
 ```
 $ cd apiserver
 $ deno run -A apiserver.ts
 ```
 
 ## APIプロトコル
+
 - [match API](./apiserver/docs/match_api.md)
 - [users API](./apiserver/docs/users_api.md)
 - [tournaments API](./apiserver/docs/tournaments_api.md)
@@ -41,12 +45,15 @@ $ deno run -A apiserver.ts
 $ cd client_deno
 $ deno run -A client_a1.js --local
 ```
+
 別のコンソールから
+
 ```
 $ cd client_deno
 $ deno run -A client_a2.js --local
 ```
-詳細→[Kakomimasu client for deno - README.md](https://github.com/codeforkosen/Kakomimasu/blob/master/client_deno/README.md)  
+
+詳細→[Kakomimasu client for deno - README.md](https://github.com/codeforkosen/Kakomimasu/blob/master/client_deno/README.md)
 
 ## APIクライアント for Node
 
@@ -65,30 +72,38 @@ $ ./a.out
 
 ## サポート Discord
 
-囲みマス 公式Discord 招待リンク  
+囲みマス 公式Discord 招待リンク\
 https://discord.gg/283ZvKPcUD
 
 ## 人vs人で遊んでみる
 
-http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9  
+http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9
 
 ## 利用方法（コアのみ使用する）
 
 for Deno
+
 ```typescript
-import { Kakomimasu, Board, Action } from "https://codeforkosen.github.io/Kakomimasu/Kakomimasu.js";
+import {
+  Action,
+  Board,
+  Kakomimasu,
+} from "https://codeforkosen.github.io/Kakomimasu/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
 
 ## 利用方法（リポジトリを取得し、ローカルで使用する）
 
 for Deno
+
 ```
 $ git clone https://github.com/codeforkosen/Kakomimasu.git
 ```
+
 main.js を編集（そのままでも動きます）
+
 ```javascript
-import { Kakomimasu, Board, Action } from "./Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "./Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
 
@@ -124,39 +139,56 @@ for (;;) {
   }
 }
 console.log(game.getStatusJSON());
-
 ```
+
 コンソールにて
+
 ```
 $ deno run main.js
 ```
 
 ## テスト
 
+囲みマスコア（Kakomimasu.js）のテストを行うには以下を実行
+
+```console
+$ deno test ./test
 ```
-$ deno test
+
+囲みマスAPIサーバのテストを行うには、localでサーバを起動した状態で以下を実行
+
+```console
+$ deno test ./apiserver
+```
+
+Github
+Actionsのローカル実行ツール「[act](https://github.com/nektos/act)」を使用したテストを行うには、actとDockerをインストールした状態で以下を実行
+
+```console
+$ act
 ```
 
 ## デザイン
-Kakomimasu – Figma  
-https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu  
+
+Kakomimasu – Figma\
+https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu
 
 ## フィールド
 
-参考、2019年 競技部門 公開フィールド  
-http://www.procon.gr.jp/?p=76585  
+参考、2019年 競技部門 公開フィールド\
+http://www.procon.gr.jp/?p=76585
 
 ## 出典
 
-高専プロコン第31回苫小牧大会  
-http://www.procon.gr.jp/  
+高専プロコン第31回苫小牧大会\
+http://www.procon.gr.jp/
 
 ## 記事
 
-2020-06-02 中止になった高専プロコン競技部門はオンラインで遊ぼう！ 競技システムのDeno/Node.js用コアモジュールのオープンソース公開  
-https://fukuno.jig.jp/2869  
+2020-06-02 中止になった高専プロコン競技部門はオンラインで遊ぼう！ 競技システムのDeno/Node.js用コアモジュールのオープンソース公開\
+https://fukuno.jig.jp/2869
 
-2020-06-09 高専プロコン競技部門を勝手に開催する会オンラインハックデーの進捗、プロトコル、デザイン、Denoで30行のAPIサーバーのモック  
-https://fukuno.jig.jp/2876  
+2020-06-09 高専プロコン競技部門を勝手に開催する会オンラインハックデーの進捗、プロトコル、デザイン、Denoで30行のAPIサーバーのモック\
+https://fukuno.jig.jp/2876
 
-遊んでくれる人、協力者募集！ 
+遊んでくれる人、協力者募集！
