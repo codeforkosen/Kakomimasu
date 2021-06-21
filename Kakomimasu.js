@@ -1,3 +1,4 @@
+/// <reference types="./Kakomimasu.d.ts" />
 import util from "./util.js";
 
 class Board {
@@ -436,10 +437,10 @@ class Game {
     game.players = data.players.map(p => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
-    game.field.field = data.tiled;
+    game.field.field = data.field.field;
     game.log = data.log;
     game.turn = data.turn;
-    game.agents = data.players.map((_p, i) => {
+    game.agents = data.agents.map((_p, i) => {
       return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
     });
     return game;
