@@ -4,7 +4,6 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA2 extends Algorithm {
-
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
@@ -35,12 +34,13 @@ export class ClientA2 extends Algorithm {
         const p = pntall[i + offset];
         actions.push(new Action(i, "PUT", p.x, p.y));
       } else {
-        for (; ;) {
+        for (;;) {
           const [dx, dy] = DIR[util.rnd(8)];
           const x = agent.x + dx;
           const y = agent.y + dy;
-          if (x < 0 || x >= w || y < 0 || y >= w)
+          if (x < 0 || x >= w || y < 0 || y >= w) {
             continue;
+          }
           actions.push(new Action(i, "MOVE", x, y));
           break;
         }
@@ -56,6 +56,6 @@ if (import.meta.main) {
     id: "ai-2",
     name: "AI-2",
     spec: "",
-    password: "ai-2-pw"
+    password: "ai-2-pw",
   });
 }

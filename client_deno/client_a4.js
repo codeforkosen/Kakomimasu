@@ -4,7 +4,6 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA4 extends Algorithm {
-
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
@@ -19,7 +18,7 @@ export class ClientA4 extends Algorithm {
         pntall.push({ x: j, y: i, point: points[i][j] });
       }
     }
-    const sortByPoint = p => {
+    const sortByPoint = (p) => {
       p.sort((a, b) => b.point - a.point);
     };
     sortByPoint(pntall);
@@ -32,8 +31,9 @@ export class ClientA4 extends Algorithm {
     const checkFree = (x, y) => {
       for (let i = 0; i < poschk.length; i++) {
         const p = poschk[i];
-        if (p.x === x && p.y === y)
+        if (p.x === x && p.y === y) {
           return false;
+        }
       }
       return true;
     };
@@ -51,9 +51,21 @@ export class ClientA4 extends Algorithm {
           if (x >= 0 && x < w && y >= 0 && y < h && checkFree(x, y)) {
             const f = field[y][x];
             if (f.type === 0 && f.pid !== -1 && f.pid !== pno) { // 敵土地、おいしい！
-              dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point + 10 });
+              dirall.push({
+                x,
+                y,
+                type: f.type,
+                pid: f.pid,
+                point: f.point + 10,
+              });
             } else if (f.type === 0 && f.pid === -1) { // 空き土地優先
-              dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point + 5 });
+              dirall.push({
+                x,
+                y,
+                type: f.type,
+                pid: f.pid,
+                point: f.point + 5,
+              });
             } else if (f.type === 1 && f.pid !== pno) { // 敵壁
               dirall.push({ x, y, type: f.type, pid: f.pid, point: f.point });
             }
@@ -72,12 +84,13 @@ export class ClientA4 extends Algorithm {
           }
         } else {
           // 周りが全部埋まっていたらランダムに動く
-          for (; ;) {
+          for (;;) {
             const [dx, dy] = DIR[util.rnd(8)];
             const x = agent.x + dx;
             const y = agent.y + dy;
-            if (x < 0 || x >= w || y < 0 || y >= w)
+            if (x < 0 || x >= w || y < 0 || y >= w) {
               continue;
+            }
             actions.push(new Action(i, "MOVE", x, y));
             poschk.push({ x, y });
             break;
@@ -95,6 +108,6 @@ if (import.meta.main) {
     id: "ai-4",
     name: "AI-4",
     spec: "破壊者",
-    password: "ai-4-pw"
+    password: "ai-4-pw",
   });
 }

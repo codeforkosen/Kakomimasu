@@ -1,7 +1,7 @@
 // アルゴリズムを自動対戦して強さ測定
 import { ClientA1 } from "./client_a1.js";
 import { ClientA4 } from "./client_a4.js";
-import { Board, Game, Player, Action } from "../Kakomimasu.js";
+import { Action, Board, Game, Player } from "../Kakomimasu.js";
 import { KakomimasuClient } from "./KakomimasuClient.js";
 
 // ボード名、アルゴリズム実装、対戦回数を設定する
@@ -12,7 +12,9 @@ const ALGORITHMS = [
 ];
 const BATTLE_NUM = 10;
 
-const board = new Board(JSON.parse(Deno.readTextFileSync(`../apiserver/board/${BOARD_NAME}.json`)));
+const board = new Board(
+  JSON.parse(Deno.readTextFileSync(`../apiserver/board/${BOARD_NAME}.json`)),
+);
 const win = new Array(ALGORITHMS.length).fill(0);
 
 for (let i = 0; i < BATTLE_NUM; i++) {
@@ -30,7 +32,7 @@ for (let i = 0; i < BATTLE_NUM; i++) {
   while (!game.ending) {
     for (let j = 0; j < ALGORITHMS.length; j++) {
       const kact = ALGORITHMS[j].think(info);
-      game.players[j].setActions(kact.map(a => convertGameAction(a)));
+      game.players[j].setActions(kact.map((a) => convertGameAction(a)));
     }
     game.nextTurn();
     info = game2Info(game);
@@ -81,14 +83,22 @@ for (let i = 0; i < BATTLE_NUM; i++) {
 function convertGameAction(a) {
   let type;
   switch (a.type) {
-    case "PUT": type = Action.PUT; break;
-    case "NONE": type = Action.NONE; break;
-    case "MOVE": type = Action.MOVE; break;
-    case "REMOVE": type = Action.REMOVE; break;
+    case "PUT":
+      type = Action.PUT;
+      break;
+    case "NONE":
+      type = Action.NONE;
+      break;
+    case "MOVE":
+      type = Action.MOVE;
+      break;
+    case "REMOVE":
+      type = Action.REMOVE;
+      break;
   }
   return new Action(a.agentId, type, a.x, a.y);
 }
 
 function game2Info(game) {
-  return JSON.parse(JSON.stringify(game))
+  return JSON.parse(JSON.stringify(game));
 }
