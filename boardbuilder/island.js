@@ -26,4 +26,7 @@ for (let i = 0; i < 6; i++) {
 }
 console.log(b, b.points.length);
 
-Deno.writeTextFileSync("../apiserver/board/" + b.name + ".json", JSON.stringify(b));
+Deno.writeTextFileSync(
+  "../apiserver/board/" + b.name + ".json",
+  JSON.stringify(b),
+);

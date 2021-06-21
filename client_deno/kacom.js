@@ -11,10 +11,10 @@ export class Kacom extends Algorithm {
     const h = points.length;
 
     const line = [];
-    for (let i = 0; i < w; i++)line.push([i, 0]);
-    for (let i = 1; i < h; i++)line.push([w - 1, i]);
-    for (let i = w - 2; i >= 0; i--)line.push([i, h - 1]);
-    for (let i = h - 2; i >= 1; i--)line.push([0, i]);
+    for (let i = 0; i < w; i++) line.push([i, 0]);
+    for (let i = 1; i < h; i++) line.push([w - 1, i]);
+    for (let i = w - 2; i >= 0; i--) line.push([i, h - 1]);
+    for (let i = h - 2; i >= 1; i--) line.push([0, i]);
 
     const _field = this.getField();
     const actions = [];

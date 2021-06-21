@@ -1,5 +1,7 @@
-# VPSへのAPIサーバーの立て方 
+# VPSへのAPIサーバーの立て方
+
 OS: CentOS Stream8
+
 ```
 # yum install git
 # git clone https://github.com/codeforkosen/Kakomimasu.git
@@ -41,6 +43,7 @@ server_name practice.kakomimasu.website; # managed by Certbot
 ```
 
 ## systemdを使用した囲みマスサービス起動
+
 ```
 # cp vps/kakomimasu.service /etc/systemd/system/kakomimasu.service
 # systemctl daemon-reload

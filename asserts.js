@@ -9,7 +9,7 @@ const assertEquals = (x, y) => {
   }
 };
 
-const assert = b => {
+const assert = (b) => {
   if (!b) {
     throw new AssertionError(`must be true`);
   }
@@ -27,4 +27,4 @@ const test = async (s, f) => {
   console.log("test " + s, res);
 };
 
-export { test, assert, assertEquals, AssertionError };
+export { assert, assertEquals, AssertionError, test };
