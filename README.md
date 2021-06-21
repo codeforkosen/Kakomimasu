@@ -149,8 +149,23 @@ $ deno run main.js
 
 ## テスト
 
+囲みマスコア（Kakomimasu.js）のテストを行うには以下を実行
+
+```console
+$ deno test ./test
 ```
-$ deno test
+
+囲みマスAPIサーバのテストを行うには、localでサーバを起動した状態で以下を実行
+
+```console
+$ deno test ./apiserver
+```
+
+Github
+Actionsのローカル実行ツール「[act](https://github.com/nektos/act)」を使用したテストを行うには、actとDockerをインストールした状態で以下を実行
+
+```console
+$ act
 ```
 
 ## デザイン

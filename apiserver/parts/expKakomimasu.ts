@@ -1,9 +1,7 @@
 import util from "../../util.js";
 
-// @deno-types="../../Kakomimasu.d.ts"
 export * from "../../Kakomimasu.js";
 
-// @deno-types="../../Kakomimasu.d.ts"
 import { Agent, Board, Game, Kakomimasu, Player } from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
@@ -83,7 +81,7 @@ export class ExpGame extends Game {
     }
   }
 
-  updateStatus = () => {
+  updateStatus() {
     try {
       if (this.isGaming()) { // ゲーム進行中
         if (!this.nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
@@ -115,7 +113,7 @@ export class ExpGame extends Game {
     } catch (e) {
       console.log(e);
     }
-  };
+  }
 
   toJSON() {
     const ret = super.toJSON();
