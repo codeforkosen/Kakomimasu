@@ -4,7 +4,6 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA5 extends Algorithm {
-
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
@@ -51,7 +50,9 @@ export class ClientA5 extends Algorithm {
           if (x >= 0 && x < w && y >= 0 && y < h && checkFree(x, y)) {
             const f = field[y][x];
             if (f.point > 0) { // プラスのときだけ
-              if (f.type === 0 && f.pid !== -1 && f.pid !== pno && f.point > 0) { // 敵土地、おいしい！
+              if (
+                f.type === 0 && f.pid !== -1 && f.pid !== pno && f.point > 0
+              ) { // 敵土地、おいしい！
                 dirall.push(
                   { x, y, type: f.type, pid: f.pid, point: f.point + 10 },
                 );
@@ -108,7 +109,7 @@ export class ClientA5 extends Algorithm {
             poschk.push({ x: agent.x, y: agent.y });
           } else {
             // 空いているところなければランダム
-            for (; ;) {
+            for (;;) {
               const [dx, dy] = DIR[util.rnd(8)];
               const x = agent.x + dx;
               const y = agent.y + dy;
@@ -133,6 +134,6 @@ if (import.meta.main) {
     id: "ai-5",
     name: "AI-5",
     spec: "破壊者",
-    password: "ai-5-pw"
+    password: "ai-5-pw",
   });
 }

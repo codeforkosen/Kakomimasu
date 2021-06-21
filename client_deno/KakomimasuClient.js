@@ -1,10 +1,4 @@
-import {
-  Action,
-  sleep,
-  diffTime,
-  cl,
-  args
-} from "./client_util.js";
+import { Action, args, cl, diffTime, sleep } from "./client_util.js";
 
 import ApiClient from "../client_js/api_client.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
@@ -28,7 +22,7 @@ class KakomimasuClient {
         host = host.substring(0, host.length - 1);
       }
       //setHost(`${host}/api`);
-      this.apiClient = new ApiClient(host)
+      this.apiClient = new ApiClient(host);
     }
   }
   readGameId() {
@@ -42,11 +36,18 @@ class KakomimasuClient {
   }
   async waitMatching() { // GameInfo
     // ユーザ取得（ユーザがなかったら新規登録）
-    const userRes = await this.apiClient.usersShow(this.id, `Basic ${this.id}:${this.password}`);
+    const userRes = await this.apiClient.usersShow(
+      this.id,
+      `Basic ${this.id}:${this.password}`,
+    );
     let user;
     if (userRes.success) user = userRes.data;
     else {
-      const res = await this.apiClient.usersRegist({ screenName: this.name, name: this.id, password: this.password });
+      const res = await this.apiClient.usersRegist({
+        screenName: this.name,
+        name: this.id,
+        password: this.password,
+      });
       if (res.success) user = res.data;
       else throw Error("User Regist Error");
     }
@@ -54,18 +55,25 @@ class KakomimasuClient {
     cl(user);
 
     // プレイヤー登録
-    const matchParam = { id: user.id, password: this.password, spec: this.spec };
+    const matchParam = {
+      id: user.id,
+      password: this.password,
+      spec: this.spec,
+    };
     if (args.useAi) {
       matchParam.useAi = true;
       matchParam.aiOption = {
         aiName: args.useAi,
         boardName: args.aiBoard,
-      }
+      };
     } else if (args.gameId) {
       matchParam.gameId = args.gameId;
     }
     //cl(matchParam);
-    const MatchRes = await this.apiClient.match(matchParam, `Bearer ${this.bearerToken}`);
+    const MatchRes = await this.apiClient.match(
+      matchParam,
+      `Bearer ${this.bearerToken}`,
+    );
     //cl(MatchRes);
     if (MatchRes.success) {
       const matchGame = MatchRes.data;
@@ -165,7 +173,11 @@ class KakomimasuClient {
   }
 
   async setActions(actions) { // void
-    const res = await this.apiClient.setAction(this.gameId, { actions }, "Bearer " + this.bearerToken);
+    const res = await this.apiClient.setAction(
+      this.gameId,
+      { actions },
+      "Bearer " + this.bearerToken,
+    );
     console.log("setActions", res);
     if (res.success === false) throw Error("Set Action Error");
   }
@@ -176,7 +188,7 @@ class KakomimasuClient {
       cl("nextTurnUnixTime", bknext);
       await sleep(diffTime(bknext));
 
-      for (; ;) {
+      for (;;) {
         const res = await this.apiClient.getMatch(this.gameId);
         if (res.success) this.gameInfo = res.data;
         else throw Error("Get Match Error");
@@ -220,4 +232,4 @@ const DIR = [
   [-1, -1],
 ];
 
-export { KakomimasuClient, Action, DIR, cl, args };
+export { Action, args, cl, DIR, KakomimasuClient };

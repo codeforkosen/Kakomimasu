@@ -3,7 +3,7 @@ const args = parse(Deno.args);
 
 const cl = (...param) => {
   if (!args.nolog) console.log(...param);
-}
+};
 
 class Action {
   constructor(agentId, type, x, y) {
@@ -26,10 +26,4 @@ function diffTime(unixTime) {
   return dt;
 }
 
-export {
-  Action,
-  sleep,
-  diffTime,
-  cl,
-  args
-};
+export { Action, args, cl, diffTime, sleep };

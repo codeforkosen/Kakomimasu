@@ -1,6 +1,8 @@
 import { Board, Field } from "../Kakomimasu.js";
 
-const cl = (...a) => { a; };//console.log(...a);
+const cl = (...a) => {
+  a;
+}; //console.log(...a);
 
 Deno.test("fillBase1", () => {
   const nagent = 6;
@@ -19,7 +21,7 @@ Deno.test("fillBase1", () => {
     }
     cl();
   };
-  const set = s => {
+  const set = (s) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
@@ -30,7 +32,7 @@ Deno.test("fillBase1", () => {
       }
     }
   };
-  const chk = s => {
+  const chk = (s) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
@@ -42,7 +44,7 @@ Deno.test("fillBase1", () => {
         }
       }
     }
-  }
+  };
 
   p();
 

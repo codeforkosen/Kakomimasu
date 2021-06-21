@@ -29,7 +29,15 @@ class Board {
   }
 
   static restore(data) {
-    const board = new Board(data.w, data.h, data.points, data.nagent, data.nturn, data.nsec, data.nplayer)
+    const board = new Board(
+      data.w,
+      data.h,
+      data.points,
+      data.nagent,
+      data.nturn,
+      data.nsec,
+      data.nplayer,
+    );
     return board;
   }
 
@@ -434,25 +442,27 @@ class Game {
     const board = Board.restore(data.board);
     const game = new Game(board);
     game.uuid = data.uuid;
-    game.players = data.players.map(p => Player.restore(p));
+    game.players = data.players.map((p) => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
     game.field.field = data.field.field;
     game.log = data.log;
     game.turn = data.turn;
     game.agents = data.agents.map((_p, i) => {
-      return data.agents[i].map(a => Agent.restore(a, game.board, game.field));
+      return data.agents[i].map((a) =>
+        Agent.restore(a, game.board, game.field)
+      );
     });
     return game;
   }
 
   toLogJSON() {
     const data = { ...this };
-    data.players = data.players.map(p => p.toLogJSON());
+    data.players = data.players.map((p) => p.toLogJSON());
     data.board = data.board.toLogJSON();
     data.field = data.field.toLogJSON();
-    data.agents = data.agents.map(p => {
-      p = p.map(a => a.toLogJSON());
+    data.agents = data.agents.map((p) => {
+      p = p.map((a) => a.toLogJSON());
       return p;
     });
     return data;
@@ -831,4 +841,4 @@ class Kakomimasu {
   }
 }
 
-export { Kakomimasu, Board, Action, Field, Game, Player, Agent };
+export { Action, Agent, Board, Field, Game, Kakomimasu, Player };

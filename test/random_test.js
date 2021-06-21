@@ -4,7 +4,9 @@ import { assert, AssertionError } from "../asserts.js";
 //import util from "./nornd.js";
 import util from "./mtrnd.js";
 
-const cl = (...a) => { a; };//console.log(...a);
+const cl = (...a) => {
+  a;
+}; //console.log(...a);
 
 Deno.test("random", () => {
   const nagent = 6;
@@ -46,10 +48,12 @@ Deno.test("random", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -89,7 +93,9 @@ Deno.test("random", () => {
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
         if (a !== "." && n[1] >= 0 && n[1] != a) {
-          throw new AssertionError(`illegal field!! ${j}x${i} ${n[1]} must be ${a}`);
+          throw new AssertionError(
+            `illegal field!! ${j}x${i} ${n[1]} must be ${a}`,
+          );
         }
       }
     }
@@ -125,7 +131,14 @@ Deno.test("random", () => {
     actions = [Action.PUT, Action.MOVE, Action.REMOVE];
   }
   //console.log("actions", actions);
-  const getRandomAction = (n) => [n, actions[util.rnd(actions.length)], util.rnd(nagent), util.rnd(nagent)];
+  const getRandomAction = (
+    n,
+  ) => [
+    n,
+    actions[util.rnd(actions.length)],
+    util.rnd(nagent),
+    util.rnd(nagent),
+  ];
   for (let i = 1; i <= nturn; i++) {
     const act = [];
     for (let k = 0; k < nplayers; k++) {

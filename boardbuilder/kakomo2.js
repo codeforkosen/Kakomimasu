@@ -11,7 +11,7 @@ for (let i = 0; i < len; i++) {
   const x5 = x % 5;
   const y5 = y % 5;
   if ((x5 >= 1 && x5 <= 3) && (y5 >= 1 && y5 <= 3)) {
-      b.points[i] = -16;
+    b.points[i] = -16;
   }
 }
 console.log(b);

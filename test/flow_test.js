@@ -1,12 +1,13 @@
-import { Kakomimasu, Board, Action } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 import { assertEquals } from "../asserts.js";
 // import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 //import util from "../util.mjs";
 
-const cl = (...a) => { a; };//console.log(...a);
+const cl = (...a) => {
+  a;
+}; //console.log(...a);
 
 Deno.test("flow", () => {
-
   //test("flow", () => {
   const w = 8;
   const h = 8;
@@ -28,7 +29,7 @@ Deno.test("flow", () => {
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();
-  for (; ;) {
+  for (;;) {
     const _st = game.getStatusJSON();
     // console.log(st);
     p1.setActions(Action.fromJSON([
@@ -48,6 +49,9 @@ Deno.test("flow", () => {
   }
   assertEquals(game.getStatusJSON().log.length, nturn);
   cl(game.getStatusJSON().points);
-  assertEquals(game.getStatusJSON().points, [{ basepoint: 0, wallpoint: 0 }, { basepoint: 0, wallpoint: 51 }]);
+  assertEquals(game.getStatusJSON().points, [{ basepoint: 0, wallpoint: 0 }, {
+    basepoint: 0,
+    wallpoint: 51,
+  }]);
   // util.p(game.getStatusJSON());
 });

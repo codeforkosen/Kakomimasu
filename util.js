@@ -26,7 +26,12 @@ util.deepEquals = (x, y) => {
     if (!util.deepEquals(x[p], y[p])) return false;
   }
   for (const p in y) {
-    if (Object.prototype.hasOwnProperty.call(y, p) && !Object.prototype.hasOwnProperty.call(x, p)) return false;
+    if (
+      Object.prototype.hasOwnProperty.call(y, p) &&
+      !Object.prototype.hasOwnProperty.call(x, p)
+    ) {
+      return false;
+    }
   }
   return true;
 };

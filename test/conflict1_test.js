@@ -26,10 +26,12 @@ Deno.test("conflict1", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -106,8 +108,7 @@ Deno.test("conflict1", () => {
   p1.setActions(Action.fromJSON([
     [0, Action.MOVE, 1, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W0. W00 W11");
@@ -116,8 +117,7 @@ Deno.test("conflict1", () => {
   p1.setActions(Action.fromJSON([
     [0, Action.MOVE, 0, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W00 W0. W11");
@@ -134,8 +134,7 @@ Deno.test("conflict1", () => {
   chk("W00 W0. W11");
 
   // remove no conflict
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.REMOVE, 1, 0],
   ]));
@@ -144,8 +143,7 @@ Deno.test("conflict1", () => {
   chk("W00 _.. W11");
 
   cl("move no conflict");
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.MOVE, 1, 0],
   ]));
@@ -154,8 +152,7 @@ Deno.test("conflict1", () => {
   chk("W00 W11 W1.");
 
   cl("remove failed");
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.REMOVE, 0, 0],
   ]));
@@ -164,8 +161,7 @@ Deno.test("conflict1", () => {
   chk("W00 W11 W1.");
 
   cl("move failed");
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.MOVE, 0, 0],
   ]));

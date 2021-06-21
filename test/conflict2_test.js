@@ -26,10 +26,12 @@ Deno.test("conflict2", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -52,10 +54,11 @@ Deno.test("conflict2", () => {
     return res.join("\n");
   };
 
-  const cl = (...a) => { a; };//console.log(...a);
+  const cl = (...a) => {
+    a;
+  }; //console.log(...a);
   const p = () => cl(tos());
   const chk = (s) => assertEquals(s.trim(), tos());
-
 
   // put
   p1.setActions(Action.fromJSON([
@@ -122,8 +125,7 @@ W00 _.. W11
     [1, Action.MOVE, 1, 1],
     [2, Action.MOVE, 1, 2],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk(`
@@ -138,8 +140,7 @@ W0. W00 W11
     [1, Action.MOVE, 2, 1],
     [2, Action.MOVE, 2, 2],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk(`
@@ -150,5 +151,4 @@ W0. W00 W11
 
   // finish
   while (game.nextTurn());
-
 });

@@ -19,16 +19,21 @@ export default class ApiClient {
         headers,
         body: JSON.stringify(data),
       },
-    )
+    );
     return res;
   }
 
   async _fetch(path, auth) {
-    const res = await fetch(this.baseUrl + path, auth ? {
-      headers: new Headers({
-        Authorization: auth
-      })
-    } : {});
+    const res = await fetch(
+      this.baseUrl + path,
+      auth
+        ? {
+          headers: new Headers({
+            Authorization: auth,
+          }),
+        }
+        : {},
+    );
     return res;
   }
 
@@ -90,7 +95,10 @@ export default class ApiClient {
     return { success: res.status === 200, data: await res.json() };
   }
   async tournamentsAddUser(tournamentId, data) {
-    const res = await this._fetchPostJson(`/tournament/add?id=${tournamentId}`, data);
+    const res = await this._fetchPostJson(
+      `/tournament/add?id=${tournamentId}`,
+      data,
+    );
     return { success: res.status === 200, data: await res.json() };
   }
 
@@ -115,7 +123,11 @@ export default class ApiClient {
   }
 
   async setAction(gameId, data, auth) {
-    const res = await this._fetchPostJson(`/match/${gameId}/action`, data, auth);
+    const res = await this._fetchPostJson(
+      `/match/${gameId}/action`,
+      data,
+      auth,
+    );
     return { success: res.status === 200, data: await res.json() };
   }
 }

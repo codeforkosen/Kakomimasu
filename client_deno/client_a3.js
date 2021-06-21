@@ -4,7 +4,6 @@ import { Algorithm } from "./algorithm.js";
 import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA3 extends Algorithm {
-
   think(info) {
     const pno = this.getPlayerNumber();
     const points = this.getPoints();
@@ -48,6 +47,6 @@ if (import.meta.main) {
     id: "ai-3",
     name: "AI-3",
     spec: "デタラメ",
-    password: "ai-3-pw"
+    password: "ai-3-pw",
   });
 }
