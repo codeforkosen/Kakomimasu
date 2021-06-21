@@ -20,7 +20,9 @@ Deno.test("conflict4", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const cl = (...a) => { a; };//console.log(...a);
+  const cl = (...a) => {
+    a;
+  }; //console.log(...a);
 
   const _showAgents = () => {
     let i = 0;
@@ -41,10 +43,12 @@ Deno.test("conflict4", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -131,9 +135,8 @@ W0. W00 W11
 _.. W00 _..
 `);
 
-
   // finish
-  for (let i = 0; ; i++) {
+  for (let i = 0;; i++) {
     //console.log("turn", i);
     // showAgents();
     if (!game.nextTurn()) break;

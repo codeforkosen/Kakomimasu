@@ -20,7 +20,9 @@ Deno.test("conflict3", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const cl = (...a) => { a; };//console.log(...a);
+  const cl = (...a) => {
+    a;
+  }; //console.log(...a);
 
   const showAgents = () => {
     let i = 0;
@@ -41,10 +43,12 @@ Deno.test("conflict3", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -90,16 +94,14 @@ Deno.test("conflict3", () => {
   p1.setActions(Action.fromJSON([
     [1, Action.PUT, 1, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W0. W00 _..");
   showAgents();
 
   cl("put conflict");
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
   ]));
@@ -113,8 +115,7 @@ Deno.test("conflict3", () => {
     [0, Action.MOVE, 2, 0],
     [1, Action.PUT, 2, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W0. W00 _..");
@@ -133,8 +134,7 @@ Deno.test("conflict3", () => {
   showAgents();
 
   cl("put no conflict");
-  p1.setActions(Action.fromJSON([
-  ]));
+  p1.setActions(Action.fromJSON([]));
   p2.setActions(Action.fromJSON([
     [0, Action.PUT, 2, 0],
   ]));
@@ -147,8 +147,7 @@ Deno.test("conflict3", () => {
   p1.setActions(Action.fromJSON([
     [0, Action.REMOVE, 0, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("_.. W00 W11");
@@ -158,8 +157,7 @@ Deno.test("conflict3", () => {
   p1.setActions(Action.fromJSON([
     [1, Action.PUT, 0, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W00 W00 W11");
@@ -170,16 +168,14 @@ Deno.test("conflict3", () => {
     [0, Action.MOVE, 0, 0],
     [1, Action.REMOVE, 1, 0],
   ]));
-  p2.setActions(Action.fromJSON([
-  ]));
+  p2.setActions(Action.fromJSON([]));
   assert(game.nextTurn());
   p();
   chk("W00 W00 W11");
   showAgents();
 
-
   // finish
-  for (let i = 0; ; i++) {
+  for (let i = 0;; i++) {
     //console.log("turn", i);
     // showAgents();
     if (!game.nextTurn()) break;

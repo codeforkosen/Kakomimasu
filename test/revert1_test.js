@@ -1,7 +1,9 @@
 import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 import { assert, assertEquals, AssertionError } from "../asserts.js";
 
-const cl = (...a) => { a; };//console.log(...a);
+const cl = (...a) => {
+  a;
+}; //console.log(...a);
 
 Deno.test("revert1", () => {
   const nagent = 6;
@@ -28,10 +30,12 @@ Deno.test("revert1", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 

@@ -32,7 +32,9 @@ Deno.test("conflict5 test", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const cl = (...a) => { a; };//console.log(...a);
+  const cl = (...a) => {
+    a;
+  }; //console.log(...a);
 
   const _showAgents = () => {
     let i = 0;
@@ -53,10 +55,12 @@ Deno.test("conflict5 test", () => {
         cnt++;
       }
     }
-    if (cnt === 1)
+    if (cnt === 1) {
       return true;
-    if (cnt === 0)
+    }
+    if (cnt === 0) {
       return false;
+    }
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
@@ -104,7 +108,10 @@ Deno.test("conflict5 test", () => {
   p();
   actions = game.log[game.log.length - 1][0].actions;
   //console.log("log", actions);
-  assertEquals(actions.map((a) => a.res), [Action.ERR_ONLY_ONE_TURN, Action.ERR_ONLY_ONE_TURN]);
+  assertEquals(actions.map((a) => a.res), [
+    Action.ERR_ONLY_ONE_TURN,
+    Action.ERR_ONLY_ONE_TURN,
+  ]);
   chk("W00 _.. _..");
 
   cl("conflict2");
@@ -115,7 +122,10 @@ Deno.test("conflict5 test", () => {
   assert(game.nextTurn());
   p();
   actions = game.log[game.log.length - 1][0].actions;
-  assertEquals(actions.map((a) => a.res), [Action.ERR_ONLY_ONE_TURN, Action.ERR_ONLY_ONE_TURN]);
+  assertEquals(actions.map((a) => a.res), [
+    Action.ERR_ONLY_ONE_TURN,
+    Action.ERR_ONLY_ONE_TURN,
+  ]);
   chk("W00 _.. _..");
   //console.log(game.log);
 
@@ -129,13 +139,16 @@ Deno.test("conflict5 test", () => {
   p();
   actions = game.log[game.log.length - 1][0].actions;
   //console.log("log", actions);
-  assertEquals(actions.map((a) => a.res), [Action.ERR_ONLY_ONE_TURN, Action.ERR_ONLY_ONE_TURN, Action.ERR_ONLY_ONE_TURN]);
+  assertEquals(actions.map((a) => a.res), [
+    Action.ERR_ONLY_ONE_TURN,
+    Action.ERR_ONLY_ONE_TURN,
+    Action.ERR_ONLY_ONE_TURN,
+  ]);
   chk("W00 _.. _..");
   //console.log(game.log);
 
-
   // finish
-  for (let i = 0; ; i++) {
+  for (let i = 0;; i++) {
     //console.log("turn", i);
     // showAgents();
     if (!game.nextTurn()) break;
