@@ -23,13 +23,8 @@ jobs:
       - name: Run lint
         run: |
           deno lint --ignore=./act
-  deno_test:
-    runs-on: ubuntu-latest
-    name: Deno test by Docker
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-      - name: Deno test
-        uses: ./ 
-  
-            
+      - name: Run test
+        run: |
+          deno cache ./apiserver/apiserver.ts
+          deno run -A ./apiserver/apiserver.ts --noViewer > /dev/null &
+          deno test -A
