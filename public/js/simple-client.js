@@ -4,7 +4,7 @@ import ApiClient from "./api_client.js";
 
 export class Client {
 
-    apiClient = new ApiClient("http://localhost:8880");
+    apiClient = new ApiClient(location.origin);
 
     constructor(id, name, spec, password) {
         if (password) {
@@ -83,17 +83,28 @@ export class Client {
                     diff = this.diffTime(this.gameInfo.nextTurnUnixTime);
                 }
                 await this.sleep(diff + 200);
-                this.gameInfo = await this.getGameInfo(this.gameId);
+                const res  = await this.apiClient.getMatch(this.gameId);
+                if (res.success) this.gameInfo = res.data;
+                else throw Error("Get Match Error");
                 console.log("gameInfo更新");
                 return 0;
             }
         }
-        this.gameInfo = await this.getGameInfo(this.gameId);
+        this.gameInfo = await this.apiClient.getMatch(this.gameId);
+        const res  = await this.apiClient.getMatch(this.gameId);
+        if (res.success) this.gameInfo = res.data;
+        else throw Error("Get Match Error");
         return -1;
     }
 
-    action(actions) {
-        this.setAction(actions);
+    async action(actions) {
+        const res = await this.apiClient.setAction(
+            this.gameId,
+            { actions },
+            "Bearer " + this.bearerToken,
+        );
+        console.log("setActions", res);
+        if (res.success === false) throw Error("Set Action Error");
     }
 
     sleep(msec) {
@@ -105,50 +116,6 @@ export class Client {
         const dt = unixTime * 1000 - new Date().getTime();
         console.log("diffTime", dt);
         return dt;
-    }
-
-    async match({ name = "", id = "", password = "", spec = "" }) {
-        const sendJson = { name: name, id: id, password: password, spec: spec };
-        const resJson = await (await fetch(
-            `/api/match`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(sendJson),
-            },
-        )).json();
-        //console.log(resJson, "match");
-        return resJson; //[reqJson.accessToken, reqJson.roomId];
-    }
-
-    async getGameInfo() {
-        const res = await (await fetch(`/api/match/${this.gameId}`)).json();
-        if (res.error) {
-            console.log("error! ", res);
-        }
-        return res;
-    }
-
-    async setAction(actions) {
-        console.log("setAction", JSON.stringify(actions));
-
-        const sendJson = {
-            time: Math.floor(new Date().getTime() / 1000),
-            actions: actions,
-        };
-        const resJson = await (await fetch(
-            `/api/match/${this.gameId}/action`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": this.token,
-                },
-                body: JSON.stringify(sendJson),
-            },
-        )).json();
-        console.log(resJson, "setAction");
-        return resJson;
     }
 }
 

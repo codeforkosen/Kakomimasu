@@ -45,7 +45,7 @@
         </main>
 
         <script type="module">
-            import { Client, Action } from "/js/api-client.js";
+            import { Client, Action } from "/js/simple-client.js";
             import { getUrlQueries } from "/js/util.js";
             getUrlQueries();
 
@@ -78,7 +78,7 @@
                     log.innerText = "1ターン目のため、エージェントを配置しています・・・";
                     const putx = client.pno * (client.gameInfo.board.width - 1);
                     const puty = client.pno * (client.gameInfo.board.height - 1);
-                    client.action([new Action(0, "PUT", putx, puty)]);
+                    await client.action([new Action(0, "PUT", putx, puty)]);
                     await client.waitNextTurn();
 
                 } else if (token) {
