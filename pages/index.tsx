@@ -41,6 +41,8 @@ export default function () {
             <br />
             <a href="/vr/latest.html">最新のゲームビューア(VR版)はこちらから</a>
             <br />
+            <a href="simple-client.html">簡易ゲームクライアントはこちらから</a>
+            <br />
             <Link to="/game/create">カスタムゲーム作成はこちらから</Link>
           </div>
         </SubSection>

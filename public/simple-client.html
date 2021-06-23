@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/css/main.css">
+        <link rel="icon" type="image/png" href="/img/kakomimasu-icon.png">
+        <link rel="apple-touch-icon" href="/img/kakomimasu-icon.png">
+
+        <title>簡易ゲームクライアント - 囲みマス</title>
+    </head>
+
+    <body>
+        <main>
+            <form id="connect">
+                <input id="userid" type="text" value="nt-sabae">
+                <input id="connectBtn" type="button" value="ゲームに接続する">
+            </form>
+            <hr>
+            <table id="controller" hidden>
+                <tr>
+                    <td><input type="button" value="↖"></td>
+                    <td><input type="button" value="↑"></td>
+                    <td><input type="button" value="↗"></td>
+                </tr>
+                <tr>
+                    <td><input type="button" value="←"></td>
+                    <td></td>
+                    <td><input type="button" value="→"></td>
+                </tr>
+                <tr>
+                    <td><input type="button" value="↙"></td>
+                    <td><input type="button" value="↓"></td>
+                    <td><input type="button" value="↘"></td>
+                </tr>
+            </table>
+
+            <div id="log"></div>
+        </main>
+
+        <script type="module">
+            import { Client, Action } from "/js/api-client.js";
+            import { getUrlQueries } from "/js/util.js";
+            getUrlQueries();
+
+            const inputs = controller.getElementsByTagName("input");
+            const around = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+            const keyMap = ["q", "w", "e", "a", "d", "z", "x", "c"];
+
+            let client;
+
+            const nextAudio = new Audio("/sound/crrect_answer1.mp3");
+
+            connectBtn.onclick = async (e, token, pno) => {
+                document.body.style.backgroundColor = "#FFFFFF";
+                nextAudio.play();
+
+                if (!token) {
+                    e.preventDefault();
+
+                    controller.hidden = true;
+
+                    client = new Client(userid.value, userid.value, "簡易", `${userid.value}-pw`);
+
+                    log.innerText = "マッチ中・・・";
+                    await client.waitMatching();
+                    document.body.style.backgroundColor = client.pno === 0 ? "#A0A0FF" : "#FFA0A0";
+
+                    log.innerText = "マッチしました！ゲーム開始まで待機中・・・";
+                    await client.waitNextTurn();
+
+                    log.innerText = "1ターン目のため、エージェントを配置しています・・・";
+                    const putx = client.pno * (client.gameInfo.board.width - 1);
+                    const puty = client.pno * (client.gameInfo.board.height - 1);
+                    client.action([new Action(0, "PUT", putx, puty)]);
+                    await client.waitNextTurn();
+
+                } else if (token) {
+                    client = new Client(e, token, pno);
+                    await client.waitNextTurn();
+                }
+
+                controller.hidden = false;
+                while (true) {
+                    if (client.gameInfo?.ending) break;
+                    //nextAudio.play();
+                    log.innerText = `${client.gameInfo.turn}ターン目`;
+                    for (const input of inputs) input.disabled = false;
+                    const status = await client.waitNextTurn();
+
+                    if (status !== 0) {
+                        controller.hidden = true;
+                        break;
+                    }
+                }
+            }
+
+            const action = (i) => {
+                inputs[i].disabled = true;
+                const aPos = client.gameInfo.players[client.pno].agents[0];
+                const nPos = { x: aPos.x + around[i][0], y: aPos.y + around[i][1] };
+                const tile = client.gameInfo.tiled[nPos.x + nPos.y * client.gameInfo.board.width];
+                const aType = tile[1] !== client.pno && tile[0] === 1 ? "REMOVE" : "MOVE";
+                client.action([new Action(0, aType, nPos.x, nPos.y)]);
+            }
+
+            for (const input of inputs) {
+                input.onclick = (e) => {
+                    for (let i = 0; i < inputs.length; i++) {
+                        for (const input of inputs) input.disabled = false;
+                        if (e.target === inputs[i]) {
+                            action(i);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            document.onkeydown = (e) => {
+                let keyName = e.key;
+                if (keyName === "Enter") connectBtn.onclick(e);
+                if (controller.hidden === true) return;
+                console.log(keyName);
+                for (const input of inputs) input.disabled = false;
+                for (let i = 0; i < keyMap.length; i++) {
+                    if (keyName === keyMap[i]) {
+                        action(i);
+                        break;
+                    }
+                }
+            }
+
+            const query = getUrlQueries();
+            console.log(query);
+            if (Object.keys(query).length) connectBtn.onclick(query.gameId, query.token, query.pno);
+
+        </script>
+    </body>
+
+</html>
+
+<style>
+    input[type="submit"],
+    input[type="button"] {
+        border-radius: 0;
+        -webkit-box-sizing: content-box;
+        -webkit-appearance: button;
+        appearance: button;
+        border: none;
+        box-sizing: border-box;
+        cursor: pointer;
+
+        background: #E0E0E0;
+    }
+
+    input[type="submit"]::-webkit-search-decoration,
+    input[type="button"]::-webkit-search-decoration {
+        display: none;
+    }
+
+    input[type="submit"]::focus,
+    input[type="button"]::focus {
+        outline-offset: -2px;
+    }
+
+    html {
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    main {
+        margin: 1em;
+        text-align: center;
+    }
+
+    #connect {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #connect input {
+        text-align: center;
+        font-size: 6vw;
+        margin: 0.2em;
+        width: 100%;
+    }
+
+    #connect input[type="submit"] {
+        border: solid 1px;
+        border-radius: 0;
+        background-color: #FBD5A8;
+    }
+
+    #controller {
+        margin: 0 auto;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    #controller,
+    #controller td,
+    th {
+        border: 1px solid;
+    }
+
+    #controller td {
+        width: 25vw;
+        height: 25vw;
+    }
+
+    #controller input {
+        width: 100%;
+        height: 100%;
+        font-size: 30px;
+        font-family: 'Noto Sans JP', sans-serif;
+        border: none;
+    }
+
+    #controller input:disabled {
+        background: #A0A000;
+    }
+</style>
