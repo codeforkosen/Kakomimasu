@@ -1,6 +1,11 @@
 "use strict";
 
+import ApiClient from "./api_client.js";
+
 export class Client {
+
+    apiClient = new ApiClient("http://localhost:8880");
+
     constructor(id, name, spec, password) {
         if (password) {
             this.id = id;
@@ -18,25 +23,49 @@ export class Client {
 
     async waitMatching() {
         // ユーザ取得（ユーザがなかったら新規登録）
-        let user = await this.userShow();
-        console.log(user.error);
-        if (user.error) {
-            user = await this.userRegist();
+        const userRes = await this.apiClient.usersShow(
+            this.id,
+            `Basic ${this.id}:${this.password}`,
+        );
+        let user;
+        console.log(userRes.success);
+        if (userRes.success) user = userRes.data;
+        else {
+            const res = await this.userRegist({
+                screenName: this.name,
+                name: this.id,
+                password: this.password,
+            });
+            if (res.success) user = res.data;
+            else throw Error("User Regist Error");
         }
+        this.bearerToken = user.bearerToken;
 
         // プレイヤー登録
-        const match = await this.match(
-            { id: user.id, password: this.password, spec: this.spec },
+        const matchParam = {
+            id: user.id,
+            password: this.password,
+            spec: this.spec,
+        };
+        const MatchRes = await this.apiClient.match(
+            matchParam,
+            `Bearer ${this.bearerToken}`,
         );
-        this.token = match.accessToken;
-        this.gameId = match.gameId;
-        this.pno = match.index;
-        console.log("playerid", match, this.pno);
-
+        if (MatchRes.success) {
+            const matchGame = MatchRes.data;
+            this.gameId = matchGame.gameId;
+            this.pno = matchGame.index;
+            console.log("playerid", matchGame, this.pno);
+        } else {
+            console.log(MatchRes.data);
+            throw Error("Match Error");
+        }
         do {
-            this.gameInfo = await this.getGameInfo(this.gameId);
+            const gameRes = await this.apiClient.getMatch(this.gameId);
+            if (gameRes.success) this.gameInfo = gameRes.data;
+            else throw Error("Get Match Error");
             await this.sleep(100);
-        } while (this.gameInfo.startedAtUnixTime === undefined || this.gameInfo.startedAtUnixTime === null);
+        } while (this.gameInfo.startedAtUnixTime === null);
 
         console.log(this.gameInfo);
         console.log(
@@ -76,32 +105,6 @@ export class Client {
         const dt = unixTime * 1000 - new Date().getTime();
         console.log("diffTime", dt);
         return dt;
-    }
-
-    async userRegist() {
-        const sendJson = {
-            screenName: this.name,//screenName,
-            name: this.id,
-            password: this.password,
-        };
-        const reqJson = await (await fetch(
-            "/api/users/regist",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(sendJson),
-            },
-        )).json();
-        //console.log(reqJson, "userRegist");
-        return reqJson;
-    }
-
-    async userShow() {
-        const reqJson = await (await fetch(
-            `/api/users/show/${this.id}`,
-        )).json();
-        //console.log(reqJson, "userShow");
-        return reqJson;
     }
 
     async match({ name = "", id = "", password = "", spec = "" }) {
