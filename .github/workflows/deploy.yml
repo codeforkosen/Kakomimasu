@@ -12,4 +12,4 @@ jobs:
       - if: ${{ !env.ACT }}
         run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > secret_key && chmod 600 secret_key
       - if: ${{ !env.ACT }}
-        run: ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git checkout simple-client-2 && git pull && systemctl restart kakomimasu"
+        run: ssh -oStrictHostKeyChecking=no root@practice.kakomimasu.website -i secret_key "cd ~/Kakomimasu && git remote update && git fetch && git checkout simple-client-2 && git pull && systemctl restart kakomimasu"
