@@ -31,7 +31,7 @@ export class Client {
         console.log(userRes.success);
         if (userRes.success) user = userRes.data;
         else {
-            const res = await this.userRegist({
+            const res = await this.apiClient.usersRegist({
                 screenName: this.name,
                 name: this.id,
                 password: this.password,
