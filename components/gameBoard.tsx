@@ -306,7 +306,7 @@ export default function (props: Props) {
           {[...Array(game.board.height)].map((_, y) => {
             return (
               <tr>
-                <th>{y}</th>
+                <th>{y + 1}</th>
                 {[...Array(game.board.width)].map((_, x) => {
                   const cell = getCell(x, y);
                   const agent = isAgent(x, y);
