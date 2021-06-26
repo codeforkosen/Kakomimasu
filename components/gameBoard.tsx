@@ -12,7 +12,17 @@ const apiClient = new ApiClient("");
 import datas from "./player_datas.ts";
 
 type Props = {
-  game: Pick<Game, "board" | "tiled" | "players" | "log">;
+  game: Pick<
+    Game,
+    | "board"
+    | "tiled"
+    | "players"
+    | "log"
+    | "startedAtUnixTime"
+    | "gaming"
+    | "ending"
+    | "nextTurnUnixTime"
+  >;
 };
 
 const useStyles = makeStyles({
@@ -102,6 +112,7 @@ export default function (props: Props) {
   //console.log("gameBoard", game);
 
   const [users, setUsers] = useState<User[]>([]);
+  const [status, setStatus] = useState<string>();
 
   /*const turnT = (game.gaming || game.ending)
     ? `${game.turn}/${game.totalTurn}`
@@ -110,13 +121,26 @@ export default function (props: Props) {
   const points = (game.players as any[]).map(
     (player) => (player.point.basepoint + player.point.wallpoint),
   );
+  */
+  const setStatusT = () => {
+    let status = "";
+    if (game.startedAtUnixTime === null) status = "プレイヤー入室待ち";
+    else if (game.ending) status = "ゲーム終了";
+    else if (game.gaming) {
+      const nextTime = new Date(game.nextTurnUnixTime * 1000).getTime();
+      const nowTime = new Date().getTime();
+      const diffTime = ((nextTime - nowTime) / 1000);
+      if (diffTime > 0) {
+        status = "次のターンまで" + diffTime.toFixed(1) + "秒";
+        setTimeout(setStatusT, 100);
+      } else status = "競合確認中…";
+    } else status = "ゲームスタート待ち";
+    setStatus(status);
+  };
 
-  const getStatusT = () => {
-    if (game.startedAtUnixTime === null) return "プレイヤー入室待ち";
-    else if (game.ending) return "ゲーム終了";
-    else if (game.gaming) return "プレイ中";
-    else return "ゲームスタート待ち";
-  };*/
+  useEffect(() => {
+    setStatusT();
+  }, [game.nextTurnUnixTime]);
 
   const getUsers = async () => {
     const users_ = [];
@@ -237,9 +261,13 @@ export default function (props: Props) {
         </div>
       ))}
       <div
-        style={media
-          ? { order: -1, gridRow: "1", gridColumn: "1/3" }
-          : { gridRow: "1/-1", gridColumn: "2" }}
+        style={{
+          ...(media
+            ? { order: -1, gridRow: "1", gridColumn: "1/3" }
+            : { gridRow: "1/-1", gridColumn: "2" }),
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
         {
           /* GameListが同じ内容を兼ねているため削除。見にくかったら戻します。
@@ -264,6 +292,9 @@ export default function (props: Props) {
           {turnT && <h4>{getStatusT()}</h4>}
           </div>*/
         }
+        <div>
+          {status}
+        </div>
         {game.board && <table id="field" className={classes.table}>
           <tr>
             <th></th>
