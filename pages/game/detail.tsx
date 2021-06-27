@@ -136,7 +136,7 @@ export default function () {
             >
               VR版はこちら
             </Button>
-            <GameList games={[game]} />
+            <GameList games={[game]} pagenation={false} hover={false} />
             <GameBoard game={game} />
             <PointsGraph game={game} />
           </>
