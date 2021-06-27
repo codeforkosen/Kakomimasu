@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Theme, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import { Link, useHistory } from "react-router-dom";
 import Table from "@material-ui/core/Table";
@@ -24,22 +24,7 @@ import { Game, Player, User } from "../apiserver/types.ts";
 import ApiClient from "../client_js/api_client.js";
 const apiClient = new ApiClient("");
 
-type Props = {
-  games: Game[];
-};
-
 const useStyles = makeStyles({
-  table: (theme: Theme) => ({
-    borderCollapse: "separate",
-    borderSpacing: "0em 0.5em",
-    margin: "0 auto",
-    textAlign: "center",
-    "& td": {
-      borderBottom: "2px solid",
-      borderBottomColor: theme.palette.secondary.main,
-      padding: "0 0.5em",
-    },
-  }),
   un: {
     color: "gray",
   },
@@ -61,10 +46,6 @@ const useStyles = makeStyles({
     alignItems: "center",
     flexDirection: "row",
   },
-  gameNameId: {
-    maxWidth: "30em",
-    textAlign: "left",
-  },
   gameName: {
     maxWidth: "30em",
     overflow: "hidden",
@@ -85,8 +66,7 @@ const GameList = (props: {
   const hover = props.hover ?? true;
   const games = props.games;
 
-  const theme = useTheme();
-  const classes = useStyles(theme);
+  const classes = useStyles();
   const history = useHistory();
   const [users, setUsers] = useState<User[] | null>();
   const [page, setPage] = React.useState(0);
