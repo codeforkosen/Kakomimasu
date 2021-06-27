@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import ToggleButtonGroup from "@material-ui/core/ToggleButtonGroup";
 import ToggleButton from "@material-ui/core/ToggleButton";
 
@@ -37,7 +35,11 @@ export default function () {
 
   const getGames = () => {
     const games_ = games.filter((game) => game.type === gameType)
-      .reverse();
+      .sort((a, b) => {
+        const aTime = a.startedAtUnixTime || 10000000000;
+        const bTime = b.startedAtUnixTime || 10000000000;
+        return bTime - aTime;
+      });
     return games_;
   };
 
