@@ -8,7 +8,7 @@
     "@material-ui/lab/": "https://esm.sh/@material-ui/lab@4/",
     "@material-ui/styles": "https://esm.sh/@material-ui/styles",
     "@material-ui/icons/": "https://esm.sh/@material-ui/icons@5.0.0-alpha.34/",
-    "recharts": "https://cdn.esm.sh/recharts@1.8.5",
+    "recharts": "https://cdn.esm.sh/recharts@2.0.9",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
     "https://cdn.esm.sh/v43/@types/react@17.0.2/": "https://cdn.esm.sh/v43/@types/react@17.0.11/",
     "https://cdn.esm.sh/v43/@firebase/app@0.6.20/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
