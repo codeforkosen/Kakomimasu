@@ -68,34 +68,39 @@ const GameList = (props: {
 
   const classes = useStyles();
   const history = useHistory();
-  const [users, setUsers] = useState<User[] | null>();
+
+  type IUser = {
+    u: User;
+    exists: true;
+  } | { u: { id: string }; exists: false };
+  const [users, setUsers] = useState<IUser[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const getUsers = async () => {
-    const users: User[] = [];
-    console.log("getUsers", games);
+    const u: typeof users = [];
+    //console.log("getUsers", games);
     for (const game of games) {
-      console.log("game", game);
+      //console.log("game", game);
       for (const player of game.players) {
-        console.log("player", player);
-        if (users.some((user) => user.id === player.id)) continue;
-        console.log("player2", player);
+        //console.log("player", player);
+        if ([...users, ...u].some((user) => user.u.id === player.id)) continue;
+        //console.log("player2", player);
         const res = await apiClient.usersShow(player.id);
         if (res.success) {
           const user = res.data;
-          console.log("user", user);
-          users.push(user);
-        }
+          //console.log("user", user);
+          u.push({ u: user, exists: true });
+        } else u.push({ exists: false, u: { id: player.id } });
       }
     }
-    console.log("users", users);
-    setUsers(users);
+    //console.log("u", u);
+    setUsers([...users, ...u]);
   };
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [games]);
 
   const getStatusClass = (game: Game) => {
     if (game.ending) return classes.ending;
@@ -115,8 +120,9 @@ const GameList = (props: {
   };
 
   const getUser = (id: string) => {
-    if (!users) return undefined;
-    return users.find((user) => user.id === id);
+    const user = users.find((user) => user.u.id === id);
+    if (user?.exists) return user.u;
+    else return undefined;
   };
 
   const toGameDetail = (id: string) => {
