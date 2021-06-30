@@ -68,7 +68,7 @@ function PointsGraph(props: { game: Game }) {
 
         <XAxis dataKey="turn" />
         <YAxis />
-        <Tooltip labelFormatter={(props) => "Turn : " + props} />
+        <Tooltip labelFormatter={(props: string) => "Turn : " + props} />
         <Legend />
 
         {game.players.map((_, i) => {

@@ -179,9 +179,9 @@ export class Game {
   public ending: boolean;
   public field: Field;
   public log: {
-    point: number;
-    actions: ReturnType<typeof Agent.prototype.getJSON>[];
-  }[];
+    point: { basepoint: number; wallpoint: number };
+    actions: ReturnType<typeof Action.prototype.getJSON>[];
+  }[][];
   public turn: number;
   public agents: Agent[][];
 
@@ -223,8 +223,8 @@ export class Game {
     totalTurn: typeof Game.prototype.nturn;
     tiled: typeof Game.prototype.field.field | null;
     players: {
-      id: number;
-      agents: Agent[];
+      id: string;
+      agents: { x: number; y: number }[];
       point: ReturnType<typeof Field.prototype.getPoints>[0];
     }[];
     log: typeof Game.prototype.log;

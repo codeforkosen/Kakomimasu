@@ -2,14 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import {
-  Cell,
-  ContentRenderer,
-  Pie,
-  PieChart,
-  PieLabelRenderProps,
-  ResponsiveContainer,
-} from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { Link, useParams } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
 import Content from "../../components/content.tsx";
@@ -101,35 +94,6 @@ export default function () {
     });
   }, [id]);
 
-  const renderLabel: ContentRenderer<PieLabelRenderProps> = (
-    { cx, cy, midAngle, innerRadius, outerRadius, percent },
-  ) => {
-    const [cx_, cy_, midAngle_, innerRadius_, outerRadius_] = [
-      cx as number,
-      cy as number,
-      midAngle as number,
-      innerRadius as number,
-      outerRadius as number,
-    ];
-    if (!percent) return (<></>);
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius_ + (outerRadius_ - innerRadius_) * 0.5;
-    const x = cx_ + radius * Math.cos(-midAngle_ * RADIAN);
-    const y = cy_ + radius * Math.sin(-midAngle_ * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx_ ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-
   return (
     <Content title="ユーザ詳細">
       <div className={classes.content}>
@@ -158,7 +122,44 @@ export default function () {
                         cx="50%"
                         cy="50%"
                         fill="#8884d8"
-                        label={renderLabel}
+                        label={(
+                          {
+                            cx,
+                            cy,
+                            midAngle,
+                            innerRadius,
+                            outerRadius,
+                            percent,
+                          }: {
+                            cx: number;
+                            cy: number;
+                            midAngle: number;
+                            innerRadius: number;
+                            outerRadius: number;
+                            percent?: number;
+                          },
+                        ) => {
+                          if (!percent) return (<></>);
+                          const RADIAN = Math.PI / 180;
+                          const radius = innerRadius +
+                            (outerRadius - innerRadius) * 0.5;
+                          const x = cx +
+                            radius * Math.cos(-midAngle * RADIAN);
+                          const y = cy +
+                            radius * Math.sin(-midAngle * RADIAN);
+
+                          return (
+                            <text
+                              x={x}
+                              y={y}
+                              fill="white"
+                              textAnchor={x > cx ? "start" : "end"}
+                              dominantBaseline="central"
+                            >
+                              {`${(percent * 100).toFixed(0)}%`}
+                            </text>
+                          );
+                        }}
                         labelLine={false}
                       >
                         <Cell fill="#D92546" />

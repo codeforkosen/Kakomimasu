@@ -127,6 +127,7 @@ export default function (props: Props) {
     if (game.startedAtUnixTime === null) status = "プレイヤー入室待ち";
     else if (game.ending) status = "ゲーム終了";
     else if (game.gaming) {
+      if (!game.nextTurnUnixTime) return;
       const nextTime = new Date(game.nextTurnUnixTime * 1000).getTime();
       const nowTime = new Date().getTime();
       const diffTime = ((nextTime - nowTime) / 1000);
@@ -171,6 +172,7 @@ export default function (props: Props) {
     return num;
   };
   const index = (x: number, y: number) => {
+    if (!game.board) return;
     return x + y * game.board.width;
   };
   const isAgent = (x: number, y: number) => {
@@ -213,9 +215,11 @@ export default function (props: Props) {
     return history.reverse();
   };
   const getCell = (x: number, y: number) => {
+    const i = index(x, y);
+    if (!i) return;
     return {
-      point: game.board.points[index(x, y)] as number,
-      tiled: (game.tiled ? game.tiled[index(x, y)] : [0, -1]) as [
+      point: game.board ? game.board.points[i] : 0,
+      tiled: (game.tiled ? game.tiled[i] : [0, -1]) as [
         number,
         number,
       ],
@@ -307,8 +311,9 @@ export default function (props: Props) {
             return (
               <tr>
                 <th>{y + 1}</th>
-                {[...Array(game.board.width)].map((_, x) => {
+                {[...Array(game.board?.width)].map((_, x) => {
                   const cell = getCell(x, y);
+                  if (!cell) return;
                   const agent = isAgent(x, y);
                   const isAbs = cell.point < 0 && cell.tiled[1] !== -1 &&
                     cell.tiled[0] === 0;
