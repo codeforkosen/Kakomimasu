@@ -7,6 +7,8 @@ import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
 
+import { Game as GameType } from "../types.ts";
+
 export class ExpGame extends Game {
   public name?: string;
   public startedAtUnixTime: number | null;
@@ -115,7 +117,7 @@ export class ExpGame extends Game {
     }
   }
 
-  toJSON() {
+  toJSON(): GameType {
     const ret = super.toJSON();
     return {
       ...ret,

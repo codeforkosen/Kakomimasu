@@ -36,7 +36,17 @@ export default function () {
   const classes = useStyles();
   const [boards, setBoards] = useState<Board[]>();
   const [game, setGame] = useState<
-    Pick<Game, "board" | "tiled" | "players" | "log">
+    Pick<
+      Game,
+      | "board"
+      | "tiled"
+      | "players"
+      | "log"
+      | "startedAtUnixTime"
+      | "gaming"
+      | "ending"
+      | "nextTurnUnixTime"
+    >
   >();
 
   useEffect(() => {
@@ -60,7 +70,17 @@ export default function () {
     for (let i = 0; i < tiled.length; i++) {
       tiled[i] = [0, -1];
     }
-    const game: Pick<Game, "board" | "tiled" | "players" | "log"> = {
+    const game: Pick<
+      Game,
+      | "board"
+      | "tiled"
+      | "players"
+      | "log"
+      | "startedAtUnixTime"
+      | "gaming"
+      | "ending"
+      | "nextTurnUnixTime"
+    > = {
       board,
       tiled,
       players: [{ id: "", agents: [], point: { basepoint: 0, wallpoint: 0 } }, {
@@ -69,6 +89,10 @@ export default function () {
         point: { basepoint: 0, wallpoint: 0 },
       }],
       log: [],
+      startedAtUnixTime: null,
+      nextTurnUnixTime: null,
+      gaming: false,
+      ending: false,
     };
     setGame(game);
   };
@@ -86,6 +110,7 @@ export default function () {
       const td = tds[i];
       td.oncontextmenu = () => false;
       td.onmousedown = (e) => {
+        if (!game.tiled) return;
         const tiled = [...game.tiled];
         const players = [...game.players];
 

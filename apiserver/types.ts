@@ -81,23 +81,24 @@ export interface Game {
   gameId: string;
   gaming: boolean;
   ending: boolean;
-  board: Board;
+  board: Board | null;
   turn: number;
-  tiled: Array<[0 | 1, number]>;
+  totalTurn: number;
+  tiled: Array<[0 | 1, number]> | null;
   players: Player[];
   log: {
     point: { basepoint: number; wallpoint: number };
     actions: {
       agentId: number;
-      type: number;
+      type: 1 | 2 | 3 | 4;
       x: number;
       y: number;
-      res: number;
+      res: 0 | 1 | 2 | 3 | 4 | 5;
     }[];
   }[][];
-  gameName: string;
-  startedAtUnixTime: number;
-  nextTurnUnixTime: number;
+  gameName: string | undefined;
+  startedAtUnixTime: number | null;
+  nextTurnUnixTime: number | null;
   reservedUsers: string[];
   type: string;
 }
