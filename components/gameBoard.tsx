@@ -216,7 +216,7 @@ export default function (props: Props) {
   };
   const getCell = (x: number, y: number) => {
     const i = index(x, y);
-    if (!i) return;
+    if (i === undefined) return;
     return {
       point: game.board ? game.board.points[i] : 0,
       tiled: (game.tiled ? game.tiled[i] : [0, -1]) as [
