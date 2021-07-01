@@ -16,7 +16,7 @@ import { Board, Game, User } from "../../apiserver/types.ts";
 
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
-import GameBoard from "../../components/gameboard.tsx";
+import GameBoard from "../../components/gameBoard.tsx";
 
 const useStyles = makeStyles({
   content: {
