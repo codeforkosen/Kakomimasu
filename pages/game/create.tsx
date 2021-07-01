@@ -250,7 +250,7 @@ export default function () {
             ending: false,
           };
           return <div>
-            <div>ボードイメージ</div>
+            <div>ボードプレビュー</div>
             <GameBoard game={game} />
           </div>;
         })()}
