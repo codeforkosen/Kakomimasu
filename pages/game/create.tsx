@@ -16,6 +16,7 @@ import { Board, Game, User } from "../../apiserver/types.ts";
 
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
+import GameBoard from "../../components/gameboard.tsx";
 
 const useStyles = makeStyles({
   content: {
@@ -215,6 +216,44 @@ export default function () {
           </Button>
         </form>
         {game && <GameList games={[game]} />}
+        {data.boardName && (() => {
+          const board = boards?.find((b) => b.name === data.boardName);
+          if (!board) return;
+          const tiled = new Array(board.height * board.width);
+          for (let i = 0; i < tiled.length; i++) tiled[i] = [0, -1];
+          const game: Pick<
+            Game,
+            | "board"
+            | "tiled"
+            | "players"
+            | "log"
+            | "startedAtUnixTime"
+            | "gaming"
+            | "ending"
+            | "nextTurnUnixTime"
+          > = {
+            board,
+            tiled,
+            players: [{
+              id: "",
+              agents: [],
+              point: { basepoint: 0, wallpoint: 0 },
+            }, {
+              id: "",
+              agents: [],
+              point: { basepoint: 0, wallpoint: 0 },
+            }],
+            log: [],
+            startedAtUnixTime: null,
+            nextTurnUnixTime: null,
+            gaming: false,
+            ending: false,
+          };
+          return <div>
+            <div>ボードイメージ</div>
+            <GameBoard game={game} />
+          </div>;
+        })()}
       </div>
     </Content>
   </>);
