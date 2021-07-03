@@ -122,12 +122,12 @@ export default function () {
     } else return;
   };
 
-  const gameCreateUrl = (m: number, o: number) => {
-    if (!users) return;
-    if (!tournament) return;
+  const gameCreateUrl = (m: number, o: number): string => {
+    if (!users) return "";
+    if (!tournament) return "";
     const mUser = users[m];
     const oUser = users[o];
-    if (!mUser || !oUser) return;
+    if (!mUser || !oUser) return "";
 
     const params = new URLSearchParams();
     params.append(
