@@ -61,7 +61,7 @@ export default function () {
   const [data, setData] = useState({
     name: searchParam.get("name") || "",
     boardName: "",
-    nPlayer: (searchParam.get("n-player") || 2) as number,
+    nPlayer: parseInt(searchParam.get("n-player") || "2"),
     playerIdentifiers: fixedUsers,
     tournamentId: searchParam.get("tournament-id") || "",
   });
