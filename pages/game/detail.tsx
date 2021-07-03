@@ -57,12 +57,6 @@ function PointsGraph(props: { game: Game }) {
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={data}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5,
-        }}
       >
         <CartesianGrid strokeDasharray="3 3" />
 
@@ -126,13 +120,14 @@ export default function () {
 
   return (
     <Content title="ゲーム詳細">
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         {game
           ? <>
             <Button
               component={Link}
               to={id ? `/vr/index?id=${id}` : "/vr/latest"}
               target="_blank"
+              style={{ margin: "auto" }}
             >
               VR版はこちら
             </Button>
