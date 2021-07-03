@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { createStyles, makeStyles } from "@material-ui/styles";
+import { Link } from "react-router-dom";
+import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 
 import Content from "../../components/content.tsx";
@@ -28,7 +28,6 @@ const useStyles = makeStyles({
 
 export default function () {
   const classes = useStyles();
-  const history = useHistory();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
 
   const getTournament = async () => {
@@ -44,9 +43,8 @@ export default function () {
     <Content title="大会一覧">
       <div className={classes.content}>
         <Button
-          onClick={() => {
-            history.push("/tournament/create");
-          }}
+          component={Link}
+          to="/tournament/create"
         >
           大会作成はこちらから
         </Button>
