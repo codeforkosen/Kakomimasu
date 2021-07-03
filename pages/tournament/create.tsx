@@ -86,10 +86,11 @@ export default function () {
 
   return (<>
     <Content title="大会作成">
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <Button
           component={Link}
           to={"/tournament/index"}
+          style={{ margin: "auto" }}
         >
           大会一覧に戻る
         </Button>
