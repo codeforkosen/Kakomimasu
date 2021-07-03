@@ -30,12 +30,13 @@ import Section, { SubSection } from "../../components/section.tsx";
 const useStyles = makeStyles({
   table: {
     margin: "0 auto",
-    width: "90%",
+    width: "max-content",
     border: "1px solid",
     borderCollapse: "collapse",
     textAlign: "center",
     "& td,& th": {
       border: "1px solid",
+      padding: "5px",
     },
   },
   oblique: {
@@ -121,12 +122,12 @@ export default function () {
     } else return;
   };
 
-  const gameCreate = (m: number, o: number) => {
-    if (!users) return;
-    if (!tournament) return;
+  const gameCreateUrl = (m: number, o: number): string => {
+    if (!users) return "";
+    if (!tournament) return "";
     const mUser = users[m];
     const oUser = users[o];
-    if (!mUser || !oUser) return;
+    if (!mUser || !oUser) return "";
 
     const params = new URLSearchParams();
     params.append(
@@ -138,7 +139,8 @@ export default function () {
     params.append("player", oUser.name);
     params.append("tournament-id", tournament.id);
     params.append("return", "true");
-    history.push("/game/create?" + params.toString());
+    return "/game/create?" + params.toString();
+    //history.push("/game/create?" + params.toString());
   };
 
   const getRanking = () => {
@@ -225,11 +227,11 @@ export default function () {
 
   return (
     <Content title="大会詳細">
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <Button
-          onClick={() => {
-            history.push("/tournament/index");
-          }}
+          component={Link}
+          to="/tournament/index"
+          style={{ margin: "auto" }}
         >
           大会一覧に戻る
         </Button>
@@ -311,7 +313,7 @@ export default function () {
                   ユーザ追加
                 </Button>
 
-                {users && <>
+                {users && <div style={{ width: "100%", overflow: "auto" }}>
                   <table className={classes.table}>
                     <tr>
                       <th className={classes.oblique}></th>
@@ -334,8 +336,9 @@ export default function () {
                                 </div>;
                               } else {
                                 return <Button
+                                  component={Link}
                                   variant="outlined"
-                                  onClick={() => gameCreate(y, x)}
+                                  to={gameCreateUrl(y, x)}
                                 >
                                   ゲーム作成
                                 </Button>;
@@ -346,7 +349,7 @@ export default function () {
                       </tr>;
                     })}
                   </table>
-                </>}
+                </div>}
               </div>
             </Section>
             <Section title="ランキング">
@@ -354,10 +357,16 @@ export default function () {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell align="center">順位</TableCell>
-                      <TableCell>ユーザ</TableCell>
-                      <TableCell align="center">勝敗数</TableCell>
-                      <TableCell align="right">累計獲得ポイント</TableCell>
+                      <TableCell align="center" style={{ minWidth: "5em" }}>
+                        順位
+                      </TableCell>
+                      <TableCell style={{ minWidth: "6em" }}>ユーザ</TableCell>
+                      <TableCell align="center" style={{ minWidth: "8em" }}>
+                        勝敗数
+                      </TableCell>
+                      <TableCell align="right" style={{ minWidth: "11em" }}>
+                        累計獲得ポイント
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

@@ -139,7 +139,7 @@ const GameList = (props: {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>
+              <TableCell style={{ minWidth: "8em" }}>
                 <div>ステータス</div>
                 <div>ターン</div>
               </TableCell>
@@ -175,6 +175,7 @@ const GameList = (props: {
                         return (
                           <div
                             className={classes.player + " " + classes.playerDiv}
+                            style={{ width: "max-content" }}
                           >
                             {i !== 0 &&
                               <div className={classes.playerDiv}>vs</div>}

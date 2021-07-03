@@ -38,13 +38,16 @@ const useStyles = makeStyles({
   table: { // table全体のcss
     borderCollapse: "collapse",
     userSelect: "none",
+    margin: "auto",
     "& td,& th": {
       padding: 5,
+      fontSize: "min(1em,2.5vw)",
+      "--size": "min(10vw,50px)",
+      width: "var(--size)",
+      height: "var(--size)",
     },
     "& td": {
       border: "1px solid",
-      width: 50,
-      height: 50,
       textAlign: "right",
       verticalAlign: "bottom",
       whiteSpace: "pre-line",
@@ -107,7 +110,7 @@ const useStyles = makeStyles({
 
 export default function (props: Props) {
   const classes = useStyles();
-  const media = useMediaQuery("(max-width:1000px");
+  const media = useMediaQuery("(max-width:1000px)");
   const game = props.game;
   //console.log("gameBoard", game);
 
@@ -271,6 +274,7 @@ export default function (props: Props) {
             : { gridRow: "1/-1", gridColumn: "2" }),
           display: "flex",
           flexDirection: "column",
+          overflow: "auto",
         }}
       >
         {
