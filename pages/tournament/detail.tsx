@@ -6,6 +6,13 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/core/Autocomplete";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
 
 // @deno-types="../../client_js/api_client.d.ts"
 import ApiClient from "../../client_js/api_client.js";
@@ -133,6 +140,80 @@ export default function () {
     params.append("return", "true");
     history.push("/game/create?" + params.toString());
   };
+
+  const getRanking = () => {
+    if (!games) return;
+    const ranking: {
+      userId: string;
+      point: number;
+      wallPoint: number;
+      basePoint: number;
+      result: [number, number, number];
+    }[] = [];
+    for (const game of games) {
+      if (!game.ending) continue;
+      const userResult = getUserResult(game);
+      console.log(userResult);
+      const isDraw = userResult[0].point === userResult[1].point;
+      userResult.forEach((pr, i) => {
+        const userId = pr.id;
+
+        let r = ranking.find((e) => e.userId === userId);
+        if (!r) {
+          ranking.push({
+            userId,
+            point: 0,
+            wallPoint: 0,
+            basePoint: 0,
+            result: [0, 0, 0],
+          });
+          r = ranking[ranking.length - 1];
+        }
+        r.point += pr.point;
+        r.wallPoint += pr.wallpoint;
+        r.basePoint += pr.basepoint;
+        if (isDraw) r.result[1]++;
+        else if (i === 0) r.result[0]++;
+        else r.result[2]++;
+      });
+    }
+    ranking.sort((a, b) => {
+      const win = b.result[0] - a.result[0];
+      if (win !== 0) return win;
+      const draw = b.result[1] - a.result[1];
+      if (draw !== 0) return draw;
+      const lose = a.result[2] - b.result[2];
+      if (lose !== 0) return lose;
+      const point = b.point - a.point;
+      if (point !== 0) return point;
+      const wallpoint = b.wallPoint - a.wallPoint;
+      if (wallpoint !== 0) return wallpoint;
+      const basepoint = b.basePoint - a.basePoint;
+      if (basepoint !== 0) return basepoint;
+      return 0;
+    });
+    console.log(ranking);
+    return ranking;
+  };
+
+  function getUserResult(game: Game) {
+    const a = game.players.map((p) => ({
+      id: p.id,
+      point: p.point.basepoint + p.point.wallpoint,
+      basepoint: p.point.basepoint,
+      wallpoint: p.point.wallpoint,
+    }));
+    a.sort((a, b) => {
+      if (a.point < b.point) return 1;
+      else if (a.point > b.point) return -1;
+      else { // 同じ場合は、wallPointが大きい方が勝つ
+        if (a.wallpoint < b.wallpoint) return 1;
+        else if (a.wallpoint > b.wallpoint) return -1;
+        else return 0;
+      }
+    });
+    return a;
+  }
 
   useEffect(() => {
     getTournament();
@@ -267,6 +348,41 @@ export default function () {
                   </table>
                 </>}
               </div>
+            </Section>
+            <Section title="ランキング">
+              {<TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">順位</TableCell>
+                      <TableCell>ユーザ</TableCell>
+                      <TableCell align="center">勝敗数</TableCell>
+                      <TableCell align="right">累計獲得ポイント</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {getRanking()?.map((user, i) => (
+                      <TableRow>
+                        <TableCell align="center" component="th" scope="row">
+                          {i + 1}
+                        </TableCell>
+                        <TableCell>
+                          {users?.find((u) => u?.id === user.userId)?.name}
+                        </TableCell>
+                        <TableCell align="center">
+                          {user.result[0]}勝{user.result[2]}敗{user.result[1]}分
+                        </TableCell>
+                        <TableCell align="right">
+                          {user.point}
+                          <br />
+                          {"("}壁：{user.wallPoint}, 城壁：{user.basePoint}
+                          {")"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>}
             </Section>
           </>
           : <CircularProgress color="secondary" />}
