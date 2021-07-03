@@ -1,6 +1,5 @@
 {
   "imports": {
-    "https://cdn.esm.sh/v41/": "https://cdn.esm.sh/v43/",
     "react": "https://esm.sh/react@17.0.2",
     "react-dom": "https://esm.sh/react-dom",
     "react-router-dom": "https://esm.sh/react-router-dom",
@@ -11,7 +10,7 @@
     "recharts": "https://cdn.esm.sh/recharts@2.0.9",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
     "https://cdn.esm.sh/v43/@types/react@17.0.2/": "https://cdn.esm.sh/v43/@types/react@17.0.11/",
-    "https://cdn.esm.sh/v43/@firebase/app@0.6.20/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
+    "https://cdn.esm.sh/v43/@firebase/app@0.6.27/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
     "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/deno/core.js": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/cjs/popper.min.js",
     "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/dist/cjs/popper.d.ts": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/lib/index.d.ts"
   }
