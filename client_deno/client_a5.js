@@ -2,7 +2,7 @@
 import { Algorithm } from "./algorithm.js";
 
 export class ClientA5 extends Algorithm {
-  onInit(boardPoints, agentNum, turnNum) {
+  onInit(boardPoints, _agentNum, _turnNum) {
     const w = boardPoints[0].length;
     const h = boardPoints.length;
 
