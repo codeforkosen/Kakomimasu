@@ -2,7 +2,7 @@
 import { Algorithm } from "./algorithm.js";
 
 export class ClientA1 extends Algorithm {
-  onInit(boardPoints, agentNum, turnNum) {
+  onInit(boardPoints, _agentNum, _turnNum) {
     const w = boardPoints[0].length;
     const h = boardPoints.length;
 
@@ -16,7 +16,7 @@ export class ClientA1 extends Algorithm {
     this.sortByPoint(this.pntall);
   }
 
-  onTurn(field, pid, agents, turn) {
+  onTurn(_field, _pid, agents, _turn) {
     // ランダムにずらしつつ置けるだけおく
     // 置いたものはランダムに8方向動かす
     const actions = [];
