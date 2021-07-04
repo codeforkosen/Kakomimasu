@@ -7,6 +7,7 @@
     "@material-ui/icons/": "https://esm.sh/@material-ui/icons@5.0.0-alpha.34/",
     "recharts": "https://cdn.esm.sh/recharts@2.0.8?deps=react@17.0.2",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
+    "https://cdn.esm.sh/v43/@material-ui/core@5.0.0-alpha.38/": "https://cdn.esm.sh/v43/@material-ui/core@5.0.0-alpha.34/",
     "https://cdn.esm.sh/v43/@firebase/app@0.6.27/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
     "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/dist/cjs/": "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/lib/"
   }
