@@ -5,7 +5,6 @@ const codes = [];
 
 function object(data) {
   for (const [key, value] of Object.entries(data)) {
-    //console.log(key, typeof value);
     if (typeof value === "object") {
       object(value);
     } else if (typeof value === "string") {
