@@ -12,6 +12,7 @@ class KakomimasuClient {
     this.password = password || Deno.env.get("password");
     this.name = name || Deno.env.get("name");
     this.spec = spec || Deno.env.get("spec");
+    if (!args.aiOnly) this.bearerToken = Deno.env.get("bearerToken");
     console.log(args.local);
     if (args.local) this.setServerHost("http://localhost:8880");
     else this.setServerHost(Deno.env.get("host"));
@@ -35,28 +36,30 @@ class KakomimasuClient {
     }
   }
   async waitMatching() { // GameInfo
-    // ユーザ取得（ユーザがなかったら新規登録）
-    const userRes = await this.apiClient.usersShow(
-      this.id,
-      `Basic ${this.id}:${this.password}`,
-    );
     let user;
-    if (userRes.success) user = userRes.data;
-    else {
-      const res = await this.apiClient.usersRegist({
-        screenName: this.name,
-        name: this.id,
-        password: this.password,
-      });
-      if (res.success) user = res.data;
-      else throw Error("User Regist Error");
+    if (!this.bearerToken) {
+      // ユーザ取得（ユーザがなかったら新規登録）
+      const userRes = await this.apiClient.usersShow(
+        this.id,
+        `Basic ${this.id}:${this.password}`,
+      );
+      if (userRes.success) user = userRes.data;
+      else {
+        const res = await this.apiClient.usersRegist({
+          screenName: this.name,
+          name: this.id,
+          password: this.password,
+        });
+        if (res.success) user = res.data;
+        else throw Error("User Regist Error");
+      }
+      this.bearerToken = user.bearerToken;
+      cl(user);
     }
-    this.bearerToken = user.bearerToken;
-    cl(user);
 
     // プレイヤー登録
     const matchParam = {
-      id: user.id,
+      id: user?.id,
       password: this.password,
       spec: this.spec,
     };
