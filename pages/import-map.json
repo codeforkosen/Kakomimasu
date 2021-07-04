@@ -11,7 +11,6 @@
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
     "https://cdn.esm.sh/v43/@types/react@17.0.2/": "https://cdn.esm.sh/v43/@types/react@17.0.11/",
     "https://cdn.esm.sh/v43/@firebase/app@0.6.27/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
-    "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/deno/core.js": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/cjs/popper.min.js",
-    "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/dist/cjs/popper.d.ts": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/lib/index.d.ts"
+    "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/dist/cjs/": "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/lib/"
   }
 }
