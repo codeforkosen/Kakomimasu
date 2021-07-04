@@ -2,7 +2,7 @@
 import { Algorithm } from "./algorithm.js";
 
 export class ClientA4 extends Algorithm {
-  onInit(boardPoints, agentNum, turnNum) {
+  onInit(boardPoints, _agentNum, _turnNum) {
     const w = boardPoints[0].length;
     const h = boardPoints.length;
 
@@ -16,7 +16,7 @@ export class ClientA4 extends Algorithm {
     this.sortByPoint(this.pntall);
   }
 
-  onTurn(field, pid, agents, turn) {
+  onTurn(field, pid, agents, _turn) {
     const w = field[0].length;
     const h = field.length;
 

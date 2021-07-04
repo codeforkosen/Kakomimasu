@@ -2,7 +2,7 @@
 import { Algorithm } from "./algorithm.js";
 
 export class Kacom extends Algorithm {
-  onInit(boardPoints, agentNum, turnNum) {
+  onInit(boardPoints, _agentNum, _turnNum) {
     const w = boardPoints[0].length;
     const h = boardPoints.length;
 
@@ -13,7 +13,7 @@ export class Kacom extends Algorithm {
     for (let i = h - 2; i >= 1; i--) this.line.push([0, i]);
   }
 
-  onTurn(field, pid, agents, turn) {
+  onTurn(_field, _pid, agents, _turn) {
     const actions = [];
     for (let i = 0; i < agents.length; i++) {
       const agent = agents[i];

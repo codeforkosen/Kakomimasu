@@ -16,7 +16,7 @@ export class ClientA5 extends Algorithm {
     this.sortByPoint(this.pntall);
   }
 
-  onTurn(field, pid, agents, turn) {
+  onTurn(field, pid, agents, _turn) {
     const w = field[0].length;
     const h = field.length;
 

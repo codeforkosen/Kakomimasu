@@ -1,10 +1,10 @@
 import { Algorithm } from "./algorithm.js";
 
 export class ClientNone extends Algorithm {
-  onInit(boardPoints, agentNum, turnNum) {
+  onInit(_boardPoints, _agentNum, _turnNum) {
   }
 
-  onTurn(field, pid, agents, turn) {
+  onTurn(_field, _pid, _agents, _turn) {
     return [];
   }
 }
