@@ -14,8 +14,13 @@ jobs:
       - name: Run lint
         run: |
           deno lint
-      - name: Run test
+      - name: Run cache & check(apiserver)
         run: |
           deno cache ./apiserver/apiserver.ts
+      - name: Run cache & check(viewer)
+        run: |
+          deno cache --import-map ./pages/import-map.json --config ./pages/tsconfig.json ./pages/route.tsx
+      - name: Run test
+        run: |
           deno run -A ./apiserver/apiserver.ts --noViewer > /dev/null &
           deno test -A
