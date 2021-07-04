@@ -5,7 +5,6 @@
     "react-router-dom": "https://esm.sh/react-router-dom",
     "@material-ui/core/": "https://esm.sh/@material-ui/core@5.0.0-alpha.34/",
     "@material-ui/lab/": "https://esm.sh/@material-ui/lab@4/",
-    "@material-ui/styles": "https://esm.sh/@material-ui/styles",
     "@material-ui/icons/": "https://esm.sh/@material-ui/icons@5.0.0-alpha.34/",
     "recharts": "https://cdn.esm.sh/recharts@2.0.9",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
