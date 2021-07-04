@@ -107,6 +107,7 @@ export const matchRouter = () => {
               "-A",
               aiFolderPath + ai.filePath,
               "--local",
+              "--aiOnly",
               "--nolog",
               "--gameId",
               game.uuid,
