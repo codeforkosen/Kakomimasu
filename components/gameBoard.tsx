@@ -81,7 +81,6 @@ const useStyles = makeStyles({
     left: "50%",
     textAlign: "center",
     borderRadius: "10px",
-    transform: "translate(+0%, -100%)",
     padding: "1em",
     filter: "drop-shadow(0 0 5px rgba(0, 0, 0, .7))",
     width: "max-content",
@@ -237,6 +236,15 @@ export default function (props: Props) {
     console.log("update gameBoard", game.tiled[0]);
   });*/
 
+  const getAgentTransform = (x: number, y: number) => {
+    if (!game.board) return;
+    const w = game.board.width;
+    const h = game.board.height;
+    const transX = x < w / 2 ? "0%" : "-100%";
+    const transY = y < h / 2 ? "0%" : "-100%";
+    return `translate(${transX},${transY})`;
+  };
+
   return (
     <div
       className={classes.content}
@@ -367,6 +375,7 @@ export default function (props: Props) {
                         className={classes.detail}
                         style={{
                           border: `solid 4px ${datas[agent.player].colors[1]}`,
+                          transform: getAgentTransform(x, y),
                         }}
                       >
                         <span>
