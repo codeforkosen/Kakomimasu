@@ -1,7 +1,10 @@
 import { Algorithm } from "./algorithm.js";
 
 export class ClientNone extends Algorithm {
-  think(_info) {
+  onInit(_boardPoints, _agentNum, _turnNum) {
+  }
+
+  onTurn(_field, _pid, _agents, _turn) {
     return [];
   }
 }

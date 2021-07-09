@@ -1,52 +1,68 @@
 // だいたい点数の高い順にデタラメに置き、画面外を避けつつデタラメに動くアルゴリズム
-import util from "../util.js";
 import { Algorithm } from "./algorithm.js";
-import { Action, DIR } from "./KakomimasuClient.js";
 
 export class ClientA2 extends Algorithm {
-  think(info) {
-    const pno = this.getPlayerNumber();
-    const points = this.getPoints();
-    const w = points[0].length;
-    const h = points.length;
-    const nagents = this.getAgentCount();
+  onInit(boardPoints, _agentNum, _turnNum) {
+    const w = boardPoints[0].length;
+    const h = boardPoints.length;
 
     // ポイントの高い順ソート
-    const pntall = [];
+    this.pntall = [];
     for (let i = 0; i < h; i++) {
       for (let j = 0; j < w; j++) {
-        pntall.push({ x: j, y: i, point: points[i][j] });
+        this.pntall.push({ x: j, y: i, point: boardPoints[i][j] });
       }
     }
-    const sortByPoint = (p) => {
-      p.sort((a, b) => b.point - a.point);
-    };
-    sortByPoint(pntall);
+    this.sortByPoint(this.pntall);
+  }
+
+  onTurn(field, _pid, agents, _turn) {
+    const w = field[0].length;
+    const h = field.length;
 
     // ランダムにずらしつつ置けるだけおく
     // 置いたものはランダムに8方向動かす
     // 画面外にはでない判定を追加（a1 → a2)
     const actions = [];
-    const offset = util.rnd(nagents);
-    for (let i = 0; i < nagents; i++) {
-      const agent = info.players[pno].agents[i];
+    const offset = this.rnd(agents.length);
+    for (let i = 0; i < agents.length; i++) {
+      const agent = agents[i];
       if (agent.x === -1) {
-        const p = pntall[i + offset];
-        actions.push(new Action(i, "PUT", p.x, p.y));
+        const p = this.pntall[i + offset];
+        actions.push([i, "PUT", p.x, p.y]);
       } else {
         for (;;) {
-          const [dx, dy] = DIR[util.rnd(8)];
+          const [dx, dy] = this.DIR[this.rnd(8)];
           const x = agent.x + dx;
           const y = agent.y + dy;
-          if (x < 0 || x >= w || y < 0 || y >= w) {
+          if (x < 0 || x >= w || y < 0 || y >= h) {
             continue;
           }
-          actions.push(new Action(i, "MOVE", x, y));
+          actions.push([i, "MOVE", x, y]);
           break;
         }
       }
     }
     return actions;
+  }
+
+  sortByPoint(p) {
+    p.sort((a, b) => b.point - a.point);
+  }
+
+  DIR = [
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+  ];
+
+  rnd(n) {
+    return Math.floor(Math.random() * n); // MT is better
   }
 }
 
