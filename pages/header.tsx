@@ -18,6 +18,7 @@ type Props = { firebase: typeof firebase };
 export default function (props: Props) {
   const location = useLocation();
   const [user, setUser] = useState<firebase.User | undefined | null>(undefined);
+  const [verified, setVerified] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -40,7 +41,9 @@ export default function (props: Props) {
     props.firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         const idToken = await user.getIdToken();
-        if ((await apiClient.usersVerify(idToken)).success === false) {
+        const res = await apiClient.usersVerify(idToken);
+        setVerified(res.success);
+        if (res.success === false) {
           if (location.pathname !== "/user/login") {
             logOut();
             return;
@@ -65,7 +68,7 @@ export default function (props: Props) {
         </div>
         {user !== undefined &&
           <>
-            {user
+            {user && verified
               ? <>
                 <Button variant="text" color="inherit" onClick={logOut}>
                   ログアウト
