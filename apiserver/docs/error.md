@@ -42,6 +42,10 @@
 
 各検索APIにて検索文字列が存在しない場合にこのエラーコードが返されます。 検索文字列のクエリ「?q=(検索文字列)」を加えて送信しているかを確認してください。
 
+##### 2(invalid content-type)
+
+Content-Typeが無効の場合にこのエラーコードが返されます。 POST APIのContent-Typeは`application/json`です。
+
 #### 100番台:試合関連
 
 ##### 100(can not find game)
