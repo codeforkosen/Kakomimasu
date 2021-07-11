@@ -1,4 +1,4 @@
-import { createRouter } from "./deps.ts";
+import { contentTypeFilter, createRouter } from "./deps.ts";
 
 import { jsonResponse } from "./apiserver_util.ts";
 import util from "../util.js";
@@ -121,7 +121,7 @@ export const tournamentRouter = () => {
   const router = createRouter();
 
   // 大会登録
-  router.post("/create", async (req) => {
+  router.post("/create", contentTypeFilter("application/json"), async (req) => {
     const data = await req.json() as TournamentCreateReq;
     if (!data.name) throw new ServerError(errors.INVALID_TOURNAMENT_NAME);
     if (!data.type || !checkType(data.type)) {
@@ -139,7 +139,7 @@ export const tournamentRouter = () => {
   });
 
   // 大会削除
-  router.post("/delete", async (req) => {
+  router.post("/delete", contentTypeFilter("application/json"), async (req) => {
     const data = await req.json() as TournamentDeleteReq;
     if (!data.id) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
 
@@ -164,7 +164,7 @@ export const tournamentRouter = () => {
   });
 
   // 参加者追加
-  router.post("/add", async (req) => {
+  router.post("/add", contentTypeFilter("application/json"), async (req) => {
     const query = req.query;
     const tournamentId = query.get("id");
     console.log(tournamentId);
