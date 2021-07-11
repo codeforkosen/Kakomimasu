@@ -1,6 +1,6 @@
-import { contentTypeFilter, createRouter } from "./deps.ts";
+import { createRouter } from "./deps.ts";
 
-import { jsonResponse } from "./apiserver_util.ts";
+import { contentTypeFilter, jsonResponse } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";

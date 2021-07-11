@@ -1,6 +1,10 @@
-import { config, contentTypeFilter, createRouter } from "./deps.ts";
+import { config, createRouter } from "./deps.ts";
 
-import { jsonResponse, pathResolver } from "./apiserver_util.ts";
+import {
+  contentTypeFilter,
+  jsonResponse,
+  pathResolver,
+} from "./apiserver_util.ts";
 
 const resolve = pathResolver(import.meta);
 
@@ -140,60 +144,64 @@ export const matchRouter = () => {
     if (!game) throw new ServerError(errors.NOT_GAME);
     await req.respond(jsonResponse(game));
   });
-  router.post(new RegExp("^/(.+)/action$"), async (req) => {
-    //console.log(req, "SetAction");
+  router.post(
+    new RegExp("^/(.+)/action$"),
+    contentTypeFilter("application/json"),
+    async (req) => {
+      //console.log(req, "SetAction");
 
-    // Actionを受け取った時刻を取得
-    const reqTime = new Date().getTime() / 1000;
+      // Actionを受け取った時刻を取得
+      const reqTime = new Date().getTime() / 1000;
 
-    const gameId = req.match[1];
-    const auth = req.headers.get("Authorization");
-    if (!auth || !auth.startsWith("Bearer ")) {
-      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-    }
-    const bearerToken = auth.split(" ")[1];
-    //console.log(auth, bearerToken);
+      const gameId = req.match[1];
+      const auth = req.headers.get("Authorization");
+      if (!auth || !auth.startsWith("Bearer ")) {
+        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+      }
+      const bearerToken = auth.split(" ")[1];
+      //console.log(auth, bearerToken);
 
-    const game = kkmm.getGames().find((item) => item.uuid === gameId);
-    if (!game) throw new ServerError(errors.NOT_GAME);
-    const player = game.players.find((p) => {
-      const user = accounts.getUsers().find((user) => user.id === p.id);
-      if (user?.bearerToken === bearerToken) return true;
-      return false;
-    });
-    if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+      const game = kkmm.getGames().find((item) => item.uuid === gameId);
+      if (!game) throw new ServerError(errors.NOT_GAME);
+      const player = game.players.find((p) => {
+        const user = accounts.getUsers().find((user) => user.id === p.id);
+        if (user?.bearerToken === bearerToken) return true;
+        return false;
+      });
+      if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
-    const actionData = (await req.json()) as ActionReq;
-    if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
-      throw new ServerError(errors.INVALID_ACTION);
-    }
+      const actionData = (await req.json()) as ActionReq;
+      if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
+        throw new ServerError(errors.INVALID_ACTION);
+      }
 
-    const getType = (type: string) => {
-      if (type === "PUT") return Action.PUT;
-      else if (type === "NONE") return Action.NONE;
-      else if (type === "MOVE") return Action.MOVE;
-      else if (type === "REMOVE") return Action.REMOVE;
-      return Action.NONE;
-    };
+      const getType = (type: string) => {
+        if (type === "PUT") return Action.PUT;
+        else if (type === "NONE") return Action.NONE;
+        else if (type === "MOVE") return Action.MOVE;
+        else if (type === "REMOVE") return Action.REMOVE;
+        return Action.NONE;
+      };
 
-    const actionsAry: [number, ReturnType<typeof getType>, number, number][] =
-      actionData.actions.map((a) => [a.agentId, getType(a.type), a.x, a.y]);
-    let nowTurn;
-    if (!actionData.option?.dryRun) {
-      nowTurn = player.setActions(Action.fromJSON(actionsAry));
-    } else {
-      nowTurn = game.turn;
-    }
+      const actionsAry: [number, ReturnType<typeof getType>, number, number][] =
+        actionData.actions.map((a) => [a.agentId, getType(a.type), a.x, a.y]);
+      let nowTurn;
+      if (!actionData.option?.dryRun) {
+        nowTurn = player.setActions(Action.fromJSON(actionsAry));
+      } else {
+        nowTurn = game.turn;
+      }
 
-    const resData: ActionRes = {
-      receptionUnixTime: Math.floor(reqTime),
-      turn: nowTurn,
-    };
+      const resData: ActionRes = {
+        receptionUnixTime: Math.floor(reqTime),
+        turn: nowTurn,
+      };
 
-    await req.respond(
-      jsonResponse(resData),
-    );
-  });
+      await req.respond(
+        jsonResponse(resData),
+      );
+    },
+  );
 
   return router;
 };

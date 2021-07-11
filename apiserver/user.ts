@@ -1,7 +1,7 @@
-import { contentTypeFilter, createRouter } from "./deps.ts";
+import { createRouter } from "./deps.ts";
 
 import util from "../util.js";
-import { jsonResponse } from "./apiserver_util.ts";
+import { contentTypeFilter, jsonResponse } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";

@@ -42,7 +42,7 @@ POST /api/tournament/create
 
 以下のエラーレスポンスが返ってるくる可能性があります。エラーレスポンスについては[Error Response](./error.md)を見てください。
 
-`204` `300` `301` `304`
+`2` `204` `300` `301` `304`
 
 ---
 
@@ -104,7 +104,7 @@ POST /api/tournament/delete
 
 以下のエラーレスポンスが返ってるくる可能性があります。エラーレスポンスについては[Error Response](./error.md)を見てください。
 
-`302` `303`
+`2` `302` `303`
 
 ---
 
@@ -115,7 +115,7 @@ POST /api/tournament/delete
 ### URL
 
 ```
-GET /api/tournament/add?id=(大会ID)
+POST /api/tournament/add?id=(大会ID)
 ```
 
 ### パラメータJSON
@@ -142,4 +142,4 @@ GET /api/tournament/add?id=(大会ID)
 
 以下のエラーレスポンスが返ってるくる可能性があります。エラーレスポンスについては[Error Response](./error.md)を見てください。
 
-`204` `205` `302` `304`
+`2` `204` `205` `302` `304`
