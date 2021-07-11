@@ -1,6 +1,10 @@
-import { config, contentTypeFilter, createRouter } from "./deps.ts";
+import { config, createRouter } from "./deps.ts";
 
-import { jsonResponse, pathResolver } from "./apiserver_util.ts";
+import {
+  contentTypeFilter,
+  jsonResponse,
+  pathResolver,
+} from "./apiserver_util.ts";
 
 const resolve = pathResolver(import.meta);
 

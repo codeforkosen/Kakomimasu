@@ -3,6 +3,10 @@ export const errors = {
     errorCode: 1,
     message: "nothing search query",
   },
+  INVALID_CONTENT_TYPE: {
+    errorCode: 2,
+    message: "invalid content-type",
+  },
   NOT_GAME: {
     errorCode: 100,
     message: "can not find game",
