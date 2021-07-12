@@ -29,3 +29,13 @@ export const contentTypeFilter = (
     throw new ServerError(errors.INVALID_CONTENT_TYPE);
     //throw new RoutingError(400, "Invalid content-type");
   };
+
+export const jsonParse = (): ServeHandler =>
+  async (req) => {
+    try {
+      const reqJson = await req.json();
+      req.set("data", reqJson);
+    } catch (e) {
+      throw new ServerError(errors.INVALID_SYNTAX);
+    }
+  };

@@ -7,6 +7,10 @@ export const errors = {
     errorCode: 2,
     message: "invalid content-type",
   },
+  INVALID_SYNTAX: {
+    errorCode: 3,
+    message: "invalid syntax",
+  },
   NOT_GAME: {
     errorCode: 100,
     message: "can not find game",

@@ -1,7 +1,11 @@
 import { createRouter } from "./deps.ts";
 
 import util from "../util.js";
-import { contentTypeFilter, jsonResponse } from "./apiserver_util.ts";
+import {
+  contentTypeFilter,
+  jsonParse,
+  jsonResponse,
+} from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
@@ -195,8 +199,9 @@ export const userRouter = () => {
   router.post(
     "/regist",
     contentTypeFilter("application/json"),
+    jsonParse(),
     async (req) => {
-      const reqData = (await req.json()) as Partial<UserRegistReq>;
+      const reqData = req.get("data") as Partial<UserRegistReq>;
       //console.log(reqData);
 
       if (!reqData.screenName) {
@@ -280,8 +285,9 @@ export const userRouter = () => {
   router.post(
     "/delete",
     contentTypeFilter("application/json"),
+    jsonParse(),
     async (req) => {
-      const reqData = ((await req.json()) as UserDeleteReq);
+      const reqData = req.get("data") as UserDeleteReq;
       const auth = req.headers.get("Authorization");
       let user: User | undefined = undefined;
       if (auth) {

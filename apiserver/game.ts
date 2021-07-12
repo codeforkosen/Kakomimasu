@@ -1,6 +1,10 @@
 import { createRouter } from "./deps.ts";
 
-import { contentTypeFilter, jsonResponse } from "./apiserver_util.ts";
+import {
+  contentTypeFilter,
+  jsonParse,
+  jsonResponse,
+} from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
@@ -16,8 +20,9 @@ export const gameRouter = () => {
   router.post(
     "/create",
     contentTypeFilter("application/json"),
+    jsonParse(),
     async (req) => {
-      const reqJson = (await req.json()) as GameCreateReq;
+      const reqJson = req.get("data") as GameCreateReq;
       if (!reqJson.boardName) {
         throw new ServerError(errors.INVALID_BOARD_NAME);
       }
