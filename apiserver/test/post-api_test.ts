@@ -23,3 +23,18 @@ urls.forEach((url) => {
     assertEquals(body, errors.INVALID_CONTENT_TYPE);
   });
 });
+
+// fetch all urls by invalid json
+urls.forEach((url) => {
+  Deno.test(`${url} with invalid json`, async () => {
+    const res = await fetch("http://localhost:8880/api/" + url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: "{",
+    });
+    const body = await res.json();
+    assertEquals(body, errors.INVALID_SYNTAX);
+  });
+});
