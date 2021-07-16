@@ -128,8 +128,8 @@ export default function () {
             error={!data.type}
             helperText={data.type ? "" : "入力必須項目です"}
           >
-            <MenuItem value="round-robin">グループトーナメント</MenuItem>
-            {/*<MenuItem value="knockout">勝ち残り式トーナメント</MenuItem>;*/}
+            <MenuItem value="round-robin">総当たり戦</MenuItem>
+            {/*<MenuItem value="knockout">勝ち残り戦</MenuItem>;*/}
           </TextField>
           <Autocomplete
             multiple
