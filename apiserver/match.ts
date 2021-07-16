@@ -2,6 +2,7 @@ import { config, createRouter } from "./deps.ts";
 
 import {
   contentTypeFilter,
+  jsonParse,
   jsonResponse,
   pathResolver,
 } from "./apiserver_util.ts";
@@ -60,84 +61,90 @@ class ActionPost implements IActionPost {
 export const matchRouter = () => {
   const router = createRouter();
 
-  router.post("/", contentTypeFilter("application/json"), async (req) => {
-    const reqData = await req.json() as Partial<MatchReq>;
-    //console.log(reqData);
-    const auth = req.headers.get("Authorization");
-    if (!auth || !auth.startsWith("Bearer ")) {
-      throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-    }
-    const bearerToken = auth.split(" ")[1];
-    console.log(auth, bearerToken);
-    const user = accounts.getUsers().find((user) =>
-      user.bearerToken === bearerToken
-    );
-    if (!user) throw new ServerError(errors.NOT_USER);
+  router.post(
+    "/",
+    contentTypeFilter("application/json"),
+    jsonParse(),
+    async (req) => {
+      const reqData = req.get("data") as Partial<MatchReq>;
+      //console.log(reqData);
+      const auth = req.headers.get("Authorization");
+      if (!auth || !auth.startsWith("Bearer ")) {
+        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
+      }
+      const bearerToken = auth.split(" ")[1];
+      console.log(auth, bearerToken);
+      const user = accounts.getUsers().find((user) =>
+        user.bearerToken === bearerToken
+      );
+      if (!user) throw new ServerError(errors.NOT_USER);
 
-    const player = kkmm.createPlayer(user.id, reqData.spec);
-    if (reqData.gameId) {
-      const game = kkmm.getGames().find((
-        game,
-      ) => game.uuid === reqData.gameId);
-      if (!game) throw new ServerError(errors.NOT_GAME);
-      if (!reqData.option?.dryRun) {
-        if (game.attachPlayer(player) === false) {
-          throw new ServerError(errors.NOT_FREE_GAME);
-          //throw Error("Game is not free");
+      const player = kkmm.createPlayer(user.id, reqData.spec);
+      if (reqData.gameId) {
+        const game = kkmm.getGames().find((
+          game,
+        ) => game.uuid === reqData.gameId);
+        if (!game) throw new ServerError(errors.NOT_GAME);
+        if (!reqData.option?.dryRun) {
+          if (game.attachPlayer(player) === false) {
+            throw new ServerError(errors.NOT_FREE_GAME);
+            //throw Error("Game is not free");
+          }
         }
-      }
-      //accounts.addGame(user.userId, game.uuid);
-    } else if (reqData.useAi) {
-      const aiFolderPath = resolve("../client_deno/");
-      const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
-      if (!ai) throw new ServerError(errors.NOT_AI);
-      const bname = reqData.aiOption?.boardName || boardname ||
-        await getRandomBoardName();
-      const brd = BoardFileOp.get(bname); //readBoard(bname);
-      if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
-      if (!reqData.option?.dryRun) {
-        const game = kkmm.createGame(brd);
-        game.name = `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
-
-        game.changeFuncs.push(sendAllGame);
-        game.changeFuncs.push(sendGame);
-        game.attachPlayer(player);
         //accounts.addGame(user.userId, game.uuid);
-        Deno.run(
-          {
-            cmd: [
-              "deno",
-              "run",
-              "-A",
-              aiFolderPath + ai.filePath,
-              "--local",
-              "--aiOnly",
-              "--nolog",
-              "--gameId",
-              game.uuid,
-            ],
-          },
-        );
-      }
-    } else {
-      const freeGame = kkmm.getFreeGames();
-      if (!reqData.option?.dryRun) {
-        if (freeGame.length === 0) {
-          const bname = boardname || await getRandomBoardName();
-          const brd = BoardFileOp.get(bname); //readBoard(bname);
-          if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
+      } else if (reqData.useAi) {
+        const aiFolderPath = resolve("../client_deno/");
+        const ai = aiList.find((e) => e.name === reqData.aiOption?.aiName);
+        if (!ai) throw new ServerError(errors.NOT_AI);
+        const bname = reqData.aiOption?.boardName || boardname ||
+          await getRandomBoardName();
+        const brd = BoardFileOp.get(bname); //readBoard(bname);
+        if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
+        if (!reqData.option?.dryRun) {
           const game = kkmm.createGame(brd);
+          game.name =
+            `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
+
           game.changeFuncs.push(sendAllGame);
           game.changeFuncs.push(sendGame);
-
-          freeGame.push(game);
+          game.attachPlayer(player);
+          //accounts.addGame(user.userId, game.uuid);
+          Deno.run(
+            {
+              cmd: [
+                "deno",
+                "run",
+                "-A",
+                aiFolderPath + ai.filePath,
+                "--local",
+                "--aiOnly",
+                "--nolog",
+                "--gameId",
+                game.uuid,
+              ],
+            },
+          );
         }
-        freeGame[0].attachPlayer(player);
-        //console.log(player);
+      } else {
+        const freeGame = kkmm.getFreeGames();
+        if (!reqData.option?.dryRun) {
+          if (freeGame.length === 0) {
+            const bname = boardname || await getRandomBoardName();
+            const brd = BoardFileOp.get(bname); //readBoard(bname);
+            if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
+            const game = kkmm.createGame(brd);
+            game.changeFuncs.push(sendAllGame);
+            game.changeFuncs.push(sendGame);
+
+            freeGame.push(game);
+          }
+          freeGame[0].attachPlayer(player);
+          //console.log(player);
+        }
       }
-    }
-    await req.respond(jsonResponse(player.getJSON()));
-  });
+      await req.respond(jsonResponse(player.getJSON()));
+    },
+  );
   router.get(new RegExp("^/(.+)$"), async (req) => {
     const id = req.match[1];
     const game = kkmm.getGames().find((item) => item.uuid === id);
@@ -147,6 +154,7 @@ export const matchRouter = () => {
   router.post(
     new RegExp("^/(.+)/action$"),
     contentTypeFilter("application/json"),
+    jsonParse(),
     async (req) => {
       //console.log(req, "SetAction");
 
@@ -170,7 +178,7 @@ export const matchRouter = () => {
       });
       if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
-      const actionData = (await req.json()) as ActionReq;
+      const actionData = req.get("data") as ActionReq;
       if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
         throw new ServerError(errors.INVALID_ACTION);
       }

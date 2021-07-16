@@ -46,6 +46,10 @@
 
 Content-Typeが無効の場合にこのエラーコードが返されます。 POST APIのContent-Typeは`application/json`です。
 
+##### 3(invalid syntax)
+
+Bodyに含まれるJSON構文が無効です。
+
 #### 100番台:試合関連
 
 ##### 100(can not find game)
