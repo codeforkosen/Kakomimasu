@@ -35,7 +35,7 @@ export const jsonParse = (): ServeHandler =>
     try {
       const reqJson = await req.json();
       req.set("data", reqJson);
-    } catch (e) {
+    } catch (_e) {
       throw new ServerError(errors.INVALID_SYNTAX);
     }
   };
