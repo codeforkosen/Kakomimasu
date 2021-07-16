@@ -403,7 +403,7 @@ export default function (props: Props) {
                       </div>}
                   </td>;
                 })}
-                <th>{y}</th>
+                <th>{y + 1}</th>
               </tr>
             );
           })}
