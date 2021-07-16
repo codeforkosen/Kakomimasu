@@ -64,10 +64,10 @@ function PointsGraph(props: { game: Game }) {
 
         <XAxis
           dataKey="turn"
-          domain={[0, game.totalTurn]}
+          domain={[0, game.totalTurn - 1]}
           tickFormatter={(turn: number) => turn + 1}
-          //type="number"
-          interval={0}
+          type="number"
+          tickCount={game.totalTurn / 2}
         />
         <YAxis />
         <Tooltip labelFormatter={(props: number) => "Turn : " + (props + 1)} />
