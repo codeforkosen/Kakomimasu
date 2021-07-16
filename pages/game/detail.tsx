@@ -57,12 +57,20 @@ function PointsGraph(props: { game: Game }) {
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={data}
+        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
       >
+        >
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="turn" />
+        <XAxis
+          dataKey="turn"
+          domain={[0, game.totalTurn]}
+          tickFormatter={(turn: number) => turn + 1}
+          //type="number"
+          interval={0}
+        />
         <YAxis />
-        <Tooltip labelFormatter={(props: string) => "Turn : " + props} />
+        <Tooltip labelFormatter={(props: number) => "Turn : " + (props + 1)} />
         <Legend />
 
         {game.players.map((_, i) => {
