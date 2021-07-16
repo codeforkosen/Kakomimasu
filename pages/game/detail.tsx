@@ -59,7 +59,6 @@ function PointsGraph(props: { game: Game }) {
         data={data}
         margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
       >
-        >
         <CartesianGrid strokeDasharray="3 3" />
 
         <XAxis
