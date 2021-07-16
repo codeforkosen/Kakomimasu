@@ -64,7 +64,7 @@ function PointsGraph(props: { game: Game }) {
         <XAxis
           dataKey="turn"
           domain={[0, game.totalTurn - 1]}
-          tickFormatter={(turn: string) => String(parseInt(turn) + 1)}
+          tickFormatter={(turn: number) => String(turn + 1)}
           type="number"
           tickCount={game.totalTurn / 2}
         />
