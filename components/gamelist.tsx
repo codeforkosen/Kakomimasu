@@ -167,7 +167,7 @@ const GameList = (props: {
                 >
                   <TableCell align="center">
                     <div className={getStatusClass(game)}>●</div>
-                    <div>{game.turn}</div>
+                    <div>{game.turn}/{game.totalTurn}</div>
                   </TableCell>
                   <TableCell>
                     <div className={classes.player}>
