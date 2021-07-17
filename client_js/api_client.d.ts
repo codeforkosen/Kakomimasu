@@ -17,7 +17,11 @@ import {
 } from "../apiserver/types.ts";
 
 type ApiRes<T> = Promise<
-  { success: true; data: T } | { success: false; data: Error }
+  { success: true; data: T; res: Response } | {
+    success: false;
+    data: Error;
+    res: Response;
+  }
 >;
 
 export default class ApiClient {

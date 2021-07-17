@@ -11,6 +11,7 @@ import { errors, ServerError } from "./error.ts";
 import { ExpGame } from "./parts/expKakomimasu.ts";
 import { getPayload } from "./parts/jwt.ts";
 import { UserDeleteReq, UserRegistReq } from "./types.ts";
+import { auth } from "./middleware.ts";
 
 export interface IUser {
   screenName: string;
@@ -247,64 +248,37 @@ export const userRouter = () => {
   );
 
   // ユーザ情報取得
-  router.get(new RegExp("^/show/(.*)$"), async (req) => {
-    const identifier = req.match[1];
+  router.get(
+    new RegExp("^/show/(.*)$"),
+    auth({ basic: true, jwt: true, required: false }),
+    async (req) => {
+      const identifier = req.match[1];
 
-    if (identifier !== "") {
-      const user = accounts.showUser(identifier);
+      if (identifier !== "") {
+        const user = accounts.showUser(identifier);
 
-      const auth = req.headers.get("Authorization");
-      console.log("user show", auth);
-      let isAuthenticated = false;
-      if (auth) {
-        const a = auth.split(" ");
-        if (a[0] === "Basic") {
-          const [username, password] = a[1].split(":");
-          if (
-            user.password === password &&
-            (user.id === username || user.name === username)
-          ) {
-            isAuthenticated = true;
-          }
-        } else {
-          const payload = await getPayload(auth);
-          if (payload) {
-            if (user.id === payload.user_id) {
-              isAuthenticated = true;
-            }
-          }
-        }
+        // 認証済みユーザかの確認
+        const authedUserId = req.getString("authed_userId");
+        await req.respond(
+          jsonResponse(user.id === authedUserId ? user.noSafe() : user),
+        );
+      } else {
+        await req.respond(jsonResponse(accounts.getUsers()));
       }
-      await req.respond(jsonResponse(isAuthenticated ? user.noSafe() : user));
-    } else {
-      await req.respond(jsonResponse(accounts.getUsers()));
-    }
-  });
+    },
+  );
 
   // ユーザ削除
   router.post(
     "/delete",
     contentTypeFilter("application/json"),
+    auth({ bearer: true, jwt: true }),
     jsonParse(),
     async (req) => {
       const reqData = req.get("data") as UserDeleteReq;
-      const auth = req.headers.get("Authorization");
-      let user: User | undefined = undefined;
-      if (auth) {
-        const a = auth.split(" ");
-        if (a[0] === "Bearer") {
-          console.log(a);
-          user = accounts.getUsers().find((u) => u.bearerToken === a[1]);
-          console.log(user);
-        } else {
-          const payload = await getPayload(auth);
-          if (payload) {
-            user = accounts.getUsers().find((u) => u.id === payload.user_id);
-          }
-        }
-      } else {
-        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-      }
+      const authedUserId = req.getString("authed_userId");
+
+      let user = accounts.getUsers().find((e) => e.id === authedUserId);
       if (!user) throw new ServerError(errors.NOT_USER);
       user = new User(user);
       accounts.deleteUser(user.id, reqData.option?.dryRun);

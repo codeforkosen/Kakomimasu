@@ -59,9 +59,9 @@ const assertAction = (actionRes) => {
 // gameID有：ゲーム無し
 // useAi：AI無し
 Deno.test("api/match:invalid bearerToken", async () => {
-  const data = { option: { dryRun: true } };
-  const res = await ac.match(data);
-  assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
+  const res = await ac.match({ option: { dryRun: true } });
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
 });
 Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
@@ -187,9 +187,19 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   assertAction(res.data);
 });
 Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
+  const res = await ac.setAction(v4.generate(), {});
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
+});
+
+Deno.test("api/match/(gameId)/action:invalid user", async () => {
   const uuid = v4.generate();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
+  const uuid2 = v4.generate();
+  const userData2 = { screenName: uuid2, name: uuid2, password: uuid2 };
+  const userRes2 = await ac.usersRegist(userData2);
+
   userData.id = userRes.data.id;
 
   const data = {
@@ -208,8 +218,10 @@ Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
   const res = await ac.setAction(
     matchRes.data.gameId,
     actionData,
+    "Bearer " + userRes2.data.bearerToken,
   );
   await ac.usersDelete({}, `Bearer ${userRes.data.bearerToken}`);
+  await ac.usersDelete({}, `Bearer ${userRes2.data.bearerToken}`);
 
   assertEquals(res.data, errors.INVALID_USER_AUTHORIZATION);
 });

@@ -64,62 +64,62 @@ export default class ApiClient {
   }
   async usersRegist(data, auth) {
     const res = await this._fetchPostJson("/users/regist", data, auth);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async usersDelete(data, auth) {
     const res = await this._fetchPostJson("/users/delete", data, auth);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async usersShow(identifier, idToken) {
     const res = await this._fetch(`/users/show/${identifier}`, idToken);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async usersSearch(searchText) {
     const res = await this._fetch(`/users/search?q=${searchText}`);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async tournamentsCreate(data) {
     const res = await this._fetchPostJson("/tournament/create", data);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
   async tournamentsGet(id = "") {
     const res = await this._fetch(`/tournament/get?id=${id}`);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
   async tournamentsDelete(data) {
     const res = await this._fetchPostJson("/tournament/delete", data);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
   async tournamentsAddUser(tournamentId, data) {
     const res = await this._fetchPostJson(
       `/tournament/add?id=${tournamentId}`,
       data,
     );
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async gameCreate(data) {
     const res = await this._fetchPostJson("/game/create", data);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async getBoards() {
     const res = await this._fetch("/game/boards");
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async match(data, auth) {
     const res = await this._fetchPostJson("/match", data, auth);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async getMatch(gameId) {
     const res = await this._fetch(`/match/${gameId}`);
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 
   async setAction(gameId, data, auth) {
@@ -128,6 +128,6 @@ export default class ApiClient {
       data,
       auth,
     );
-    return { success: res.status === 200, data: await res.json() };
+    return { success: res.status === 200, data: await res.json(), res };
   }
 }

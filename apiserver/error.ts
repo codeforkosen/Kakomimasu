@@ -11,6 +11,10 @@ export const errors = {
     errorCode: 3,
     message: "invalid syntax",
   },
+  UNAUTHORIZED: {
+    errorCode: 4,
+    message: "unauthorized",
+  },
   NOT_GAME: {
     errorCode: 100,
     message: "can not find game",
@@ -58,7 +62,7 @@ export const errors = {
   },
   INVALID_USER_AUTHORIZATION: {
     errorCode: 207,
-    message: "invalid firebase idtoken",
+    message: "invalid user authorization",
   },
   INVALID_TOURNAMENT_NAME: {
     errorCode: 300,

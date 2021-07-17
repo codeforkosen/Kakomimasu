@@ -21,6 +21,7 @@ import {
   ActionRes,
   MatchReq,
 } from "./types.ts";
+import { auth } from "./middleware.ts";
 
 const env = config({
   path: resolve("./.env"),
@@ -64,19 +65,14 @@ export const matchRouter = () => {
   router.post(
     "/",
     contentTypeFilter("application/json"),
+    auth({ bearer: true }),
     jsonParse(),
     async (req) => {
       const reqData = req.get("data") as Partial<MatchReq>;
       //console.log(reqData);
-      const auth = req.headers.get("Authorization");
-      if (!auth || !auth.startsWith("Bearer ")) {
-        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-      }
-      const bearerToken = auth.split(" ")[1];
-      console.log(auth, bearerToken);
-      const user = accounts.getUsers().find((user) =>
-        user.bearerToken === bearerToken
-      );
+      const authedUserId = req.getString("authed_userId");
+
+      const user = accounts.getUsers().find((user) => user.id === authedUserId);
       if (!user) throw new ServerError(errors.NOT_USER);
 
       const player = kkmm.createPlayer(user.id, reqData.spec);
@@ -154,6 +150,7 @@ export const matchRouter = () => {
   router.post(
     new RegExp("^/(.+)/action$"),
     contentTypeFilter("application/json"),
+    auth({ bearer: true }),
     jsonParse(),
     async (req) => {
       //console.log(req, "SetAction");
@@ -162,20 +159,12 @@ export const matchRouter = () => {
       const reqTime = new Date().getTime() / 1000;
 
       const gameId = req.match[1];
-      const auth = req.headers.get("Authorization");
-      if (!auth || !auth.startsWith("Bearer ")) {
-        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-      }
-      const bearerToken = auth.split(" ")[1];
-      //console.log(auth, bearerToken);
 
       const game = kkmm.getGames().find((item) => item.uuid === gameId);
       if (!game) throw new ServerError(errors.NOT_GAME);
-      const player = game.players.find((p) => {
-        const user = accounts.getUsers().find((user) => user.id === p.id);
-        if (user?.bearerToken === bearerToken) return true;
-        return false;
-      });
+
+      const authedUserId = req.getString("authed_userId");
+      const player = game.players.find((p) => p.id === authedUserId);
       if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
       const actionData = req.get("data") as ActionReq;
