@@ -1,5 +1,4 @@
 /// <reference types="./Kakomimasu.d.ts" />
-import util from "./util.js";
 
 class Board {
   constructor(w, h, points, nagent, nturn, nsec = 3, nplayer = 2) {
@@ -415,7 +414,6 @@ class Game {
       console.log(dummy);
       throw new Error("too much");
     }
-    this.uuid = util.uuid();
     this.board = board;
     this.players = [];
     this.nturn = board.nturn;
@@ -441,7 +439,6 @@ class Game {
   static restore(data) {
     const board = Board.restore(data.board);
     const game = new Game(board);
-    game.uuid = data.uuid;
     game.players = data.players.map((p) => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
@@ -742,7 +739,6 @@ class Game {
 
     // いろいろ仕様と違うので実際に使用するときに修正
     return {
-      gameId: this.uuid,
       gaming: this.gaming,
       ending: this.ending,
       board: board,
@@ -800,7 +796,6 @@ class Player {
     return {
       userId: this.id,
       spec: this.spec,
-      gameId: this.game?.uuid,
       index: this.index,
     };
   }

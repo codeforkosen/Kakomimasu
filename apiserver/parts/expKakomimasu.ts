@@ -1,15 +1,32 @@
 import util from "../../util.js";
 
-export * from "../../Kakomimasu.js";
+//export * from "../../Kakomimasu.js";
 
-import { Agent, Board, Game, Kakomimasu, Player } from "../../Kakomimasu.js";
+import {
+  Action,
+  Agent,
+  Board,
+  Game,
+  Kakomimasu,
+  Player as RawPlayer,
+} from "../../Kakomimasu.js";
 import { LogFileOp } from "./file_opration.ts";
 
 import { accounts } from "../user.ts";
 
 import { Game as GameType } from "../types.ts";
 
-export class ExpGame extends Game {
+class Player extends RawPlayer<ExpGame> {
+  getJSON() {
+    return {
+      ...super.getJSON(),
+      gameId: this.game?.uuid,
+    };
+  }
+}
+
+class ExpGame extends Game {
+  public uuid: string;
   public name?: string;
   public startedAtUnixTime: number | null;
   public nextTurnUnixTime: number | null;
@@ -19,6 +36,7 @@ export class ExpGame extends Game {
 
   constructor(board: Board, name?: string) {
     super(board);
+    this.uuid = util.uuid();
     this.name = name;
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
@@ -121,6 +139,7 @@ export class ExpGame extends Game {
     const ret = super.toJSON();
     return {
       ...ret,
+      gameId: this.uuid,
       gameName: this.name,
       startedAtUnixTime: this.startedAtUnixTime,
       nextTurnUnixTime: this.nextTurnUnixTime,
@@ -141,7 +160,7 @@ export class ExpGame extends Game {
   }
 }
 
-class ExpKakomimasu extends Kakomimasu<ExpGame> {
+class ExpKakomimasu extends Kakomimasu<ExpGame, Player> {
   createGame(...param: ConstructorParameters<typeof ExpGame>) {
     const game = new ExpGame(...param);
     this.games.push(game);
@@ -152,6 +171,12 @@ class ExpKakomimasu extends Kakomimasu<ExpGame> {
     const games = super.getFreeGames();
     return games.filter((game) => game.type === "normal");
   }
+
+  createPlayer(...param: ConstructorParameters<typeof RawPlayer>) {
+    const [playername, spec] = param;
+    if (spec == null) return new Player(playername);
+    else return new Player(playername, spec);
+  }
 }
 
-export { ExpKakomimasu };
+export { Action, Agent, Board, ExpGame, ExpKakomimasu, Player };
