@@ -72,13 +72,6 @@ export const matchRouter = () => {
       //console.log(reqData);
       const authedUserId = req.getString("authed_userId");
 
-      /*const auth = req.headers.get("Authorization");
-      if (!auth || !auth.startsWith("Bearer ")) {
-        throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-      }
-      const bearerToken = auth.split(" ")[1];
-      console.log(auth, bearerToken);*/
-
       const user = accounts.getUsers().find((user) => user.id === authedUserId);
       if (!user) throw new ServerError(errors.NOT_USER);
 
