@@ -1,6 +1,9 @@
 import { assertEquals, v4 } from "../deps.ts";
 import { errors } from "../error.ts";
 
+import ApiClient from "../../client_js/api_client.js";
+const ac = new ApiClient();
+
 const urls = [
   `game/create`,
   `match`,
@@ -25,16 +28,24 @@ urls.forEach((url) => {
 });
 
 // fetch all urls by invalid json
-urls.forEach((url) => {
+for await (const url of urls) {
   Deno.test(`${url} with invalid json`, async () => {
+    const uuid = v4.generate();
+    const data = { screenName: uuid, name: uuid, password: uuid };
+    const userRes = await ac.usersRegist(data);
+    if (!userRes.success) new Error("Could not create user");
+
     const res = await fetch("http://localhost:8880/api/" + url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": "Bearer " + userRes.data.bearerToken,
       },
       body: "{",
     });
     const body = await res.json();
     assertEquals(body, errors.INVALID_SYNTAX);
+
+    await ac.usersDelete({}, "Bearer " + userRes.data.bearerToken);
   });
-});
+}
