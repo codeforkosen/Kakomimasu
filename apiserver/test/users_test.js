@@ -193,20 +193,18 @@ Deno.test("users delete:normal by bearerToken", async () => {
   assertUser(res.data, data);
 });
 Deno.test("users delete:invalid bearerToken", async () => {
-  const data_ = {
-    option: { dryRun: true },
-  };
-  const res = await ac._fetchPostJson("/users/delete", data_, "");
-  await res.text();
-  assertEquals(res.status, 401);
+  const res = await ac.usersDelete({ option: { dryRun: true } }, "");
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
 });
 
 Deno.test("users delete:not user", async () => {
-  const res = await ac._fetchPostJson("/users/delete", {
-    option: { dryRun: true },
-  }, `Bearer ${v4.generate()}`);
-  await res.text();
-  assertEquals(res.status, 401);
+  const res = await ac.usersDelete(
+    { option: { dryRun: true } },
+    `Bearer ${v4.generate()}`,
+  );
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
 });
 Deno.test("users delete:normal no dryrun", async () => {
   const res = await ac.usersDelete({ ...data }, `Bearer ${bearerToken}`);

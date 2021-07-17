@@ -59,9 +59,9 @@ const assertAction = (actionRes) => {
 // gameID有：ゲーム無し
 // useAi：AI無し
 Deno.test("api/match:invalid bearerToken", async () => {
-  const res = await ac._fetchPostJson("/match", { option: { dryRun: true } });
-  await res.text();
-  assertEquals(res.status, 401);
+  const res = await ac.match({ option: { dryRun: true } });
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
 });
 Deno.test("api/match:can not find game", async () => {
   const uuid = v4.generate();
@@ -187,12 +187,9 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   assertAction(res.data);
 });
 Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
-  const res = await ac._fetchPostJson(
-    `/match/${v4.generate()}/action`,
-    {},
-  );
-  await res.text();
-  assertEquals(res.status, 401);
+  const res = await ac.setAction(v4.generate(), {});
+  assertEquals(res.res.status, 401);
+  assertEquals(res.data, errors.UNAUTHORIZED);
 });
 
 Deno.test("api/match/(gameId)/action:invalid user", async () => {

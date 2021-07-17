@@ -2,6 +2,7 @@ import { ServeHandler } from "./deps.ts";
 
 import { accounts } from "./user.ts";
 import { getPayload } from "./parts/jwt.ts";
+import { errorCodeResponse, errors, ServerError } from "./error.ts";
 
 export const auth = (
   { basic, bearer, jwt, required = true }: {
@@ -49,7 +50,11 @@ export const auth = (
       }
     }
     if (required) {
-      const headers = new Headers();
+      const { headers, body } = errorCodeResponse(
+        new ServerError(errors.UNAUTHORIZED),
+      );
+
+      //const headers = resTemp.headers
       if (basic) {
         headers.append("WWW-Authenticate", "Basic");
       }
@@ -59,40 +64,6 @@ export const auth = (
       if (jwt) {
         headers.append("WWW-Authenticate", "JWT");
       }
-      req.respond({ status: 401, headers });
+      req.respond({ status: 401, headers, body });
     }
   };
-
-/*
-  if (a[0] === "Basic") {
-          const [username, password] = a[1].split(":");
-          if (
-            user.password === password &&
-            (user.id === username || user.name === username)
-          ) {
-            isAuthenticated = true;
-          }
-        } else {
-          const payload = await getPayload(auth);
-          if (payload) {
-            if (user.id === payload.user_id) {
-              isAuthenticated = true;
-            }
-          }
-        }
-
-  const idToken = req.headers.get("Authorization");
-      let id: string | undefined = undefined;
-      if (idToken) {
-        const payload = await getPayload(idToken);
-        if (payload) {
-          id = payload.user_id;
-          if (accounts.getUsers().some((e) => e.id === id)) {
-            throw new ServerError(errors.ALREADY_REGISTERED_USER);
-          }
-        } else throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
-      } else {
-        if (!reqData.password) {
-          throw new ServerError(errors.NOTHING_PASSWORD);
-        }
-      }*/
