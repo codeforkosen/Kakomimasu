@@ -40,4 +40,4 @@ export const jsonParse = (): ServeHandler =>
     }
   };
 
-export const uuid = () => crypto.randomUUID();
+export const randomUUID = () => crypto.randomUUID();

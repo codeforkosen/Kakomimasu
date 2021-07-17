@@ -1,5 +1,5 @@
 import util from "../../util.js";
-import { uuid } from "../apiserver_util.ts";
+import { randomUUID } from "../apiserver_util.ts";
 
 //export * from "../../Kakomimasu.js";
 
@@ -37,7 +37,7 @@ class ExpGame extends Game {
 
   constructor(board: Board, name?: string) {
     super(board);
-    this.uuid = uuid();
+    this.uuid = randomUUID();
     this.name = name;
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;

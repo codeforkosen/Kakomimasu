@@ -1,4 +1,5 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
+import { randomUUID } from "../apiserver_util.ts";
 
 import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
@@ -14,7 +15,7 @@ const read = (fileName) => {
   );
 };
 
-const uuid = v4.generate();
+const uuid = randomUUID();
 const data = {
   screenName: uuid,
   name: uuid,
@@ -143,7 +144,7 @@ Deno.test("users show:normal by id", async () => {
   assertUser(res.data, data);
 });
 Deno.test("users show:not user", async () => {
-  const res = await ac.usersShow(v4.generate());
+  const res = await ac.usersShow(randomUUID());
   assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("users show:normal with auth by name", async () => {
@@ -201,7 +202,7 @@ Deno.test("users delete:invalid bearerToken", async () => {
 Deno.test("users delete:not user", async () => {
   const res = await ac.usersDelete(
     { option: { dryRun: true } },
-    `Bearer ${v4.generate()}`,
+    `Bearer ${randomUUID()}`,
   );
   assertEquals(res.res.status, 401);
   assertEquals(res.data, errors.UNAUTHORIZED);

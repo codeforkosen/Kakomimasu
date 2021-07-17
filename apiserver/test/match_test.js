@@ -1,5 +1,7 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
 
+import { randomUUID } from "../apiserver_util.ts";
+
 import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
 
@@ -64,12 +66,12 @@ Deno.test("api/match:invalid bearerToken", async () => {
   assertEquals(res.data, errors.UNAUTHORIZED);
 });
 Deno.test("api/match:can not find game", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
   const data = {
-    gameId: v4.generate(),
+    gameId: randomUUID(),
     option: { dryRun: true },
   };
   const res = await ac.match(data, "Bearer " + userRes.data.bearerToken);
@@ -77,7 +79,7 @@ Deno.test("api/match:can not find game", async () => {
   assertEquals(res.data, errors.NOT_GAME);
 });
 Deno.test("api/match:can not find ai", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -94,7 +96,7 @@ Deno.test("api/match:can not find ai", async () => {
   assertEquals(res.data, errors.NOT_AI);
 });
 Deno.test("api/match:normal", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -105,7 +107,7 @@ Deno.test("api/match:normal", async () => {
   assertMatch(res.data, { userId: userData.id });
 });
 Deno.test("api/match:normal by selfGame", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -122,7 +124,7 @@ Deno.test("api/match:normal by selfGame", async () => {
   assertMatch(res.data, { userId: userData.id, gameId: gameRes.data.gameId });
 });
 Deno.test("api/match:normal by useAi", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -150,7 +152,7 @@ Deno.test("api/match/(gameId):normal", async () => {
   assertGame(res.data, { gameId: gameRes.data.gameId, name: gameData.name });
 });
 Deno.test("api/match/(gameId):not find game", async () => {
-  const res = await ac.getMatch(v4.generate());
+  const res = await ac.getMatch(randomUUID());
 
   assertEquals(res.data, errors.NOT_GAME);
 });
@@ -159,7 +161,7 @@ Deno.test("api/match/(gameId):not find game", async () => {
 // テスト項目
 // 正常、アクセストークン無効
 Deno.test("api/match/(gameId)/action:normal", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -187,16 +189,16 @@ Deno.test("api/match/(gameId)/action:normal", async () => {
   assertAction(res.data);
 });
 Deno.test("api/match/(gameId)/action:invalid bearerToken", async () => {
-  const res = await ac.setAction(v4.generate(), {});
+  const res = await ac.setAction(randomUUID(), {});
   assertEquals(res.res.status, 401);
   assertEquals(res.data, errors.UNAUTHORIZED);
 });
 
 Deno.test("api/match/(gameId)/action:invalid user", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
-  const uuid2 = v4.generate();
+  const uuid2 = randomUUID();
   const userData2 = { screenName: uuid2, name: uuid2, password: uuid2 };
   const userRes2 = await ac.usersRegist(userData2);
 

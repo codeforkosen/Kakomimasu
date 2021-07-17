@@ -1,5 +1,6 @@
-import { assertEquals, v4 } from "../deps.ts";
+import { assertEquals } from "../deps.ts";
 import { errors } from "../error.ts";
+import { randomUUID } from "../apiserver_util.ts";
 
 import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
@@ -7,7 +8,7 @@ const ac = new ApiClient();
 const urls = [
   `game/create`,
   `match`,
-  `match/${v4.generate()}/action`,
+  `match/${randomUUID()}/action`,
   `tournament/create`,
   `tournament/delete`,
   `tournament/add`,
@@ -30,7 +31,7 @@ urls.forEach((url) => {
 // fetch all urls by invalid json
 for await (const url of urls) {
   Deno.test(`${url} with invalid json`, async () => {
-    const uuid = v4.generate();
+    const uuid = randomUUID();
     const data = { screenName: uuid, name: uuid, password: uuid };
     const userRes = await ac.usersRegist(data);
     if (!userRes.success) new Error("Could not create user");

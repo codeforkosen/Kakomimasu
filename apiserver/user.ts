@@ -4,7 +4,7 @@ import {
   contentTypeFilter,
   jsonParse,
   jsonResponse,
-  uuid,
+  randomUUID,
 } from "./apiserver_util.ts";
 import { UserFileOp } from "./parts/file_opration.ts";
 import { errors, ServerError } from "./error.ts";
@@ -33,10 +33,10 @@ class User implements IUser {
   constructor(data: IUser) {
     this.screenName = data.screenName;
     this.name = data.name;
-    this.id = data.id || uuid();
+    this.id = data.id || randomUUID();
     this.password = data.password;
     this.gamesId = data.gamesId || [];
-    this.bearerToken = data.bearerToken || uuid();
+    this.bearerToken = data.bearerToken || randomUUID();
   }
 
   dataCheck(games: ExpGame[]) {

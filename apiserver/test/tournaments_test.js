@@ -1,4 +1,5 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
+import { randomUUID } from "../apiserver_util.ts";
 
 import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
@@ -29,7 +30,7 @@ const assertTournament = (tournament, sample = {}) => {
   assertEquals(tournament_, sample_);
 };
 
-const uuid = v4.generate();
+const uuid = randomUUID();
 
 const data = {
   name: uuid,
@@ -133,7 +134,7 @@ Deno.test("api/tournament/get:normal by all", async () => {
   res.data.forEach((e) => assertTournament(e));
 });
 Deno.test("api/tournament/get:nothing tournament id", async () => {
-  const res = await ac.tournamentsGet(v4.generate());
+  const res = await ac.tournamentsGet(randomUUID());
   assertEquals(res.data, errors.NOTHING_TOURNAMENT_ID);
 });
 
@@ -141,7 +142,7 @@ Deno.test("api/tournament/get:nothing tournament id", async () => {
 // テスト項目
 // 正常、ID無し、user無し、存在しない大会ID、存在しないユーザ、登録済みのユーザ
 Deno.test("api/tournament/add:normal", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
 
@@ -155,7 +156,7 @@ Deno.test("api/tournament/add:normal", async () => {
 });
 Deno.test("api/tournament/add:tournament that do not exist", async () => {
   {
-    const res = await ac.tournamentsAddUser(v4.generate(), {
+    const res = await ac.tournamentsAddUser(randomUUID(), {
       option: { dryRun: true },
     });
     assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);
@@ -207,14 +208,14 @@ Deno.test("api/tournament/add:nothing user", async () => {
 Deno.test("api/tournament/add:user that do not exist", async () => {
   {
     const res = await ac.tournamentsAddUser(data.id, {
-      user: v4.generate(),
+      user: randomUUID(),
       option: { dryRun: true },
     });
     assertEquals(res.data, errors.NOT_USER);
   }
 });
 Deno.test("api/tournament/add:already registed user", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
 
@@ -260,7 +261,7 @@ Deno.test("api/tournament/delete:invalid tournament id", async () => {
 });
 Deno.test("api/tournament/delete:nothing tournament id", async () => {
   const res = await ac.tournamentsDelete({
-    id: v4.generate(),
+    id: randomUUID(),
     option: { dryRun: true },
   });
   assertEquals(res.data, errors.NOTHING_TOURNAMENT_ID);
