@@ -1,5 +1,7 @@
 import { assert, assertEquals, v4 } from "../deps.ts";
 
+import { randomUUID } from "../apiserver_util.ts";
+
 import ApiClient from "../../client_js/api_client.js";
 const ac = new ApiClient();
 
@@ -48,7 +50,7 @@ Deno.test("api/game/create:normal", async () => {
   assertGame(res.data, data);
 });
 Deno.test("api/game/create:normal with playerIdentifiers", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -91,13 +93,13 @@ Deno.test("api/game/create:invalid boardName", async () => {
 Deno.test("api/game/create:not user", async () => {
   const res = await ac.gameCreate({
     ...data,
-    playerIdentifiers: [v4.generate()],
+    playerIdentifiers: [randomUUID()],
     option: { dryRun: true },
   });
   assertEquals(res.data, errors.NOT_USER);
 });
 Deno.test("api/game/create:already registed user", async () => {
-  const uuid = v4.generate();
+  const uuid = randomUUID();
   const userData = { screenName: uuid, name: uuid, password: uuid };
   const userRes = await ac.usersRegist(userData);
   userData.id = userRes.data.id;
@@ -113,7 +115,7 @@ Deno.test("api/game/create:already registed user", async () => {
 Deno.test("api/game/create:invalid tournament id", async () => {
   const res = await ac.gameCreate({
     ...data,
-    tournamentId: v4.generate(),
+    tournamentId: randomUUID(),
     option: { dryRun: true },
   });
   assertEquals(res.data, errors.INVALID_TOURNAMENT_ID);

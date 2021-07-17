@@ -1,8 +1,7 @@
-import util from "../../util.js";
 import { assert, assertEquals, v4 } from "../deps.ts";
 
 //import { assert, assertEquals, test } from "../../asserts.js";
-import { pathResolver } from "../apiserver_util.ts";
+import { pathResolver, randomUUID } from "../apiserver_util.ts";
 import { diffTime, sleep } from "./client_util.ts";
 
 // @deno-types=../../client_js/api_client.d.ts
@@ -12,7 +11,7 @@ const ac = new ApiClient();
 const resolve = pathResolver(import.meta);
 
 const testScreenName = "高専太郎";
-const testName = util.uuid();
+const testName = randomUUID();
 const testPassword = "nit-taro-pw";
 const testSpec = "test";
 

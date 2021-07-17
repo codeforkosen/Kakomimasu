@@ -39,3 +39,5 @@ export const jsonParse = (): ServeHandler =>
       throw new ServerError(errors.INVALID_SYNTAX);
     }
   };
+
+export const randomUUID = () => crypto.randomUUID();

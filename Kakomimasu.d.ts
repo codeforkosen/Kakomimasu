@@ -170,7 +170,6 @@ export class Field {
 }
 
 export class Game {
-  public uuid: string;
   public board: Board;
   public players: Player[];
   public nturn: number;
@@ -215,7 +214,6 @@ export class Game {
   };
 
   toJSON(): {
-    gameId: typeof Game.prototype.uuid; //string;
     gaming: typeof Game.prototype.gaming; // boolean;
     ending: typeof Game.prototype.ending; //boolean;
     board: ReturnType<Board["toJSON"]> | null;
@@ -231,14 +229,14 @@ export class Game {
   };
 }
 
-export class Player {
+export class Player<T extends Game = Game> {
   public id: string;
   public spec: string;
-  public game: Game | null;
+  public game: T | null;
   public actions: Action[];
   public index: number;
 
-  constructor(id: string, spec: string);
+  constructor(id: string, spec?: string);
 
   static restore(data: Player): Player;
 
@@ -252,12 +250,14 @@ export class Player {
   getJSON(): {
     userId: typeof Player.prototype.id;
     spec: typeof Player.prototype.spec;
-    gameId: null | typeof Game.prototype.uuid;
     index: typeof Player.prototype.index;
   };
 }
 
-export abstract class Kakomimasu<T extends Game = Game> {
+export abstract class Kakomimasu<
+  T extends Game = Game,
+  P extends Player = Player,
+> {
   public games: T[];
   public boards: Board[];
 
@@ -270,5 +270,5 @@ export abstract class Kakomimasu<T extends Game = Game> {
   ): T;
   getGames(): T[];
   getFreeGames(): T[];
-  createPlayer(playername: string, spec?: string): Player;
+  createPlayer(playername: string, spec?: string): P;
 }

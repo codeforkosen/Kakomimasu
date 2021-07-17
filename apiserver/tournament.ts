@@ -4,8 +4,8 @@ import {
   contentTypeFilter,
   jsonParse,
   jsonResponse,
+  randomUUID,
 } from "./apiserver_util.ts";
-import util from "../util.js";
 import { TournamentFileOp } from "./parts/file_opration.ts";
 import { accounts } from "./user.ts";
 import { errors, ServerError } from "./error.ts";
@@ -38,7 +38,7 @@ export class Tournament implements ITournament {
     this.organizer = a.organizer || "";
     this.type = a.type;
     this.remarks = a.remarks || "";
-    this.id = a.id || util.uuid();
+    this.id = a.id || randomUUID();
     this.users = a.users || [];
     this.gameIds = a.gameIds || [];
   }
