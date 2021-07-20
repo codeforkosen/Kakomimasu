@@ -5,7 +5,7 @@
 <img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.drawio.png">
 
 ![.github/workflows/test.yml](https://github.com/codeforkosen/Kakomimasu/workflows/.github/workflows/test.yml/badge.svg)
-[![deno](https://taisukef.github.com/denolib/denobadge@1.3.3.svg)](https://deno.land/)
+[![deno](https://img.shields.io/static/v1?logo=deno&label=Deno&message=1.12.0)](https://deno.land/)
 
 <!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->
 
