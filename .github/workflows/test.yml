@@ -22,5 +22,5 @@ jobs:
           deno cache --import-map ./pages/import-map.json --config ./pages/tsconfig.json ./pages/route.tsx
       - name: Run test
         run: |
-          deno run -A ./apiserver/apiserver.ts --noViewer > /dev/null &
+          deno run -A ./apiserver/apiserver.ts > /dev/null &
           deno test -A
