@@ -1,16 +1,9 @@
-import {
-  createRouter,
-  denoPlugin,
-  esbuild,
-  parse,
-  serveStatic,
-} from "./deps.ts";
-const args = parse(Deno.args);
+import { createRouter, denoPlugin, esbuild, serveStatic } from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
 
-if (!args.noViewer) {
+async function createBundleJsFile() {
   const _bundle = await esbuild.build({
     entryPoints: ["file:///" + resolve("../pages/route.tsx")],
     plugins: [
@@ -20,7 +13,9 @@ if (!args.noViewer) {
     outfile: resolve("../public/app.bundle.js"),
     minify: true,
   });
+  console.log("Viewer started.");
 }
+createBundleJsFile();
 
 export const viewerRoutes = () => {
   const router = createRouter();
