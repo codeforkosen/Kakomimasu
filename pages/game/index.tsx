@@ -23,9 +23,8 @@ export default function () {
       setSocket(sock);
     };
     sock.onmessage = (event) => {
-      console.log("websocket2 onmessage");
       const res = JSON.parse(event.data) as WsGameRes;
-      console.log(res);
+      //console.log(res);
       if (res.type === "initial") {
         setGames(res.games);
       } else {
@@ -56,7 +55,7 @@ export default function () {
 
   useEffect(() => {
     if (socket && gameType) {
-      const q = ["sort:startAtUnixTime-asc", "is:newGame", `is:${gameType}`]
+      const q = ["sort:startAtUnixTime-desc", "is:newGame", `is:${gameType}`]
         .join(" ");
       console.log(q);
       const req: WsGameReq = {
@@ -68,12 +67,11 @@ export default function () {
   }, [gameType]);
 
   const getGames = () => {
-    const games_ = games.filter((game) => game.type === gameType)
-      .sort((a, b) => {
-        const aTime = a.startedAtUnixTime || 10000000000;
-        const bTime = b.startedAtUnixTime || 10000000000;
-        return bTime - aTime;
-      });
+    const games_ = games.sort((a, b) => {
+      const aTime = a.startedAtUnixTime || 10000000000;
+      const bTime = b.startedAtUnixTime || 10000000000;
+      return bTime - aTime;
+    });
     return games_;
   };
 
