@@ -26,10 +26,12 @@ const filterGame = (game: ExpGame, searchOptions: SearchOptions) => {
     if (so.op === "is") {
       if (so.value === "self" && game.type !== "self") {
         isMatched = false;
-      } else if (so.value === "normal" && game.type !== "normal") {
+      }
+      if (so.value === "normal" && game.type !== "normal") {
         isMatched = false;
       }
     }
+    if (so.op === "id" && so.value !== game.uuid) isMatched = false;
   });
   console.log(game.type, isMatched);
   return isMatched;

@@ -1,5 +1,5 @@
 /// <reference lib="dom"/>
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
@@ -24,7 +24,7 @@ import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import GameBoard from "../../components/gameBoard.tsx";
 
-import { Game, User } from "../../apiserver/types.ts";
+import { Game, User, WsGameReq, WsGameRes } from "../../apiserver/types.ts";
 
 function PointsGraph(props: { game: Game }) {
   const game = props.game;
@@ -88,42 +88,65 @@ function PointsGraph(props: { game: Game }) {
 export default function () {
   const { id } = useParams<{ id?: string }>();
 
-  const [game, setGame] = useState<Game | null | undefined>(undefined);
+  const [game, setGame] = useState<Game | null>();
+  const refGame = useRef(game);
 
   let socket: WebSocket;
-  //console.log("detail", id);
 
-  useEffect(() => {
-    if (!id) {
-      socket = new WebSocket(
-        ((window.location.protocol === "https:") ? "wss://" : "ws://") +
-          window.location.host + "/api/allGame",
-      );
-      socket.onmessage = (event) => {
-        console.log("websocket onmessage");
-        const games = JSON.parse(event.data) as Game[];
-        if (games.length === 0) setGame(null);
-        else setGame(games.reverse()[0]);
+  const connect = () => {
+    socket = new WebSocket(
+      ((window.location.protocol === "https:") ? "wss://" : "ws://") +
+        window.location.host + "/api/ws/game",
+    );
+    socket.onopen = () => {
+      const q =
+        (id
+          ? [`id:${id}`]
+          : ["sort:startAtUnixTime-desc", "is:newGame", `is:normal`])
+          .join(
+            " ",
+          );
+      console.log(q);
+      const req: WsGameReq = {
+        q,
+        endIndex: 1,
       };
-    } else {
-      socket = new WebSocket(
-        ((window.location.protocol === "https:") ? "wss://" : "ws://") +
-          window.location.host + "/api/ws/game/" + id,
-      );
-      socket.onmessage = (event) => {
-        const game = JSON.parse(event.data) as Game;
-        console.log("websocket onmessage", game);
-        setGame(game);
-      };
-    }
-    socket.onopen = (event) => {
-      console.log("websocket open");
+      socket.send(JSON.stringify(req));
+    };
+    socket.onmessage = (event) => {
+      const res = JSON.parse(event.data) as WsGameRes;
+      console.log(res);
+      if (res.type === "initial") {
+        if (res.games.length > 0) {
+          console.log("setGame");
+          setGame(res.games[0]);
+        } else {
+          setGame(null);
+        }
+      } else {
+        if (res.game.gameId === refGame.current?.gameId) {
+          setGame(res.game);
+        } else if (
+          (res.game.startedAtUnixTime ?? 10000000000) >
+            (refGame.current?.startedAtUnixTime ?? 10000000000)
+        ) {
+          connect();
+        }
+      }
     };
     return () => {
       socket.close();
       console.log("websocket close");
     };
+  };
+
+  useEffect(() => {
+    return connect();
   }, [id]);
+
+  useEffect(() => {
+    refGame.current = game;
+  }, [game]);
 
   return (
     <Content title="ゲーム詳細">
