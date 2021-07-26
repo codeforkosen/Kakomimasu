@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ToggleButtonGroup from "@material-ui/core/ToggleButtonGroup";
 import ToggleButton from "@material-ui/core/ToggleButton";
 
@@ -6,32 +6,66 @@ import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";
 import Clock from "../../components/clock.tsx";
 
-import { Game } from "../../apiserver/types.ts";
+import { Game, WsGameReq, WsGameRes } from "../../apiserver/types.ts";
 
 export default function () {
   const [games, setGames] = useState<Game[]>([]);
-  let socket: WebSocket;
+  const [socket, setSocket] = useState<WebSocket>();
+  const [gameType, setGameType] = React.useState<"normal" | "self">();
+  const refGames = useRef(games);
 
   useEffect(() => {
-    socket = new WebSocket(
+    const sock = new WebSocket(
       ((window.location.protocol === "https:") ? "wss://" : "ws://") +
-        window.location.host + "/api/allGame",
+        window.location.host + "/api/ws/game",
     );
-    socket.onopen = (event) => {
-      console.log("websocket open");
+    sock.onopen = () => {
+      setSocket(sock);
     };
-    socket.onmessage = (event) => {
-      console.log("websocket onmessage");
-      const games = JSON.parse(event.data) as Game[];
-      setGames(games);
+    sock.onmessage = (event) => {
+      console.log("websocket2 onmessage");
+      const res = JSON.parse(event.data) as WsGameRes;
+      console.log(res);
+      if (res.type === "initial") {
+        setGames(res.games);
+      } else {
+        const gs = refGames.current;
+        const updateGameIndex = gs.findIndex((g) =>
+          g.gameId === res.game.gameId
+        );
+        if (updateGameIndex >= 0) gs[updateGameIndex] = res.game;
+        else gs.push(res.game);
+        console.log(gs);
+        setGames([...gs]);
+      }
     };
+
     return () => {
-      socket.close();
+      sock.close();
       console.log("websocket close");
     };
   }, []);
 
-  const [gameType, setGameType] = React.useState<string>("normal");
+  useEffect(() => {
+    refGames.current = games;
+  }, [games]);
+
+  useEffect(() => {
+    if (socket) setGameType("normal");
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket && gameType) {
+      const q = ["sort:startAtUnixTime-asc", "is:newGame", `is:${gameType}`]
+        .join(" ");
+      console.log(q);
+      const req: WsGameReq = {
+        q,
+        //endIndex: 0,
+      };
+      socket.send(JSON.stringify(req));
+    }
+  }, [gameType]);
 
   const getGames = () => {
     const games_ = games.filter((game) => game.type === gameType)
