@@ -21,6 +21,7 @@ import { accounts, userRouter } from "./user.ts";
 import { gameRouter } from "./game.ts";
 import { matchRouter } from "./match.ts";
 import { viewerRoutes } from "./viewer.ts";
+import { wsRoutes } from "./ws.ts";
 
 export const kkmm = new ExpKakomimasu();
 kkmm.games.push(...LogFileOp.read());
@@ -123,6 +124,7 @@ const apiRoutes = () => {
   router.ws("allGame", wsAllGame);
   router.ws(new RegExp("^ws/game/(.+)$"), wsGetGame);
 
+  router.route("ws", wsRoutes());
   router.route("match", matchRouter());
   router.route("game", gameRouter());
   router.route("users", userRouter());
