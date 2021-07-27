@@ -7,7 +7,7 @@ import {
 } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
 import { errors, ServerError } from "./error.ts";
-import { kkmm, sendAllGame, sendGame } from "./apiserver.ts";
+import { kkmm } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";
 import { BoardFileOp } from "./parts/file_opration.ts";
 import { GameCreateReq } from "./types.ts";
@@ -34,10 +34,6 @@ export const gameRouter = () => {
       if (!reqJson.option?.dryRun) {
         game = kkmm.createGame(board, reqJson.name);
         game.type = "self";
-
-        game.changeFuncs.push(sendAllGame);
-        game.changeFuncs.push(sendGame);
-        sendAllGame();
       } else game = new ExpGame(board, reqJson.name);
 
       if (reqJson.playerIdentifiers) {

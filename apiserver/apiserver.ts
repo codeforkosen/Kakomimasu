@@ -29,100 +29,8 @@ kkmm.games.push(...LogFileOp.read());
 accounts.dataCheck(kkmm.getGames());
 tournaments.dataCheck(kkmm.getGames());
 
-//#region WebSocket
-let socks: WebSocket[] = [];
-
-const wsAllGame = async (sock: WebSocket) => {
-  await sock.send(
-    JSON.stringify(kkmm.getGames()),
-  );
-  socks.push(sock);
-
-  for await (const msg of sock) {
-    if (typeof msg === "string") {
-      //console.log(msg);
-    } else {
-      //console.log("err on ws", msg);
-      // ws { code: 0, reason: "" } -- close
-      // ws { code: 1001, reason: "" } -- 遮断
-      break;
-    }
-  }
-};
-
-let sendAllGameQue = 0;
-
-setInterval(() => {
-  if (sendAllGameQue === 0) return;
-  sendAllGameQue = 0;
-  const games = kkmm.getGames();
-
-  socks = socks.filter((s) => {
-    try {
-      if (!s.isClosed) {
-        s.send(
-          JSON.stringify(games),
-        );
-        return true;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return false;
-  });
-}, 1000);
-
-export const sendAllGame = () => {
-  sendAllGameQue++;
-};
-
-let getGameSocks: { sock: WebSocket; id: string }[] = [];
-
-const wsGetGame = async (sock: WebSocket, req: ServerRequest) => {
-  const id = req.match[1];
-
-  const game = getGame(id);
-  if (game) {
-    await sock.send(JSON.stringify(game));
-    if (!game.ending) {
-      getGameSocks.push({ sock: sock, id: id });
-      for await (const _msg of sock) {
-        //
-      }
-    }
-  }
-  if (!sock.isClosed) {
-    sock.close();
-  }
-};
-export const sendGame = (id: string) => {
-  const game = getGame(id);
-  if (game) {
-    getGameSocks = getGameSocks.filter((e) => {
-      if (e.id === id) {
-        try {
-          if (!e.sock.isClosed) {
-            e.sock.send(JSON.stringify(game));
-            return true;
-          }
-        } catch (e) {
-          console.log(e);
-        }
-        return false;
-      } else return true;
-    });
-  }
-};
-
-const getGame = (id: string) => {
-  return kkmm.getGames().find((e) => e.uuid === id);
-};
-
 const apiRoutes = () => {
   const router = createRouter();
-
-  router.ws("allGame", wsAllGame);
-  router.ws(new RegExp("^ws/game/(.+)$"), wsGetGame);
 
   router.route("ws", wsRoutes());
   router.route("match", matchRouter());
@@ -137,7 +45,6 @@ const apiRoutes = () => {
 
 // Port Listen
 const app = createApp();
-//app.use(serveJsx(resolve("../pages"), (f) => import("file:///" + f), Layout));
 app.route("/api/", apiRoutes());
 app.route("/", viewerRoutes());
 

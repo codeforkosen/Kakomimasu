@@ -46,6 +46,7 @@ class ExpGame extends Game {
     this.changeFuncs = [sendGame(this)];
     this.reservedUsers = [];
     this.type = "normal";
+    this.wsSend();
   }
 
   static restore(data: ExpGame) {

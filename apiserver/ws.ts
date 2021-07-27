@@ -39,7 +39,6 @@ const filterGame = (game: ExpGame, searchOptions: SearchOptions) => {
 
 export function sendGame(game: ExpGame) {
   return () => {
-    console.log("sendGame!!");
     clients.forEach((value, ws) => {
       console.log(game, value);
       if (!value.gameIds.some((id) => id === game.uuid)) {
