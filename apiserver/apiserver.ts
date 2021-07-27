@@ -1,6 +1,4 @@
-//import type { WebSocket } from "./deps.ts";
-import type { WebSocket } from "./mod.ts";
-import { config, createApp, createRouter, ServerRequest } from "./deps.ts";
+import { config, createApp, createRouter } from "./deps.ts";
 
 import * as util from "./apiserver_util.ts";
 const resolve = util.pathResolver(import.meta);
