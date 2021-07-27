@@ -6,6 +6,7 @@ import {
   jsonResponse,
 } from "./apiserver_util.ts";
 import { accounts } from "./user.ts";
+import { sendGame } from "./ws.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm } from "./apiserver.ts";
 import { tournaments } from "./tournament.ts";
@@ -34,6 +35,10 @@ export const gameRouter = () => {
       if (!reqJson.option?.dryRun) {
         game = kkmm.createGame(board, reqJson.name);
         game.type = "self";
+
+        const changeFunc = sendGame(game);
+        game.changeFuncs.push(changeFunc);
+        changeFunc();
       } else game = new ExpGame(board, reqJson.name);
 
       if (reqJson.playerIdentifiers) {

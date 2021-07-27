@@ -11,6 +11,7 @@ const resolve = pathResolver(import.meta);
 
 import util from "../util.js";
 import { accounts } from "./user.ts";
+import { sendGame } from "./ws.ts";
 import { errors, ServerError } from "./error.ts";
 import { kkmm } from "./apiserver.ts";
 import { aiList } from "./parts/ai-list.ts";
@@ -101,6 +102,7 @@ export const matchRouter = () => {
           game.name =
             `対AI戦：${user.screenName}(@${user.name}) vs AI(${ai.name})`;
 
+          game.changeFuncs.push(sendGame(game));
           game.attachPlayer(player);
           //accounts.addGame(user.userId, game.uuid);
           Deno.run(
@@ -127,6 +129,7 @@ export const matchRouter = () => {
             const brd = BoardFileOp.get(bname); //readBoard(bname);
             if (!brd) throw new ServerError(errors.INVALID_BOARD_NAME);
             const game = kkmm.createGame(brd);
+            game.changeFuncs.push(sendGame(game));
             freeGame.push(game);
           }
           freeGame[0].attachPlayer(player);

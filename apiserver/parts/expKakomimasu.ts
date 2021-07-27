@@ -1,10 +1,6 @@
 import util from "../../util.js";
 import { randomUUID } from "../apiserver_util.ts";
 
-import { sendGame } from "../ws.ts";
-
-//export * from "../../Kakomimasu.js";
-
 import {
   Action,
   Agent,
@@ -43,10 +39,9 @@ class ExpGame extends Game {
     this.name = name;
     this.startedAtUnixTime = null;
     this.nextTurnUnixTime = null;
-    this.changeFuncs = [sendGame(this)];
+    this.changeFuncs = [];
     this.reservedUsers = [];
     this.type = "normal";
-    this.wsSend();
   }
 
   static restore(data: ExpGame) {
