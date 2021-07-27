@@ -135,12 +135,24 @@ export interface Tournament extends TournamentBasic {
   gameIds?: string[];
 }
 
-/*export interface Tournament {
-  name: string;
-  organizer: string;
-  type: "round-robin" | "knockout";
-  remarks: string;
-  id: string;
-  users: string[];
-  gameIds: string[];
-}*/
+export interface WsGameReq {
+  q: string;
+  startIndex?: number;
+  endIndex?: number;
+}
+
+interface WsGameResInitial {
+  type: "initial";
+  q: string;
+  startIndex?: number;
+  endIndex?: number;
+  games: Game[];
+  gamesNum: number;
+}
+
+interface WsGameResUpdate {
+  type: "update";
+  game: Game;
+}
+
+export type WsGameRes = WsGameResInitial | WsGameResUpdate;

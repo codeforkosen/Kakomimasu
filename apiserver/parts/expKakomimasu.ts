@@ -1,8 +1,6 @@
 import util from "../../util.js";
 import { randomUUID } from "../apiserver_util.ts";
 
-//export * from "../../Kakomimasu.js";
-
 import {
   Action,
   Agent,
