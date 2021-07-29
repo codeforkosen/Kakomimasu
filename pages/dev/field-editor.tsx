@@ -1,6 +1,6 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import { Link, Redirect, RouteComponentProps } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -14,18 +14,16 @@ const apiClient = new ApiClient("");
 
 import { Board, Game } from "../../apiserver/types.ts";
 
-const useStyles = makeStyles(
-  createStyles({
-    content: {
-      display: "flex",
-      alignItems: "center",
-      flexDirection: "column",
-    },
-    pieGraph: {
-      height: 300,
-    },
-  }),
-);
+const useStyles = makeStyles({
+  content: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  pieGraph: {
+    height: 300,
+  },
+});
 
 type NestedPartial<T> = {
   [K in keyof T]?: T[K] extends Array<infer R> ? Array<NestedPartial<R>>
