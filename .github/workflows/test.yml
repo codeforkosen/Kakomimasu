@@ -32,7 +32,6 @@ jobs:
         with: 
           deno-version: v1.x
       - name: Run test
-        if: runner.os == 'Windows'
         run: |
           deno run -A ./apiserver/apiserver.ts > $null &
           deno test -A
@@ -44,7 +43,6 @@ jobs:
         with: 
           deno-version: v1.x
       - name: Run test
-        if: runner.os == 'Windows'
         run: |
           deno run -A ./apiserver/apiserver.ts > /dev/null &
           deno test -A
