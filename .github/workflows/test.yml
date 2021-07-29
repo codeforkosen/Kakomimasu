@@ -1,16 +1,9 @@
 on: [push]
 
 jobs:
-  test:
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  test_ubuntu-latest:
+    runs-on: ubuntu-latest
     steps:
-      - name: Set git to use LF
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
         with: 
@@ -27,13 +20,31 @@ jobs:
       - name: Run cache & check(viewer)
         run: |
           deno cache --import-map ./pages/import-map.json --config ./pages/tsconfig.json ./pages/route.tsx
-      - name: Run test(Unix)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Run test
         run: |
           deno run -A ./apiserver/apiserver.ts > /dev/null &
           deno test -A
-      - name: Run test(Windows)
+  test_windows-latest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with: 
+          deno-version: v1.x
+      - name: Run test
         if: runner.os == 'Windows'
         run: |
           deno run -A ./apiserver/apiserver.ts > $null &
+          deno test -A
+  test_macos-latest:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with: 
+          deno-version: v1.x
+      - name: Run test
+        if: runner.os == 'Windows'
+        run: |
+          deno run -A ./apiserver/apiserver.ts > /dev/null &
           deno test -A
