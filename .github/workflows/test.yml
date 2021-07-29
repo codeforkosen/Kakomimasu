@@ -2,7 +2,7 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest,windows-latest,macos-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
@@ -20,7 +20,13 @@ jobs:
       - name: Run cache & check(viewer)
         run: |
           deno cache --import-map ./pages/import-map.json --config ./pages/tsconfig.json ./pages/route.tsx
-      - name: Run test
+      - name: Run test(Unix)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           deno run -A ./apiserver/apiserver.ts > /dev/null &
+          deno test -A
+      - name: Run test(Windows)
+        if: runner.os == "Windows"
+        run: |
+          deno run -A ./apiserver/apiserver.ts > $null &
           deno test -A
