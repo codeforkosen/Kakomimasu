@@ -26,7 +26,7 @@ jobs:
           deno run -A ./apiserver/apiserver.ts > /dev/null &
           deno test -A
       - name: Run test(Windows)
-        if: runner.os == "Windows"
+        if: runner.os == 'Windows'
         run: |
           deno run -A ./apiserver/apiserver.ts > $null &
           deno test -A
