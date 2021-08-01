@@ -15,6 +15,7 @@ class KakomimasuClient {
     if (!args.aiOnly) this.bearerToken = Deno.env.get("bearerToken");
     console.log(args.local);
     if (args.local) this.setServerHost("http://localhost:8880");
+    else if (args.host) this.setServerHost(args.host);
     else this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
