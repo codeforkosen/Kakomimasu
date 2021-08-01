@@ -1,7 +1,7 @@
 on: [push]
 
 jobs:
-  test:
+  test_ubuntu-latest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +20,28 @@ jobs:
       - name: Run cache & check(viewer)
         run: |
           deno cache --import-map ./pages/import-map.json --config ./pages/tsconfig.json ./pages/route.tsx
+      - name: Run test
+        run: |
+          deno run -A ./apiserver/apiserver.ts > /dev/null &
+          deno test -A
+  test_windows-latest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with: 
+          deno-version: v1.x
+      - name: Run test
+        run: |
+          deno run -A ./apiserver/apiserver.ts > $null &
+          deno test -A
+  test_macos-latest:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with: 
+          deno-version: v1.x
       - name: Run test
         run: |
           deno run -A ./apiserver/apiserver.ts > /dev/null &

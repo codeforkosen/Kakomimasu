@@ -1,14 +1,14 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { Theme, useTheme } from "@material-ui/core/styles";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 
 import { Tournament } from "../apiserver/types.ts";
 
-const useStyles = makeStyles(createStyles({
+const useStyles = makeStyles({
   tournament: (theme: Theme) => ({
     border: "solid 3px",
     borderColor: theme.palette.secondary.main,
@@ -38,7 +38,7 @@ const useStyles = makeStyles(createStyles({
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
-}));
+});
 
 export default function (props: { tournament: Tournament }) {
   const theme = useTheme();

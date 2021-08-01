@@ -1,2 +1,2 @@
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
--j test
+-j test_ubuntu-latest
