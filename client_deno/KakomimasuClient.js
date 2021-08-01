@@ -4,7 +4,7 @@ import ApiClient from "../client_js/api_client.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
 class KakomimasuClient {
-  apiClient = new ApiClient("https://practice.kakomimasu.website");
+  apiClient = new ApiClient("https://kakomimasu.website");
 
   constructor(id, name, spec, password) {
     dotenv.config();
