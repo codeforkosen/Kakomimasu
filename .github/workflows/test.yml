@@ -31,6 +31,9 @@ jobs:
       - uses: denoland/setup-deno@v1
         with: 
           deno-version: v1.x
+      - name: Run cache
+        run: |
+          deno cache ./apiserver/apiserver.ts
       - name: Run test
         run: |
           deno run -A ./apiserver/apiserver.ts > $null &
@@ -42,6 +45,9 @@ jobs:
       - uses: denoland/setup-deno@v1
         with: 
           deno-version: v1.x
+      - name: Run cache
+        run: |
+          deno cache ./apiserver/apiserver.ts
       - name: Run test
         run: |
           deno run -A ./apiserver/apiserver.ts > /dev/null &
