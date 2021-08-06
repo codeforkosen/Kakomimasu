@@ -132,14 +132,14 @@ Deno.test("send action", async () => {
   }
   const gameInfo = res.data;
   if (!gameInfo.startedAtUnixTime) throw Error("startedAtUnixTime is null.");
-  await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
+  await sleep(diffTime(gameInfo.startedAtUnixTime) + 0.3);
   await ac.setAction(gameId, {
     actions: [{ agentId: 0, type: "PUT", x: 1, y: 1 }],
   }, "Bearer " + bearerToken);
   //console.log(reqJson);
 
   if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
-  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 0.3);
   res = await ac.getMatch(gameId);
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
