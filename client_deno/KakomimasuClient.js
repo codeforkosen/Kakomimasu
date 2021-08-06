@@ -178,7 +178,7 @@ class KakomimasuClient {
   async setActions(actions) { // void
     const res = await this.apiClient.setAction(
       this.gameId,
-      { actions },
+      { actions, index: this.pno },
       "Bearer " + this.bearerToken,
     );
     console.log("setActions", res);
