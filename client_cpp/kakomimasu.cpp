@@ -59,15 +59,6 @@ string curlPost(string req, string post_data, string bearer = "") {
     return res;
 }
 
-void userRegist(string screenName, string name, string password) {
-    picojson::object send_obj;
-    send_obj.emplace(make_pair("screenName", screenName));
-    send_obj.emplace(make_pair("name", name));
-    send_obj.emplace(make_pair("password", password));
-
-    string res = curlPost("/users/regist", picojson::value(send_obj).serialize());
-}
-
 string userShow(string identifier) {
     string res = curlGet("/users/show/" + identifier);
     cout << res << endl;
