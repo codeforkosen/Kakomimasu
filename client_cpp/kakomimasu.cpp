@@ -37,7 +37,7 @@ string curlGet(string req, string token = "") {
     return res;
 }
 
-string curlPost(string req, string post_data, string token = "") {
+string curlPost(string req, string post_data, string bearer = "") {
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
@@ -47,7 +47,7 @@ string curlPost(string req, string post_data, string token = "") {
             i++;
         }
     }
-    snprintf(cmdline, sz, "curl --request POST --header \"Authorization: %s\" --header \"Content-Type: application/json\" --data %s \"%s%s\"", token.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d %s \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
 #ifdef _MSC_VER
     FILE *fp = _popen(cmdline, "r");
 #else
@@ -80,18 +80,8 @@ int rnd(int n) {
     return engine() % n;
 }
 
-KakomimasuClient::KakomimasuClient(string id, string name, string spec, string password) {
-    string res = userShow(id);
-    picojson::value val;
-    picojson::parse(val, res);
-    picojson::object obj = val.get<picojson::object>();
-
-    if (!obj["errorCode"].is<picojson::null>()) {
-        userRegist(name, id, password);
-        cout << "ユーザー登録しました" << endl;
-    }
-    m_name = id;
-    m_password = password;
+KakomimasuClient::KakomimasuClient(string bearer) {
+    m_bearer = bearer;
 }
 
 bool KakomimasuClient::getGameInfo() {
@@ -111,16 +101,12 @@ bool KakomimasuClient::getGameInfo() {
 
 void KakomimasuClient::waitMatching() {
     picojson::object send_obj;
-    send_obj.emplace(make_pair("name", m_name));
-    send_obj.emplace(make_pair("password", m_password));
-
-    string res = curlPost("/match", picojson::value(send_obj).serialize());
+    string res = curlPost("/match", picojson::value(send_obj).serialize(), m_bearer);
 
     picojson::value val;
     picojson::parse(val, res);
     picojson::object obj = val.get<picojson::object>();
 
-    //cout << res << endl;
     m_token = obj["accessToken"].get<string>();
     m_game_id = obj["gameId"].get<string>();
     m_player_no = obj["index"].get<double>();
@@ -250,5 +236,5 @@ void KakomimasuClient::setAction(vector<Action> action) {
     post_data.erase(post_data.size() - 1);
     post_data += "]}";
 
-    cout << curlPost("/match/" + m_game_id + "/action", post_data, m_token) << endl;
+    cout << curlPost("/match/" + m_game_id + "/action", post_data, m_bearer) << endl;
 };
