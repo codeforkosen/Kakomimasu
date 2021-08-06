@@ -13,7 +13,8 @@ struct Tile_info {
 };
 
 int main() {
-    KakomimasuClient kc("ai-5", "AI-5", "破壊者改", "ai-5-pw");
+    // 自分のbearerTokenを書く
+    KakomimasuClient kc("");
     kc.waitMatching();
     kc.getGameInfo();
 

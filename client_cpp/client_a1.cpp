@@ -1,7 +1,8 @@
 #include "kakomimasu.h"
 
 int main() {
-    KakomimasuClient kc("ai-1", "AI-1", "", "ai-1-pw");
+    // 自分のbearerTokenを書く
+    KakomimasuClient kc("");
     kc.waitMatching();
     kc.getGameInfo();
 

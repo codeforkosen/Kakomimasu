@@ -1,7 +1,8 @@
 #include "kakomimasu.h"
 
 int main() {
-    KakomimasuClient kc("ai-none", "AI-NONE", "なにもしない", "ai-none-pw");
+    // 自分のbearerTokenを書く
+    KakomimasuClient kc("");
     kc.waitMatching();
 
     return 0;
