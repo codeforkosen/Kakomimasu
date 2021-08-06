@@ -224,7 +224,7 @@ void KakomimasuClient::setAction(vector<Action> action) {
 
     picojson::object send_obj;
     send_obj.emplace(make_pair("actions", arr));
-    send_obj.emplace(make_pair("index", m_player_no));
+    send_obj.emplace(make_pair("index", (double)m_player_no));
 
     picojson::value val(send_obj);
     string post_data = val.serialize();
