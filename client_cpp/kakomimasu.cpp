@@ -107,7 +107,6 @@ void KakomimasuClient::waitMatching() {
     picojson::parse(val, res);
     picojson::object obj = val.get<picojson::object>();
 
-    m_token = obj["accessToken"].get<string>();
     m_game_id = obj["gameId"].get<string>();
     m_player_no = obj["index"].get<double>();
 
