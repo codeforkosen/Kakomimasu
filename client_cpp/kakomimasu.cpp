@@ -220,8 +220,7 @@ void KakomimasuClient::waitNextTurn() {
 }
 
 void KakomimasuClient::setAction(vector<Action> action) {
-    string post_data = "{\"actions\":[";
-
+    picojson::array arr;
     for (const auto &[agentId, type, x, y] : action) {
         picojson::object obj;
         obj.emplace(make_pair("agentId", picojson::value((double)agentId)));
@@ -229,11 +228,14 @@ void KakomimasuClient::setAction(vector<Action> action) {
         obj.emplace(make_pair("x", picojson::value((double)x)));
         obj.emplace(make_pair("y", picojson::value((double)y)));
 
-        picojson::value val(obj);
-        post_data += val.serialize() + ",";
+        arr.push_back(picojson::value(obj));
     }
-    post_data.erase(post_data.size() - 1);
-    post_data += "]}";
+
+    picojson::object send_obj;
+    send_obj.emplace(make_pair("actions", arr));
+
+    picojson::value val(send_obj);
+    string post_data = val.serialize();
 
     cout << curlPost("/match/" + m_game_id + "/action", post_data, m_bearer) << endl;
 };
