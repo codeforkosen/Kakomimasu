@@ -70,6 +70,7 @@ export interface ActionPost {
 
 export interface ActionReq extends ApiOption {
   actions: ActionPost[];
+  index?: number;
 }
 
 export interface ActionRes {
