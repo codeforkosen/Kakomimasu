@@ -163,10 +163,21 @@ export const matchRouter = () => {
       if (!game) throw new ServerError(errors.NOT_GAME);
 
       const authedUserId = req.getString("authed_userId");
-      const player = game.players.find((p) => p.id === authedUserId);
+      const actionData = req.get("data") as ActionReq;
+
+      const isPluralUser = () => {
+        return game.players.filter((p) => p.id === authedUserId).length !== 1;
+      };
+      let player;
+      if (isPluralUser()) {
+        player = game.players.find((p, i) =>
+          p.id === authedUserId && i === actionData.index
+        );
+      } else {
+        player = game.players.find((p) => p.id === authedUserId);
+      }
       if (!player) throw new ServerError(errors.INVALID_USER_AUTHORIZATION);
 
-      const actionData = req.get("data") as ActionReq;
       if (actionData.actions.some((a) => !ActionPost.isEnable(a))) {
         throw new ServerError(errors.INVALID_ACTION);
       }
