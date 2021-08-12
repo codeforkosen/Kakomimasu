@@ -6,12 +6,12 @@
     "@material-ui/core/": "https://esm.sh/@material-ui/core@5.0.0-beta.2/",
     "@material-ui/icons/": "https://esm.sh/@material-ui/icons@5.0.0-beta.1/",
     "@material-ui/styles": "https://esm.sh/@material-ui/styles@5.0.0-beta.2",
-    "recharts": "https://cdn.esm.sh/recharts@2.0.8?deps=react@17.0.2",
+    "recharts": "https://esm.sh/recharts@2.0.8",
     "react-firebaseui/": "https://esm.sh/react-firebaseui/",
-    "https://cdn.esm.sh/v43/@types/react@17.0.2/": "https://cdn.esm.sh/v43/@types/react@17.0.15/",
-    "https://cdn.esm.sh/v43/@types/react@17.0.11/": "https://cdn.esm.sh/v43/@types/react@17.0.15/",
-    "https://cdn.esm.sh/v43/@types/react@17.0.14/": "https://cdn.esm.sh/v43/@types/react@17.0.15/",
+    "https://esm.sh/v45/@types/react@17.0.17/": "https://cdn.esm.sh/v45/@types/react@17.0.16/",
+    "https://cdn.esm.sh/v45/prop-types@15.7.2/deno/prop-types.js": "https://cdn.esm.sh/v43/prop-types@15.7.2/deno/prop-types.js",
+    "https://cdn.esm.sh/v45/react-transition-group@2.9.0/deno/react-transition-group.js": "https://cdn.esm.sh/v43/react-transition-group@2.9.0/deno/react-transition-group.js",
     "https://cdn.esm.sh/v43/@firebase/app@0.6.27/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
-    "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/dist/cjs/": "https://cdn.esm.sh/v43/@popperjs/core@2.9.2/lib/"
+    "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/dist/cjs/": "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/lib/"
   }
 }
