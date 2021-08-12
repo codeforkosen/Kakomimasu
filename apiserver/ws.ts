@@ -15,7 +15,7 @@ const analyzeStringSearchOption = (q: string) => {
       return { op: "match", value: sp[0] };
     } else return { op: sp[0], value: sp[1] };
   });
-  console.log(qs);
+  //console.log(qs);
 
   return qs;
 };
@@ -33,14 +33,14 @@ const filterGame = (game: ExpGame, searchOptions: SearchOptions) => {
     }
     if (so.op === "id" && so.value !== game.uuid) isMatched = false;
   });
-  console.log(game.type, isMatched);
+  //console.log(game.type, isMatched);
   return isMatched;
 };
 
 export function sendGame(game: ExpGame) {
   return () => {
     clients.forEach((value, ws) => {
-      console.log(game, value);
+      //console.log(game, value);
       if (!value.gameIds.some((id) => id === game.uuid)) {
         if (
           value.searchOption.some((so) =>
@@ -66,74 +66,65 @@ export const wsRoutes = () => {
   router.ws(
     "/game",
     (async (sock) => {
-      console.log("ws connected.");
+      //console.log("ws connected.");
       const client: MapValue = { searchOption: [], gameIds: [] };
       clients.set(sock, client);
 
-      for await (const ev of sock) {
-        if (isWebSocketCloseEvent(ev)) {
-          console.log(clients);
-          clients.delete(sock);
-          console.log(clients);
-        }
-        if (typeof ev !== "string") continue;
-
-        const { q, startIndex: sIdx, endIndex: eIdx } = JSON.parse(ev);
-
-        // check json type
-        if (typeof q !== "string") continue;
-        if (typeof sIdx !== "number" && typeof sIdx !== "undefined") continue;
-        if (typeof eIdx !== "number" && typeof eIdx !== "undefined") continue;
-
-        const searchOptions = analyzeStringSearchOption(q);
-        client.searchOption = searchOptions;
-
-        const games = kkmm.getGames().sort((a, b) => {
-          const sort = searchOptions.find((query) => query.op === "sort");
-          if (!sort) return 0;
-          const v = sort.value;
-          if (v === "startAtUnixTime-desc") {
-            return (b.startedAtUnixTime ?? 10000000000) -
-              (a.startedAtUnixTime ?? 10000000000);
-          } else if (v === "startAtUnixTime-asc") {
-            return (a.startedAtUnixTime ?? 10000000000) -
-              (b.startedAtUnixTime ?? 10000000000);
+      try {
+        for await (const ev of sock) {
+          if (isWebSocketCloseEvent(ev)) {
+            clients.delete(sock);
           }
-          return 0;
-        }).filter((game) => filterGame(game, searchOptions));
+          if (typeof ev !== "string") continue;
 
-        const gamesNum = games.length;
-        const slicedGames = games.slice(sIdx, eIdx);
-        client.gameIds = slicedGames.map((g) => g.uuid);
-        const body: WsGameRes = {
-          type: "initial",
-          q,
-          startIndex: sIdx,
-          endIndex: eIdx,
-          games: slicedGames.map((g) => g.toJSON()),
-          gamesNum,
-        };
+          const { q, startIndex: sIdx, endIndex: eIdx } = JSON.parse(ev);
 
-        sock.send(JSON.stringify(body));
-        console.log(ev);
+          // check json type
+          if (typeof q !== "string") continue;
+          if (typeof sIdx !== "number" && typeof sIdx !== "undefined") continue;
+          if (typeof eIdx !== "number" && typeof eIdx !== "undefined") continue;
+
+          const searchOptions = analyzeStringSearchOption(q);
+          client.searchOption = searchOptions;
+
+          const games = kkmm.getGames().sort((a, b) => {
+            const sort = searchOptions.find((query) => query.op === "sort");
+            if (!sort) return 0;
+            const v = sort.value;
+            if (v === "startAtUnixTime-desc") {
+              return (b.startedAtUnixTime ?? 10000000000) -
+                (a.startedAtUnixTime ?? 10000000000);
+            } else if (v === "startAtUnixTime-asc") {
+              return (a.startedAtUnixTime ?? 10000000000) -
+                (b.startedAtUnixTime ?? 10000000000);
+            }
+            return 0;
+          }).filter((game) => filterGame(game, searchOptions));
+
+          const gamesNum = games.length;
+          const slicedGames = games.slice(sIdx, eIdx);
+          client.gameIds = slicedGames.map((g) => g.uuid);
+          const body: WsGameRes = {
+            type: "initial",
+            q,
+            startIndex: sIdx,
+            endIndex: eIdx,
+            games: slicedGames.map((g) => g.toJSON()),
+            gamesNum,
+          };
+
+          sock.send(JSON.stringify(body));
+          //console.log(ev);
+        }
+      } catch (e) {
+        if (e instanceof Deno.errors.ConnectionAborted) {
+          clients.delete(sock);
+        } else {
+          console.log(e);
+        }
       }
     }),
   );
 
   return router;
 };
-/*await sock.send(
-            JSON.stringify(kkmm.getGames()),
-          );
-          socks.push(sock);
-
-          for await (const msg of sock) {
-            if (typeof msg === "string") {
-              //console.log(msg);
-            } else {
-              //console.log("err on ws", msg);
-              // ws { code: 0, reason: "" } -- close
-              // ws { code: 1001, reason: "" } -- 遮断
-              break;
-            }
-          }*/
