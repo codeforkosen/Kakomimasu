@@ -185,7 +185,7 @@ export const tournamentRouter = () => {
     async (req) => {
       const query = req.query;
       const tournamentId = query.get("id");
-      console.log(tournamentId);
+      //console.log(tournamentId);
       if (!tournamentId) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
       let tournament = tournaments.get(tournamentId);
       if (!tournament) throw new ServerError(errors.INVALID_TOURNAMENT_ID);
