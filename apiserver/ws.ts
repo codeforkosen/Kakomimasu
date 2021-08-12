@@ -40,6 +40,10 @@ const filterGame = (game: ExpGame, searchOptions: SearchOptions) => {
 export function sendGame(game: ExpGame) {
   return () => {
     clients.forEach((value, ws) => {
+      if (ws.isClosed) {
+        clients.delete(ws);
+        return;
+      }
       //console.log(game, value);
       if (!value.gameIds.some((id) => id === game.uuid)) {
         if (
