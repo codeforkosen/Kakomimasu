@@ -182,7 +182,7 @@ class KakomimasuClient {
       { actions, index: this.pno },
       "Bearer " + this.bearerToken,
     );
-    console.log("setActions", res);
+    //console.log("setActions", res);
     if (res.success === false) throw Error("Set Action Error");
   }
 
