@@ -51,8 +51,11 @@ string curlPost(string req, string post_data, string bearer = "") {
             i++;
         }
     }
-#endif
+    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d %s \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#else
     snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d '%s' \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#endif
+
 #ifdef _MSC_VER
     FILE *fp = _popen(cmdline, "r");
 #else
