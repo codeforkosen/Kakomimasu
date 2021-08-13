@@ -23,6 +23,7 @@ static size_t callbackWrite(char *ptr, size_t size, size_t nmemb, string *stream
 }
 
 string curlGet(string req, string token = "") {
+    // cout << "GET " << req << endl;
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
@@ -34,20 +35,24 @@ string curlGet(string req, string token = "") {
 #endif
     fgets(buf, sz, fp);
     string res(buf);
+    // cout << res << endl;
     return res;
 }
 
 string curlPost(string req, string post_data, string bearer = "") {
+    // cout << "POST " << req << endl;
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
+#ifdef _WIN64
     for (int i = 0; i < post_data.size(); ++i) {
         if (post_data[i] == '"') {
             post_data.insert(i, "\\");
             i++;
         }
     }
-    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d %s \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#endif
+    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d '%s' \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
 #ifdef _MSC_VER
     FILE *fp = _popen(cmdline, "r");
 #else
@@ -56,6 +61,7 @@ string curlPost(string req, string post_data, string bearer = "") {
 
     fgets(buf, sz, fp);
     string res(buf);
+    // cout << res << endl;
     return res;
 }
 
