@@ -170,8 +170,7 @@ Deno.test("send action(Turn 2)", async () => {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
   }
   const gameInfo = res.data;
-  if (!gameInfo.startedAtUnixTime) throw Error("startedAtUnixTime is null.");
-  await sleep(diffTime(gameInfo.startedAtUnixTime) + 0.3);
+
   await ac.setAction(gameId, {
     actions: [{ agentId: 0, type: "PUT", x: 1, y: 2 }],
     index: 1,
