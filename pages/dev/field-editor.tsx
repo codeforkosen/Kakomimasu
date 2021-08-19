@@ -168,9 +168,11 @@ export default function () {
             return <MenuItem value={board.name}>{board.name}</MenuItem>;
           })}
         </TextField>
-        {game && <div id="game-board">
-          <GameBoard game={game} />
-        </div>}
+        {game && (
+          <div id="game-board">
+            <GameBoard game={game} />
+          </div>
+        )}
       </div>
     </Content>
   );

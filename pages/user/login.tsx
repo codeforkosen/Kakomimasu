@@ -158,29 +158,35 @@ export default function () {
 
   return (
     <Content title="ログイン">
-      {<div className={classes.content}>
-        {user !== undefined
-          ? <>
-            {(user === null)
-              ? <StyledFirebaseAuth
-                uiConfig={{
-                  signInSuccessUrl: "/user/login?signInSuccess=true",
-                  signInOptions: [
-                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    //props.firebaseP.auth.FacebookAuthProvider.PROVIDER_ID,
-                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-                    firebase.auth.GithubAuthProvider.PROVIDER_ID,
-                    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                    firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-                    //firebaseP.auth.AnonymousAuthProvider.PROVIDER_ID
-                  ],
-                }}
-                firebaseAuth={firebase.auth()}
-              />
-              : <Signup user={user} />}
-          </>
-          : <CircularProgress color="secondary" />}
-      </div>}
+      {(
+        <div className={classes.content}>
+          {user !== undefined
+            ? (
+              <>
+                {(user === null)
+                  ? (
+                    <StyledFirebaseAuth
+                      uiConfig={{
+                        signInSuccessUrl: "/user/login?signInSuccess=true",
+                        signInOptions: [
+                          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                          //props.firebaseP.auth.FacebookAuthProvider.PROVIDER_ID,
+                          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                          firebase.auth.GithubAuthProvider.PROVIDER_ID,
+                          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                          firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                          //firebaseP.auth.AnonymousAuthProvider.PROVIDER_ID
+                        ],
+                      }}
+                      firebaseAuth={firebase.auth()}
+                    />
+                  )
+                  : <Signup user={user} />}
+              </>
+            )
+            : <CircularProgress color="secondary" />}
+        </div>
+      )}
     </Content>
   );
 }

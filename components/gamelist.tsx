@@ -183,16 +183,20 @@ const GameList = (props: {
                               {(() => {
                                 const user = getUser(player.id);
                                 return user
-                                  ? <span>
-                                    <Link
-                                      to={`/user/detail/${user.name}`}
-                                    >
-                                      {user.screenName}
-                                    </Link>
-                                  </span>
-                                  : <span className={classes.un}>
-                                    No player
-                                  </span>;
+                                  ? (
+                                    <span>
+                                      <Link
+                                        to={`/user/detail/${user.name}`}
+                                      >
+                                        {user.screenName}
+                                      </Link>
+                                    </span>
+                                  )
+                                  : (
+                                    <span className={classes.un}>
+                                      No player
+                                    </span>
+                                  );
                               })()}
                               <br />
                               {getPoint(player)}
@@ -205,40 +209,44 @@ const GameList = (props: {
                   <TableCell>
                     {game.gameName
                       ? <div className={classes.gameName}>{game.gameName}</div>
-                      : <div className={`${classes.un} ${classes.gameName}`}>
-                        Untitle
-                      </div>}
+                      : (
+                        <div className={`${classes.un} ${classes.gameName}`}>
+                          Untitle
+                        </div>
+                      )}
                     <div className={classes.gameId}>{game.gameId}</div>
                   </TableCell>
                   <TableCell>{getStartTime(game.startedAtUnixTime)}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
-          {pagenation && <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[10, 20, 30, { label: "すべて", value: -1 }]}
-                colSpan={4}
-                count={games.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: {
-                    "aria-label": "1ページあたりの行数",
-                  },
-                  native: true,
-                }}
-                onPageChange={(_, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(
-                  event: React.ChangeEvent<{ value: string }>,
-                ) => {
-                  setRowsPerPage(parseInt(event.target.value, 10));
-                  setPage(0);
-                }}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>}
+          {pagenation && (
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[10, 20, 30, { label: "すべて", value: -1 }]}
+                  colSpan={4}
+                  count={games.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: {
+                      "aria-label": "1ページあたりの行数",
+                    },
+                    native: true,
+                  }}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                  onRowsPerPageChange={(
+                    event: React.ChangeEvent<{ value: string }>,
+                  ) => {
+                    setRowsPerPage(parseInt(event.target.value, 10));
+                    setPage(0);
+                  }}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          )}
         </Table>
       </TableContainer>
     </div>

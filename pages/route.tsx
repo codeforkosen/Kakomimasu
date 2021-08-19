@@ -61,44 +61,48 @@ const theme = createTheme({
 
 function MainContents(props: { style: React.CSSProperties }) {
   console.log("main contents", firebase);
-  return (<main style={props.style}>
-    <Switch>
-      <Redirect exact from="/" to="/index" />
-      <Route path="/index" component={Index} />
+  return (
+    <main style={props.style}>
+      <Switch>
+        <Redirect exact from="/" to="/index" />
+        <Route path="/index" component={Index} />
 
-      <Route
-        path="/game"
-        render={(routeProps) => <Game />}
-      />
+        <Route
+          path="/game"
+          render={(routeProps) => <Game />}
+        />
 
-      <Route path="/user" component={User} />
-      <Route path="/tournament" component={Tournament} />
-      <Route
-        path="/dev"
-        render={(routeProps) => <Dev {...routeProps} />}
-      />
-      <Redirect push={false} from="" to="/404" />
-      <Route component={NotFound} />
-    </Switch>
-  </main>);
+        <Route path="/user" component={User} />
+        <Route path="/tournament" component={Tournament} />
+        <Route
+          path="/dev"
+          render={(routeProps) => <Dev {...routeProps} />}
+        />
+        <Redirect push={false} from="" to="/404" />
+        <Route component={NotFound} />
+      </Switch>
+    </main>
+  );
 }
 
 function Layout() {
-  return (<BrowserRouter>
-    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Header firebase={firebase} />
-      <MainContents
-        style={{
-          flexGrow: 1,
-          width: "90%",
-          maxWidth: "1000px",
-          padding: "3em 0",
-          margin: "0 auto",
-        }}
-      />
-      <Footer />
-    </div>
-  </BrowserRouter>);
+  return (
+    <BrowserRouter>
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <Header firebase={firebase} />
+        <MainContents
+          style={{
+            flexGrow: 1,
+            width: "90%",
+            maxWidth: "1000px",
+            padding: "3em 0",
+            margin: "0 auto",
+          }}
+        />
+        <Footer />
+      </div>
+    </BrowserRouter>
+  );
 }
 
 function Main() {

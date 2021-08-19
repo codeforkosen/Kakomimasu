@@ -67,42 +67,51 @@ export default function (props: Props) {
           </Link>
         </div>
         {user !== undefined &&
-          <>
-            {user && verified
-              ? <>
-                <Button variant="text" color="inherit" onClick={logOut}>
-                  ログアウト
-                </Button>
-                <div
-                  aria-controls="user-icon"
-                  onClick={handleClick}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Avatar src={user.photoURL ? user.photoURL : ""} />
-                </div>
-                <Menu
-                  id="user-icon"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handleClose}>
-                    <Link to="/user/detail" style={{ textDecoration: "none" }}>
-                      マイページ
-                    </Link>
-                  </MenuItem>
-                </Menu>
-              </>
-              : <Button
-                variant="text"
-                color="inherit"
-                component={Link}
-                to="/user/login"
-              >
-                ログイン・新規登録
-              </Button>}
-          </>}
+          (
+            <>
+              {user && verified
+                ? (
+                  <>
+                    <Button variant="text" color="inherit" onClick={logOut}>
+                      ログアウト
+                    </Button>
+                    <div
+                      aria-controls="user-icon"
+                      onClick={handleClick}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <Avatar src={user.photoURL ? user.photoURL : ""} />
+                    </div>
+                    <Menu
+                      id="user-icon"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <MenuItem onClick={handleClose}>
+                        <Link
+                          to="/user/detail"
+                          style={{ textDecoration: "none" }}
+                        >
+                          マイページ
+                        </Link>
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )
+                : (
+                  <Button
+                    variant="text"
+                    color="inherit"
+                    component={Link}
+                    to="/user/login"
+                  >
+                    ログイン・新規登録
+                  </Button>
+                )}
+            </>
+          )}
       </Toolbar>
     </AppBar>
   );
