@@ -184,7 +184,7 @@ Deno.test("send action(Turn 2)", async () => {
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
   }
-  Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
 
   //console.log(res);
   //console.log(JSON.stringify(reqJson, null, 2));
