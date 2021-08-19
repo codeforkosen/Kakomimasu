@@ -2,21 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import { Link, useHistory } from "react-router-dom";
-import Table from "@material-ui/core/Table";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableFooter from "@material-ui/core/TableFooter";
-import TablePagination from "@material-ui/core/TablePagination";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
+import { Table } from "@material-ui/core";
+import { TableContainer } from "@material-ui/core";
+import { TableBody } from "@material-ui/core";
+import { TableCell } from "@material-ui/core";
+import { TableHead } from "@material-ui/core";
+import { TableRow } from "@material-ui/core";
+import { TableFooter } from "@material-ui/core";
+import { TablePagination } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
+import { Box } from "@material-ui/core";
+import { IconButton } from "@material-ui/core";
+import { FirstPage } from "@material-ui/icons";
+import { KeyboardArrowLeft } from "@material-ui/icons";
+import { KeyboardArrowRight } from "@material-ui/icons";
+import { LastPage } from "@material-ui/icons";
 
 import { Game, Player, User } from "../apiserver/types.ts";
 
@@ -288,7 +288,7 @@ function TablePaginationActions(props: {
         disabled={page === 0}
         aria-label="first page"
       >
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
+        {theme.direction === "rtl" ? <LastPage /> : <FirstPage />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
@@ -312,7 +312,7 @@ function TablePaginationActions(props: {
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
         aria-label="last page"
       >
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
+        {theme.direction === "rtl" ? <FirstPage /> : <LastPage />}
       </IconButton>
     </Box>
   );

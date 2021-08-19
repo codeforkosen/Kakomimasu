@@ -1,7 +1,7 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { CircularProgress } from "@material-ui/core";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { Link, useParams } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";

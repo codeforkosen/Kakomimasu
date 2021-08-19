@@ -3,15 +3,20 @@
     "react": "https://esm.sh/react@17.0.2",
     "react-dom": "https://esm.sh/react-dom",
     "react-router-dom": "https://esm.sh/react-router-dom",
-    "@material-ui/core/": "https://esm.sh/@material-ui/core@5.0.0-beta.2/",
-    "@material-ui/icons/": "https://esm.sh/@material-ui/icons@5.0.0-beta.1/",
+    "@material-ui/core": "https://esm.sh/@material-ui/core@5.0.0-beta.2",
+    "@material-ui/core/styles": "https://esm.sh/@material-ui/core@5.0.0-beta.2/styles",
+    "@material-ui/icons": "https://esm.sh/@material-ui/icons@5.0.0-beta.1",
     "@material-ui/styles": "https://esm.sh/@material-ui/styles@5.0.0-beta.2",
     "recharts": "https://esm.sh/recharts@2.0.8",
-    "react-firebaseui/": "https://esm.sh/react-firebaseui/",
-    "https://esm.sh/v45/@types/react@17.0.17/": "https://cdn.esm.sh/v45/@types/react@17.0.16/",
+    "firebase/app": "https://esm.sh/firebase/app?deps=firebase@8.9.1",
+    "firebase/auth": "https://esm.sh/firebase/auth?deps=firebase@8.9.1",
+    "firebase/analytics": "https://esm.sh/firebase/analytics?deps=firebase@8.9.1",
+    "react-firebaseui/StyledFirebaseAuth": "https://esm.sh/react-firebaseui/StyledFirebaseAuth",
+    "https://cdn.esm.sh/v45/@material-ui/styles@4.11.4/": "https://cdn.esm.sh/v45/@material-ui/styles@5.0.0-beta.2/",
     "https://cdn.esm.sh/v45/prop-types@15.7.2/deno/prop-types.js": "https://cdn.esm.sh/v43/prop-types@15.7.2/deno/prop-types.js",
     "https://cdn.esm.sh/v45/react-transition-group@2.9.0/deno/react-transition-group.js": "https://cdn.esm.sh/v43/react-transition-group@2.9.0/deno/react-transition-group.js",
-    "https://cdn.esm.sh/v43/@firebase/app@0.6.27/deno/app.js": "https://cdn.esm.sh/v43/firebase@8.5.0/deno/firebase.bundle.js",
-    "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/dist/cjs/": "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/lib/"
+    "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/dist/cjs/": "https://cdn.esm.sh/v45/@popperjs/core@2.9.3/lib/",
+    "https://cdn.esm.sh/v45/@types/react@17.0.17/": "https://cdn.esm.sh/v45/@types/react@17.0.18/",
+    "https://cdn.esm.sh/v45/@types/react@17.0.16/": "https://cdn.esm.sh/v45/@types/react@17.0.18/"
   }
 }
