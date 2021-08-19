@@ -288,22 +288,21 @@ export default function () {
                       setAddUser(newUser);
                     }}
                     style={{ width: "20em" }}
-                    renderInput={(params) =>
-                      (
-                        <TextField
-                          {...params}
-                          label="追加ユーザ"
-                          onChange={async (event) => {
-                            const value = event.target.value;
-                            const req = await apiClient.usersSearch(value);
-                            if (!req.success) return;
-                            setAddUserList(req.data);
-                          }}
-                          placeholder="id or name"
-                          helperText={addUserHelperText}
-                          error={Boolean(addUserHelperText)}
-                        />
-                      )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="追加ユーザ"
+                        onChange={async (event) => {
+                          const value = event.target.value;
+                          const req = await apiClient.usersSearch(value);
+                          if (!req.success) return;
+                          setAddUserList(req.data);
+                        }}
+                        placeholder="id or name"
+                        helperText={addUserHelperText}
+                        error={Boolean(addUserHelperText)}
+                      />
+                    )}
                   />
                   <Button
                     onClick={async () => {

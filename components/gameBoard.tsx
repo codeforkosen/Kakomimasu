@@ -367,7 +367,11 @@ export default function (props: Props) {
                           backgroundColor: bgColor(),
                         }}
                       >
-                        <span className={isAbs ? classes.striket : ""}>
+                        <span
+                          className={isAbs
+                            ? classes.striket
+                            : ""}
+                        >
                           {cell.point}
                         </span>
                         {isAbs && (
