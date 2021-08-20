@@ -188,7 +188,7 @@ export const userRouter = () => {
     if (!jwt) return;
     const payload = await getPayload(jwt);
     if (!payload) return;
-    console.log(payload);
+    //console.log(payload);
     const isUser = accounts.getUsers().some((user) =>
       user.id === payload.user_id
     );

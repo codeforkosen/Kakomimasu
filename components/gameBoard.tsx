@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useMediaQuery } from "@material-ui/core";
 import { Link, useHistory } from "react-router-dom";
 
 import { Game, User } from "../apiserver/types.ts";
@@ -311,110 +311,130 @@ export default function (props: Props) {
         <div>
           {status}
         </div>
-        {game.board && <table id="field" className={classes.table}>
-          <tr>
-            <th></th>
-            {[...Array(game.board.width)].map((_, x) => {
-              return <th>{x + 1}</th>;
-            })}
-            <th></th>
-          </tr>
-          {[...Array(game.board.height)].map((_, y) => {
-            return (
-              <tr>
-                <th>{y + 1}</th>
-                {[...Array(game.board?.width)].map((_, x) => {
-                  const cell = getCell(x, y);
-                  if (!cell) return;
-                  const agent = isAgent(x, y);
-                  const isAbs = cell.point < 0 && cell.tiled[1] !== -1 &&
-                    cell.tiled[0] === 0;
-                  const isConflict = game.log
-                    ? (() => {
-                      const lastActLog = game.log[game.log.length - 1]?.map((
-                        e,
-                      ) => e.actions).flat();
-                      const isConflict = lastActLog?.some(
-                        (a) => ((a.res > 0 && a.res < 3) && a.x === x &&
-                          a.y === y),
-                      );
-                      return isConflict;
-                    })()
-                    : false;
+        {game.board && (
+          <table id="field" className={classes.table}>
+            <tr>
+              <th></th>
+              {[...Array(game.board.width)].map((_, x) => {
+                return <th>{x + 1}</th>;
+              })}
+              <th></th>
+            </tr>
+            {[...Array(game.board.height)].map((_, y) => {
+              return (
+                <tr>
+                  <th>
+                    {y + 1}
+                  </th>
+                  {[...Array(game.board?.width)].map((_, x) => {
+                    const cell = getCell(x, y);
+                    if (!cell) return;
+                    const agent = isAgent(x, y);
+                    const isAbs = cell.point < 0 && cell.tiled[1] !== -1 &&
+                      cell.tiled[0] === 0;
+                    const isConflict = game.log
+                      ? (() => {
+                        const lastActLog = game.log[game.log.length - 1]?.map((
+                          e,
+                        ) => e.actions).flat();
+                        const isConflict = lastActLog?.some(
+                          (a) => ((a.res > 0 && a.res < 3) && a.x === x &&
+                            a.y === y),
+                        );
+                        return isConflict;
+                      })()
+                      : false;
 
-                  const bgColor = () => {
-                    if (cell.tiled[1] !== -1) {
-                      return datas[cell.tiled[1]].colors[cell.tiled[0]];
-                    } else if (cell.point < 0) {
-                      const l = 100 - (Math.abs(cell.point) * 50 / 16);
-                      return `hsl(0,0%,${l}%)`;
-                    } else if (cell.point > 0) {
-                      const l = 100 - (Math.abs(cell.point) * 50 / 16);
-                      return `hsl(60,100%,${l}%)`;
-                    }
-                  };
+                    const bgColor = () => {
+                      if (cell.tiled[1] !== -1) {
+                        return datas[cell.tiled[1]].colors[cell.tiled[0]];
+                      } else if (cell.point < 0) {
+                        const l = 100 - (Math.abs(cell.point) * 50 / 16);
+                        return `hsl(0,0%,${l}%)`;
+                      } else if (cell.point > 0) {
+                        const l = 100 - (Math.abs(cell.point) * 50 / 16);
+                        return `hsl(60,100%,${l}%)`;
+                      }
+                    };
 
-                  return <td
-                    className={`${agent && classes.agent} ${isConflict &&
-                      classes.conflict}`}
-                    style={{
-                      backgroundImage: agent &&
-                        `url(${datas[agent.player].agentUrl})`,
-                      backgroundColor: bgColor(),
-                    }}
-                  >
-                    <span className={isAbs ? classes.striket : ""}>
-                      {cell.point}
-                    </span>
-                    {isAbs && <>
-                      <br />
-                      <span>{Math.abs(cell.point)}</span>
-                    </>}
-                    {agent && users[agent.player] &&
-                      <div
-                        className={classes.detail}
+                    return (
+                      <td
+                        className={`${agent && classes.agent} ${isConflict &&
+                          classes.conflict}`}
                         style={{
-                          border: `solid 4px ${datas[agent.player].colors[1]}`,
-                          transform: getAgentTransform(x, y),
+                          backgroundImage: agent &&
+                            `url(${datas[agent.player].agentUrl})`,
+                          backgroundColor: bgColor(),
                         }}
                       >
-                        <span>
-                          {users[agent.player].screenName}:{agent.n + 1}
-                        </span>
-                        <br />
-                        <span>行動履歴</span>
-                        <div
-                          className={classes.detailHistory}
+                        <span
+                          className={isAbs
+                            ? classes.striket
+                            : ""}
                         >
-                          {agentHistory(agent).map((e) => {
-                            return <div
+                          {cell.point}
+                        </span>
+                        {isAbs && (
+                          <>
+                            <br />
+                            <span>
+                              {Math.abs(cell.point)}
+                            </span>
+                          </>
+                        )}
+                        {agent && users[agent.player] &&
+                          (
+                            <div
+                              className={classes.detail}
                               style={{
-                                textDecoration: e.res > 0
-                                  ? "line-through"
-                                  : "none",
+                                border: `solid 4px ${
+                                  datas[agent.player].colors[1]
+                                }`,
+                                transform: getAgentTransform(x, y),
                               }}
                             >
-                              T{e.turn}：{e.type !== "停留" &&
-                                `x:${e.x} , y:${e.y}に`}
-                              {e.type}
-                            </div>;
-                          })}
-                        </div>
-                      </div>}
-                  </td>;
-                })}
-                <th>{y + 1}</th>
-              </tr>
-            );
-          })}
-          <tr>
-            <th></th>
-            {[...Array(game.board.width)].map((_, x) => {
-              return <th>{x + 1}</th>;
+                              <span>
+                                {users[agent.player].screenName}:{agent.n + 1}
+                              </span>
+                              <br />
+                              <span>行動履歴</span>
+                              <div
+                                className={classes.detailHistory}
+                              >
+                                {agentHistory(agent).map((e) => {
+                                  return (
+                                    <div
+                                      style={{
+                                        textDecoration: e.res > 0
+                                          ? "line-through"
+                                          : "none",
+                                      }}
+                                    >
+                                      T{e.turn}：{e.type !== "停留" &&
+                                        `x:${e.x} , y:${e.y}に`}
+                                      {e.type}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                      </td>
+                    );
+                  })}
+                  <th>{y + 1}</th>
+                </tr>
+              );
             })}
-            <th></th>
-          </tr>
-        </table>}
+            <tr>
+              <th></th>
+              {[...Array(game.board.width)].map((_, x) => {
+                return <th>{x + 1}</th>;
+              })}
+              <th></th>
+            </tr>
+          </table>
+        )}
       </div>
     </div>
   );

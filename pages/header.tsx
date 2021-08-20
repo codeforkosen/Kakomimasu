@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import AppBar from "@material-ui/core/AppBar";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import Toolbar from "@material-ui/core/Toolbar";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import { AppBar } from "@material-ui/core";
+import { Avatar } from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import { Toolbar } from "@material-ui/core";
+import { Menu } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
 
 import firebase from "../components/firebase.ts";
 
@@ -67,42 +67,51 @@ export default function (props: Props) {
           </Link>
         </div>
         {user !== undefined &&
-          <>
-            {user && verified
-              ? <>
-                <Button variant="text" color="inherit" onClick={logOut}>
-                  ログアウト
-                </Button>
-                <div
-                  aria-controls="user-icon"
-                  onClick={handleClick}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Avatar src={user.photoURL ? user.photoURL : ""} />
-                </div>
-                <Menu
-                  id="user-icon"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handleClose}>
-                    <Link to="/user/detail" style={{ textDecoration: "none" }}>
-                      マイページ
-                    </Link>
-                  </MenuItem>
-                </Menu>
-              </>
-              : <Button
-                variant="text"
-                color="inherit"
-                component={Link}
-                to="/user/login"
-              >
-                ログイン・新規登録
-              </Button>}
-          </>}
+          (
+            <>
+              {user && verified
+                ? (
+                  <>
+                    <Button variant="text" color="inherit" onClick={logOut}>
+                      ログアウト
+                    </Button>
+                    <div
+                      aria-controls="user-icon"
+                      onClick={handleClick}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <Avatar src={user.photoURL ? user.photoURL : ""} />
+                    </div>
+                    <Menu
+                      id="user-icon"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <MenuItem onClick={handleClose}>
+                        <Link
+                          to="/user/detail"
+                          style={{ textDecoration: "none" }}
+                        >
+                          マイページ
+                        </Link>
+                      </MenuItem>
+                    </Menu>
+                  </>
+                )
+                : (
+                  <Button
+                    variant="text"
+                    color="inherit"
+                    component={Link}
+                    to="/user/login"
+                  >
+                    ログイン・新規登録
+                  </Button>
+                )}
+            </>
+          )}
       </Toolbar>
     </AppBar>
   );

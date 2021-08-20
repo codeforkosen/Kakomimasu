@@ -8,7 +8,5 @@ export default function () {
     }, 100);
   }, []);
 
-  return (
-    <h4>現在時刻：{nowTime}</h4>
-  );
+  return <h4>現在時刻：{nowTime}</h4>;
 }

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { Theme, useTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import MenuItem from "@material-ui/core/MenuItem";
-import Autocomplete from "@material-ui/core/Autocomplete";
+import { TextField } from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/core";
 
 // @deno-types=../../client_js/api_client.d.ts
 import ApiClient from "../../client_js/api_client.js";
@@ -84,91 +84,93 @@ export default function () {
     setAddUserInput({ value, helperText: "", q });
   };
 
-  return (<>
-    <Content title="大会作成">
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <Button
-          component={Link}
-          to={"/tournament/index"}
-          style={{ margin: "auto" }}
-        >
-          大会一覧に戻る
-        </Button>
-        <form autoComplete="off" className={classes.form}>
-          <TextField
-            required
-            label="大会名"
-            placeholder="〇〇大会"
-            className={classes.textField}
-            value={data.name}
-            onChange={({ target: { value } }) => {
-              setData({ ...data, name: value });
-            }}
-            error={!data.name}
-            helperText={data.name ? "" : "入力必須項目です"}
-          />
-          <TextField
-            label="主催"
-            placeholder="Code for KOSEN"
-            className={classes.textField}
-            value={data.organizer}
-            onChange={({ target: { value } }) => {
-              setData({ ...data, organizer: value });
-            }}
-          />
-          <TextField
-            required
-            select
-            label="試合形式"
-            className={classes.textField}
-            value={data.type}
-            onChange={({ target: { value } }) => {
-              setData({ ...data, type: value as TournamentType });
-            }}
-            error={!data.type}
-            helperText={data.type ? "" : "入力必須項目です"}
-          >
-            <MenuItem value="round-robin">総当たり戦</MenuItem>
-            {/*<MenuItem value="knockout">勝ち残り戦</MenuItem>;*/}
-          </TextField>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={addUserInput.q}
-            getOptionLabel={(option) => option.name}
-            onChange={(_, newValue) => {
-              console.log("onInputChange", newValue);
-              setAddUserInput({ ...addUserInput, q: [] });
-              setData({ ...data, participants: newValue.map((e) => e.id) });
-            }}
-            className={classes.textField}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="参加ユーザ"
-                placeholder="name"
-                onChange={addHandleChange}
-              />
-            )}
-          />
-          <TextField
-            label="備考"
-            className={classes.textField}
-            value={data.remarks}
-            onChange={({ target: { value } }) => {
-              setData({ ...data, remarks: value });
-            }}
-          />
+  return (
+    <>
+      <Content title="大会作成">
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <Button
-            className={classes.button}
-            onClick={submit}
-            disabled={!validate()}
+            component={Link}
+            to={"/tournament/index"}
+            style={{ margin: "auto" }}
           >
-            ゲーム作成！
+            大会一覧に戻る
           </Button>
-        </form>
-        {tournament && <TournamentCard tournament={tournament} />}
-      </div>
-    </Content>
-  </>);
+          <form autoComplete="off" className={classes.form}>
+            <TextField
+              required
+              label="大会名"
+              placeholder="〇〇大会"
+              className={classes.textField}
+              value={data.name}
+              onChange={({ target: { value } }) => {
+                setData({ ...data, name: value });
+              }}
+              error={!data.name}
+              helperText={data.name ? "" : "入力必須項目です"}
+            />
+            <TextField
+              label="主催"
+              placeholder="Code for KOSEN"
+              className={classes.textField}
+              value={data.organizer}
+              onChange={({ target: { value } }) => {
+                setData({ ...data, organizer: value });
+              }}
+            />
+            <TextField
+              required
+              select
+              label="試合形式"
+              className={classes.textField}
+              value={data.type}
+              onChange={({ target: { value } }) => {
+                setData({ ...data, type: value as TournamentType });
+              }}
+              error={!data.type}
+              helperText={data.type ? "" : "入力必須項目です"}
+            >
+              <MenuItem value="round-robin">総当たり戦</MenuItem>
+              {/*<MenuItem value="knockout">勝ち残り戦</MenuItem>;*/}
+            </TextField>
+            <Autocomplete
+              multiple
+              id="tags-standard"
+              options={addUserInput.q}
+              getOptionLabel={(option) => option.name}
+              onChange={(_, newValue) => {
+                console.log("onInputChange", newValue);
+                setAddUserInput({ ...addUserInput, q: [] });
+                setData({ ...data, participants: newValue.map((e) => e.id) });
+              }}
+              className={classes.textField}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="参加ユーザ"
+                  placeholder="name"
+                  onChange={addHandleChange}
+                />
+              )}
+            />
+            <TextField
+              label="備考"
+              className={classes.textField}
+              value={data.remarks}
+              onChange={({ target: { value } }) => {
+                setData({ ...data, remarks: value });
+              }}
+            />
+            <Button
+              className={classes.button}
+              onClick={submit}
+              disabled={!validate()}
+            >
+              ゲーム作成！
+            </Button>
+          </form>
+          {tournament && <TournamentCard tournament={tournament} />}
+        </div>
+      </Content>
+    </>
+  );
 }
