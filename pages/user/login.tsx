@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import TextField from "@material-ui/core/TextField";
+import { Button } from "@material-ui/core";
+import { CircularProgress } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 
 import firebase from "../../components/firebase.ts";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
@@ -158,29 +158,35 @@ export default function () {
 
   return (
     <Content title="ログイン">
-      {<div className={classes.content}>
-        {user !== undefined
-          ? <>
-            {(user === null)
-              ? <StyledFirebaseAuth
-                uiConfig={{
-                  signInSuccessUrl: "/user/login?signInSuccess=true",
-                  signInOptions: [
-                    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                    //props.firebaseP.auth.FacebookAuthProvider.PROVIDER_ID,
-                    firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-                    firebase.auth.GithubAuthProvider.PROVIDER_ID,
-                    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-                    firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-                    //firebaseP.auth.AnonymousAuthProvider.PROVIDER_ID
-                  ],
-                }}
-                firebaseAuth={firebase.auth()}
-              />
-              : <Signup user={user} />}
-          </>
-          : <CircularProgress color="secondary" />}
-      </div>}
+      {(
+        <div className={classes.content}>
+          {user !== undefined
+            ? (
+              <>
+                {(user === null)
+                  ? (
+                    <StyledFirebaseAuth
+                      uiConfig={{
+                        signInSuccessUrl: "/user/login?signInSuccess=true",
+                        signInOptions: [
+                          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                          //props.firebaseP.auth.FacebookAuthProvider.PROVIDER_ID,
+                          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+                          firebase.auth.GithubAuthProvider.PROVIDER_ID,
+                          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                          firebase.auth.PhoneAuthProvider.PROVIDER_ID,
+                          //firebaseP.auth.AnonymousAuthProvider.PROVIDER_ID
+                        ],
+                      }}
+                      firebaseAuth={firebase.auth()}
+                    />
+                  )
+                  : <Signup user={user} />}
+              </>
+            )
+            : <CircularProgress color="secondary" />}
+        </div>
+      )}
     </Content>
   );
 }

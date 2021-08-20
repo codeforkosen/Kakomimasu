@@ -1,4 +1,6 @@
-import firebase from "http://esm.sh/firebase@8.5.0?bundle";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/analytics";
 
 const init = () => {
   const firebaseConfig = {

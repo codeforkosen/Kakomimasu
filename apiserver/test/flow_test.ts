@@ -123,7 +123,7 @@ Deno.test("get gameinfo", async () => {
   assertEquals(sample, res.data);
 });
 
-Deno.test("send action", async () => {
+Deno.test("send action(Turn 1)", async () => {
   const sampleFilePath = resolve("./sample/afterAction_sample.json");
 
   let res = await ac.getMatch(gameId);
@@ -132,19 +132,58 @@ Deno.test("send action", async () => {
   }
   const gameInfo = res.data;
   if (!gameInfo.startedAtUnixTime) throw Error("startedAtUnixTime is null.");
-  await sleep(diffTime(gameInfo.startedAtUnixTime) + 1);
+  await sleep(diffTime(gameInfo.startedAtUnixTime) + 0.3);
   await ac.setAction(gameId, {
     actions: [{ agentId: 0, type: "PUT", x: 1, y: 1 }],
+    index: 0,
   }, "Bearer " + bearerToken);
   //console.log(reqJson);
 
   if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
-  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 1);
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 0.3);
   res = await ac.getMatch(gameId);
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
   }
   //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data, null, 2));
+
+  //console.log(res);
+  //console.log(JSON.stringify(reqJson, null, 2));
+  const sample = JSON.parse(Deno.readTextFileSync(sampleFilePath));
+
+  assert(v4.validate(res.data.gameId));
+  assert(v4.validate(res.data.players[0].id));
+  assert(v4.validate(res.data.players[1].id));
+  sample.gameId = res.data.gameId = "";
+  sample.players[0].id = res.data.players[0].id = "";
+  sample.players[1].id = res.data.players[1].id = "";
+  sample.startedAtUnixTime = res.data.startedAtUnixTime = 0;
+  sample.nextTurnUnixTime = res.data.nextTurnUnixTime = 0;
+
+  assertEquals(sample, res.data);
+});
+Deno.test("send action(Turn 2)", async () => {
+  const sampleFilePath = resolve("./sample/afterAction_sample2.json");
+
+  let res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  const gameInfo = res.data;
+
+  await ac.setAction(gameId, {
+    actions: [{ agentId: 0, type: "PUT", x: 1, y: 2 }],
+    index: 1,
+  }, "Bearer " + bearerToken);
+  //console.log(reqJson);
+
+  if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 0.3);
+  res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  //Deno.writeTextFileSync(sampleFilePath, JSON.stringify(res.data));
 
   //console.log(res);
   //console.log(JSON.stringify(reqJson, null, 2));

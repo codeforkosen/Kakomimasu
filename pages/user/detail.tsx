@@ -1,7 +1,7 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { CircularProgress } from "@material-ui/core";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { Link, useParams } from "react-router-dom";
 import Section, { SubSection } from "../../components/section.tsx";
@@ -97,88 +97,96 @@ export default function () {
   return (
     <Content title="ユーザ詳細">
       <div className={classes.content}>
-        {user === undefined ? <CircularProgress color="secondary" /> : <>
-          {user
-            ? <>
-              <Section title="基本情報">
-                <div className={classes.content}>
-                  <SubSection title="表示名">{user.screenName}</SubSection>
-                  <SubSection title="ユーザネーム">{user.name}</SubSection>
-                  <SubSection title="ユーザID">{user.id}</SubSection>
-                  {user.bearerToken &&
-                    <SubSection title="BearerToken(この値は他人に教えないようにしてください)">
-                      {user.bearerToken}
-                    </SubSection>}
-                </div>
-              </Section>
-              <Section title="勝敗記録">
-                <div className={classes.pieGraph}>
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie
-                        data={user.pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        fill="#8884d8"
-                        label={(
-                          {
-                            cx,
-                            cy,
-                            midAngle,
-                            innerRadius,
-                            outerRadius,
-                            percent,
-                          }: {
-                            cx: number;
-                            cy: number;
-                            midAngle: number;
-                            innerRadius: number;
-                            outerRadius: number;
-                            percent?: number;
-                          },
-                        ) => {
-                          if (!percent) return (<></>);
-                          const RADIAN = Math.PI / 180;
-                          const radius = innerRadius +
-                            (outerRadius - innerRadius) * 0.5;
-                          const x = cx +
-                            radius * Math.cos(-midAngle * RADIAN);
-                          const y = cy +
-                            radius * Math.sin(-midAngle * RADIAN);
+        {user === undefined ? <CircularProgress color="secondary" /> : (
+          <>
+            {user
+              ? (
+                <>
+                  <Section title="基本情報">
+                    <div className={classes.content}>
+                      <SubSection title="表示名">{user.screenName}</SubSection>
+                      <SubSection title="ユーザネーム">{user.name}</SubSection>
+                      <SubSection title="ユーザID">{user.id}</SubSection>
+                      {user.bearerToken &&
+                        (
+                          <SubSection title="BearerToken(この値は他人に教えないようにしてください)">
+                            {user.bearerToken}
+                          </SubSection>
+                        )}
+                    </div>
+                  </Section>
+                  <Section title="勝敗記録">
+                    <div className={classes.pieGraph}>
+                      <ResponsiveContainer>
+                        <PieChart>
+                          <Pie
+                            data={user.pieData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            fill="#8884d8"
+                            label={(
+                              {
+                                cx,
+                                cy,
+                                midAngle,
+                                innerRadius,
+                                outerRadius,
+                                percent,
+                              }: {
+                                cx: number;
+                                cy: number;
+                                midAngle: number;
+                                innerRadius: number;
+                                outerRadius: number;
+                                percent?: number;
+                              },
+                            ) => {
+                              if (!percent) return <></>;
+                              const RADIAN = Math.PI / 180;
+                              const radius = innerRadius +
+                                (outerRadius - innerRadius) * 0.5;
+                              const x = cx +
+                                radius * Math.cos(-midAngle * RADIAN);
+                              const y = cy +
+                                radius * Math.sin(-midAngle * RADIAN);
 
-                          return (
-                            <text
-                              x={x}
-                              y={y}
-                              fill="white"
-                              textAnchor={x > cx ? "start" : "end"}
-                              dominantBaseline="central"
-                            >
-                              {`${(percent * 100).toFixed(0)}%`}
-                            </text>
-                          );
-                        }}
-                        labelLine={false}
-                      >
-                        <Cell fill="#D92546" />
-                        <Cell fill="#A7D4D9" />
-                        <Cell fill="#F2BB9B" />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+                              return (
+                                <text
+                                  x={x}
+                                  y={y}
+                                  fill="white"
+                                  textAnchor={x > cx ? "start" : "end"}
+                                  dominantBaseline="central"
+                                >
+                                  {`${(percent * 100).toFixed(0)}%`}
+                                </text>
+                              );
+                            }}
+                            labelLine={false}
+                          >
+                            <Cell fill="#D92546" />
+                            <Cell fill="#A7D4D9" />
+                            <Cell fill="#F2BB9B" />
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </Section>
+                  <Section title="参加ゲーム一覧">
+                    <GameList games={user.games} />
+                  </Section>
+                </>
+              )
+              : (
+                <div className={classes.content}>
+                  <div>ユーザが存在しません</div>
+                  <Link to="/">囲みマス トップページへ</Link>
                 </div>
-              </Section>
-              <Section title="参加ゲーム一覧">
-                <GameList games={user.games} />
-              </Section>
-            </>
-            : <div className={classes.content}>
-              <div>ユーザが存在しません</div>
-              <Link to="/">囲みマス トップページへ</Link>
-            </div>}
-        </>}
+              )}
+          </>
+        )}
       </div>
     </Content>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import ToggleButtonGroup from "@material-ui/core/ToggleButtonGroup";
-import ToggleButton from "@material-ui/core/ToggleButton";
+import { ToggleButtonGroup } from "@material-ui/core";
+import { ToggleButton } from "@material-ui/core";
 
 import Content from "../../components/content.tsx";
 import GameList from "../../components/gamelist.tsx";

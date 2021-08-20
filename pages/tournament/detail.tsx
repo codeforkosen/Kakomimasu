@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/core/Autocomplete";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import { CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/core";
+import { Table } from "@material-ui/core";
+import { TableBody } from "@material-ui/core";
+import { TableCell } from "@material-ui/core";
+import { TableContainer } from "@material-ui/core";
+import { TableHead } from "@material-ui/core";
+import { TableRow } from "@material-ui/core";
+import { Paper } from "@material-ui/core";
 
 // @deno-types="../../client_js/api_client.d.ts"
 import ApiClient from "../../client_js/api_client.js";
@@ -236,164 +236,196 @@ export default function () {
           大会一覧に戻る
         </Button>
         {tournament
-          ? <>
-            <Section title="基本情報">
-              <div style={{ textAlign: "center" }}>
-                <SubSection title="大会名">
-                  <div>{tournament.name}</div>
-                </SubSection>
-                <SubSection title="主催">
-                  <div>{tournament.organizer}</div>
-                </SubSection>
-                <SubSection title="大会ID">
-                  <div>{tournament.id}</div>
-                </SubSection>
-                <SubSection title="試合形式">
-                  <div>{getType(tournament.type)}</div>
-                </SubSection>
-                {tournament.remarks && <SubSection title="備考">
-                  <div>{tournament.remarks}</div>
-                </SubSection>}
-              </div>
-            </Section>
+          ? (
+            <>
+              <Section title="基本情報">
+                <div style={{ textAlign: "center" }}>
+                  <SubSection title="大会名">
+                    <div>{tournament.name}</div>
+                  </SubSection>
+                  <SubSection title="主催">
+                    <div>{tournament.organizer}</div>
+                  </SubSection>
+                  <SubSection title="大会ID">
+                    <div>{tournament.id}</div>
+                  </SubSection>
+                  <SubSection title="試合形式">
+                    <div>{getType(tournament.type)}</div>
+                  </SubSection>
+                  {tournament.remarks && (
+                    <SubSection title="備考">
+                      <div>{tournament.remarks}</div>
+                    </SubSection>
+                  )}
+                </div>
+              </Section>
 
-            <Section title="試合">
-              <div
-                style={{
-                  textAlign: "center",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <SubSection title="試合形式">
-                  <div>{getType(tournament.type)}</div>
-                </SubSection>
-                <Autocomplete
-                  options={addUserList}
-                  getOptionLabel={(option) => option.name}
-                  onChange={(_, newUser) => {
-                    if (!tournament) return;
-                    if (
-                      tournament.users.some((userId) => userId === newUser?.id)
-                    ) {
-                      setAddUserHelperText("既にこのユーザは参加しています。");
-                      return;
-                    } else setAddUserHelperText("");
-                    setAddUser(newUser);
+              <Section title="試合">
+                <div
+                  style={{
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                   }}
-                  style={{ width: "20em" }}
-                  renderInput={(params) =>
-                    <TextField
-                      {...params}
-                      label="追加ユーザ"
-                      onChange={async (event) => {
-                        const value = event.target.value;
-                        const req = await apiClient.usersSearch(value);
-                        if (!req.success) return;
-                        setAddUserList(req.data);
-                      }}
-                      placeholder="id or name"
-                      helperText={addUserHelperText}
-                      error={Boolean(addUserHelperText)}
-                    />}
-                />
-                <Button
-                  onClick={async () => {
-                    if (!addUser) return;
-                    const req = await apiClient.tournamentsAddUser(
-                      id,
-                      { user: addUser.id },
-                    );
-                    console.log(req);
-                    if (req.success) setTournament(req.data);
-                  }}
-                  disabled={!addUser || Boolean(addUserHelperText)}
                 >
-                  ユーザ追加
-                </Button>
+                  <SubSection title="試合形式">
+                    <div>{getType(tournament.type)}</div>
+                  </SubSection>
+                  <Autocomplete
+                    options={addUserList}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(_, newUser) => {
+                      if (!tournament) return;
+                      if (
+                        tournament.users.some((userId) =>
+                          userId === newUser?.id
+                        )
+                      ) {
+                        setAddUserHelperText("既にこのユーザは参加しています。");
+                        return;
+                      } else setAddUserHelperText("");
+                      setAddUser(newUser);
+                    }}
+                    style={{ width: "20em" }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="追加ユーザ"
+                        onChange={async (event) => {
+                          const value = event.target.value;
+                          const req = await apiClient.usersSearch(value);
+                          if (!req.success) return;
+                          setAddUserList(req.data);
+                        }}
+                        placeholder="id or name"
+                        helperText={addUserHelperText}
+                        error={Boolean(addUserHelperText)}
+                      />
+                    )}
+                  />
+                  <Button
+                    onClick={async () => {
+                      if (!addUser) return;
+                      const req = await apiClient.tournamentsAddUser(
+                        id,
+                        { user: addUser.id },
+                      );
+                      console.log(req);
+                      if (req.success) setTournament(req.data);
+                    }}
+                    disabled={!addUser || Boolean(addUserHelperText)}
+                  >
+                    ユーザ追加
+                  </Button>
 
-                {users && <div style={{ width: "100%", overflow: "auto" }}>
-                  <table className={classes.table}>
-                    <tr>
-                      <th className={classes.oblique}></th>
-                      {users.map((user) => {
-                        return <th>{user ? user.name : "no player"}</th>;
-                      })}
-                    </tr>
-                    {users.map((user, y) => {
-                      return <tr>
-                        <th>{user ? user.name : "no player"}</th>
-                        {users.map((_, x) => {
-                          return <td className={x === y ? classes.oblique : ""}>
-                            {x !== y && (() => {
-                              const result = getResult(y, x);
-                              if (result) {
-                                return <div>
-                                  <div>{result.resultText}</div>
-                                  <div>{result.pointText}</div>
-                                  <Link to={result.url}>ゲーム詳細へ</Link>
-                                </div>;
-                              } else {
-                                return <Button
-                                  component={Link}
-                                  variant="outlined"
-                                  to={gameCreateUrl(y, x)}
-                                >
-                                  ゲーム作成
-                                </Button>;
-                              }
-                            })()}
-                          </td>;
+                  {users && (
+                    <div style={{ width: "100%", overflow: "auto" }}>
+                      <table className={classes.table}>
+                        <tr>
+                          <th className={classes.oblique}></th>
+                          {users.map((user) => {
+                            return <th>{user ? user.name : "no player"}</th>;
+                          })}
+                        </tr>
+                        {users.map((user, y) => {
+                          return (
+                            <tr>
+                              <th>{user ? user.name : "no player"}</th>
+                              {users.map((_, x) => {
+                                return (
+                                  <td
+                                    className={x === y ? classes.oblique : ""}
+                                  >
+                                    {x !== y && (() => {
+                                      const result = getResult(y, x);
+                                      if (result) {
+                                        return (
+                                          <div>
+                                            <div>
+                                              {result.resultText}
+                                            </div>
+                                            <div>
+                                              {result.pointText}
+                                            </div>
+                                            <Link to={result.url}>
+                                              ゲーム詳細へ
+                                            </Link>
+                                          </div>
+                                        );
+                                      } else {
+                                        return (
+                                          <Button
+                                            component={Link}
+                                            variant="outlined"
+                                            to={gameCreateUrl(y, x)}
+                                          >
+                                            ゲーム作成
+                                          </Button>
+                                        );
+                                      }
+                                    })()}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          );
                         })}
-                      </tr>;
-                    })}
-                  </table>
-                </div>}
-              </div>
-            </Section>
-            <Section title="ランキング">
-              {<TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align="center" style={{ minWidth: "5em" }}>
-                        順位
-                      </TableCell>
-                      <TableCell style={{ minWidth: "6em" }}>ユーザ</TableCell>
-                      <TableCell align="center" style={{ minWidth: "8em" }}>
-                        勝敗数
-                      </TableCell>
-                      <TableCell align="right" style={{ minWidth: "11em" }}>
-                        累計獲得ポイント
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {getRanking()?.map((user, i) => (
-                      <TableRow>
-                        <TableCell align="center" component="th" scope="row">
-                          {i + 1}
-                        </TableCell>
-                        <TableCell>
-                          {users?.find((u) => u?.id === user.userId)?.name}
-                        </TableCell>
-                        <TableCell align="center">
-                          {user.result[0]}勝{user.result[2]}敗{user.result[1]}分
-                        </TableCell>
-                        <TableCell align="right">
-                          {user.point}
-                          <br />
-                          {"("}壁：{user.wallPoint}, 城壁：{user.basePoint}
-                          {")"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>}
-            </Section>
-          </>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </Section>
+              <Section title="ランキング">
+                {(
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center" style={{ minWidth: "5em" }}>
+                            順位
+                          </TableCell>
+                          <TableCell style={{ minWidth: "6em" }}>ユーザ</TableCell>
+                          <TableCell align="center" style={{ minWidth: "8em" }}>
+                            勝敗数
+                          </TableCell>
+                          <TableCell align="right" style={{ minWidth: "11em" }}>
+                            累計獲得ポイント
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {getRanking()?.map((user, i) => (
+                          <TableRow>
+                            <TableCell
+                              align="center"
+                              component="th"
+                              scope="row"
+                            >
+                              {i + 1}
+                            </TableCell>
+                            <TableCell>
+                              {users?.find((u) => u?.id === user.userId)?.name}
+                            </TableCell>
+                            <TableCell align="center">
+                              {user.result[0]}勝{user.result[2]}敗{user
+                                .result[1]}分
+                            </TableCell>
+                            <TableCell align="right">
+                              {user.point}
+                              <br />
+                              {"("}壁：{user.wallPoint}, 城壁：{user.basePoint}
+                              {")"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </Section>
+            </>
+          )
           : <CircularProgress color="secondary" />}
       </div>
     </Content>

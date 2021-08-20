@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { Link, Redirect, RouteComponentProps } from "react-router-dom";
-import TextField from "@material-ui/core/TextField";
-import MenuItem from "@material-ui/core/MenuItem";
+import { TextField } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
 
 import Content from "../../components/content.tsx";
 import GameBoard from "../../components/gameBoard.tsx";
@@ -168,9 +168,11 @@ export default function () {
             return <MenuItem value={board.name}>{board.name}</MenuItem>;
           })}
         </TextField>
-        {game && <div id="game-board">
-          <GameBoard game={game} />
-        </div>}
+        {game && (
+          <div id="game-board">
+            <GameBoard game={game} />
+          </div>
+        )}
       </div>
     </Content>
   );

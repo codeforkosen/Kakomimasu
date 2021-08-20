@@ -4,7 +4,7 @@ import ApiClient from "../client_js/api_client.js";
 import dotenv from "https://taisukef.github.io/denolib/dotenv.js";
 
 class KakomimasuClient {
-  apiClient = new ApiClient("https://practice.kakomimasu.website");
+  apiClient = new ApiClient("https://kakomimasu.website");
 
   constructor(id, name, spec, password) {
     dotenv.config();
@@ -15,6 +15,7 @@ class KakomimasuClient {
     if (!args.aiOnly) this.bearerToken = Deno.env.get("bearerToken");
     console.log(args.local);
     if (args.local) this.setServerHost("http://localhost:8880");
+    else if (args.host) this.setServerHost(args.host);
     else this.setServerHost(Deno.env.get("host"));
   }
   setServerHost(host) {
@@ -178,10 +179,10 @@ class KakomimasuClient {
   async setActions(actions) { // void
     const res = await this.apiClient.setAction(
       this.gameId,
-      { actions },
+      { actions, index: this.pno },
       "Bearer " + this.bearerToken,
     );
-    console.log("setActions", res);
+    //console.log("setActions", res);
     if (res.success === false) throw Error("Set Action Error");
   }
 

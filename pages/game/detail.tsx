@@ -1,8 +1,8 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Button from "@material-ui/core/Button";
+import { CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import {
   CartesianGrid,
   Legend,
@@ -53,36 +53,42 @@ function PointsGraph(props: { game: Game }) {
     getUsers();
   }, [game.gameId]);
 
-  return <div style={{ width: "100%", height: "300px" }}>
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart
-        data={data}
-        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
+  return (
+    <div style={{ width: "100%", height: "300px" }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis
-          dataKey="turn"
-          domain={[0, game.totalTurn - 1]}
-          tickFormatter={(turn: number) => String(turn + 1)}
-          type="number"
-          tickCount={game.totalTurn / 2}
-        />
-        <YAxis />
-        <Tooltip labelFormatter={(props: number) => "Turn : " + (props + 1)} />
-        <Legend />
+          <XAxis
+            dataKey="turn"
+            domain={[0, game.totalTurn - 1]}
+            tickFormatter={(turn: number) => String(turn + 1)}
+            type="number"
+            tickCount={game.totalTurn / 2}
+          />
+          <YAxis />
+          <Tooltip
+            labelFormatter={(props: number) => "Turn : " + (props + 1)}
+          />
+          <Legend />
 
-        {game.players.map((_, i) => {
-          return <Line
-            type="monotone"
-            dataKey={`points[${i}]`}
-            stroke={datas[i].colors[1]}
-            name={users[i]?.screenName || "loading..."}
-          />;
-        })}
-      </LineChart>
-    </ResponsiveContainer>
-  </div>;
+          {game.players.map((_, i) => {
+            return (
+              <Line
+                type="monotone"
+                dataKey={`points[${i}]`}
+                stroke={datas[i].colors[1]}
+                name={users[i]?.screenName || "loading..."}
+              />
+            );
+          })}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 export default function () {
@@ -152,19 +158,21 @@ export default function () {
     <Content title="ゲーム詳細">
       <div style={{ display: "flex", flexDirection: "column" }}>
         {game
-          ? <>
-            <Button
-              component={Link}
-              to={id ? `/vr/index?id=${id}` : "/vr/latest"}
-              target="_blank"
-              style={{ margin: "auto" }}
-            >
-              VR版はこちら
-            </Button>
-            <GameList games={[game]} pagenation={false} hover={false} />
-            <GameBoard game={game} />
-            <PointsGraph game={game} />
-          </>
+          ? (
+            <>
+              <Button
+                component={Link}
+                to={id ? `/vr/index?id=${id}` : "/vr/latest"}
+                target="_blank"
+                style={{ margin: "auto" }}
+              >
+                VR版はこちら
+              </Button>
+              <GameList games={[game]} pagenation={false} hover={false} />
+              <GameBoard game={game} />
+              <PointsGraph game={game} />
+            </>
+          )
           : <CircularProgress color="secondary" />}
       </div>
     </Content>

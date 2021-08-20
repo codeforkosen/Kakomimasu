@@ -115,7 +115,7 @@ class ExpGame extends Game {
       } else if (this.ending) { // ゲーム終了後
         LogFileOp.save(this);
 
-        console.log("turn", this.turn);
+        //console.log("turn", this.turn);
         this.wsSend();
       } // ゲーム開始前
       else {
