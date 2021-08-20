@@ -32,9 +32,7 @@
       (x86)\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin
     - C:\Program Files
       (x86)\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\bin
-- curlをインストールします
-  - https://curl.se/windows/dl-7.75.0_4/curl-7.75.0_4-win32-mingw.zip
-  - 「bin、include、lib」を「C:\Program Files
-    (x86)\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32」にコピーします
 - コンパイルします
   - g++ -std=c++17 client_a1.cpp kakomimasu.cpp -lcurl
+
+コンパイルできない場合は、環境変数の設定でMinGWの優先度を一番上にするとうまくいく場合があります。
