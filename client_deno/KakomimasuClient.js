@@ -139,7 +139,7 @@ class KakomimasuClient {
         const point = p[idx];
         const type = tiled[idx][0];
         const pid = tiled[idx][1];
-        row.push({ type, pid, point, x: j, y: i });
+        row.push({ type, pid, point, x: j, y: i, agentPid: -1 });
       }
       res.push(row);
     }
@@ -150,12 +150,25 @@ class KakomimasuClient {
     const w = this.gameInfo.board.width;
     const h = this.gameInfo.board.height;
     const tiled = this.gameInfo.tiled;
+
+    const agentXYs = {};
+    for (let i = 0; i < this.gameInfo.players.length; i++) {
+      const player = this.gameInfo.players[i];
+      for (const agent of player.agents) {
+        if (agent.x != -1) {
+          agentXYs[agent.x + "," + agent.y] = i;
+        }
+      }
+    }
+
     for (let i = 0; i < h; i++) {
       for (let j = 0; j < w; j++) {
         const f = this.field[i][j];
         const idx = i * w + j;
         f.type = tiled[idx][0];
         f.pid = tiled[idx][1];
+        const agentPid = agentXYs[j + "," + i];
+        f.agentPid = (agentPid != undefined) ? agentPid : -1;
       }
     }
   }
