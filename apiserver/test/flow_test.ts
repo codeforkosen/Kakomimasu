@@ -132,7 +132,7 @@ Deno.test("send action(Turn 1)", async () => {
   }
   const gameInfo = res.data;
   if (!gameInfo.startedAtUnixTime) throw Error("startedAtUnixTime is null.");
-  await sleep(diffTime(gameInfo.startedAtUnixTime) + 0.3);
+  await sleep(diffTime(gameInfo.startedAtUnixTime) + 100);
   await ac.setAction(gameId, {
     actions: [{ agentId: 0, type: "PUT", x: 1, y: 1 }],
     index: 0,
@@ -140,7 +140,7 @@ Deno.test("send action(Turn 1)", async () => {
   //console.log(reqJson);
 
   if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
-  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 0.3);
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 100);
   res = await ac.getMatch(gameId);
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
@@ -178,7 +178,7 @@ Deno.test("send action(Turn 2)", async () => {
   //console.log(reqJson);
 
   if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
-  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 0.3);
+  await sleep(diffTime(gameInfo.nextTurnUnixTime) + 100);
   res = await ac.getMatch(gameId);
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
