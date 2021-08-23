@@ -28,7 +28,6 @@ class ExpGame extends Game {
   public uuid: string;
   public name?: string;
   public startedAtUnixTime: number | null;
-  public nextTurnUnixTime: number | null;
   public changeFuncs: (((id: string) => void) | (() => void))[];
   public reservedUsers: string[];
   public type: "normal" | "self";
@@ -38,7 +37,6 @@ class ExpGame extends Game {
     this.uuid = randomUUID();
     this.name = name;
     this.startedAtUnixTime = null;
-    this.nextTurnUnixTime = null;
     this.changeFuncs = [];
     this.reservedUsers = [];
     this.type = "normal";
@@ -58,7 +56,6 @@ class ExpGame extends Game {
       agents.map((agent) => Agent.restore(agent, game.board, game.field))
     );
     game.startedAtUnixTime = data.startedAtUnixTime;
-    game.nextTurnUnixTime = data.nextTurnUnixTime;
     game.reservedUsers = data.reservedUsers;
     game.type = data.type || "normal";
     return game;
@@ -71,24 +68,9 @@ class ExpGame extends Game {
     }
 
     if (super.attachPlayer(player) === false) return false;
-    if (this.isReady()) {
-      this.startedAtUnixTime = Math.floor(new Date().getTime() / 1000) + 5;
-      this.nextTurnUnixTime = this.startedAtUnixTime + this.nsec;
-      this.updateStatus();
-    }
+    this.updateStatus();
     accounts.addGame(player.id, this.uuid);
-    this.wsSend();
     return true;
-  }
-
-  nextTurn() {
-    if (this.turn < this.nturn) {
-      this.nextTurnUnixTime = util.nowUnixTime() + this.nsec;
-    } else if (this.turn == this.nturn) {
-      this.nextTurnUnixTime = null;
-    }
-    const ret = super.nextTurn();
-    return ret;
   }
 
   addReservedUser(userId: string) {
@@ -103,34 +85,29 @@ class ExpGame extends Game {
   updateStatus() {
     try {
       if (this.isGaming()) { // ゲーム進行中
-        if (!this.nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
-        const diff = (this.nextTurnUnixTime * 1000) - new Date().getTime();
-        if (diff <= 0) {
+        const nextTurnUnixTime = this.getNextTurnUnixTime();
+        if (!nextTurnUnixTime) throw Error("nextTurnUnixTime is null");
+        const diff = (nextTurnUnixTime * 1000) - new Date().getTime();
+        setTimeout(() => {
           this.nextTurn();
-          this.wsSend();
           this.updateStatus();
-        } else {
-          setTimeout(() => this.updateStatus(), diff);
-        }
+        }, diff);
       } else if (this.ending) { // ゲーム終了後
         LogFileOp.save(this);
 
         //console.log("turn", this.turn);
-        this.wsSend();
       } // ゲーム開始前
-      else {
-        if (!this.startedAtUnixTime) throw Error("startedAtUnixTime is null");
+      else if (this.isReady()) {
+        this.startedAtUnixTime = util.nowUnixTime() + 5;
         const diff = (this.startedAtUnixTime * 1000) - new Date().getTime();
-        if (diff <= 0) {
+        setTimeout(() => {
           this.start();
-          this.wsSend();
           this.updateStatus();
-        } else {
-          setTimeout(() => this.updateStatus(), diff);
-        }
+        }, diff);
       }
+      this.wsSend();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
