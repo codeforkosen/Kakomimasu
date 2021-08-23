@@ -11,7 +11,7 @@ const int DIR[8][2] = {
     {1, 1},
 };
 
-string host = "localhost:8880/api";
+string host = "https://kakomimasu.website/api";
 void setHost(string s) {
     host = s;
 }
@@ -23,6 +23,7 @@ static size_t callbackWrite(char *ptr, size_t size, size_t nmemb, string *stream
 }
 
 string curlGet(string req, string token = "") {
+    // cout << "GET " << req << endl;
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
@@ -34,20 +35,27 @@ string curlGet(string req, string token = "") {
 #endif
     fgets(buf, sz, fp);
     string res(buf);
+    // cout << res << endl;
     return res;
 }
 
-string curlPost(string req, string post_data, string token = "") {
+string curlPost(string req, string post_data, string bearer = "") {
+    // cout << "POST " << req << endl;
     const int sz = 102400;
     char buf[sz];
     char cmdline[sz];
+#ifdef _WIN64
     for (int i = 0; i < post_data.size(); ++i) {
         if (post_data[i] == '"') {
             post_data.insert(i, "\\");
             i++;
         }
     }
-    snprintf(cmdline, sz, "curl --request POST --header \"Authorization: %s\" --header \"Content-Type: application/json\" --data %s \"%s%s\"", token.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d %s \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#else
+    snprintf(cmdline, sz, "curl -s -X POST -H \"Authorization:Bearer %s\" -H \"Content-Type: application/json\" -d '%s' \"%s%s\"", bearer.c_str(), post_data.c_str(), host.c_str(), req.c_str());
+#endif
+
 #ifdef _MSC_VER
     FILE *fp = _popen(cmdline, "r");
 #else
@@ -56,16 +64,8 @@ string curlPost(string req, string post_data, string token = "") {
 
     fgets(buf, sz, fp);
     string res(buf);
+    // cout << res << endl;
     return res;
-}
-
-void userRegist(string screenName, string name, string password) {
-    picojson::object send_obj;
-    send_obj.emplace(make_pair("screenName", screenName));
-    send_obj.emplace(make_pair("name", name));
-    send_obj.emplace(make_pair("password", password));
-
-    string res = curlPost("/users/regist", picojson::value(send_obj).serialize());
 }
 
 string userShow(string identifier) {
@@ -80,18 +80,8 @@ int rnd(int n) {
     return engine() % n;
 }
 
-KakomimasuClient::KakomimasuClient(string id, string name, string spec, string password) {
-    string res = userShow(id);
-    picojson::value val;
-    picojson::parse(val, res);
-    picojson::object obj = val.get<picojson::object>();
-
-    if (!obj["errorCode"].is<picojson::null>()) {
-        userRegist(name, id, password);
-        cout << "ユーザー登録しました" << endl;
-    }
-    m_name = id;
-    m_password = password;
+KakomimasuClient::KakomimasuClient(string bearer) {
+    m_bearer = bearer;
 }
 
 bool KakomimasuClient::getGameInfo() {
@@ -111,17 +101,12 @@ bool KakomimasuClient::getGameInfo() {
 
 void KakomimasuClient::waitMatching() {
     picojson::object send_obj;
-    send_obj.emplace(make_pair("name", m_name));
-    send_obj.emplace(make_pair("password", m_password));
-
-    string res = curlPost("/match", picojson::value(send_obj).serialize());
+    string res = curlPost("/match", picojson::value(send_obj).serialize(), m_bearer);
 
     picojson::value val;
     picojson::parse(val, res);
     picojson::object obj = val.get<picojson::object>();
 
-    //cout << res << endl;
-    m_token = obj["accessToken"].get<string>();
     m_game_id = obj["gameId"].get<string>();
     m_player_no = obj["index"].get<double>();
 
@@ -235,8 +220,7 @@ void KakomimasuClient::waitNextTurn() {
 }
 
 void KakomimasuClient::setAction(vector<Action> action) {
-    string post_data = "{\"actions\":[";
-
+    picojson::array arr;
     for (const auto &[agentId, type, x, y] : action) {
         picojson::object obj;
         obj.emplace(make_pair("agentId", picojson::value((double)agentId)));
@@ -244,11 +228,15 @@ void KakomimasuClient::setAction(vector<Action> action) {
         obj.emplace(make_pair("x", picojson::value((double)x)));
         obj.emplace(make_pair("y", picojson::value((double)y)));
 
-        picojson::value val(obj);
-        post_data += val.serialize() + ",";
+        arr.push_back(picojson::value(obj));
     }
-    post_data.erase(post_data.size() - 1);
-    post_data += "]}";
 
-    cout << curlPost("/match/" + m_game_id + "/action", post_data, m_token) << endl;
+    picojson::object send_obj;
+    send_obj.emplace(make_pair("actions", arr));
+    send_obj.emplace(make_pair("index", (double)m_player_no));
+
+    picojson::value val(send_obj);
+    string post_data = val.serialize();
+
+    cout << curlPost("/match/" + m_game_id + "/action", post_data, m_bearer) << endl;
 };

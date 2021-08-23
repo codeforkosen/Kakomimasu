@@ -34,7 +34,7 @@ int rnd(int n);
 
 class KakomimasuClient {
   public:
-    KakomimasuClient(string id, string name, string spec, string password);
+    KakomimasuClient(string bearer);
     bool getGameInfo();
     void waitMatching();
     int getWidth();
@@ -56,6 +56,7 @@ class KakomimasuClient {
     string m_password;
     string m_token;
     string m_game_id;
+    string m_bearer;
     int m_player_no;
     picojson::object m_gameInfo;
     picojson::object m_board;
