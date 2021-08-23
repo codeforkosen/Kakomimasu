@@ -134,6 +134,14 @@ class ExpGame extends Game {
     }
   }
 
+  getNextTurnUnixTime() {
+    if (this.startedAtUnixTime === null || this.ending) {
+      return null;
+    } else {
+      return this.startedAtUnixTime + this.nsec * this.turn;
+    }
+  }
+
   toJSON(): GameType {
     const ret = super.toJSON();
     return {
@@ -141,7 +149,7 @@ class ExpGame extends Game {
       gameId: this.uuid,
       gameName: this.name,
       startedAtUnixTime: this.startedAtUnixTime,
-      nextTurnUnixTime: this.nextTurnUnixTime,
+      nextTurnUnixTime: this.getNextTurnUnixTime(),
       reservedUsers: this.reservedUsers,
       type: this.type,
     };

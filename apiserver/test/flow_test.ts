@@ -130,7 +130,7 @@ Deno.test("send action(Turn 1)", async () => {
   if (res.success === false) {
     throw Error("Response Error. ErrorCode:" + res.data.errorCode);
   }
-  const gameInfo = res.data;
+  let gameInfo = res.data;
   if (!gameInfo.startedAtUnixTime) throw Error("startedAtUnixTime is null.");
   await sleep(diffTime(gameInfo.startedAtUnixTime) + 100);
   await ac.setAction(gameId, {
@@ -138,6 +138,12 @@ Deno.test("send action(Turn 1)", async () => {
     index: 0,
   }, "Bearer " + bearerToken);
   //console.log(reqJson);
+
+  res = await ac.getMatch(gameId);
+  if (res.success === false) {
+    throw Error("Response Error. ErrorCode:" + res.data.errorCode);
+  }
+  gameInfo = res.data;
 
   if (!gameInfo.nextTurnUnixTime) throw Error("nextTurnUnixTime is null.");
   await sleep(diffTime(gameInfo.nextTurnUnixTime) + 100);
@@ -157,8 +163,8 @@ Deno.test("send action(Turn 1)", async () => {
   sample.gameId = res.data.gameId = "";
   sample.players[0].id = res.data.players[0].id = "";
   sample.players[1].id = res.data.players[1].id = "";
-  sample.startedAtUnixTime = res.data.startedAtUnixTime = 0;
-  sample.nextTurnUnixTime = res.data.nextTurnUnixTime = 0;
+  sample.startedAtUnixTime = res.data.startedAtUnixTime;
+  sample.nextTurnUnixTime = res.data.nextTurnUnixTime;
 
   assertEquals(sample, res.data);
 });
@@ -195,8 +201,8 @@ Deno.test("send action(Turn 2)", async () => {
   sample.gameId = res.data.gameId = "";
   sample.players[0].id = res.data.players[0].id = "";
   sample.players[1].id = res.data.players[1].id = "";
-  sample.startedAtUnixTime = res.data.startedAtUnixTime = 0;
-  sample.nextTurnUnixTime = res.data.nextTurnUnixTime = 0;
+  sample.startedAtUnixTime = res.data.startedAtUnixTime;
+  sample.nextTurnUnixTime = res.data.nextTurnUnixTime;
 
   assertEquals(sample, res.data);
 });
