@@ -20,10 +20,11 @@ const latestMtime = (path: string) => {
 };
 
 async function createBundleJsFile() {
-  const sourceMtime = [
+  const sourceMtimes = [
     latestMtime(resolve("../pages")),
     latestMtime(resolve("../components")),
-  ].sort().reverse()[0];
+  ];
+  const sourceMtime = sourceMtimes.sort((a, b) => b.getTime() - a.getTime())[0];
 
   try {
     const bundleJsMtime =
