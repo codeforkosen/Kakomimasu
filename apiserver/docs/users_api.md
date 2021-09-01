@@ -74,6 +74,10 @@ GET /api/users/show/(ユーザのname又はID)
 POST /api/users/delete
 ```
 
+### Authorizationヘッダ
+
+HTTPリクエストのヘッダにBearer認証を含める必要があります。
+
 ### パラメータJSON
 
 以下のパラメータを含んだJSONをbodyに入れて送信して下さい。
