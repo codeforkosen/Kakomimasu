@@ -1,9 +1,5 @@
-import { assert, assertEquals } from "../deps.ts";
-import { errors } from "../error.ts";
+import { assert } from "../deps.ts";
 import { randomUUID } from "../apiserver_util.ts";
-
-import ApiClient from "../../client_js/api_client.js";
-const ac = new ApiClient();
 
 const authRequiredUrlList = [
   `match`,
@@ -25,8 +21,6 @@ authRequiredUrlList.forEach((url) => {
     const wwwAuthentiate = res.headers.get("WWW-Authenticate");
     assert(wwwAuthentiate !== null);
     assert(wwwAuthentiate.includes(`Bearer realm="token_required`));
-    const body = await res.json();
-    //console.log(body);
-    //assertEquals(body, errors.INVALID_CONTENT_TYPE);
+    await res.text();
   });
 });
