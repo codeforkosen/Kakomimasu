@@ -1,12 +1,12 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { Theme, useTheme } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/styles";
-import { TextField } from "@material-ui/core";
-import { Button } from "@material-ui/core";
-import { MenuItem } from "@material-ui/core";
-import { Autocomplete } from "@material-ui/core";
+import { Theme, useTheme } from "@mui/material/styles";
+import { makeStyles } from "@mui/styles";
+import { TextField } from "@mui/material";
+import { Button } from "@mui/material";
+import { MenuItem } from "@mui/material";
+import { Autocomplete } from "@mui/material";
 
 // @deno-types=../../client_js/api_client.d.ts
 import ApiClient from "../../client_js/api_client.js";
