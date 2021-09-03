@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
 
 import firebase, { init } from "../components/firebase.ts";
 init();

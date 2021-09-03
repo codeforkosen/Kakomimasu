@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
-import { Button } from "@mui/material";
-import { CircularProgress } from "@mui/material";
-import { TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import TextField from "@mui/material/TextField";
 
 import firebase from "../../components/firebase.ts";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";

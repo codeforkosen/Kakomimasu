@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
-import { useMediaQuery } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { Link, useHistory } from "react-router-dom";
 
 import { Game, User } from "../apiserver/types.ts";

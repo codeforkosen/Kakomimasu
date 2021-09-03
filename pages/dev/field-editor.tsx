@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { Link, Redirect, RouteComponentProps } from "react-router-dom";
-import { TextField } from "@mui/material";
-import { MenuItem } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
 import Content from "../../components/content.tsx";
 import GameBoard from "../../components/gameBoard.tsx";

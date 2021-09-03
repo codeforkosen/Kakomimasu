@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
-import { Button } from "@mui/material";
+import Button from "@mui/material/Button";
 
 import Content from "../../components/content.tsx";
 import TournamentCard from "../../components/tournament_card.tsx";

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { Theme, useTheme } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
-import { TextField } from "@mui/material";
-import { Button } from "@mui/material";
-import { MenuItem } from "@mui/material";
-import { Autocomplete } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import Autocomplete from "@mui/material/Autocomplete";
 
 // @deno-types=../../client_js/api_client.d.ts
 import ApiClient from "../../client_js/api_client.js";

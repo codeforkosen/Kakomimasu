@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
-import { CircularProgress } from "@mui/material";
-import { Button } from "@mui/material";
-import { TextField } from "@mui/material";
-import { Autocomplete } from "@mui/material";
-import { Table } from "@mui/material";
-import { TableBody } from "@mui/material";
-import { TableCell } from "@mui/material";
-import { TableContainer } from "@mui/material";
-import { TableHead } from "@mui/material";
-import { TableRow } from "@mui/material";
-import { Paper } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 
 // @deno-types="../../client_js/api_client.d.ts"
 import ApiClient from "../../client_js/api_client.js";
