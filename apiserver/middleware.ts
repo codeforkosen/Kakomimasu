@@ -56,13 +56,13 @@ export const auth = (
 
       //const headers = resTemp.headers
       if (basic) {
-        headers.append("WWW-Authenticate", "Basic");
+        headers.append("WWW-Authenticate", `Basic realm="token_required"`);
       }
       if (bearer) {
-        headers.append("WWW-Authenticate", "Bearer");
+        headers.append("WWW-Authenticate", `Bearer realm="token_required"`);
       }
       if (jwt) {
-        headers.append("WWW-Authenticate", "JWT");
+        headers.append("WWW-Authenticate", `JWT realm="token_required"`);
       }
       req.respond({ status: 401, headers, body });
     }
