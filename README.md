@@ -27,6 +27,8 @@ $ cd apiserver
 $ deno run -A apiserver.ts
 ```
 
+そのあと、[localhost:8880](http://localhost:8880/index)をクリックする。
+
 ## APIプロトコル
 
 - [match API](./apiserver/docs/match_api.md)
