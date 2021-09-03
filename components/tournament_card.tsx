@@ -1,10 +1,10 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { Theme, useTheme } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/styles";
-import { Card } from "@material-ui/core";
-import { CardActionArea } from "@material-ui/core";
-import { CardContent } from "@material-ui/core";
+import { Theme, useTheme } from "@mui/material/styles";
+import { makeStyles } from "@mui/styles";
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardContent from "@mui/material/CardContent";
 
 import { Tournament } from "../apiserver/types.ts";
 

@@ -1,6 +1,6 @@
 import React from "react";
-import { makeStyles } from "@material-ui/styles";
-import { Theme, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
+import { Theme, useTheme } from "@mui/material/styles";
 
 const useStyles = makeStyles({
   footer: (theme: Theme) => ({

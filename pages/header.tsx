@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { AppBar } from "@material-ui/core";
-import { Avatar } from "@material-ui/core";
-import { Button } from "@material-ui/core";
-import { Toolbar } from "@material-ui/core";
-import { Menu } from "@material-ui/core";
-import { MenuItem } from "@material-ui/core";
+import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Toolbar from "@mui/material/Toolbar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 import firebase from "../components/firebase.ts";
 

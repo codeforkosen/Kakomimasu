@@ -1,8 +1,8 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CircularProgress } from "@material-ui/core";
-import { Button } from "@material-ui/core";
+import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
 import {
   CartesianGrid,
   Legend,
