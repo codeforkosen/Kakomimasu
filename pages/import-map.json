@@ -4,7 +4,7 @@
     "react-dom": "https://esm.sh/react-dom",
     "react-router-dom": "https://esm.sh/react-router-dom",
     "@mui/material/": "https://esm.sh/@mui/material@latest/",
-    "@mui/icons-material": "https://esm.sh/@mui/icons-material@latest",
+    "@mui/icons-material/": "https://esm.sh/@mui/icons-material@latest/",
     "@mui/styles": "https://esm.sh/@mui/styles@latest",
     "recharts": "https://esm.sh/recharts@2.0.8",
     "firebase/": "https://esm.sh/firebase@8.9.1/",

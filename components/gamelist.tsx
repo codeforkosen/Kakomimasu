@@ -13,10 +13,10 @@ import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { FirstPage } from "@mui/icons-material";
-import { KeyboardArrowLeft } from "@mui/icons-material";
-import { KeyboardArrowRight } from "@mui/icons-material";
-import { LastPage } from "@mui/icons-material";
+import FirstPage from "@mui/icons-material/FirstPage";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import LastPage from "@mui/icons-material/LastPage";
 
 import { Game, Player, User } from "../apiserver/types.ts";
 
