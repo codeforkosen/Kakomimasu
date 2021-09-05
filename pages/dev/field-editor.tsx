@@ -1,9 +1,9 @@
 /// <reference lib="dom"/>
 import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import { Link, Redirect, RouteComponentProps } from "react-router-dom";
-import { TextField } from "@material-ui/core";
-import { MenuItem } from "@material-ui/core";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
 import Content from "../../components/content.tsx";
 import GameBoard from "../../components/gameBoard.tsx";

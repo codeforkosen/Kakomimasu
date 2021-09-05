@@ -3,16 +3,15 @@
     "react": "https://esm.sh/react@17.0.2",
     "react-dom": "https://esm.sh/react-dom",
     "react-router-dom": "https://esm.sh/react-router-dom",
-    "@material-ui/core": "https://esm.sh/@material-ui/core@5.0.0-beta.2",
-    "@material-ui/core/styles": "https://esm.sh/@material-ui/core@5.0.0-beta.2/styles",
-    "@material-ui/icons": "https://esm.sh/@material-ui/icons@5.0.0-beta.1?deps=@material-ui/core@5.0.0-beta.2",
-    "@material-ui/styles": "https://esm.sh/@material-ui/styles@5.0.0-beta.2",
+    "@mui/material/": "https://esm.sh/@mui/material@latest/",
+    "@mui/icons-material/": "https://esm.sh/@mui/icons-material@latest/",
+    "@mui/styles": "https://esm.sh/@mui/styles@latest",
     "recharts": "https://esm.sh/recharts@2.0.8",
     "firebase/": "https://esm.sh/firebase@8.9.1/",
     "react-firebaseui/StyledFirebaseAuth": "https://esm.sh/react-firebaseui/StyledFirebaseAuth",
     "https://cdn.esm.sh/v47/firebase@9.0.1/": "https://cdn.esm.sh/v47/firebase@8.9.1/",
     "https://cdn.esm.sh/v47/firebase@9.0.0/": "https://cdn.esm.sh/v47/firebase@8.9.1/",
     "https://cdn.esm.sh/v47/react-transition-group@2.9.0/deno/react-transition-group.js": "https://cdn.esm.sh/v43/react-transition-group@2.9.0/deno/react-transition-group.js",
-    "https://cdn.esm.sh/v47/@popperjs/core@2.9.3/dist/cjs/": "https://cdn.esm.sh/v47/@popperjs/core@2.9.3/lib/"
+    "https://cdn.esm.sh/v47/@popperjs/core@2.10.0/dist/cjs/": "https://cdn.esm.sh/v47/@popperjs/core@2.10.0/lib/"
   }
 }
