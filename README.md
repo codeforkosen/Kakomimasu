@@ -5,70 +5,33 @@
 <img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.drawio.png">
 
 ![.github/workflows/test.yml](https://github.com/codeforkosen/Kakomimasu/workflows/.github/workflows/test.yml/badge.svg)
-[![deno](https://img.shields.io/static/v1?logo=deno&label=Deno&message=1.12.0)](https://deno.land/)
-
-<!--[![esmodules](https://taisukef.github.com/denolib/esmodulesbadge.svg)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules)-->
-
-https://github.com/codeforkosen/Kakomimasu/edit/master/README.md 囲みマス\
-https://codeforkosen.github.io/Kakomimasu/
+[![deno](https://img.shields.io/static/v1?logo=deno&label=Deno&message=1.13.2)](https://deno.land/)
 
 ## 競技部門ルール
 
-http://www.procon.gr.jp/?p=77044
+[#procon31の競技ルール](http://www.procon.gr.jp/?p=77044)を元に作成しました。下記URLからご覧ください。
 
-## APIサーバー
+https://hackmd.io/cBAzsJkoSp6c6N5Vggo7VA
 
-[apiserver/](apiserver)
+## 関連ツール・リポジトリ
 
-### 起動方法
+### kakomimasu server
 
-```
-$ cd apiserver
-$ deno run -A apiserver.ts
-```
+オンラインで対戦可能なサーバを公開しています。
 
-## APIプロトコル
+[kakomimasu/server - Github](https://github.com/kakomimasu/server)
 
-- [match API](./apiserver/docs/match_api.md)
-- [users API](./apiserver/docs/users_api.md)
-- [tournaments API](./apiserver/docs/tournaments_api.md)
-- [game API](./apiserver/docs/game_api.md)
+### kakomimasu client for Deno
 
-- [data dictionary](./apiserver/docs/data.md)
-- [error](./apiserver/docs/error.md)
+[囲みマス サーバ](#kakomimasu-server)に参戦するためのDeno用クライアントです。
 
-## APIクライアント for Deno (JavaScript)
+[kakomimasu/client-deno - Github](https://github.com/kakomimasu/client-deno)
 
-[apiserver/](apiserver)を立ち上げ、[テストページ](http://localhost:8880/)を開いた状態で下記を実行する。
+### kakomimasu client for C++
 
-```
-$ cd client_deno
-$ deno run -A client_a1.js --local
-```
+[囲みマス サーバ](#kakomimasu-server)に参戦するためのC++用クライアントです。
 
-別のコンソールから
-
-```
-$ cd client_deno
-$ deno run -A client_a2.js --local
-```
-
-詳細→[Kakomimasu client for deno - README.md](https://github.com/codeforkosen/Kakomimasu/blob/master/client_deno/README.md)
-
-## APIクライアント for Node
-
-```
-$ cd client_node
-$ node action.mjs
-```
-
-## APIクライアント for C (Mac/Windows gcc)
-
-```
-$ cd client_c
-$ gcc action_test.c
-$ ./a.out
-```
+[kakomimasu/client-cpp - Github](https://github.com/kakomimasu/client-cpp)
 
 ## サポート Discord
 
@@ -79,9 +42,9 @@ https://discord.gg/283ZvKPcUD
 
 http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&positiveRatio=80&min=-16&max=9
 
-## 利用方法（コアのみ使用する）
+## コア利用方法（コアのみ使用する）
 
-for Deno
+### for Deno
 
 ```typescript
 import {
@@ -92,11 +55,11 @@ import {
 const kkmm = new Kakomimasu();
 ```
 
-## 利用方法（リポジトリを取得し、ローカルで使用する）
+## コア利用方法（リポジトリを取得し、ローカルで使用する）
 
-for Deno
+### for Deno
 
-```
+```console
 $ git clone https://github.com/codeforkosen/Kakomimasu.git
 ```
 
@@ -143,22 +106,14 @@ console.log(game.getStatusJSON());
 
 コンソールにて
 
-```
+```console
 $ deno run main.js
 ```
 
-## テスト
-
-囲みマスコア（Kakomimasu.js）のテストを行うには以下を実行
+## コアテスト
 
 ```console
 $ deno test ./test
-```
-
-囲みマスAPIサーバのテストを行うには、localでサーバを起動した状態で以下を実行
-
-```console
-$ deno test ./apiserver
 ```
 
 Github
@@ -168,22 +123,19 @@ Actionsのローカル実行ツール「[act](https://github.com/nektos/act)」�
 $ act
 ```
 
-## デザイン
+## その他
+
+### スマホアプリデザイン案
 
 Kakomimasu – Figma\
 https://www.figma.com/file/oWmSSWHCkRUS3a4h1URvx3/Kakomimasu
-
-## フィールド
-
-参考、2019年 競技部門 公開フィールド\
-http://www.procon.gr.jp/?p=76585
 
 ## 出典
 
 高専プロコン第31回苫小牧大会\
 http://www.procon.gr.jp/
 
-## 記事
+## 関連記事
 
 2020-06-02 中止になった高専プロコン競技部門はオンラインで遊ぼう！ 競技システムのDeno/Node.js用コアモジュールのオープンソース公開\
 https://fukuno.jig.jp/2869
