@@ -2,7 +2,7 @@
 
 #procon31 競技部門 コアモジュール for
 [Deno](https://deno.land/)/[Node.js](https://nodejs.org/ja/)/web\
-<img src="https://codeforkosen.github.io/Kakomimasu/img/kakomimasu-img.drawio.png">
+<img src="https://raw.githubusercontent.com/kakomimasu/img/main/kakomimasu-img.drawio.png">
 
 ![.github/workflows/test.yml](https://github.com/codeforkosen/Kakomimasu/workflows/.github/workflows/test.yml/badge.svg)
 [![deno](https://img.shields.io/static/v1?logo=deno&label=Deno&message=1.13.2)](https://deno.land/)
@@ -66,7 +66,7 @@ $ git clone https://github.com/codeforkosen/Kakomimasu.git
 main.js を編集（そのままでも動きます）
 
 ```javascript
-import { Action, Board, Kakomimasu } from "./Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
 
@@ -107,7 +107,7 @@ console.log(game.getStatusJSON());
 コンソールにて
 
 ```console
-$ deno run main.js
+$ deno run sample/main.js
 ```
 
 ## コアテスト

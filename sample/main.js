@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "./Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
 
 const kkmm = new Kakomimasu();
 
@@ -9,11 +9,11 @@ for (let i = 0; i < w * h; i++) {
   points[i] = i;
 }
 const nagent = 6;
-const board = new Board(w, h, points, nagent);
+const nturn = 10;
+const board = new Board(w, h, points, nagent, nturn);
 kkmm.appendBoard(board);
 
-const nturn = 10;
-const game = kkmm.createGame(board, nturn);
+const game = kkmm.createGame(board);
 const p1 = kkmm.createPlayer("test1");
 const p2 = kkmm.createPlayer("test2");
 game.attachPlayer(p1);
