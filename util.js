@@ -30,8 +30,4 @@ util.deepEquals = (x, y) => {
   return true;
 };
 
-util.nowUnixTime = () => {
-  return Math.floor(new Date().getTime() / 1000);
-};
-
 export default util;
