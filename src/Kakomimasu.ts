@@ -15,9 +15,9 @@ class Board {
       points: number[];
       nagent: number;
       nturn: number;
-      nsec: number;
-      nplayer: number;
-      name: string;
+      nsec?: number;
+      nplayer?: number;
+      name?: string;
     },
   ) {
     this.w = w;
@@ -632,6 +632,7 @@ class Game {
   }
 
   checkConflict(actions: Action[][]): void {
+    console.log("Actions", actions);
     const chkfield: Action[][] = new Array(this.field.field.length);
     for (let i = 0; i < chkfield.length; i++) {
       chkfield[i] = [];
@@ -917,11 +918,9 @@ class Kakomimasu {
     return this.boards;
   }
 
-  createGame( // deno-lint-ignore no-explicit-any ban-types
-    ...param: ConstructorParameters<(new (...args: any) => {}) & Game>
-  ): Game {
+  createGame(...param: ConstructorParameters<typeof Game>): Game {
     //console.log(board);
-    const game = new Game(param);
+    const game = new Game(...param);
     this.games.push(game);
     return game;
   }
