@@ -9,12 +9,12 @@ class Board {
   public name: string;
 
   constructor(
-    { w, h, points, nagent, nturn = 30, nsec = 3, nplayer = 2, name = "" }: {
+    { w, h, points, nagent, nturn, nsec, nplayer, name }: {
       w: number;
       h: number;
       points: number[];
       nagent: number;
-      nturn: number;
+      nturn?: number;
       nsec?: number;
       nplayer?: number;
       name?: string;
@@ -24,10 +24,10 @@ class Board {
     this.h = h;
     this.points = points;
     this.nagent = nagent;
-    this.nturn = nturn;
-    this.nsec = nsec;
-    this.nplayer = nplayer;
-    this.name = name;
+    this.nturn = nturn || 30;
+    this.nsec = nsec || 3;
+    this.nplayer = nplayer || 2;
+    this.name = name || "";
     if (this.points.length !== this.w * this.h) {
       throw new Error("points.length must be " + this.w * this.h);
     }
@@ -251,8 +251,9 @@ class Agent {
   }
 }
 
-type ActionType = 1 | 2 | 3 | 4;
+export type ActionType = 1 | 2 | 3 | 4;
 type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
+export type ActionJSON = [number, ActionType, number, number];
 
 class Action {
   public agentid: number;
@@ -310,7 +311,7 @@ class Action {
     ][res];
   }
 
-  static fromJSON = (array: [number, ActionType, number, number][]) =>
+  static fromJSON = (array: ActionJSON[]) =>
     array.map((a) => new Action(a[0], a[1], a[2], a[3]));
 }
 
