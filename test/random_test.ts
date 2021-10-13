@@ -1,10 +1,16 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-import { assert, AssertionError } from "../asserts.js";
+import {
+  Action,
+  ActionJSON,
+  ActionType,
+  Board,
+  Kakomimasu,
+} from "../src/Kakomimasu.ts";
+import { assert, AssertionError } from "./deps.ts";
 //import util from "../util.js";
 //import util from "./nornd.js";
 import util from "./mtrnd.js";
 
-const cl = (...a) => {
+const cl = (...a: Parameters<Console["log"]>) => {
   a;
 }; //console.log(...a);
 
@@ -12,7 +18,7 @@ Deno.test("random", () => {
   const nagent = 6;
   const [w, h] = [nagent, nagent];
   const nturn = 10000;
-  const board = new Board(w, h, new Array(w * h), nagent, nturn);
+  const board = new Board({ w, h, points: new Array(w * h), nagent, nturn });
 
   const initialput = false;
 
@@ -41,7 +47,7 @@ Deno.test("random", () => {
     }
   };
 
-  const isOnAgent = (p, x, y) => {
+  const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
     for (const a of game.agents[p]) {
       if (a.x === x && a.y === y) {
@@ -71,7 +77,7 @@ Deno.test("random", () => {
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
         s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString() + a);
-        fillfld += n[0] === 0 && n[1] !== -1;
+        fillfld += (n[0] === 0 && n[1] !== -1) ? 1 : 0;
       }
       res.push(s.join(" "));
     }
@@ -92,7 +98,7 @@ Deno.test("random", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        if (a !== "." && n[1] >= 0 && n[1] != a) {
+        if (a !== "." && n[1] >= 0 && n[1] != parseInt(a)) {
           throw new AssertionError(
             `illegal field!! ${j}x${i} ${n[1]} must be ${a}`,
           );
@@ -111,9 +117,9 @@ Deno.test("random", () => {
   };
 
   // put
-  let actions = null;
-  const getPutAction = (x) => {
-    const act = [];
+  let actions: ActionType[];
+  const getPutAction = (x: number) => {
+    const act: ActionJSON[] = [];
     for (let i = 0; i < nagent; i++) {
       act.push([i, Action.PUT, x, i]);
     }
@@ -131,18 +137,16 @@ Deno.test("random", () => {
     actions = [Action.PUT, Action.MOVE, Action.REMOVE];
   }
   //console.log("actions", actions);
-  const getRandomAction = (
-    n,
-  ) => [
+  const getRandomAction = (n: number): ActionJSON => [
     n,
     actions[util.rnd(actions.length)],
     util.rnd(nagent),
     util.rnd(nagent),
   ];
   for (let i = 1; i <= nturn; i++) {
-    const act = [];
+    const act: ActionJSON[][] = [];
     for (let k = 0; k < nplayers; k++) {
-      const act2 = [];
+      const act2: ActionJSON[] = [];
       for (let j = 0; j < nagent; j++) {
         act2.push(getRandomAction(j));
       }

@@ -1,9 +1,9 @@
-import { assertEquals } from "https://deno.land/std@0.67.0/testing/asserts.ts";
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../src/Kakomimasu.ts";
+import { assert, assertEquals, AssertionError } from "./deps.ts";
 
-const assert = (b) => {
+/*const assert = (b) => {
   assertEquals(true, b);
-};
+};*/
 
 /*
 Deno.test("a", async () => {
@@ -18,7 +18,7 @@ Deno.test("conflict5 test", () => {
   const [w, h] = [3, 1];
   const points = [1, 1, 1];
   const nturn = 20;
-  const board = new Board(w, h, points, nagent, nturn);
+  const board = new Board({ w, h, points, nagent, nturn });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
@@ -32,7 +32,7 @@ Deno.test("conflict5 test", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const cl = (...a) => {
+  const cl = (...a: Parameters<Console["log"]>) => {
     a;
   }; //console.log(...a);
 
@@ -48,7 +48,7 @@ Deno.test("conflict5 test", () => {
     }
   };
 
-  const isOnAgent = (p, x, y) => {
+  const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
     for (const a of game.agents[p]) {
       if (a.x === x && a.y === y) {
@@ -83,7 +83,7 @@ Deno.test("conflict5 test", () => {
     return res.join("\n");
   };
   const p = () => cl(tos());
-  const chk = (s) => assertEquals(s.trim(), tos());
+  const chk = (s: string) => assertEquals(s.trim(), tos());
 
   //put 2,2
   //kc.setActions([ new Action(0, "MOVE", 4, 2),new Action(0, "MOVE", 3, 2)]); // こっちだとAgentが[3,2]に移動する。

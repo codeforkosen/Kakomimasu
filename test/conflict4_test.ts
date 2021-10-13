@@ -1,12 +1,19 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-import { assert, assertEquals, AssertionError } from "../asserts.js";
+import { Action, Board, Kakomimasu } from "../src/Kakomimasu.ts";
+import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 Deno.test("conflict4", () => {
   const nagent = 2;
   const nturn = 30;
   const nsec = 3;
   const [w, h] = [3, 2];
-  const board = new Board(w, h, new Array(w * h), nagent, nturn, nsec);
+  const board = new Board({
+    w,
+    h,
+    points: new Array(w * h),
+    nagent,
+    nturn,
+    nsec,
+  });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
@@ -20,7 +27,7 @@ Deno.test("conflict4", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const cl = (...a) => {
+  const cl = (...a: Parameters<Console["log"]>) => {
     a;
   }; //console.log(...a);
 
@@ -36,7 +43,7 @@ Deno.test("conflict4", () => {
     }
   };
 
-  const isOnAgent = (p, x, y) => {
+  const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
     for (const a of game.agents[p]) {
       if (a.x === x && a.y === y) {
@@ -72,7 +79,7 @@ Deno.test("conflict4", () => {
   };
 
   const p = () => cl(tos());
-  const chk = (s) => assertEquals(s.trim(), tos());
+  const chk = (s: string) => assertEquals(s.trim(), tos());
 
   cl("put");
   p1.setActions(Action.fromJSON([
