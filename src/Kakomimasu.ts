@@ -632,7 +632,7 @@ class Game {
   }
 
   checkConflict(actions: Action[][]): void {
-    console.log("Actions", actions);
+    //console.log("Actions", actions);
     const chkfield: Action[][] = new Array(this.field.field.length);
     for (let i = 0; i < chkfield.length; i++) {
       chkfield[i] = [];
@@ -694,9 +694,8 @@ class Game {
       }
       this.agents.flat().forEach((agent) => {
         const act = agent.lastaction;
-        if (!act) return;
         if (
-          agent.isValidAction() &&
+          agent.isValidAction() && act &&
           (act.type === Action.MOVE || act.type === Action.PUT)
         ) {
           const n = act.x + act.y * this.board.w;
