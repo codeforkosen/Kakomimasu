@@ -1,3 +1,5 @@
+import { flat } from "./util.ts";
+
 class Board {
   public w: number;
   public h: number;
@@ -662,7 +664,8 @@ class Game {
     for (let i = 0; i < chkfield.length; i++) {
       chkfield[i] = [];
     }
-    this.agents.flat().forEach((agent) => {
+
+    flat(this.agents).forEach((agent) => {
       if (agent.x === -1) return;
       const _act = agent.lastaction;
       const n = agent.x + agent.y * this.board.w;
@@ -671,12 +674,13 @@ class Game {
     });
     chkfield.filter((a) => a.length >= 2).forEach((a) => {
       console.log("**\nduplicate!!", a);
-      Deno.exit(0);
+      throw Error("**\nduplicate!!");
+      //Deno.exit(0);
     });
   }
 
   putOrMove(): void {
-    this.agents.flat().forEach((agent) => {
+    flat(this.agents).forEach((agent) => {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
         // throw new Error("illegal action!")
@@ -693,7 +697,7 @@ class Game {
       for (let i = 0; i < chkfield.length; i++) {
         chkfield[i] = [];
       }
-      this.agents.flat().forEach((agent) => {
+      flat(this.agents).forEach((agent) => {
         const act = agent.lastaction;
         if (
           agent.isValidAction() && act &&
@@ -721,7 +725,7 @@ class Game {
   }
 
   removeOrNot(): void {
-    const agents = this.agents.flat();
+    const agents = flat(this.agents);
     agents.forEach((agent) => {
       if (agent.x === -1) return;
       if (!agent.isValidAction()) return;
@@ -737,7 +741,7 @@ class Game {
   }
 
   revertNotOwnerWall(): void {
-    const agents = this.agents.flat();
+    const agents = flat(this.agents);
     const fld = this.field.field;
     const w = this.board.w;
     agents.forEach((agent) => {
@@ -758,7 +762,7 @@ class Game {
   }
 
   commit(): void {
-    const agents = this.agents.flat();
+    const agents = flat(this.agents);
     agents.forEach((agent) => {
       // if (agent.x === -1) return;
       // if (!agent.isValidAction()) return;
@@ -925,7 +929,7 @@ class Kakomimasu {
     return game;
   }
 
-  getGames(): Game[] {
+  getGames() {
     return this.games;
   }
 
