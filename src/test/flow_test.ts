@@ -1,9 +1,8 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-import { assertEquals } from "../asserts.js";
-// import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { assertEquals } from "./deps.ts";
 //import util from "../util.mjs";
 
-const cl = (...a) => {
+const cl = (...a: Parameters<Console["log"]>) => {
   a;
 }; //console.log(...a);
 
@@ -19,7 +18,7 @@ Deno.test("flow", () => {
   }
   const nagent = 6;
   const nturn = 10;
-  const board = new Board(w, h, points, nagent, nturn);
+  const board = new Board({ w, h, points, nagent, nturn });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);

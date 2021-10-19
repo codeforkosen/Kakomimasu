@@ -1,13 +1,13 @@
-import { Board, Field } from "../Kakomimasu.js";
+import { Board, Field } from "../Kakomimasu.ts";
 
-const cl = (...a) => {
+const cl = (...a: Parameters<Console["log"]>) => {
   a;
 }; //console.log(...a);
 
 Deno.test("fillBase2", () => {
   const nagent = 6;
   const [w, h] = [8, 8];
-  const board = new Board(w, h, new Array(w * h), nagent);
+  const board = new Board({ w, h, points: new Array(w * h), nagent });
   const field = new Field(board);
 
   const p = () => {
@@ -21,7 +21,7 @@ Deno.test("fillBase2", () => {
     }
     cl();
   };
-  const set = (s) => {
+  const set = (s: string) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
@@ -34,7 +34,7 @@ Deno.test("fillBase2", () => {
       }
     }
   };
-  const chk = (s) => {
+  const chk = (s: string) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);

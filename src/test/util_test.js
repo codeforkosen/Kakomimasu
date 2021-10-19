@@ -1,5 +1,5 @@
-import util from "../util.js";
-import { assert } from "../asserts.js";
+import util from "../../util.js";
+import { assert } from "./deps.ts";
 
 Deno.test("rnd", () => {
   for (let i = 0; i < 100; i++) {

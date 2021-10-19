@@ -1,5 +1,5 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-import { assertEquals } from "../asserts.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { assertEquals } from "./deps.ts";
 // import util from "../util.mjs";
 
 const prepare = () => {
@@ -12,7 +12,7 @@ const prepare = () => {
     // util.rnd(16 * 2 + 1) - 16;
   }
   const nagent = 9;
-  const board = new Board(w, h, points, nagent, 30);
+  const board = new Board({ w, h, points, nagent, nturn: 30 });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);

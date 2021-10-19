@@ -1,14 +1,14 @@
-import { Board, Field } from "../Kakomimasu.js";
-import { AssertionError } from "../asserts.js";
+import { Board, Field } from "../Kakomimasu.ts";
+import { AssertionError } from "./deps.ts";
 
-const cl = (...a) => {
+const cl = (...a: Parameters<Console["log"]>) => {
   a;
 }; //console.log(...a);
 
 Deno.test("fillBase2", () => {
   const nagent = 6;
   const [w, h] = [3, 3];
-  const board = new Board(w, h, new Array(w * h), nagent);
+  const board = new Board({ w, h, points: new Array(w * h), nagent });
   const field = new Field(board);
 
   const p = () => {
@@ -22,7 +22,7 @@ Deno.test("fillBase2", () => {
     }
     cl();
   };
-  const set = (s) => {
+  const set = (s: string) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
@@ -33,14 +33,14 @@ Deno.test("fillBase2", () => {
       }
     }
   };
-  const chk = (s) => {
+  const chk = (s: string) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i += 2) {
       const c = s.charAt(i) === "W" ? Field.WALL : Field.BASE;
       const n = s.charAt(i + 1) === "." ? -1 : parseInt(s.charAt(i + 1));
       const f = field.field[i / 2];
       if (f[0] !== c || f[1] !== n) {
-        throw new AssertionError();
+        throw new AssertionError("");
       }
     }
   };

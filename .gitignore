@@ -1,7 +1,0 @@
-.vscode/
-
-log/
-*.bat
-*.env
-*.code-workspace
-.idea/

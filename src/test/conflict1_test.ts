@@ -1,11 +1,11 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-import { assert, assertEquals, AssertionError } from "../asserts.js";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 Deno.test("conflict1", () => {
   const nagent = 6;
   const [w, h] = [3, 1];
   const nturn = 20;
-  const board = new Board(w, h, new Array(w * h), nagent, nturn);
+  const board = new Board({ w, h, points: new Array(w * h), nagent, nturn });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
@@ -19,7 +19,7 @@ Deno.test("conflict1", () => {
   game.attachPlayer(p2);
   game.start();
 
-  const isOnAgent = (p, x, y) => {
+  const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
     for (const a of game.agents[p]) {
       if (a.x === x && a.y === y) {
@@ -54,9 +54,9 @@ Deno.test("conflict1", () => {
     return res.join("\n");
   };
 
-  const chk = (s) => assertEquals(s.trim(), tos());
+  const chk = (s: string) => assertEquals(s.trim(), tos());
 
-  const cl = (...a) => console.log(...a);
+  const cl = (...a: Parameters<Console["log"]>) => a; //console.log(...a);
   const p = () => cl(tos());
 
   // put

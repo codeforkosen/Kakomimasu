@@ -1,0 +1,24 @@
+{
+  "name": "@kakomimasu/core",
+  "version": "v2.0.0",
+  "description": "Kakomimasu core module for js/ts(browser/deno/node)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codeforkosen/Kakomimasu"
+  },
+  "bugs": {
+    "url": "https://github.com/codeforkosen/Kakomimasu/issues"
+  },
+  "dependencies": {},
+  "main": "./cjs/Kakomimasu.js",
+  "module": "./mjs/Kakomimasu.js",
+  "types": "./types/Kakomimasu.d.ts",
+  "exports": {
+    ".": {
+      "import": "./mjs/Kakomimasu.js",
+      "require": "./cjs/Kakomimasu.js",
+      "types": "./types/Kakomimasu.d.ts"
+    }
+  }
+}

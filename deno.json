@@ -1,0 +1,12 @@
+{
+  "fmt": {
+    "files": {
+      "exclude": ["cjs/", "mjs/", "types"]
+    }
+  },
+  "lint": {
+    "files": {
+      "exclude": ["cjs/", "mjs/", "types"]
+    }
+  }
+}
