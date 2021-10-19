@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "../src/Kakomimasu.ts";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
 import { assertEquals } from "./deps.ts";
 //import util from "../util.mjs";
 

@@ -1,4 +1,4 @@
-import { Board, Field } from "../src/Kakomimasu.ts";
+import { Board, Field } from "../Kakomimasu.ts";
 import { AssertionError } from "./deps.ts";
 
 const cl = (...a: Parameters<Console["log"]>) => {

@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "../src/Kakomimasu.ts";
+import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
 import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 const cl = (...a: Parameters<Console["log"]>) => {

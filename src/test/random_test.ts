@@ -4,7 +4,7 @@ import {
   ActionType,
   Board,
   Kakomimasu,
-} from "../src/Kakomimasu.ts";
+} from "../Kakomimasu.ts";
 import { assert, AssertionError } from "./deps.ts";
 //import util from "../util.js";
 //import util from "./nornd.js";

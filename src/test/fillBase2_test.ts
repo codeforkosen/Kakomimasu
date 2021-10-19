@@ -1,4 +1,4 @@
-import { Board, Field } from "../src/Kakomimasu.ts";
+import { Board, Field } from "../Kakomimasu.ts";
 
 const cl = (...a: Parameters<Console["log"]>) => {
   a;

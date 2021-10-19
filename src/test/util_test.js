@@ -1,4 +1,4 @@
-import util from "../util.js";
+import util from "../../util.js";
 import { assert } from "./deps.ts";
 
 Deno.test("rnd", () => {
