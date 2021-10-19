@@ -15,10 +15,10 @@ jobs:
           deno-version: v1.x
       - name: Run fmt
         run: |
-          deno fmt --check
+          deno fmt -c deno.json --check
       - name: Run lint
         run: |
-          deno lint
+          deno lint -c deno.json
       - name: Run test
         run: |
           deno test -A ./test
