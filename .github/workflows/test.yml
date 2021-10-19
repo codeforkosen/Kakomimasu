@@ -21,4 +21,4 @@ jobs:
           deno lint -c deno.json
       - name: Run test
         run: |
-          deno test -A ./test
+          deno test -A
