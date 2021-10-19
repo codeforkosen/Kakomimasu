@@ -15,12 +15,6 @@ https://hackmd.io/cBAzsJkoSp6c6N5Vggo7VA
 
 ## 関連ツール・リポジトリ
 
-### kakomimasu server
-
-オンラインで対戦可能なサーバを公開しています。
-
-[kakomimasu/server - Github](https://github.com/kakomimasu/server)
-
 ### kakomimasu client for Deno
 
 [囲みマス サーバ](#kakomimasu-server)に参戦するためのDeno用クライアントです。
@@ -32,6 +26,18 @@ https://hackmd.io/cBAzsJkoSp6c6N5Vggo7VA
 [囲みマス サーバ](#kakomimasu-server)に参戦するためのC++用クライアントです。
 
 [kakomimasu/client-cpp - Github](https://github.com/kakomimasu/client-cpp)
+
+### kakomimasu server
+
+オンラインで対戦可能なサーバのコードです。
+
+[kakomimasu/server - Github](https://github.com/kakomimasu/server)
+
+### kakomimasu viewer
+
+[囲みマスビューア](https://kakomimasu.com)のコードです。
+
+[kakomimasu/viewer - Github](https://github.com/kakomimasu/viewer)
 
 ## サポート Discord
 
@@ -51,7 +57,7 @@ import {
   Action,
   Board,
   Kakomimasu,
-} from "https://codeforkosen.github.io/Kakomimasu/Kakomimasu.js";
+} from "https://raw.githubusercontent.com/codeforkosen/Kakomimasu/v1.0.0/Kakomimasu.js";
 const kkmm = new Kakomimasu();
 ```
 
@@ -63,46 +69,7 @@ const kkmm = new Kakomimasu();
 $ git clone https://github.com/codeforkosen/Kakomimasu.git
 ```
 
-main.js を編集（そのままでも動きます）
-
-```javascript
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
-
-const kkmm = new Kakomimasu();
-
-const w = 8;
-const h = 8;
-const points = [];
-for (let i = 0; i < w * h; i++) {
-  points[i] = i;
-}
-const nagent = 6;
-const board = new Board(w, h, points, nagent);
-kkmm.appendBoard(board);
-
-const nturn = 10;
-const game = kkmm.createGame(board, nturn);
-const p1 = kkmm.createPlayer("test1");
-const p2 = kkmm.createPlayer("test2");
-game.attachPlayer(p1);
-game.attachPlayer(p2);
-game.start();
-for (;;) {
-  const st = game.getStatusJSON();
-  p1.setActions(Action.fromJSON([
-    [0, Action.PUT, 1, 1],
-    [0, Action.MOVE, 2, 2],
-  ]));
-  p2.setActions(Action.fromJSON([
-    [0, Action.PUT, 1, 1],
-    [1, Action.PUT, 1, 2],
-  ]));
-  if (!game.nextTurn()) {
-    break;
-  }
-}
-console.log(game.getStatusJSON());
-```
+`sample/main.js` を編集（そのままでも動きます）
 
 コンソールにて
 
