@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.js";
+import { Action, Board, Kakomimasu } from "../mod.ts";
 
 const kkmm = new Kakomimasu();
 
@@ -10,7 +10,7 @@ for (let i = 0; i < w * h; i++) {
 }
 const nagent = 6;
 const nturn = 10;
-const board = new Board(w, h, points, nagent, nturn);
+const board = new Board({ w, h, points, nagent, nturn });
 kkmm.appendBoard(board);
 
 const game = kkmm.createGame(board);
@@ -19,7 +19,7 @@ const p2 = kkmm.createPlayer("test2");
 game.attachPlayer(p1);
 game.attachPlayer(p2);
 game.start();
-for (;;) {
+for (; ;) {
   const _st = game.getStatusJSON();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 1, 1],
