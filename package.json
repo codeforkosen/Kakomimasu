@@ -1,5 +1,6 @@
 {
   "name": "Kakomimasu-core",
+  "version": "v2.0.0",
   "description": "Kakomimasu core module for js/ts(browser/deno/node)",
   "license": "MIT",
   "repository": {
