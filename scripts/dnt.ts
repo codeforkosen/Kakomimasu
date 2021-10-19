@@ -12,7 +12,7 @@ await build({
   typeCheck: true,
   package: {
     // package.json properties
-    name: "Kakomimasu-core",
+    name: "@kakomimasu/core",
     version,
     description: "Kakomimasu core module for js/ts(browser/deno/node)",
     license: "MIT",
