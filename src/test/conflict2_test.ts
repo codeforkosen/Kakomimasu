@@ -47,7 +47,12 @@ Deno.test("conflict2", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString() + a);
+        s.push(
+          "_W".charAt(n.type) + (n.player === null
+            ? "."
+            : n.player).toString() +
+            a,
+        );
       }
       res.push(s.join(" "));
     }

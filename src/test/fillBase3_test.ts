@@ -16,7 +16,9 @@ Deno.test("fillBase2", () => {
       const s = [];
       for (let j = 0; j < w; j++) {
         const n = field.field[j + i * w];
-        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString());
+        s.push(
+          "_W".charAt(n.type) + (n.player === null ? "." : n.player).toString(),
+        );
       }
       cl(s.join(" "));
     }
@@ -27,9 +29,9 @@ Deno.test("fillBase2", () => {
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
       if (c === "0") {
-        field.field[i] = [1, 0];
+        field.field[i] = { type: Field.WALL, player: 0 };
       } else if (c === "1") {
-        field.field[i] = [1, 1];
+        field.field[i] = { type: Field.WALL, player: 1 };
       }
     }
   };
@@ -37,9 +39,9 @@ Deno.test("fillBase2", () => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i += 2) {
       const c = s.charAt(i) === "W" ? Field.WALL : Field.BASE;
-      const n = s.charAt(i + 1) === "." ? -1 : parseInt(s.charAt(i + 1));
+      const n = s.charAt(i + 1) === "." ? null : parseInt(s.charAt(i + 1));
       const f = field.field[i / 2];
-      if (f[0] !== c || f[1] !== n) {
+      if (f.type !== c || f.player !== n) {
         throw new AssertionError("");
       }
     }
