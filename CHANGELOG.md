@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Node.jsで使用できるようにcjs,mjsのファイル、`package.json`を追加
+
 ### Changed
 
 - Node.jsモジュール化によるDeno向けエントリーポイントの変更（`./Kakomimasu.js`->`./mod.ts`）
