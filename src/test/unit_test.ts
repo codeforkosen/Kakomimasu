@@ -39,7 +39,10 @@ Deno.test("action can't put", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   assertEquals(status.field[0], { type: Field.BASE, player: null });
-  assertEquals(status.log[0][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
+  assertEquals(
+    status.log[0].players[0].actions[0].res,
+    Action.ERR_ILLEGAL_ACTION,
+  );
 });
 
 Deno.test("action move", () => {
@@ -98,7 +101,10 @@ Deno.test("action can't move", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   assertEquals(status.field[2], { type: Field.BASE, player: null });
-  assertEquals(status.log[1][0].actions[0].res, Action.ERR_ILLEGAL_ACTION);
+  assertEquals(
+    status.log[1].players[0].actions[0].res,
+    Action.ERR_ILLEGAL_ACTION,
+  );
 });
 
 Deno.test("fill", () => {
@@ -154,7 +160,7 @@ Deno.test("action can't remove", () => {
     player: null,
   });
   assertEquals(
-    game.getStatusJSON().log[1][0].actions[0].res,
+    game.getStatusJSON().log[1].players[0].actions[0].res,
     Action.ERR_ILLEGAL_ACTION,
   );
 });
@@ -202,7 +208,10 @@ Deno.test("remove on agent", () => {
   p1.setActions(Action.fromJSON([[0, Action.REMOVE, 1, 0]]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], { type: Field.WALL, player: 1 });
-  assertEquals(game.getStatusJSON().log[1][0].actions[0].res, Action.REVERT);
+  assertEquals(
+    game.getStatusJSON().log[1].players[0].actions[0].res,
+    Action.REVERT,
+  );
 });
 
 Deno.test("conflict put", () => {
@@ -213,8 +222,8 @@ Deno.test("conflict put", () => {
   const status = game.getStatusJSON();
   // util.p(status.agents);
   assertEquals(status.field[0], { type: Field.BASE, player: null });
-  assertEquals(status.log[0][0].actions[0].res, Action.CONFLICT);
-  assertEquals(status.log[0][1].actions[0].res, Action.CONFLICT);
+  assertEquals(status.log[0].players[0].actions[0].res, Action.CONFLICT);
+  assertEquals(status.log[0].players[1].actions[0].res, Action.CONFLICT);
 });
 
 Deno.test("conflict move", () => {
@@ -228,8 +237,8 @@ Deno.test("conflict move", () => {
   const status = game.getStatusJSON();
   // util.p(status.agents);
   assertEquals(status.field[1], { type: Field.BASE, player: null });
-  assertEquals(status.log[1][0].actions[0].res, Action.CONFLICT);
-  assertEquals(status.log[1][1].actions[0].res, Action.CONFLICT);
+  assertEquals(status.log[1].players[0].actions[0].res, Action.CONFLICT);
+  assertEquals(status.log[1].players[1].actions[0].res, Action.CONFLICT);
 });
 
 Deno.test("conflict remove", () => {
@@ -247,8 +256,14 @@ Deno.test("conflict remove", () => {
   p2.setActions(Action.fromJSON([[0, Action.REMOVE, 1, 0]]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], { type: Field.WALL, player: 1 });
-  assertEquals(game.getStatusJSON().log[2][0].actions[0].res, Action.CONFLICT);
-  assertEquals(game.getStatusJSON().log[2][1].actions[0].res, Action.CONFLICT);
+  assertEquals(
+    game.getStatusJSON().log[2].players[0].actions[0].res,
+    Action.CONFLICT,
+  );
+  assertEquals(
+    game.getStatusJSON().log[2].players[1].actions[0].res,
+    Action.CONFLICT,
+  );
 });
 
 Deno.test("conflict remove & move", () => {
@@ -262,10 +277,13 @@ Deno.test("conflict remove & move", () => {
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], { type: Field.WALL, player: 1 });
   assertEquals(
-    game.getStatusJSON().log[1][0].actions[0].res,
+    game.getStatusJSON().log[1].players[0].actions[0].res,
     Action.ERR_ILLEGAL_ACTION,
   );
-  assertEquals(game.getStatusJSON().log[1][1].actions[0].res, Action.SUCCESS);
+  assertEquals(
+    game.getStatusJSON().log[1].players[1].actions[0].res,
+    Action.SUCCESS,
+  );
 });
 
 Deno.test("conflict remove & move", () => {
@@ -278,8 +296,11 @@ Deno.test("conflict remove & move", () => {
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], { type: Field.WALL, player: 1 });
   assertEquals(
-    game.getStatusJSON().log[1][0].actions[0].res,
+    game.getStatusJSON().log[1].players[0].actions[0].res,
     Action.ERR_ILLEGAL_ACTION,
   );
-  assertEquals(game.getStatusJSON().log[1][1].actions[0].res, Action.SUCCESS);
+  assertEquals(
+    game.getStatusJSON().log[1].players[1].actions[0].res,
+    Action.SUCCESS,
+  );
 });

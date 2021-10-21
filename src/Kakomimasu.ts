@@ -472,9 +472,11 @@ class Game {
   public ending: boolean;
   public field: Field;
   public log: {
-    point: { basepoint: number; wallpoint: number };
-    actions: ReturnType<typeof Action.prototype.getJSON>[];
-  }[][];
+    players: {
+      point: { basepoint: number; wallpoint: number };
+      actions: ReturnType<typeof Action.prototype.getJSON>[];
+    }[];
+  }[];
   public turn: number;
   public agents: Agent[][];
 
@@ -580,14 +582,14 @@ class Game {
 
     this.field.fillBase();
 
-    this.log.push(
-      actions.map((ar, idx) => {
+    this.log.push({
+      players: actions.map((ar, idx) => {
         return {
           point: this.field.getPoints()[idx],
           actions: ar.map((a) => a.getJSON()),
         };
       }),
-    );
+    });
 
     if (this.turn < this.nturn) {
       this.turn++;

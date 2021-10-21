@@ -111,7 +111,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   //console.log("log", actions);
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,
@@ -126,7 +126,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,
     Action.ERR_ONLY_ONE_TURN,
@@ -142,7 +142,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   //console.log("log", actions);
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,
