@@ -37,9 +37,9 @@ Deno.test("random", () => {
 
   const showAgents = () => {
     let i = 0;
-    for (const agent of game.agents) {
+    for (const players of game.players) {
       let j = 0;
-      for (const a of agent) {
+      for (const a of players.agents) {
         cl("pid", i, "aid", j, a.x, a.y);
         j++;
       }
@@ -49,7 +49,7 @@ Deno.test("random", () => {
 
   const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
-    for (const a of game.agents[p]) {
+    for (const a of game.players[p].agents) {
       if (a.x === x && a.y === y) {
         cnt++;
       }

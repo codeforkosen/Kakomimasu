@@ -33,9 +33,9 @@ Deno.test("conflict4", () => {
 
   const _showAgents = () => {
     let i = 0;
-    for (const agent of game.agents) {
+    for (const player of game.players) {
       let j = 0;
-      for (const a of agent) {
+      for (const a of player.agents) {
         console.log("pid", i, "aid", j, a.x, a.y);
         j++;
       }
@@ -45,7 +45,7 @@ Deno.test("conflict4", () => {
 
   const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
-    for (const a of game.agents[p]) {
+    for (const a of game.players[p].agents) {
       if (a.x === x && a.y === y) {
         cnt++;
       }
