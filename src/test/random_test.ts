@@ -37,9 +37,9 @@ Deno.test("random", () => {
 
   const showAgents = () => {
     let i = 0;
-    for (const agent of game.agents) {
+    for (const players of game.players) {
       let j = 0;
-      for (const a of agent) {
+      for (const a of players.agents) {
         cl("pid", i, "aid", j, a.x, a.y);
         j++;
       }
@@ -49,7 +49,7 @@ Deno.test("random", () => {
 
   const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
-    for (const a of game.agents[p]) {
+    for (const a of game.players[p].agents) {
       if (a.x === x && a.y === y) {
         cnt++;
       }
@@ -76,8 +76,13 @@ Deno.test("random", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString() + a);
-        fillfld += (n[0] === 0 && n[1] !== -1) ? 1 : 0;
+        s.push(
+          "_W".charAt(n.type) + (n.player === null
+            ? "."
+            : n.player).toString() +
+            a,
+        );
+        fillfld += (n.type === 0 && n.player !== null) ? 1 : 0;
       }
       res.push(s.join(" "));
     }
@@ -98,9 +103,9 @@ Deno.test("random", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        if (a !== "." && n[1] >= 0 && n[1] != parseInt(a)) {
+        if (a !== "." && n.player !== null && n.player != parseInt(a)) {
           throw new AssertionError(
-            `illegal field!! ${j}x${i} ${n[1]} must be ${a}`,
+            `illegal field!! ${j}x${i} ${n.player} must be ${a}`,
           );
         }
       }

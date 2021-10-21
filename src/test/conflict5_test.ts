@@ -38,9 +38,9 @@ Deno.test("conflict5 test", () => {
 
   const _showAgents = () => {
     let i = 0;
-    for (const agent of game.agents) {
+    for (const player of game.players) {
       let j = 0;
-      for (const a of agent) {
+      for (const a of player.agents) {
         console.log("pid", i, "aid", j, a.x, a.y);
         j++;
       }
@@ -50,7 +50,7 @@ Deno.test("conflict5 test", () => {
 
   const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
-    for (const a of game.agents[p]) {
+    for (const a of game.players[p].agents) {
       if (a.x === x && a.y === y) {
         cnt++;
       }
@@ -76,7 +76,12 @@ Deno.test("conflict5 test", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString() + a);
+        s.push(
+          "_W".charAt(n.type) + (n.player === null
+            ? "."
+            : n.player).toString() +
+            a,
+        );
       }
       res.push(s.join(" "));
     }
@@ -106,7 +111,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   //console.log("log", actions);
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,
@@ -121,7 +126,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,
     Action.ERR_ONLY_ONE_TURN,
@@ -137,7 +142,7 @@ Deno.test("conflict5 test", () => {
   ]));
   assert(game.nextTurn());
   p();
-  actions = game.log[game.log.length - 1][0].actions;
+  actions = game.log[game.log.length - 1].players[0].actions;
   //console.log("log", actions);
   assertEquals(actions.map((a) => a.res), [
     Action.ERR_ONLY_ONE_TURN,

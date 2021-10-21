@@ -174,7 +174,7 @@ class Agent {
     if (!this.checkOnBoard(x, y)) return false;
     if (!this.checkDir(x, y)) return false;
     //const _n = x + y * this.board.w;
-    if (this.field.get(x, y)[0] !== Field.WALL) return false;
+    if (this.field.get(x, y).type !== Field.WALL) return false;
     return true;
   }
 
@@ -226,7 +226,7 @@ class Agent {
     if (this.lastaction == null) throw new Error("remove before check");
     const { x, y } = this.lastaction;
     if (!this.checkRemove(x, y)) return false;
-    this.field.set(x, y, Field.BASE);
+    this.field.set(x, y, Field.BASE, null);
     return true;
   }
 
@@ -317,8 +317,8 @@ class Action {
     array.map((a) => new Action(a[0], a[1], a[2], a[3]));
 }
 
-type FieldType = 0 | 1;
-type FieldCell = [FieldType, number];
+type FieldType = typeof Field.BASE | typeof Field.WALL;
+type FieldCell = { type: FieldType; player: null | number };
 
 class Field {
   public board: Board;
@@ -332,7 +332,7 @@ class Field {
     // field
     this.field = [];
     for (let i = 0; i < this.board.w * this.board.h; i++) {
-      this.field.push([Field.BASE, -1]);
+      this.field.push({ type: Field.BASE, player: null });
     }
   }
 
@@ -340,13 +340,11 @@ class Field {
     return { ...this, board: null };
   }
 
-  set(x: number, y: number, att: typeof Field.BASE): void;
-  set(x: number, y: number, att: typeof Field.WALL, playerid: number): void;
-  set(x: number, y: number, att: FieldType, playerid = -1): void {
-    if (att == Field.BASE && playerid !== -1) {
-      throw new Error("playerid must be -1");
+  set(x: number, y: number, att: FieldType, playerid: number | null): void {
+    if (playerid !== null && playerid < 0) {
+      throw Error("playerid must be 0 or more");
     }
-    this.field[x + y * this.board.w] = [att, playerid];
+    this.field[x + y * this.board.w] = { type: att, player: playerid };
   }
 
   get(x: number, y: number): FieldCell {
@@ -354,7 +352,7 @@ class Field {
   }
 
   setAgent(playerid: number, x: number, y: number): boolean {
-    const [att, pid] = this.get(x, y);
+    const { type: att, player: pid } = this.get(x, y);
     if (att === Field.WALL && pid !== playerid) return false;
     this.set(x, y, Field.WALL, playerid);
     return true;
@@ -375,8 +373,9 @@ class Field {
     // 外側に空白のマスを作る
     for (let y = -1; y < h + 1; y++) {
       for (let x = -1; x < w + 1; x++) {
-        if (x < 0 || x >= w || y < 0 || y >= h) field.push([0, -1]);
-        else field.push([...this.field[x + y * w]]);
+        if (x < 0 || x >= w || y < 0 || y >= h) {
+          field.push({ type: Field.BASE, player: null });
+        } else field.push({ ...this.field[x + y * w] });
       }
     }
 
@@ -395,7 +394,8 @@ class Field {
           if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return;
           else if ((area[n] & (1 << pid)) === 0) return;
           else if (
-            mask[n] !== 0 && field[n][0] === Field.WALL && field[n][1] === pid
+            mask[n] !== 0 && field[n].type === Field.WALL &&
+            field[n].player === pid
           ) {
             return;
           } else {
@@ -422,7 +422,7 @@ class Field {
         if (area[i] === 0) {
           mask[i] = 0;
         } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
-          field[i][1] = Math.log2(area[i]);
+          field[i].player = Math.log2(area[i]);
           mask[i] = 0;
         }
       }
@@ -432,8 +432,8 @@ class Field {
       for (let j = 0; j < h; j++) {
         const n = i + j * w;
         const nexp = (i + 1) + (j + 1) * (w + 2);
-        if (this.field[n][0] !== Field.WALL) {
-          this.field[n][1] = field[nexp][1];
+        if (this.field[n].type !== Field.WALL) {
+          this.field[n].player = field[nexp].player;
         }
       }
     }
@@ -445,8 +445,8 @@ class Field {
     for (let i = 0; i < this.board.nplayer; i++) {
       points[i] = { basepoint: 0, wallpoint: 0 };
     }
-    this.field.forEach(([att, pid], idx) => {
-      if (pid < 0) return;
+    this.field.forEach(({ type: att, player: pid }, idx) => {
+      if (pid === null) return;
       const p = points[pid];
       const pnt = this.board.points[idx];
       if (att === Field.WALL) {
@@ -472,11 +472,13 @@ class Game {
   public ending: boolean;
   public field: Field;
   public log: {
-    point: { basepoint: number; wallpoint: number };
-    actions: ReturnType<typeof Action.prototype.getJSON>[];
-  }[][];
+    players: {
+      point: { basepoint: number; wallpoint: number };
+      actions: ReturnType<typeof Action.prototype.getJSON>[];
+    }[];
+  }[];
   public turn: number;
-  public agents: Agent[][];
+  //public agents: Agent[][];
 
   constructor(board: Board) {
     this.board = board;
@@ -489,16 +491,6 @@ class Game {
     this.field = new Field(board);
     this.log = [];
     this.turn = 0;
-
-    // agents
-    this.agents = [];
-    for (let i = 0; i < this.board.nplayer; i++) {
-      const a = [];
-      for (let j = 0; j < this.board.nagent; j++) {
-        a.push(new Agent(board, this.field, i));
-      }
-      this.agents.push(a);
-    }
   }
 
   static restore(data: Game): Game {
@@ -510,11 +502,6 @@ class Game {
     game.field.field = data.field.field;
     game.log = data.log;
     game.turn = data.turn;
-    game.agents = data.agents.map((_p, i) => {
-      return data.agents[i].map((a) =>
-        Agent.restore(a, game.board, game.field)
-      );
-    });
     return game;
   }
 
@@ -523,10 +510,6 @@ class Game {
     data.players = data.players.map((p) => p.toLogJSON());
     data.board = data.board.toLogJSON();
     data.field = data.field.toLogJSON();
-    data.agents = data.agents.map((p) => {
-      p = p.map((a) => a.toLogJSON());
-      return p;
-    });
     return data;
   }
 
@@ -580,14 +563,14 @@ class Game {
 
     this.field.fillBase();
 
-    this.log.push(
-      actions.map((ar, idx) => {
+    this.log.push({
+      players: actions.map((ar, idx) => {
         return {
           point: this.field.getPoints()[idx],
           actions: ar.map((a) => a.getJSON()),
         };
       }),
-    );
+    });
 
     if (this.turn < this.nturn) {
       this.turn++;
@@ -606,7 +589,7 @@ class Game {
       const done: Record<string, Action> = {};
       actions[playerid].forEach((a) => {
         const aid = a.agentid;
-        const agents = this.agents[playerid];
+        const agents = this.players[playerid].agents;
         if (aid < 0 || aid >= agents.length) {
           a.res = Action.ERR_ILLEGAL_AGENT;
           return;
@@ -624,7 +607,7 @@ class Game {
     for (let playerid = 0; playerid < nplayer; playerid++) {
       actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
         const aid = a.agentid;
-        const agents = this.agents[playerid];
+        const agents = this.players[playerid].agents;
         const agent = agents[aid];
         if (!agent.check(a)) {
           a.res = Action.ERR_ILLEGAL_ACTION;
@@ -665,7 +648,7 @@ class Game {
       chkfield[i] = [];
     }
 
-    flat(this.agents).forEach((agent) => {
+    flat(this.players.map((p) => p.agents)).forEach((agent) => {
       if (agent.x === -1) return;
       const _act = agent.lastaction;
       const n = agent.x + agent.y * this.board.w;
@@ -680,7 +663,7 @@ class Game {
   }
 
   putOrMove(): void {
-    flat(this.agents).forEach((agent) => {
+    flat(this.players.map((p) => p.agents)).forEach((agent) => {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
         // throw new Error("illegal action!")
@@ -697,7 +680,7 @@ class Game {
       for (let i = 0; i < chkfield.length; i++) {
         chkfield[i] = [];
       }
-      flat(this.agents).forEach((agent) => {
+      flat(this.players.map((p) => p.agents)).forEach((agent) => {
         const act = agent.lastaction;
         if (
           agent.isValidAction() && act &&
@@ -725,7 +708,7 @@ class Game {
   }
 
   removeOrNot(): void {
-    const agents = flat(this.agents);
+    const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       if (agent.x === -1) return;
       if (!agent.isValidAction()) return;
@@ -741,7 +724,7 @@ class Game {
   }
 
   revertNotOwnerWall(): void {
-    const agents = flat(this.agents);
+    const agents = flat(this.players.map((p) => p.agents));
     const fld = this.field.field;
     const w = this.board.w;
     agents.forEach((agent) => {
@@ -753,8 +736,8 @@ class Game {
       // only PUT & MOVE
       const n = act.x + act.y * w;
       const f = fld[n];
-      const iswall = f[0] === Field.WALL;
-      const owner = f[1];
+      const iswall = f.type === Field.WALL;
+      const owner = f.player;
       if (iswall && owner !== agent.playerid && owner !== -1) {
         agent.revert();
       }
@@ -762,7 +745,7 @@ class Game {
   }
 
   commit(): void {
-    const agents = flat(this.agents);
+    const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       // if (agent.x === -1) return;
       // if (!agent.isValidAction()) return;
@@ -782,7 +765,7 @@ class Game {
       players: this.players.map((p) => p.getJSON()),
       board: this.board.getJSON(),
       field: this.field.getJSON(),
-      agents: this.agents.map((ar) => ar.map((a) => a.getJSON())),
+      agents: this.players.map((p) => p.agents.map((a) => a.getJSON())),
       points: this.field.getPoints(),
       log: this.log,
     };
@@ -812,7 +795,7 @@ class Game {
       let agents: { x: number; y: number }[] = [];
       if (this.isReady()) {
         agents = [];
-        this.agents[i].forEach((a) => {
+        p.agents.forEach((a) => {
           const agent = {
             x: a.x,
             y: a.y,
@@ -850,6 +833,7 @@ class Player<T extends Game = Game> {
   public game: T | null;
   public actions: Action[];
   public index: number;
+  public agents: Agent[];
 
   constructor(id: string, spec = "") {
     this.id = id;
@@ -857,22 +841,34 @@ class Player<T extends Game = Game> {
     this.game = null;
     this.actions = [];
     this.index = -1;
+    this.agents = [];
   }
 
-  static restore(data: Player): Player {
+  static restore(data: Player, game?: Game): Player {
     const player = new Player(data.id, data.spec);
     player.index = data.index;
+    if (game) {
+      player.game = game;
+      player.agents = data.agents.map((a) => {
+        return Agent.restore(a, game.board, game.field);
+      });
+    }
+
     return player;
   }
 
   toLogJSON(): Player {
     const p = { ...this };
     p.game = null;
+    p.agents = p.agents.map((a) => a.toLogJSON());
     return p;
   }
 
   setGame(game: T): void {
     this.game = game;
+    for (let j = 0; j < game.board.nagent; j++) {
+      this.agents.push(new Agent(game.board, game.field, this.index));
+    }
   }
 
   noticeStart(): void {

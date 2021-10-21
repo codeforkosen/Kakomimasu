@@ -31,9 +31,9 @@ Deno.test("conflict3", () => {
 
   const showAgents = () => {
     let i = 0;
-    for (const agent of game.agents) {
+    for (const player of game.players) {
       let j = 0;
-      for (const a of agent) {
+      for (const a of player.agents) {
         cl("pid", i, "aid", j, a.x, a.y);
         j++;
       }
@@ -43,7 +43,7 @@ Deno.test("conflict3", () => {
 
   const isOnAgent = (p: number, x: number, y: number) => {
     let cnt = 0;
-    for (const a of game.agents[p]) {
+    for (const a of game.players[p].agents) {
       if (a.x === x && a.y === y) {
         cnt++;
       }
@@ -69,7 +69,12 @@ Deno.test("conflict3", () => {
           throw new AssertionError("agent conflict!!");
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
-        s.push("_W".charAt(n[0]) + (n[1] < 0 ? "." : n[1]).toString() + a);
+        s.push(
+          "_W".charAt(n.type) + (n.player === null
+            ? "."
+            : n.player).toString() +
+            a,
+        );
       }
       res.push(s.join(" "));
     }
