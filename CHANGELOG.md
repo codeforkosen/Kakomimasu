@@ -15,7 +15,8 @@ and this project adheres to
 ### Changed
 
 - Node.jsモジュール化によるDeno向けエントリーポイントの変更（`./Kakomimasu.js`->`./mod.ts`）
-- Gameクラス内の2次元配列を削除
+- Boardクラスのコンストラクタ引数をオブジェクトのみ受け取るように変更
+- Gameクラス内の2次元配列を削除（型定義を以下のように変更）
 
 ```diff
 Field.fieldの型を以下のように変更
@@ -45,6 +46,23 @@ Game.logの型を以下のように変更
 Game.agentsをPlayers.agentsに移行
 - game.agents[i]
 + game.players[i].agents
+```
+
+### Deprecated
+
+- Kakomimasuクラスの`createGame`,`createPlayer`を非推奨関数に変更（クラス継承時の型定義が上手くいかないため）
+
+```diff
+- const game = kkmm.createGame(board);
++ const game = new Game(board);
++ kkmm.addGame(board);
+```
+
+```diff
+- const player = kkmm.createPlayer(...param);
++ const player = new Player(...param);
+
+// createPlayerはKakomimasuクラスとは独立していたため`addPlayer`は無しでよい。
 ```
 
 ## [1.0.0] - 2021-09-27

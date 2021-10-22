@@ -106,8 +106,11 @@ declare class Action {
     static getMessage(res: ActionRes): string;
     static fromJSON: (array: ActionJSON[]) => Action[];
 }
-declare type FieldType = 0 | 1;
-declare type FieldCell = [FieldType, number];
+declare type FieldType = typeof Field.BASE | typeof Field.WALL;
+declare type FieldCell = {
+    type: FieldType;
+    player: null | number;
+};
 declare class Field {
     board: Board;
     field: FieldCell[];
@@ -117,8 +120,7 @@ declare class Field {
     toLogJSON(): Field & {
         board: null;
     };
-    set(x: number, y: number, att: typeof Field.BASE): void;
-    set(x: number, y: number, att: typeof Field.WALL, playerid: number): void;
+    set(x: number, y: number, att: FieldType, playerid: number | null): void;
     get(x: number, y: number): FieldCell;
     setAgent(playerid: number, x: number, y: number): boolean;
     fillBase(): void;
@@ -137,14 +139,15 @@ declare class Game {
     ending: boolean;
     field: Field;
     log: {
-        point: {
-            basepoint: number;
-            wallpoint: number;
-        };
-        actions: ReturnType<typeof Action.prototype.getJSON>[];
-    }[][];
+        players: {
+            point: {
+                basepoint: number;
+                wallpoint: number;
+            };
+            actions: ReturnType<typeof Action.prototype.getJSON>[];
+        }[];
+    }[];
     turn: number;
-    agents: Agent[][];
     constructor(board: Board);
     static restore(data: Game): Game;
     toLogJSON(): Game;
@@ -194,8 +197,9 @@ declare class Player<T extends Game = Game> {
     game: T | null;
     actions: Action[];
     index: number;
+    agents: Agent[];
     constructor(id: string, spec?: string);
-    static restore(data: Player): Player;
+    static restore(data: Player, game?: Game): Player;
     toLogJSON(): Player;
     setGame(game: T): void;
     noticeStart(): void;
@@ -208,15 +212,22 @@ declare class Player<T extends Game = Game> {
         index: typeof Player.prototype.index;
     };
 }
-declare class Kakomimasu {
-    games: Game[];
+declare class Kakomimasu<T extends Game = Game> {
+    games: T[];
     boards: Board[];
     constructor();
     appendBoard(board: Board): void;
     getBoards(): typeof Kakomimasu.prototype.boards;
+    /**
+     * @deprecated use addGame
+     */
     createGame(...param: ConstructorParameters<typeof Game>): Game;
-    getGames(): Game[];
-    getFreeGames(): Game[];
+    addGame(game: T): T;
+    getGames(): T[];
+    getFreeGames(): T[];
+    /**
+     * @deprecated use Player class
+     */
     createPlayer(playername: string, spec?: string): Player;
 }
 export { Action, Agent, Board, Field, Game, Kakomimasu, Player };
