@@ -225,7 +225,7 @@ class Agent {
         if (!this.checkDir(x, y))
             return false;
         //const _n = x + y * this.board.w;
-        if (this.field.get(x, y)[0] !== Field.WALL)
+        if (this.field.get(x, y).type !== Field.WALL)
             return false;
         return true;
     }
@@ -283,7 +283,7 @@ class Agent {
         const { x, y } = this.lastaction;
         if (!this.checkRemove(x, y))
             return false;
-        this.field.set(x, y, Field.BASE);
+        this.field.set(x, y, Field.BASE, null);
         return true;
     }
     commit() {
@@ -450,23 +450,23 @@ class Field {
         // field
         this.field = [];
         for (let i = 0; i < this.board.w * this.board.h; i++) {
-            this.field.push([Field.BASE, -1]);
+            this.field.push({ type: Field.BASE, player: null });
         }
     }
     toLogJSON() {
         return Object.assign(Object.assign({}, this), { board: null });
     }
-    set(x, y, att, playerid = -1) {
-        if (att == Field.BASE && playerid !== -1) {
-            throw new Error("playerid must be -1");
+    set(x, y, att, playerid) {
+        if (playerid !== null && playerid < 0) {
+            throw Error("playerid must be 0 or more");
         }
-        this.field[x + y * this.board.w] = [att, playerid];
+        this.field[x + y * this.board.w] = { type: att, player: playerid };
     }
     get(x, y) {
         return this.field[x + y * this.board.w];
     }
     setAgent(playerid, x, y) {
-        const [att, pid] = this.get(x, y);
+        const { type: att, player: pid } = this.get(x, y);
         if (att === Field.WALL && pid !== playerid)
             return false;
         this.set(x, y, Field.WALL, playerid);
@@ -485,10 +485,11 @@ class Field {
         // 外側に空白のマスを作る
         for (let y = -1; y < h + 1; y++) {
             for (let x = -1; x < w + 1; x++) {
-                if (x < 0 || x >= w || y < 0 || y >= h)
-                    field.push([0, -1]);
+                if (x < 0 || x >= w || y < 0 || y >= h) {
+                    field.push({ type: Field.BASE, player: null });
+                }
                 else
-                    field.push([...this.field[x + y * w]]);
+                    field.push(Object.assign({}, this.field[x + y * w]));
             }
         }
         const mask = new Array(field.length);
@@ -507,7 +508,8 @@ class Field {
                         return;
                     else if ((area[n] & (1 << pid)) === 0)
                         return;
-                    else if (mask[n] !== 0 && field[n][0] === Field.WALL && field[n][1] === pid) {
+                    else if (mask[n] !== 0 && field[n].type === Field.WALL &&
+                        field[n].player === pid) {
                         return;
                     }
                     else {
@@ -533,7 +535,7 @@ class Field {
                     mask[i] = 0;
                 }
                 else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
-                    field[i][1] = Math.log2(area[i]);
+                    field[i].player = Math.log2(area[i]);
                     mask[i] = 0;
                 }
             }
@@ -542,8 +544,8 @@ class Field {
             for (let j = 0; j < h; j++) {
                 const n = i + j * w;
                 const nexp = (i + 1) + (j + 1) * (w + 2);
-                if (this.field[n][0] !== Field.WALL) {
-                    this.field[n][1] = field[nexp][1];
+                if (this.field[n].type !== Field.WALL) {
+                    this.field[n].player = field[nexp].player;
                 }
             }
         }
@@ -554,8 +556,8 @@ class Field {
         for (let i = 0; i < this.board.nplayer; i++) {
             points[i] = { basepoint: 0, wallpoint: 0 };
         }
-        this.field.forEach(([att, pid], idx) => {
-            if (pid < 0)
+        this.field.forEach(({ type: att, player: pid }, idx) => {
+            if (pid === null)
                 return;
             const p = points[pid];
             const pnt = this.board.points[idx];
@@ -586,6 +588,7 @@ Object.defineProperty(Field, "WALL", {
     value: 1
 });
 class Game {
+    //public agents: Agent[][];
     constructor(board) {
         Object.defineProperty(this, "board", {
             enumerable: true,
@@ -641,12 +644,6 @@ class Game {
             writable: true,
             value: void 0
         });
-        Object.defineProperty(this, "agents", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
         this.board = board;
         this.players = [];
         this.nturn = board.nturn;
@@ -657,15 +654,6 @@ class Game {
         this.field = new Field(board);
         this.log = [];
         this.turn = 0;
-        // agents
-        this.agents = [];
-        for (let i = 0; i < this.board.nplayer; i++) {
-            const a = [];
-            for (let j = 0; j < this.board.nagent; j++) {
-                a.push(new Agent(board, this.field, i));
-            }
-            this.agents.push(a);
-        }
     }
     static restore(data) {
         const board = Board.restore(data.board);
@@ -676,9 +664,6 @@ class Game {
         game.field.field = data.field.field;
         game.log = data.log;
         game.turn = data.turn;
-        game.agents = data.agents.map((_p, i) => {
-            return data.agents[i].map((a) => Agent.restore(a, game.board, game.field));
-        });
         return game;
     }
     toLogJSON() {
@@ -686,10 +671,6 @@ class Game {
         data.players = data.players.map((p) => p.toLogJSON());
         data.board = data.board.toLogJSON();
         data.field = data.field.toLogJSON();
-        data.agents = data.agents.map((p) => {
-            p = p.map((a) => a.toLogJSON());
-            return p;
-        });
         return data;
     }
     attachPlayer(player) {
@@ -732,12 +713,14 @@ class Game {
         this.commit();
         this.checkAgentConflict();
         this.field.fillBase();
-        this.log.push(actions.map((ar, idx) => {
-            return {
-                point: this.field.getPoints()[idx],
-                actions: ar.map((a) => a.getJSON()),
-            };
-        }));
+        this.log.push({
+            players: actions.map((ar, idx) => {
+                return {
+                    point: this.field.getPoints()[idx],
+                    actions: ar.map((a) => a.getJSON()),
+                };
+            }),
+        });
         if (this.turn < this.nturn) {
             this.turn++;
         }
@@ -755,7 +738,7 @@ class Game {
             const done = {};
             actions[playerid].forEach((a) => {
                 const aid = a.agentid;
-                const agents = this.agents[playerid];
+                const agents = this.players[playerid].agents;
                 if (aid < 0 || aid >= agents.length) {
                     a.res = Action.ERR_ILLEGAL_AGENT;
                     return;
@@ -773,7 +756,7 @@ class Game {
         for (let playerid = 0; playerid < nplayer; playerid++) {
             actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
                 const aid = a.agentid;
-                const agents = this.agents[playerid];
+                const agents = this.players[playerid].agents;
                 const agent = agents[aid];
                 if (!agent.check(a)) {
                     a.res = Action.ERR_ILLEGAL_ACTION;
@@ -813,7 +796,7 @@ class Game {
         for (let i = 0; i < chkfield.length; i++) {
             chkfield[i] = [];
         }
-        (0, util_js_1.flat)(this.agents).forEach((agent) => {
+        (0, util_js_1.flat)(this.players.map((p) => p.agents)).forEach((agent) => {
             if (agent.x === -1)
                 return;
             const _act = agent.lastaction;
@@ -828,7 +811,7 @@ class Game {
         });
     }
     putOrMove() {
-        (0, util_js_1.flat)(this.agents).forEach((agent) => {
+        (0, util_js_1.flat)(this.players.map((p) => p.agents)).forEach((agent) => {
             if (!agent.isValidAction())
                 return;
             if (!agent.putOrMove()) {
@@ -845,7 +828,7 @@ class Game {
             for (let i = 0; i < chkfield.length; i++) {
                 chkfield[i] = [];
             }
-            (0, util_js_1.flat)(this.agents).forEach((agent) => {
+            (0, util_js_1.flat)(this.players.map((p) => p.agents)).forEach((agent) => {
                 const act = agent.lastaction;
                 if (agent.isValidAction() && act &&
                     (act.type === Action.MOVE || act.type === Action.PUT)) {
@@ -872,7 +855,7 @@ class Game {
         } while (reverts); // revertがあったら再度全件チェック
     }
     removeOrNot() {
-        const agents = (0, util_js_1.flat)(this.agents);
+        const agents = (0, util_js_1.flat)(this.players.map((p) => p.agents));
         agents.forEach((agent) => {
             if (agent.x === -1)
                 return;
@@ -892,7 +875,7 @@ class Game {
         });
     }
     revertNotOwnerWall() {
-        const agents = (0, util_js_1.flat)(this.agents);
+        const agents = (0, util_js_1.flat)(this.players.map((p) => p.agents));
         const fld = this.field.field;
         const w = this.board.w;
         agents.forEach((agent) => {
@@ -908,15 +891,15 @@ class Game {
             // only PUT & MOVE
             const n = act.x + act.y * w;
             const f = fld[n];
-            const iswall = f[0] === Field.WALL;
-            const owner = f[1];
+            const iswall = f.type === Field.WALL;
+            const owner = f.player;
             if (iswall && owner !== agent.playerid && owner !== -1) {
                 agent.revert();
             }
         });
     }
     commit() {
-        const agents = (0, util_js_1.flat)(this.agents);
+        const agents = (0, util_js_1.flat)(this.players.map((p) => p.agents));
         agents.forEach((agent) => {
             // if (agent.x === -1) return;
             // if (!agent.isValidAction()) return;
@@ -928,7 +911,7 @@ class Game {
             players: this.players.map((p) => p.getJSON()),
             board: this.board.getJSON(),
             field: this.field.getJSON(),
-            agents: this.agents.map((ar) => ar.map((a) => a.getJSON())),
+            agents: this.players.map((p) => p.agents.map((a) => a.getJSON())),
             points: this.field.getPoints(),
             log: this.log,
         };
@@ -940,7 +923,7 @@ class Game {
             let agents = [];
             if (this.isReady()) {
                 agents = [];
-                this.agents[i].forEach((a) => {
+                p.agents.forEach((a) => {
                     const agent = {
                         x: a.x,
                         y: a.y,
@@ -1003,24 +986,41 @@ class Player {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "agents", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.id = id;
         this.spec = spec;
         this.game = null;
         this.actions = [];
         this.index = -1;
+        this.agents = [];
     }
-    static restore(data) {
+    static restore(data, game) {
         const player = new Player(data.id, data.spec);
         player.index = data.index;
+        if (game) {
+            player.game = game;
+            player.agents = data.agents.map((a) => {
+                return Agent.restore(a, game.board, game.field);
+            });
+        }
         return player;
     }
     toLogJSON() {
         const p = Object.assign({}, this);
         p.game = null;
+        p.agents = p.agents.map((a) => a.toLogJSON());
         return p;
     }
     setGame(game) {
         this.game = game;
+        for (let j = 0; j < game.board.nagent; j++) {
+            this.agents.push(new Agent(game.board, game.field, this.index));
+        }
     }
     noticeStart() {
     }
@@ -1068,9 +1068,16 @@ class Kakomimasu {
     getBoards() {
         return this.boards;
     }
+    /**
+     * @deprecated use addGame
+     */
     createGame(...param) {
         //console.log(board);
         const game = new Game(...param);
+        this.games.push(game);
+        return game;
+    }
+    addGame(game) {
         this.games.push(game);
         return game;
     }
@@ -1080,6 +1087,9 @@ class Kakomimasu {
     getFreeGames() {
         return this.games.filter((g) => g.isFree());
     }
+    /**
+     * @deprecated use Player class
+     */
     createPlayer(playername, spec = "") {
         if (spec == null)
             return new Player(playername);
