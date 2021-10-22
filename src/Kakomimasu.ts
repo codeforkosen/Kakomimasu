@@ -901,8 +901,8 @@ class Player<T extends Game = Game> {
   }
 }
 
-class Kakomimasu {
-  public games: Game[];
+class Kakomimasu<T extends Game = Game> {
+  public games: T[];
   public boards: Board[];
 
   constructor() {
@@ -918,9 +918,17 @@ class Kakomimasu {
     return this.boards;
   }
 
+  /**
+   * @deprecated use addGame
+   */
   createGame(...param: ConstructorParameters<typeof Game>): Game {
     //console.log(board);
     const game = new Game(...param);
+    this.games.push(game as T);
+    return game;
+  }
+
+  addGame(game: T) {
     this.games.push(game);
     return game;
   }
@@ -929,10 +937,13 @@ class Kakomimasu {
     return this.games;
   }
 
-  getFreeGames(): Game[] {
+  getFreeGames() {
     return this.games.filter((g) => g.isFree());
   }
 
+  /**
+   * @deprecated use Player class
+   */
   createPlayer(playername: string, spec = ""): Player {
     if (spec == null) return new Player(playername);
     else return new Player(playername, spec);
