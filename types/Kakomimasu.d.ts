@@ -96,6 +96,7 @@ declare class Action {
     static readonly ERR_ILLEGAL_AGENT = 4;
     static readonly ERR_ILLEGAL_ACTION = 5;
     constructor(agentid: number, type: ActionType, x: number, y: number);
+    static restore(data: Action): Action;
     getJSON(): {
         agentId: number;
         type: ActionType;
@@ -117,6 +118,7 @@ declare class Field {
     static readonly BASE = 0;
     static readonly WALL = 1;
     constructor(board: Board);
+    static restore(data: Field, board: Board): Field;
     toLogJSON(): Field & {
         board: null;
     };
