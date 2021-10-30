@@ -118,7 +118,9 @@ class Agent {
     agent.y = data.y;
     agent.bkx = data.bkx;
     agent.bky = data.bky;
-    agent.lastaction = data.lastaction;
+    agent.lastaction = data.lastaction === null
+      ? null
+      : Action.restore(data.lastaction);
     return agent;
   }
 
@@ -286,6 +288,12 @@ class Action {
     this.res = Action.SUCCESS;
   }
 
+  static restore(data: Action) {
+    const action = new Action(data.agentid, data.type, data.x, data.y);
+    action.res = data.res;
+    return action;
+  }
+
   getJSON(): {
     agentId: number;
     type: ActionType;
@@ -334,6 +342,12 @@ class Field {
     for (let i = 0; i < this.board.w * this.board.h; i++) {
       this.field.push({ type: Field.BASE, player: null });
     }
+  }
+
+  static restore(data: Field, board: Board) {
+    const field = new Field(board);
+    field.field = data.field;
+    return field;
   }
 
   toLogJSON(): Field & { board: null } {
@@ -478,7 +492,6 @@ class Game {
     }[];
   }[];
   public turn: number;
-  //public agents: Agent[][];
 
   constructor(board: Board) {
     this.board = board;
@@ -487,7 +500,6 @@ class Game {
     this.nsec = board.nsec;
     this.gaming = false;
     this.ending = false;
-    //this.actions = [];
     this.field = new Field(board);
     this.log = [];
     this.turn = 0;
