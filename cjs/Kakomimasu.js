@@ -63,8 +63,6 @@ class Board {
         if (this.points.length !== this.w * this.h) {
             throw new Error("points.length must be " + this.w * this.h);
         }
-        //console.log("board", this, this.name);
-        // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
     }
     static restore(data) {
         const board = new Board(data);
@@ -678,10 +676,10 @@ class Game {
     }
     toLogJSON() {
         const data = Object.assign({}, this);
-        data.players = data.players.map((p) => p.toLogJSON());
-        data.board = data.board.toLogJSON();
-        data.field = data.field.toLogJSON();
-        return data;
+        const players = data.players.map((p) => p.toLogJSON());
+        const board = data.board.toLogJSON();
+        const field = data.field.toLogJSON();
+        return Object.assign(Object.assign({}, data), { players, board, field });
     }
     attachPlayer(player) {
         if (!this.isFree())

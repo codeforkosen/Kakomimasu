@@ -41,8 +41,8 @@ declare class Board {
     };
 }
 declare class Agent {
-    board: Board;
-    field: Field;
+    readonly board: Readonly<Board>;
+    readonly field: Readonly<Field>;
     playerid: number;
     x: number;
     y: number;
@@ -76,8 +76,8 @@ declare class Agent {
         y: number;
     };
 }
-export declare type ActionType = 1 | 2 | 3 | 4;
-declare type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
+export declare type ActionType = typeof Action.PUT | typeof Action.NONE | typeof Action.MOVE | typeof Action.REMOVE;
+declare type ActionRes = typeof Action.SUCCESS | typeof Action.CONFLICT | typeof Action.REVERT | typeof Action.ERR_ONLY_ONE_TURN | typeof Action.ERR_ILLEGAL_AGENT | typeof Action.ERR_ILLEGAL_ACTION;
 export declare type ActionJSON = [number, ActionType, number, number];
 declare class Action {
     agentid: number;
@@ -113,7 +113,7 @@ declare type FieldCell = {
     player: null | number;
 };
 declare class Field {
-    board: Board;
+    readonly board: Readonly<Board>;
     field: FieldCell[];
     static readonly BASE = 0;
     static readonly WALL = 1;
@@ -133,13 +133,13 @@ declare class Field {
     getJSON(): FieldCell[];
 }
 declare class Game {
-    board: Board;
-    players: Player[];
+    readonly board: Readonly<Board>;
+    players: Readonly<Player>[];
     nturn: number;
     nsec: number;
     gaming: boolean;
     ending: boolean;
-    field: Field;
+    readonly field: Readonly<Field>;
     log: {
         players: {
             point: {
@@ -152,7 +152,13 @@ declare class Game {
     turn: number;
     constructor(board: Board);
     static restore(data: Game): Game;
-    toLogJSON(): Game;
+    toLogJSON(): this & {
+        players: Player<Game>[];
+        board: Board;
+        field: Field & {
+            board: null;
+        };
+    };
     attachPlayer(player: Player): boolean;
     isReady(): boolean;
     isFree(): boolean;
