@@ -33,8 +33,6 @@ class Board {
     if (this.points.length !== this.w * this.h) {
       throw new Error("points.length must be " + this.w * this.h);
     }
-    //console.log("board", this, this.name);
-    // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
   }
 
   static restore(data: Board): Board {
@@ -92,8 +90,8 @@ class Board {
 }
 
 class Agent {
-  public board: Board;
-  public field: Field;
+  public readonly board: Readonly<Board>;
+  public readonly field: Readonly<Field>;
   public playerid: number;
   public x: number;
   public y: number;
@@ -255,8 +253,18 @@ class Agent {
   }
 }
 
-export type ActionType = 1 | 2 | 3 | 4;
-type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
+export type ActionType =
+  | typeof Action.PUT
+  | typeof Action.NONE
+  | typeof Action.MOVE
+  | typeof Action.REMOVE;
+type ActionRes =
+  | typeof Action.SUCCESS
+  | typeof Action.CONFLICT
+  | typeof Action.REVERT
+  | typeof Action.ERR_ONLY_ONE_TURN
+  | typeof Action.ERR_ILLEGAL_AGENT
+  | typeof Action.ERR_ILLEGAL_ACTION;
 export type ActionJSON = [number, ActionType, number, number];
 
 class Action {
@@ -329,7 +337,7 @@ type FieldType = typeof Field.BASE | typeof Field.WALL;
 type FieldCell = { type: FieldType; player: null | number };
 
 class Field {
-  public board: Board;
+  public readonly board: Readonly<Board>;
   public field: FieldCell[];
 
   public static readonly BASE = 0;
@@ -478,13 +486,13 @@ class Field {
 }
 
 class Game {
-  public board: Board;
-  public players: Player[];
+  public readonly board: Readonly<Board>;
+  public players: Readonly<Player>[];
   public nturn: number;
   public nsec: number;
   public gaming: boolean;
   public ending: boolean;
-  public field: Field;
+  public readonly field: Readonly<Field>;
   public log: {
     players: {
       point: { basepoint: number; wallpoint: number };
@@ -507,7 +515,7 @@ class Game {
 
   static restore(data: Game): Game {
     const board = Board.restore(data.board);
-    const game = new Game(board);
+    const game: Omit<Game, "field"> & { field: Field } = new Game(board);
     game.players = data.players.map((p) => Player.restore(p));
     game.gaming = data.gaming;
     game.ending = data.ending;
@@ -517,12 +525,12 @@ class Game {
     return game;
   }
 
-  toLogJSON(): Game {
+  toLogJSON() {
     const data = { ...this };
-    data.players = data.players.map((p) => p.toLogJSON());
-    data.board = data.board.toLogJSON();
-    data.field = data.field.toLogJSON();
-    return data;
+    const players = data.players.map((p) => p.toLogJSON());
+    const board = data.board.toLogJSON();
+    const field = data.field.toLogJSON();
+    return { ...data, players, board, field };
   }
 
   attachPlayer(player: Player): boolean {
