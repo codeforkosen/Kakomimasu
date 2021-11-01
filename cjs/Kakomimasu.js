@@ -164,7 +164,9 @@ class Agent {
         agent.y = data.y;
         agent.bkx = data.bkx;
         agent.bky = data.bky;
-        agent.lastaction = data.lastaction;
+        agent.lastaction = data.lastaction === null
+            ? null
+            : Action.restore(data.lastaction);
         return agent;
     }
     toLogJSON() {
@@ -343,6 +345,11 @@ class Action {
         this.y = y;
         this.res = Action.SUCCESS;
     }
+    static restore(data) {
+        const action = new Action(data.agentid, data.type, data.x, data.y);
+        action.res = data.res;
+        return action;
+    }
     getJSON() {
         return {
             agentId: this.agentid,
@@ -452,6 +459,11 @@ class Field {
         for (let i = 0; i < this.board.w * this.board.h; i++) {
             this.field.push({ type: Field.BASE, player: null });
         }
+    }
+    static restore(data, board) {
+        const field = new Field(board);
+        field.field = data.field;
+        return field;
     }
     toLogJSON() {
         return Object.assign(Object.assign({}, this), { board: null });
@@ -588,7 +600,6 @@ Object.defineProperty(Field, "WALL", {
     value: 1
 });
 class Game {
-    //public agents: Agent[][];
     constructor(board) {
         Object.defineProperty(this, "board", {
             enumerable: true,
@@ -650,7 +661,6 @@ class Game {
         this.nsec = board.nsec;
         this.gaming = false;
         this.ending = false;
-        //this.actions = [];
         this.field = new Field(board);
         this.log = [];
         this.turn = 0;
