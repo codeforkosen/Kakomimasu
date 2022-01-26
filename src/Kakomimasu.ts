@@ -118,9 +118,7 @@ class Agent {
     agent.y = data.y;
     agent.bkx = data.bkx;
     agent.bky = data.bky;
-    agent.lastaction = data.lastaction === null
-      ? null
-      : Action.restore(data.lastaction);
+    agent.lastaction = data.lastaction ?? null;
     return agent;
   }
 
@@ -344,14 +342,17 @@ class Field {
     }
   }
 
-  static restore(data: Field, board: Board) {
+  static restore(data: ReturnType<Field["toLogJSON"]>, board: Board) {
     const field = new Field(board);
     field.field = data.field;
     return field;
   }
 
-  toLogJSON(): Field & { board: null } {
-    return { ...this, board: null };
+  toLogJSON() {
+    const field = this.field.map((cell) => {
+      return { ...cell };
+    });
+    return { field, board: null };
   }
 
   set(x: number, y: number, att: FieldType, playerid: number | null): void {
@@ -517,11 +518,13 @@ class Game {
     return game;
   }
 
-  toLogJSON(): Game {
-    const data = { ...this };
+  toLogJSON(): Game & { field: ReturnType<Field["toLogJSON"]> } {
+    const data: ReturnType<Game["toLogJSON"]> = {
+      ...this,
+      field: this.field.toLogJSON(),
+    };
     data.players = data.players.map((p) => p.toLogJSON());
     data.board = data.board.toLogJSON();
-    data.field = data.field.toLogJSON();
     return data;
   }
 

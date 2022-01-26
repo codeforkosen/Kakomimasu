@@ -159,14 +159,13 @@ class Agent {
         this.lastaction = null;
     }
     static restore(data, board, field) {
+        var _a;
         const agent = new Agent(board, field, data.playerid);
         agent.x = data.x;
         agent.y = data.y;
         agent.bkx = data.bkx;
         agent.bky = data.bky;
-        agent.lastaction = data.lastaction === null
-            ? null
-            : Action.restore(data.lastaction);
+        agent.lastaction = (_a = data.lastaction) !== null && _a !== void 0 ? _a : null;
         return agent;
     }
     toLogJSON() {
@@ -466,7 +465,10 @@ class Field {
         return field;
     }
     toLogJSON() {
-        return Object.assign(Object.assign({}, this), { board: null });
+        const field = this.field.map((cell) => {
+            return Object.assign({}, cell);
+        });
+        return { field, board: null };
     }
     set(x, y, att, playerid) {
         if (playerid !== null && playerid < 0) {
@@ -677,10 +679,9 @@ class Game {
         return game;
     }
     toLogJSON() {
-        const data = Object.assign({}, this);
+        const data = Object.assign(Object.assign({}, this), { field: this.field.toLogJSON() });
         data.players = data.players.map((p) => p.toLogJSON());
         data.board = data.board.toLogJSON();
-        data.field = data.field.toLogJSON();
         return data;
     }
     attachPlayer(player) {

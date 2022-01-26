@@ -119,8 +119,12 @@ declare class Field {
     static readonly WALL = 1;
     constructor(board: Board);
     static restore(data: Field, board: Board): Field;
-    toLogJSON(): Field & {
-        board: null;
+    toLogJSON(): {
+        field: {
+            type: FieldType;
+            player: number;
+        }[];
+        board: any;
     };
     set(x: number, y: number, att: FieldType, playerid: number | null): void;
     get(x: number, y: number): FieldCell;
@@ -152,7 +156,9 @@ declare class Game {
     turn: number;
     constructor(board: Board);
     static restore(data: Game): Game;
-    toLogJSON(): Game;
+    toLogJSON(): Game & {
+        field: ReturnType<Field["toLogJSON"]>;
+    };
     attachPlayer(player: Player): boolean;
     isReady(): boolean;
     isFree(): boolean;
