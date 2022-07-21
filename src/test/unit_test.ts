@@ -173,7 +173,7 @@ Deno.test("wall point", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().points[0], {
-    basePoint: 0,
+    areaPoint: 0,
     wallPoint: 1 + 2,
   });
 });
@@ -194,7 +194,7 @@ Deno.test("base point", () => {
   const status = game.getStatusJSON();
   assertEquals(status.field[4], { type: Field.BASE, player: 0 });
   assertEquals(game.getStatusJSON().points[0], {
-    basePoint: 4,
+    areaPoint: 4,
     wallPoint: 0 + 1 + 2 + 3 + 5 + 6 + 7 + 8,
   });
 });

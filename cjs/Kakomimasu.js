@@ -567,7 +567,7 @@ class Field {
     getPoints() {
         const points = [];
         for (let i = 0; i < this.board.nplayer; i++) {
-            points[i] = { basePoint: 0, wallPoint: 0 };
+            points[i] = { areaPoint: 0, wallPoint: 0 };
         }
         this.field.forEach(({ type: att, player: pid }, idx) => {
             if (pid === null)
@@ -578,7 +578,7 @@ class Field {
                 p.wallPoint += pnt;
             }
             else if (att === Field.BASE) {
-                p.basePoint += Math.abs(pnt);
+                p.areaPoint += Math.abs(pnt);
             }
         });
         return points;
