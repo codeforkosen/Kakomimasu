@@ -1,5 +1,5 @@
 export declare type Point = {
-    basePoint: number;
+    areaPoint: number;
     wallPoint: number;
 };
 declare class Board {
