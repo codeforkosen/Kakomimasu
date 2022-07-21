@@ -1,5 +1,10 @@
 import { flat } from "./util.ts";
 
+export type Point = {
+  basePoint: number;
+  wallPoint: number;
+};
+
 class Board {
   public w: number;
   public h: number;
@@ -454,20 +459,19 @@ class Field {
     }
   }
 
-  getPoints(): { basepoint: number; wallpoint: number }[] {
-    // tilePoint,areaPointの区別が必要→ここでいうWallとBaseかな？
-    const points: { basepoint: number; wallpoint: number }[] = [];
+  getPoints(): Point[] {
+    const points: ReturnType<Field["getPoints"]> = [];
     for (let i = 0; i < this.board.nplayer; i++) {
-      points[i] = { basepoint: 0, wallpoint: 0 };
+      points[i] = { basePoint: 0, wallPoint: 0 };
     }
     this.field.forEach(({ type: att, player: pid }, idx) => {
       if (pid === null) return;
       const p = points[pid];
       const pnt = this.board.points[idx];
       if (att === Field.WALL) {
-        p.wallpoint += pnt;
+        p.wallPoint += pnt;
       } else if (att === Field.BASE) {
-        p.basepoint += Math.abs(pnt);
+        p.basePoint += Math.abs(pnt);
       }
     });
     return points;
@@ -488,7 +492,7 @@ class Game {
   public field: Field;
   public log: {
     players: {
-      point: { basepoint: number; wallpoint: number };
+      point: Point;
       actions: ReturnType<typeof Action.prototype.getJSON>[];
     }[];
   }[];
@@ -800,11 +804,7 @@ class Game {
     }[];
     log: typeof Game.prototype.log;
   } {
-    const players: {
-      id: string;
-      agents: { x: number; y: number }[];
-      point: { basepoint: number; wallpoint: number };
-    }[] = [];
+    const players: ReturnType<Game["toJSON"]>["players"] = [];
     this.players.forEach((p, i) => {
       const id = p.id;
       let agents: { x: number; y: number }[] = [];

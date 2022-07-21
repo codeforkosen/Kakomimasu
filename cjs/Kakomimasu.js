@@ -565,10 +565,9 @@ class Field {
         }
     }
     getPoints() {
-        // tilePoint,areaPointの区別が必要→ここでいうWallとBaseかな？
         const points = [];
         for (let i = 0; i < this.board.nplayer; i++) {
-            points[i] = { basepoint: 0, wallpoint: 0 };
+            points[i] = { basePoint: 0, wallPoint: 0 };
         }
         this.field.forEach(({ type: att, player: pid }, idx) => {
             if (pid === null)
@@ -576,10 +575,10 @@ class Field {
             const p = points[pid];
             const pnt = this.board.points[idx];
             if (att === Field.WALL) {
-                p.wallpoint += pnt;
+                p.wallPoint += pnt;
             }
             else if (att === Field.BASE) {
-                p.basepoint += Math.abs(pnt);
+                p.basePoint += Math.abs(pnt);
             }
         });
         return points;

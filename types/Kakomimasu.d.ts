@@ -1,3 +1,7 @@
+export declare type Point = {
+    basePoint: number;
+    wallPoint: number;
+};
 declare class Board {
     w: number;
     h: number;
@@ -118,7 +122,7 @@ declare class Field {
     static readonly BASE = 0;
     static readonly WALL = 1;
     constructor(board: Board);
-    static restore(data: Field, board: Board): Field;
+    static restore(data: ReturnType<Field["toLogJSON"]>, board: Board): Field;
     toLogJSON(): {
         field: {
             type: FieldType;
@@ -130,10 +134,7 @@ declare class Field {
     get(x: number, y: number): FieldCell;
     setAgent(playerid: number, x: number, y: number): boolean;
     fillBase(): void;
-    getPoints(): {
-        basepoint: number;
-        wallpoint: number;
-    }[];
+    getPoints(): Point[];
     getJSON(): FieldCell[];
 }
 declare class Game {
@@ -146,10 +147,7 @@ declare class Game {
     field: Field;
     log: {
         players: {
-            point: {
-                basepoint: number;
-                wallpoint: number;
-            };
+            point: Point;
             actions: ReturnType<typeof Action.prototype.getJSON>[];
         }[];
     }[];
