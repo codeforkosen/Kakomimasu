@@ -77,9 +77,8 @@ Deno.test("random", () => {
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
         s.push(
-          "_W".charAt(n.type) + (n.player === null
-            ? "."
-            : n.player).toString() +
+          "_W".charAt(n.type) +
+            (n.player === null ? "." : n.player).toString() +
             a,
         );
         fillfld += (n.type === 0 && n.player !== null) ? 1 : 0;

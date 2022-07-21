@@ -8,5 +8,8 @@
     "files": {
       "exclude": ["cjs/", "mjs/", "types"]
     }
+  },
+  "tasks": {
+    "dnt": "deno run -A scripts/dnt.ts"
   }
 }

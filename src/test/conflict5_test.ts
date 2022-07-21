@@ -77,9 +77,8 @@ Deno.test("conflict5 test", () => {
         }
         const a = a0 ? "0" : (a1 ? "1" : ".");
         s.push(
-          "_W".charAt(n.type) + (n.player === null
-            ? "."
-            : n.player).toString() +
+          "_W".charAt(n.type) +
+            (n.player === null ? "." : n.player).toString() +
             a,
         );
       }

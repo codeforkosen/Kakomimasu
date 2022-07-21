@@ -42,9 +42,9 @@ Deno.test("two-dimensional array check", () => {
   }
   assertEquals(game.getStatusJSON().log.length, nturn);
   cl(game.getStatusJSON().points);
-  assertEquals(game.getStatusJSON().points, [{ basepoint: 0, wallpoint: 0 }, {
-    basepoint: 0,
-    wallpoint: 51,
+  assertEquals(game.getStatusJSON().points, [{ basePoint: 0, wallPoint: 0 }, {
+    basePoint: 0,
+    wallPoint: 51,
   }]);
   // util.p(game.getStatusJSON());
 
