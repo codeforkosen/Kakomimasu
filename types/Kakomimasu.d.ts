@@ -111,7 +111,7 @@ declare class Action {
     static getMessage(res: ActionRes): string;
     static fromJSON: (array: ActionJSON[]) => Action[];
 }
-declare type FieldType = typeof Field.BASE | typeof Field.WALL;
+declare type FieldType = typeof Field.AREA | typeof Field.WALL;
 declare type FieldCell = {
     type: FieldType;
     player: null | number;
@@ -119,7 +119,7 @@ declare type FieldCell = {
 declare class Field {
     board: Board;
     field: FieldCell[];
-    static readonly BASE = 0;
+    static readonly AREA = 0;
     static readonly WALL = 1;
     constructor(board: Board);
     static restore(data: ReturnType<Field["toLogJSON"]>, board: Board): Field;

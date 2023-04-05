@@ -280,7 +280,7 @@ class Agent {
         const { x, y } = this.lastaction;
         if (!this.checkRemove(x, y))
             return false;
-        this.field.set(x, y, Field.BASE, null);
+        this.field.set(x, y, Field.AREA, null);
         return true;
     }
     commit() {
@@ -450,7 +450,7 @@ class Field {
         // field
         this.field = [];
         for (let i = 0; i < this.board.w * this.board.h; i++) {
-            this.field.push({ type: Field.BASE, player: null });
+            this.field.push({ type: Field.AREA, player: null });
         }
     }
     static restore(data, board) {
@@ -494,7 +494,7 @@ class Field {
         for (let y = -1; y < h + 1; y++) {
             for (let x = -1; x < w + 1; x++) {
                 if (x < 0 || x >= w || y < 0 || y >= h) {
-                    field.push({ type: Field.BASE, player: null });
+                    field.push({ type: Field.AREA, player: null });
                 }
                 else
                     field.push(Object.assign({}, this.field[x + y * w]));
@@ -571,7 +571,7 @@ class Field {
             if (att === Field.WALL) {
                 p.wallPoint += pnt;
             }
-            else if (att === Field.BASE) {
+            else if (att === Field.AREA) {
                 p.areaPoint += Math.abs(pnt);
             }
         });
@@ -581,7 +581,7 @@ class Field {
         return this.field;
     }
 }
-Object.defineProperty(Field, "BASE", {
+Object.defineProperty(Field, "AREA", {
     enumerable: true,
     configurable: true,
     writable: true,
