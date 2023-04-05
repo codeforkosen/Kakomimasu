@@ -42,7 +42,7 @@ Deno.test("fillBase1", () => {
       if (c !== ".") {
         const n = parseInt(c);
         const f = field.field[i];
-        if (f.type !== Field.BASE || f.player !== n) {
+        if (f.type !== Field.AREA || f.player !== n) {
           throw new AssertionError("");
         }
       }

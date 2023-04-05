@@ -231,7 +231,7 @@ class Agent {
     if (this.lastaction == null) throw new Error("remove before check");
     const { x, y } = this.lastaction;
     if (!this.checkRemove(x, y)) return false;
-    this.field.set(x, y, Field.BASE, null);
+    this.field.set(x, y, Field.AREA, null);
     return true;
   }
 
@@ -328,14 +328,14 @@ class Action {
     array.map((a) => new Action(a[0], a[1], a[2], a[3]));
 }
 
-type FieldType = typeof Field.BASE | typeof Field.WALL;
+type FieldType = typeof Field.AREA | typeof Field.WALL;
 type FieldCell = { type: FieldType; player: null | number };
 
 class Field {
   public board: Board;
   public field: FieldCell[];
 
-  public static readonly BASE = 0;
+  public static readonly AREA = 0;
   public static readonly WALL = 1;
 
   constructor(board: Board) {
@@ -343,7 +343,7 @@ class Field {
     // field
     this.field = [];
     for (let i = 0; i < this.board.w * this.board.h; i++) {
-      this.field.push({ type: Field.BASE, player: null });
+      this.field.push({ type: Field.AREA, player: null });
     }
   }
 
@@ -394,7 +394,7 @@ class Field {
     for (let y = -1; y < h + 1; y++) {
       for (let x = -1; x < w + 1; x++) {
         if (x < 0 || x >= w || y < 0 || y >= h) {
-          field.push({ type: Field.BASE, player: null });
+          field.push({ type: Field.AREA, player: null });
         } else field.push({ ...this.field[x + y * w] });
       }
     }
@@ -470,7 +470,7 @@ class Field {
       const pnt = this.board.points[idx];
       if (att === Field.WALL) {
         p.wallPoint += pnt;
-      } else if (att === Field.BASE) {
+      } else if (att === Field.AREA) {
         p.areaPoint += Math.abs(pnt);
       }
     });

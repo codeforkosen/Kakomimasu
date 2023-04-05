@@ -38,7 +38,7 @@ Deno.test("action can't put", () => {
   p1.setActions(Action.fromJSON([[0, Action.PUT, 1000, 0]]));
   game.nextTurn();
   const status = game.getStatusJSON();
-  assertEquals(status.field[0], { type: Field.BASE, player: null });
+  assertEquals(status.field[0], { type: Field.AREA, player: null });
   assertEquals(
     status.log[0].players[0].actions[0].res,
     Action.ERR_ILLEGAL_ACTION,
@@ -88,7 +88,7 @@ Deno.test("action cant't move series", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[2], {
-    type: Field.BASE,
+    type: Field.AREA,
     player: null,
   });
 });
@@ -100,7 +100,7 @@ Deno.test("action can't move", () => {
   p1.setActions(Action.fromJSON([[0, Action.MOVE, 2, 0]]));
   game.nextTurn();
   const status = game.getStatusJSON();
-  assertEquals(status.field[2], { type: Field.BASE, player: null });
+  assertEquals(status.field[2], { type: Field.AREA, player: null });
   assertEquals(
     status.log[1].players[0].actions[0].res,
     Action.ERR_ILLEGAL_ACTION,
@@ -121,7 +121,7 @@ Deno.test("fill", () => {
   ]));
   game.nextTurn();
   const status = game.getStatusJSON();
-  assertEquals(status.field[4], { type: Field.BASE, player: 0 });
+  assertEquals(status.field[4], { type: Field.AREA, player: 0 });
 });
 
 Deno.test("action remove", () => {
@@ -140,7 +140,7 @@ Deno.test("action remove", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[0], {
-    type: Field.BASE,
+    type: Field.AREA,
     player: null,
   });
 });
@@ -156,7 +156,7 @@ Deno.test("action can't remove", () => {
   ]));
   game.nextTurn();
   assertEquals(game.getStatusJSON().field[1], {
-    type: Field.BASE,
+    type: Field.AREA,
     player: null,
   });
   assertEquals(
@@ -178,7 +178,7 @@ Deno.test("wall point", () => {
   });
 });
 
-Deno.test("base point", () => {
+Deno.test("AREA point", () => {
   const { game, p1 } = prepare();
   p1.setActions(Action.fromJSON([
     [0, Action.PUT, 0, 0],
@@ -192,7 +192,7 @@ Deno.test("base point", () => {
   ]));
   game.nextTurn();
   const status = game.getStatusJSON();
-  assertEquals(status.field[4], { type: Field.BASE, player: 0 });
+  assertEquals(status.field[4], { type: Field.AREA, player: 0 });
   assertEquals(game.getStatusJSON().points[0], {
     areaPoint: 4,
     wallPoint: 0 + 1 + 2 + 3 + 5 + 6 + 7 + 8,
@@ -221,7 +221,7 @@ Deno.test("conflict put", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   // util.p(status.agents);
-  assertEquals(status.field[0], { type: Field.BASE, player: null });
+  assertEquals(status.field[0], { type: Field.AREA, player: null });
   assertEquals(status.log[0].players[0].actions[0].res, Action.CONFLICT);
   assertEquals(status.log[0].players[1].actions[0].res, Action.CONFLICT);
 });
@@ -236,7 +236,7 @@ Deno.test("conflict move", () => {
   game.nextTurn();
   const status = game.getStatusJSON();
   // util.p(status.agents);
-  assertEquals(status.field[1], { type: Field.BASE, player: null });
+  assertEquals(status.field[1], { type: Field.AREA, player: null });
   assertEquals(status.log[1].players[0].actions[0].res, Action.CONFLICT);
   assertEquals(status.log[1].players[1].actions[0].res, Action.CONFLICT);
 });
