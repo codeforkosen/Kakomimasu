@@ -1,12 +1,12 @@
 {
   "fmt": {
     "files": {
-      "exclude": ["cjs/", "mjs/", "types"]
+      "exclude": ["cjs", "mjs", "types", "package.json"]
     }
   },
   "lint": {
     "files": {
-      "exclude": ["cjs/", "mjs/", "types"]
+      "exclude": ["cjs", "mjs", "types"]
     }
   },
   "tasks": {
