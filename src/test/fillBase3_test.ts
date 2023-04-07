@@ -38,7 +38,7 @@ Deno.test("fillBase2", () => {
   const chk = (s: string) => {
     s = s.replace(/\n/g, "");
     for (let i = 0; i < s.length; i += 2) {
-      const c = s.charAt(i) === "W" ? Field.WALL : Field.BASE;
+      const c = s.charAt(i) === "W" ? Field.WALL : Field.AREA;
       const n = s.charAt(i + 1) === "." ? null : parseInt(s.charAt(i + 1));
       const f = field.field[i / 2];
       if (f.type !== c || f.player !== n) {

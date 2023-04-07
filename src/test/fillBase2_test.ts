@@ -32,7 +32,7 @@ Deno.test("fillBase2", () => {
       } else if (c === "1") {
         field.field[i] = { type: Field.WALL, player: 1 };
       } else {
-        field.field[i] = { type: Field.BASE, player: null };
+        field.field[i] = { type: Field.AREA, player: null };
       }
     }
   };
@@ -43,7 +43,7 @@ Deno.test("fillBase2", () => {
       if (c !== ".") {
         const n = parseInt(c);
         const f = field.field[i];
-        if (f.type !== Field.BASE || f.player !== n) {
+        if (f.type !== Field.AREA || f.player !== n) {
           throw new Error();
         }
       }
