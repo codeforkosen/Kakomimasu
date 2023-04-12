@@ -2,17 +2,15 @@ import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
 import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 Deno.test("conflict4", () => {
-  const nagent = 2;
-  const nturn = 30;
-  const nsec = 3;
-  const [w, h] = [3, 2];
+  const nAgent = 2;
+  const totalTurn = 30;
+  const [width, height] = [3, 2];
   const board = new Board({
-    w,
-    h,
-    points: new Array(w * h),
-    nagent,
-    nturn,
-    nsec,
+    width,
+    height,
+    points: new Array(width * height),
+    nAgent,
+    totalTurn,
   });
 
   const kkmm = new Kakomimasu();
@@ -61,10 +59,10 @@ Deno.test("conflict4", () => {
 
   const tos = () => {
     const res = [];
-    for (let i = 0; i < h; i++) {
+    for (let i = 0; i < height; i++) {
       const s = [];
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         const a0 = isOnAgent(0, j, i);
         const a1 = isOnAgent(1, j, i);
         if (a0 && a1) {
@@ -86,11 +84,11 @@ Deno.test("conflict4", () => {
   const chk = (s: string) => assertEquals(s.trim(), tos());
 
   cl("put");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.PUT, 0, 0],
     [1, Action.PUT, 1, 1],
   ]));
-  p2.setActions(Action.fromJSON([
+  p2.setActions(Action.fromArray([
     [0, Action.PUT, 1, 0],
   ]));
   assert(game.nextTurn());
@@ -101,7 +99,7 @@ _.. W00 _..
 `);
 
   cl("move");
-  p2.setActions(Action.fromJSON([
+  p2.setActions(Action.fromArray([
     [0, Action.MOVE, 2, 0],
   ]));
   assert(game.nextTurn());
@@ -112,7 +110,7 @@ _.. W00 _..
 `);
 
   cl("remove move conflict");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.REMOVE, 1, 0],
     [1, Action.MOVE, 1, 0],
   ]));
@@ -124,7 +122,7 @@ _.. W00 _..
 `);
 
   cl("move");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 0],
   ]));
   assert(game.nextTurn());
@@ -135,7 +133,7 @@ _.. W00 _..
 `);
 
   cl("move remove conflict myself");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 0, 0],
     [0, Action.REMOVE, 0, 0],
   ]));

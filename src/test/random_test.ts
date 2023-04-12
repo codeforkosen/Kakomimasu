@@ -15,10 +15,16 @@ const cl = (...a: Parameters<Console["log"]>) => {
 }; //console.log(...a);
 
 Deno.test("random", () => {
-  const nagent = 6;
-  const [w, h] = [nagent, nagent];
-  const nturn = 10000;
-  const board = new Board({ w, h, points: new Array(w * h), nagent, nturn });
+  const nAgent = 6;
+  const [width, height] = [nAgent, nAgent];
+  const totalTurn = 10000;
+  const board = new Board({
+    width,
+    height,
+    points: new Array(width * height),
+    nAgent,
+    totalTurn,
+  });
 
   const initialput = false;
 
@@ -66,10 +72,10 @@ Deno.test("random", () => {
   const tos = () => {
     const res = [];
     let fillfld = 0;
-    for (let i = 0; i < h; i++) {
+    for (let i = 0; i < height; i++) {
       const s = [];
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         const a0 = isOnAgent(0, j, i);
         const a1 = isOnAgent(1, j, i);
         if (a0 && a1) {
@@ -93,9 +99,9 @@ Deno.test("random", () => {
     return res.join("\n");
   };
   const checkAgent = () => {
-    for (let i = 0; i < h; i++) {
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         const a0 = isOnAgent(0, j, i);
         const a1 = isOnAgent(1, j, i);
         if (a0 && a1) {
@@ -124,7 +130,7 @@ Deno.test("random", () => {
   let actions: ActionType[];
   const getPutAction = (x: number) => {
     const act: ActionJSON[] = [];
-    for (let i = 0; i < nagent; i++) {
+    for (let i = 0; i < nAgent; i++) {
       act.push([i, Action.PUT, x, i]);
     }
     return act;
@@ -132,8 +138,8 @@ Deno.test("random", () => {
   game.nextTurn();
   chk();
   if (initialput) {
-    p1.setActions(Action.fromJSON(getPutAction(0)));
-    p2.setActions(Action.fromJSON(getPutAction(nagent - 1)));
+    p1.setActions(Action.fromArray(getPutAction(0)));
+    p2.setActions(Action.fromArray(getPutAction(nAgent - 1)));
     assert(game.nextTurn());
     chk();
     actions = [Action.MOVE, Action.REMOVE];
@@ -144,21 +150,21 @@ Deno.test("random", () => {
   const getRandomAction = (n: number): ActionJSON => [
     n,
     actions[util.rnd(actions.length)],
-    util.rnd(nagent),
-    util.rnd(nagent),
+    util.rnd(nAgent),
+    util.rnd(nAgent),
   ];
-  for (let i = 1; i <= nturn; i++) {
+  for (let i = 1; i <= totalTurn; i++) {
     const act: ActionJSON[][] = [];
     for (let k = 0; k < nplayers; k++) {
       const act2: ActionJSON[] = [];
-      for (let j = 0; j < nagent; j++) {
+      for (let j = 0; j < nAgent; j++) {
         act2.push(getRandomAction(j));
       }
       act.push(act2);
     }
     //console.log("act", act);
-    p1.setActions(Action.fromJSON(act[0]));
-    p2.setActions(Action.fromJSON(act[1]));
+    p1.setActions(Action.fromArray(act[0]));
+    p2.setActions(Action.fromArray(act[1]));
     if (i === 9) {
       showAgents();
     }

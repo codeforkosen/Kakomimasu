@@ -6,13 +6,13 @@ const cl = (...a: Parameters<Console["log"]>) => {
 }; //console.log(...a);
 
 Deno.test("two-dimensional array check", () => {
-  const w = 8;
-  const h = 8;
+  const width = 8;
+  const height = 8;
   const points = [];
-  for (let i = 0; i < w * h; i++) points[i] = i;
-  const nagent = 6;
-  const nturn = 10;
-  const board = new Board({ w, h, points, nagent, nturn });
+  for (let i = 0; i < width * height; i++) points[i] = i;
+  const nAgent = 6;
+  const totalTurn = 10;
+  const board = new Board({ width, height, points, nAgent, totalTurn });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
@@ -23,13 +23,13 @@ Deno.test("two-dimensional array check", () => {
   game.attachPlayer(p2);
   game.start();
   for (;;) {
-    const _st = game.getStatusJSON();
+    const _st = game;
     // console.log(st);
-    p1.setActions(Action.fromJSON([
+    p1.setActions(Action.fromArray([
       [0, Action.PUT, 1, 1],
       [0, Action.MOVE, 2, 2],
     ]));
-    p2.setActions(Action.fromJSON([
+    p2.setActions(Action.fromArray([
       [0, Action.PUT, 1, 1], // point 9
       [1, Action.PUT, 1, 2], // point 17
       [2, Action.PUT, 1, 3], // point 25
@@ -40,9 +40,12 @@ Deno.test("two-dimensional array check", () => {
       break;
     }
   }
-  assertEquals(game.getStatusJSON().log.length, nturn);
-  cl(game.getStatusJSON().points);
-  assertEquals(game.getStatusJSON().points, [{ areaPoint: 0, wallPoint: 0 }, {
+  assertEquals(game.log.length, totalTurn);
+  cl(game.board.points);
+  assertEquals(game.log.at(-1)?.players.map((p) => p.point), [{
+    areaPoint: 0,
+    wallPoint: 0,
+  }, {
     areaPoint: 0,
     wallPoint: 51,
   }]);

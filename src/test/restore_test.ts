@@ -2,13 +2,12 @@ import { assert, assertEquals } from "./deps.ts";
 import { Action, Agent, Board, Field, Game, Player } from "../Kakomimasu.ts";
 
 const boardObj: ConstructorParameters<typeof Board>[0] = {
-  w: 2,
-  h: 2,
+  width: 2,
+  height: 2,
   points: [1, 2, 3, 4],
-  nagent: 1,
-  nturn: 10,
-  nsec: 1,
-  nplayer: 2,
+  nAgent: 1,
+  totalTurn: 10,
+  nPlayer: 2,
 };
 
 function assertBoard(a: Board, b: Board) {
@@ -42,103 +41,89 @@ function assertPlayer(a: Player, b: Player) {
 
 // Board test
 // constructor paramを変えてテスト
-Deno.test("restore Board class with all param", () => {
+Deno.test("fromJSON Board class with all param", () => {
   const board = new Board(boardObj);
-  const restoredBoard = Board.restore(board.toLogJSON());
+  const restoredBoard = Board.fromJSON(board.toJSON());
 
   assertEquals(board, restoredBoard);
 });
-Deno.test("restore Board class with no 'nturn'", () => {
-  const { nturn: _, ...b } = boardObj;
+Deno.test("fromJSON Board class with no 'totalTurn'", () => {
+  const { totalTurn: _, ...b } = boardObj;
   const board = new Board(b);
-  const restoredBoard = Board.restore(board.toLogJSON());
+  const restoredBoard = Board.fromJSON(board.toJSON());
 
   assertBoard(board, restoredBoard);
 });
-Deno.test("restore Board class with no 'nsec'", () => {
-  const { nsec: _, ...b } = boardObj;
+Deno.test("fromJSON Board class with no 'nPlayer'", () => {
+  const { nPlayer: _, ...b } = boardObj;
   const board = new Board(b);
-  const restoredBoard = Board.restore(board.toLogJSON());
-
-  assertBoard(board, restoredBoard);
-});
-Deno.test("restore Board class with no 'nplayer'", () => {
-  const { nplayer: _, ...b } = boardObj;
-  const board = new Board(b);
-  const restoredBoard = Board.restore(board.toLogJSON());
-
-  assertBoard(board, restoredBoard);
-});
-Deno.test("restore Board class with no 'name'", () => {
-  const { name: _, ...b } = boardObj;
-  const board = new Board(b);
-  const restoredBoard = Board.restore(board.toLogJSON());
+  const restoredBoard = Board.fromJSON(board.toJSON());
 
   assertBoard(board, restoredBoard);
 });
 
 // Agent test
 // lastactionを変えてテスト
-Deno.test("restore Agent class with lastaction is null", () => {
+Deno.test("fromJSON Agent class with lastaction is null", () => {
   const board = new Board(boardObj);
   const field = new Field(board);
   const agent = new Agent(board, field, 1);
-  const restoredAgent = Agent.restore(agent.toLogJSON(), board, field);
+  const restoredAgent = Agent.fromJSON(agent.toLogJSON(), board, field);
 
   assertAgent(agent, restoredAgent);
 });
-Deno.test("restore Agent class with lastaction is Action class", () => {
+Deno.test("fromJSON Agent class with lastaction is Action class", () => {
   const board = new Board(boardObj);
   const field = new Field(board);
   const agent = new Agent(board, field, 1);
   const action = new Action(0, Action.NONE, 0, 0);
   agent.lastaction = action;
-  const restoredAgent = Agent.restore(agent.toLogJSON(), board, field);
+  const restoredAgent = Agent.fromJSON(agent.toLogJSON(), board, field);
 
   assertAgent(agent, restoredAgent);
 });
 
 // Action test
-Deno.test("restore Action class", () => {
+Deno.test("fromJSON Action class", () => {
   const action = new Action(0, Action.NONE, 0, 0);
-  const restoredAction = Action.restore(action);
+  const restoredAction = Action.fromJSON(action);
 
   assertAction(action, restoredAction);
 });
 
 // Field test
-Deno.test("restore Field class", () => {
+Deno.test("fromJSON Field class", () => {
   const board = new Board(boardObj);
   const field = new Field(board);
-  const restoredField = Field.restore(field.toLogJSON(), board);
+  const restoredField = Field.fromJSON(field.toLogJSON(), board);
 
   assertField(field, restoredField);
 });
 
 // Game test
-Deno.test("restore Game class", () => {
+Deno.test("fromJSON Game class", () => {
   const board = new Board(boardObj);
   const game = new Game(board);
-  const restoredGame = Game.restore(game.toLogJSON());
+  const restoredGame = Game.fromJSON(game.toLogJSON());
 
   assertGame(game, restoredGame);
 });
 
 // Player test
 // game有り無しでテスト
-Deno.test("restore Player class with game is null", () => {
+Deno.test("fromJSON Player class with game is null", () => {
   const player = new Player("abcd", "spec");
-  const restoredPlayer = Player.restore(player.toLogJSON());
+  const restoredPlayer = Player.fromJSON(player.toLogJSON());
 
   assertPlayer(player, restoredPlayer);
 });
 
-Deno.test("restore Player class with game is class", () => {
+Deno.test("fromJSON Player class with game is class", () => {
   const board = new Board(boardObj);
   const game = new Game(board);
   const player = new Player("abcd", "spec");
   player.setGame(game);
-  const restoredPlayer = Player.restore(player.toLogJSON(), game);
+  const restoredPlayer = Player.fromJSON(player.toLogJSON(), game);
 
   assertPlayer(player, restoredPlayer);
 });

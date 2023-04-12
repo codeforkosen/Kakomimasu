@@ -14,11 +14,11 @@ Deno.test("a", async () => {
 });
 */
 Deno.test("conflict5 test", () => {
-  const nagent = 2;
-  const [w, h] = [3, 1];
+  const nAgent = 2;
+  const [width, height] = [3, 1];
   const points = [1, 1, 1];
-  const nturn = 20;
-  const board = new Board({ w, h, points, nagent, nturn });
+  const totalTurn = 20;
+  const board = new Board({ width, height, points, nAgent, totalTurn });
 
   const kkmm = new Kakomimasu();
   kkmm.appendBoard(board);
@@ -66,10 +66,10 @@ Deno.test("conflict5 test", () => {
 
   const tos = () => {
     const res = [];
-    for (let i = 0; i < h; i++) {
+    for (let i = 0; i < height; i++) {
       const s = [];
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         const a0 = isOnAgent(0, j, i);
         const a1 = isOnAgent(1, j, i);
         if (a0 && a1) {
@@ -93,7 +93,7 @@ Deno.test("conflict5 test", () => {
   //kc.setActions([ new Action(0, "MOVE", 4, 2),new Action(0, "MOVE", 3, 2)]); // こっちだとAgentが[3,2]に移動する。
   //kc.setActions([ new Action(0, "MOVE", 3, 2),new Action(0, "MOVE", 4, 2)]); // こっちだとAgentは移動しない。
   cl("put");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.PUT, 0, 0],
   ]));
   assert(game.nextTurn());
@@ -104,7 +104,7 @@ Deno.test("conflict5 test", () => {
   let actions;
 
   cl("conflict1");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 0],
     [0, Action.MOVE, 2, 0],
   ]));
@@ -119,7 +119,7 @@ Deno.test("conflict5 test", () => {
   chk("W00 _.. _..");
 
   cl("conflict2");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 2, 0],
     [0, Action.MOVE, 1, 0],
   ]));
@@ -134,7 +134,7 @@ Deno.test("conflict5 test", () => {
   //console.log(game.log);
 
   cl("conflict3");
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 2, 0],
     [0, Action.MOVE, 1, 0],
     [0, Action.MOVE, 3, 0],
