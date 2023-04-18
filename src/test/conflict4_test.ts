@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { Action, Board, Game, Player } from "../Kakomimasu.ts";
 import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 Deno.test("conflict4", () => {
@@ -13,14 +13,12 @@ Deno.test("conflict4", () => {
     totalTurn,
   });
 
-  const kkmm = new Kakomimasu();
-  kkmm.appendBoard(board);
-  const game = kkmm.createGame(board);
+  const game = new Game(board);
 
   const field = game.field;
 
-  const p1 = kkmm.createPlayer("test1");
-  const p2 = kkmm.createPlayer("test2");
+  const p1 = new Player("test1");
+  const p2 = new Player("test2");
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();

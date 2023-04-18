@@ -3,7 +3,8 @@ import {
   ActionJSON,
   ActionType,
   Board,
-  Kakomimasu,
+  Game,
+  Player,
 } from "../Kakomimasu.ts";
 import { assert, AssertionError } from "./deps.ts";
 //import util from "../util.js";
@@ -28,15 +29,13 @@ Deno.test("random", () => {
 
   const initialput = false;
 
-  const kkmm = new Kakomimasu();
-  kkmm.appendBoard(board);
-  const game = kkmm.createGame(board);
+  const game = new Game(board);
 
   const field = game.field;
 
   const nplayers = 2;
-  const p1 = kkmm.createPlayer("test1");
-  const p2 = kkmm.createPlayer("test2");
+  const p1 = new Player("test1");
+  const p2 = new Player("test2");
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();

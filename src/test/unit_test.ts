@@ -1,4 +1,4 @@
-import { Action, Board, Field, Kakomimasu } from "../Kakomimasu.ts";
+import { Action, Board, Field, Game, Player } from "../Kakomimasu.ts";
 import { assertEquals } from "./deps.ts";
 // import util from "../util.mjs";
 
@@ -14,11 +14,9 @@ const prepare = () => {
   const nAgent = 9;
   const board = new Board({ width, height, points, nAgent, totalTurn: 30 });
 
-  const kkmm = new Kakomimasu();
-  kkmm.appendBoard(board);
-  const game = kkmm.createGame(board);
-  const p1 = kkmm.createPlayer("test1");
-  const p2 = kkmm.createPlayer("test2");
+  const game = new Game(board);
+  const p1 = new Player("test1");
+  const p2 = new Player("test2");
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();

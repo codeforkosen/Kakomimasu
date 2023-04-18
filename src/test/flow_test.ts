@@ -1,4 +1,4 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { Action, Board, Game, Player } from "../Kakomimasu.ts";
 import { assertEquals } from "./deps.ts";
 //import util from "../util.mjs";
 
@@ -20,11 +20,9 @@ Deno.test("flow", () => {
   const totalTurn = 10;
   const board = new Board({ width, height, points, nAgent, totalTurn });
 
-  const kkmm = new Kakomimasu();
-  kkmm.appendBoard(board);
-  const game = kkmm.createGame(board);
-  const p1 = kkmm.createPlayer("test1");
-  const p2 = kkmm.createPlayer("test2");
+  const game = new Game(board);
+  const p1 = new Player("test1");
+  const p2 = new Player("test2");
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();
