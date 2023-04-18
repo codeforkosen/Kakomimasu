@@ -10,6 +10,10 @@
     }
   },
   "tasks": {
-    "dnt": "deno run -A scripts/dnt.ts"
+    "dnt": "deno run -A scripts/dnt.ts",
+    "test": "rm -rf coverage && deno test --coverage=coverage --parallel",
+    "cov": "deno coverage ./coverage --lcov --output=coverage/coverage.lcov",
+    "cov:report": "genhtml -o coverage-html coverage/coverage.lcov",
+    "test-report": "deno task test ; deno task cov && deno task cov:report"
   }
 }

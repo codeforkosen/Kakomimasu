@@ -51,7 +51,7 @@ Deno.test("two-dimensional array check", () => {
   }]);
   // util.p(game.getStatusJSON());
 
-  const log = game.toLogJSON();
+  const log = JSON.parse(JSON.stringify(game.toJSON()));
   test2dArray(log);
 });
 
