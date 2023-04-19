@@ -406,6 +406,10 @@ class Field {
   }
 }
 
+export type GameOptions = Partial<
+  Pick<Board, "nAgent" | "nPlayer" | "totalTurn">
+>;
+
 class Game {
   readonly board: Board;
   public players: Player[];
@@ -420,7 +424,7 @@ class Game {
 
   constructor(
     baseBoard: Board,
-    options?: Partial<Pick<Board, "nAgent" | "nPlayer" | "totalTurn">>,
+    options?: GameOptions,
   ) {
     this.board = new Board({ ...baseBoard, ...options });
 
