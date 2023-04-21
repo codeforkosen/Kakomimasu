@@ -305,7 +305,7 @@ class Field {
     return true;
   }
 
-  fill(): void {
+  fillArea(): void {
     // プレイヤーごとに入れ子関係なく囲まれている所にフラグを立て、まとめる。
     // (bitごと 例:010だったら、1番目のプレイヤーの領地or城壁であるという意味)
     // 各マスの立っているbitが一つだけだったらそのプレイヤーの領地or城壁で確定。
@@ -520,7 +520,7 @@ class Game {
 
     this.commit();
 
-    this.field.fill();
+    this.field.fillArea();
 
     this.log.push({
       players: actions.map((ar, idx) => {
