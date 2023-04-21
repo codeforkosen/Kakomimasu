@@ -1,4 +1,4 @@
-import type { ActionRes, ActionType, FieldTile, Game } from "./Kakomimasu.ts";
+import type { ActionRes, ActionType, FieldTile, Point } from "./Kakomimasu.ts";
 
 export interface BoardJson {
   width: number;
@@ -15,7 +15,7 @@ export interface AgentJson {
 }
 
 export interface ActionJson {
-  agentIdx: number;
+  agentId: number;
   type: ActionType;
   x: number;
   y: number;
@@ -46,5 +46,10 @@ export interface GameJson {
     tiles: FieldTile[];
   };
   players: PlayerJson[];
-  log: typeof Game.prototype.log;
+  log: {
+    players: {
+      point: Point;
+      actions: ActionJson[];
+    }[];
+  }[];
 }

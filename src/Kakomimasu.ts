@@ -138,7 +138,6 @@ class Agent {
     if (!this.isOnBoard()) return false;
     if (!this.checkOnBoard(x, y)) return false;
     if (!this.checkDir(x, y)) return false;
-    //const _n = x + y * this.board.w;
     if (this.field.get(x, y).type !== Field.WALL) return false;
     return true;
   }
@@ -212,7 +211,7 @@ export type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
 export type ActionJSON = [number, ActionType, number, number];
 
 class Action {
-  public agentIdx: number;
+  public agentId: number;
   public type: ActionType;
   public x: number;
   public y: number;
@@ -233,7 +232,7 @@ class Action {
   public static readonly ERR_ILLEGAL_ACTION = 5;
 
   constructor(agentid: number, type: ActionType, x: number, y: number) {
-    this.agentIdx = agentid;
+    this.agentId = agentid;
     this.type = type;
     this.x = x;
     this.y = y;
@@ -241,7 +240,7 @@ class Action {
   }
 
   static fromJSON(data: ActionJson) {
-    const action = new Action(data.agentIdx, data.type, data.x, data.y);
+    const action = new Action(data.agentId, data.type, data.x, data.y);
     action.res = data.res;
     return action;
   }
@@ -451,7 +450,7 @@ class Game {
     return game;
   }
 
-  toJSON(): GameJson {
+  toJSON() {
     const data: GameJson = {
       nAgent: this.board.nAgent,
       nPlayer: this.board.nPlayer,
@@ -480,7 +479,7 @@ class Game {
   }
 
   // status : free -> ready -> gaming -> ended
-  private getStatus() {
+  protected getStatus() {
     if (this.turn === 0) {
       if (this.players.length < this.board.nPlayer) return "free";
       else return "ready";
@@ -547,7 +546,7 @@ class Game {
     for (let playerid = 0; playerid < nplayer; playerid++) {
       const done: Record<string, Action> = {};
       actions[playerid].forEach((a) => {
-        const aid = a.agentIdx;
+        const aid = a.agentId;
         const agents = this.players[playerid].agents;
         if (aid < 0 || aid >= agents.length) {
           a.res = Action.ERR_ILLEGAL_AGENT;
@@ -565,7 +564,7 @@ class Game {
     // 変な動きチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
       actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
-        const aid = a.agentIdx;
+        const aid = a.agentId;
         const agents = this.players[playerid].agents;
         const agent = agents[aid];
         if (!agent.check(a)) {
