@@ -64,7 +64,7 @@ Deno.test("fill1", () => {
 
   p();
 
-  field.fill();
+  field.fillArea();
 
   p();
 

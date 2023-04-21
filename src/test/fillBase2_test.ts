@@ -70,7 +70,7 @@ Deno.test("fill2", () => {
 `);
 
   p();
-  field.fill();
+  field.fillArea();
 
   p();
 
@@ -99,7 +99,7 @@ Deno.test("fill2", () => {
 `);
 
   p();
-  field.fill();
+  field.fillArea();
   p();
 
   chk(`
@@ -127,7 +127,7 @@ Deno.test("fill2", () => {
 `);
 
   p();
-  field.fill();
+  field.fillArea();
   p();
 
   chk(`
