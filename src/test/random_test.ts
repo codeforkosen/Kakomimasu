@@ -1,6 +1,6 @@
 import {
   Action,
-  ActionJSON,
+  ActionArray,
   ActionType,
   Board,
   Game,
@@ -128,7 +128,7 @@ Deno.test("random", () => {
   // put
   let actions: ActionType[];
   const getPutAction = (x: number) => {
-    const act: ActionJSON[] = [];
+    const act: ActionArray[] = [];
     for (let i = 0; i < nAgent; i++) {
       act.push([i, Action.PUT, x, i]);
     }
@@ -146,16 +146,16 @@ Deno.test("random", () => {
     actions = [Action.PUT, Action.MOVE, Action.REMOVE];
   }
   //console.log("actions", actions);
-  const getRandomAction = (n: number): ActionJSON => [
+  const getRandomAction = (n: number): ActionArray => [
     n,
     actions[util.rnd(actions.length)],
     util.rnd(nAgent),
     util.rnd(nAgent),
   ];
   for (let i = 1; i <= totalTurn; i++) {
-    const act: ActionJSON[][] = [];
+    const act: ActionArray[][] = [];
     for (let k = 0; k < nplayers; k++) {
-      const act2: ActionJSON[] = [];
+      const act2: ActionArray[] = [];
       for (let j = 0; j < nAgent; j++) {
         act2.push(getRandomAction(j));
       }

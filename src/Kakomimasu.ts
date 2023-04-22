@@ -22,13 +22,13 @@ interface Board {
 }
 
 class Agent {
-  public field: Field;
-  public playerIdx: number;
-  public x: number;
-  public y: number;
-  public bkx: number;
-  public bky: number;
-  private lastaction: Action | null;
+  field: Field;
+  playerIdx: number;
+  x: number;
+  y: number;
+  bkx: number;
+  bky: number;
+  #lastaction: Action | null;
 
   constructor(field: Field, playeridx: number) {
     this.field = field;
@@ -37,7 +37,7 @@ class Agent {
     this.y = -1;
     this.bkx = -1;
     this.bky = -1;
-    this.lastaction = null;
+    this.#lastaction = null;
   }
 
   static fromJSON(data: AgentJson, playerIdx: number, field: Field): Agent {
@@ -50,75 +50,75 @@ class Agent {
     return { x: this.x, y: this.y };
   }
 
-  isOnBoard(): boolean {
+  #isOnBoard(): boolean {
     return this.x !== -1;
   }
 
-  checkOnBoard(x: number, y: number): boolean {
+  #checkOnBoard(x: number, y: number): boolean {
     return x >= 0 && x < this.field.width && y >= 0 &&
       y < this.field.height;
   }
 
-  checkDir(x: number, y: number): boolean {
+  #checkDir(x: number, y: number): boolean {
     if (this.x === x && this.y === y) return false;
     return Math.abs(this.x - x) <= 1 && Math.abs(this.y - y) <= 1;
   }
 
   check(act: Action): boolean {
-    this.lastaction = act;
+    this.#lastaction = act;
     this.bkx = this.x;
     this.bky = this.y;
     const x = act.x;
     const y = act.y;
     const t = act.type;
-    if (t === Action.PUT) return this.checkPut(x, y);
-    else if (t === Action.MOVE) return this.checkMove(x, y);
-    else if (t === Action.REMOVE) return this.checkRemove(x, y);
+    if (t === Action.PUT) return this.#checkPut(x, y);
+    else if (t === Action.MOVE) return this.#checkMove(x, y);
+    else if (t === Action.REMOVE) return this.#checkRemove(x, y);
     else return false;
   }
 
-  checkPut(x: number, y: number): boolean {
-    if (this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
+  #checkPut(x: number, y: number): boolean {
+    if (this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
     return true;
   }
 
-  checkMove(x: number, y: number) {
-    if (!this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
-    if (!this.checkDir(x, y)) return false;
+  #checkMove(x: number, y: number) {
+    if (!this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
+    if (!this.#checkDir(x, y)) return false;
     return true;
   }
 
-  checkRemove(x: number, y: number) {
-    if (!this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
-    if (!this.checkDir(x, y)) return false;
+  #checkRemove(x: number, y: number) {
+    if (!this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
+    if (!this.#checkDir(x, y)) return false;
     if (this.field.get(x, y).type !== Field.WALL) return false;
     return true;
   }
 
   isValidAction(): Action | undefined {
-    if (!this.lastaction) return;
-    if (this.lastaction.res !== Action.SUCCESS) return;
-    return this.lastaction;
+    if (!this.#lastaction) return;
+    if (this.#lastaction.res !== Action.SUCCESS) return;
+    return this.#lastaction;
   }
 
   putOrMove(): boolean {
     //console.log("putormove", this);
-    if (this.lastaction == null) throw new Error("putOrMove before check");
-    if (this.lastaction.res !== Action.SUCCESS) return false;
-    const act = this.lastaction;
+    if (this.#lastaction == null) throw new Error("putOrMove before check");
+    if (this.#lastaction.res !== Action.SUCCESS) return false;
+    const act = this.#lastaction;
     const x = act.x;
     const y = act.y;
     const t = act.type;
-    if (t === Action.PUT) return this.put(x, y);
-    if (t === Action.MOVE) return this.move(x, y);
+    if (t === Action.PUT) return this.#put(x, y);
+    if (t === Action.MOVE) return this.#move(x, y);
     return true;
   }
 
-  private put(x: number, y: number): boolean {
-    if (!this.checkPut(x, y)) return false;
+  #put(x: number, y: number): boolean {
+    if (!this.#checkPut(x, y)) return false;
     if (!this.field.setAgent(this.playerIdx, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
@@ -127,8 +127,8 @@ class Agent {
     return true;
   }
 
-  private move(x: number, y: number): boolean {
-    if (!this.checkMove(x, y)) return false;
+  #move(x: number, y: number): boolean {
+    if (!this.#checkMove(x, y)) return false;
     if (!this.field.setAgent(this.playerIdx, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
@@ -138,19 +138,19 @@ class Agent {
   }
 
   remove(): boolean {
-    if (this.lastaction == null) throw new Error("remove before check");
-    const { x, y } = this.lastaction;
-    if (!this.checkRemove(x, y)) return false;
+    if (this.#lastaction == null) throw new Error("remove before check");
+    const { x, y } = this.#lastaction;
+    if (!this.#checkRemove(x, y)) return false;
     this.field.set(x, y, Field.AREA, null);
     return true;
   }
 
   commit(): void {
-    this.lastaction = null;
+    this.#lastaction = null;
   }
 
   revert(): void {
-    const act = this.lastaction;
+    const act = this.#lastaction;
     if (
       act && (act.type === Action.MOVE || act.type === Action.PUT) &&
       act.res === Action.SUCCESS
@@ -164,28 +164,28 @@ class Agent {
 
 export type ActionType = 1 | 2 | 3 | 4;
 export type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
-export type ActionJSON = [number, ActionType, number, number];
+export type ActionArray = [number, ActionType, number, number];
 
 class Action {
-  public agentId: number;
-  public type: ActionType;
-  public x: number;
-  public y: number;
-  public res: ActionRes;
+  agentId: number;
+  type: ActionType;
+  x: number;
+  y: number;
+  res: ActionRes;
 
   // Action Type
-  public static readonly PUT = 1;
-  public static readonly NONE = 2;
-  public static readonly MOVE = 3;
-  public static readonly REMOVE = 4;
+  static readonly PUT = 1;
+  static readonly NONE = 2;
+  static readonly MOVE = 3;
+  static readonly REMOVE = 4;
 
   // Action Res
-  public static readonly SUCCESS = 0;
-  public static readonly CONFLICT = 1;
-  public static readonly REVERT = 2;
-  public static readonly ERR_ONLY_ONE_TURN = 3;
-  public static readonly ERR_ILLEGAL_AGENT = 4;
-  public static readonly ERR_ILLEGAL_ACTION = 5;
+  static readonly SUCCESS = 0;
+  static readonly CONFLICT = 1;
+  static readonly REVERT = 2;
+  static readonly ERR_ONLY_ONE_TURN = 3;
+  static readonly ERR_ILLEGAL_AGENT = 4;
+  static readonly ERR_ILLEGAL_ACTION = 5;
 
   constructor(agentid: number, type: ActionType, x: number, y: number) {
     this.agentId = agentid;
@@ -212,7 +212,7 @@ class Action {
     ][res];
   }
 
-  static fromArray = (array: ActionJSON[]) =>
+  static fromArray = (array: ActionArray[]) =>
     array.map((a) => new Action(a[0], a[1], a[2], a[3]));
 }
 
@@ -227,10 +227,10 @@ class Field {
   nAgent: number;
   nPlayer: number;
   points: number[];
-  public tiles: FieldTile[];
+  tiles: FieldTile[];
 
-  public static readonly AREA = 0;
-  public static readonly WALL = 1;
+  static readonly AREA = 0;
+  static readonly WALL = 1;
 
   constructor({ width, height, points, nAgent = 4, nPlayer = 2 }: FieldInit) {
     if (points.length !== width * height) {
@@ -377,15 +377,15 @@ export type GameInit = Board;
 
 class Game {
   totalTurn: number;
-  public players: Player[];
-  public field: Field;
-  public log: {
+  players: Player[];
+  field: Field;
+  log: {
     players: {
       point: Point;
       actions: Action[];
     }[];
   }[];
-  public turn: number;
+  turn: number;
 
   constructor(gameInit: GameInit) {
     const { totalTurn = 30, ...fieldInit } = gameInit;
@@ -424,7 +424,7 @@ class Game {
   }
 
   // status : free -> ready -> gaming -> ended
-  protected getStatus() {
+  getStatus() {
     if (this.turn === 0) {
       if (this.players.length < this.field.nPlayer) return "free";
       else return "ready";
@@ -456,14 +456,14 @@ class Game {
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     // console.log("actions", actions);
 
-    this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
-    this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
-    this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
-    this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
-    this.putOrMove(); // 配置または動かし、フィールド更新
-    this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
+    this.#checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
+    this.#revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
+    this.#checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
+    this.#revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
+    this.#putOrMove(); // 配置または動かし、フィールド更新
+    this.#removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
 
-    this.commit();
+    this.#commit();
 
     this.field.fillArea();
 
@@ -485,7 +485,7 @@ class Game {
     }
   }
 
-  checkActions(actions: Action[][]): void {
+  #checkActions(actions: Action[][]): void {
     const nplayer = actions.length;
     // 範囲外と、かぶりチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
@@ -520,7 +520,7 @@ class Game {
     }
   }
 
-  checkConflict(actions: Action[][]): void {
+  #checkConflict(actions: Action[][]): void {
     //console.log("Actions", actions);
     const chkfield: Action[][] = new Array(this.field.tiles.length);
     for (let i = 0; i < chkfield.length; i++) {
@@ -543,7 +543,7 @@ class Game {
     });
   }
 
-  putOrMove(): void {
+  #putOrMove(): void {
     flat(this.players.map((p) => p.agents)).forEach((agent) => {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
@@ -554,7 +554,7 @@ class Game {
     });
   }
 
-  revertOverlap(): void {
+  #revertOverlap(): void {
     let reverts = false;
     const chkfield: Agent[][] = new Array(this.field.tiles.length);
     do {
@@ -588,7 +588,7 @@ class Game {
     } while (reverts); // revertがあったら再度全件チェック
   }
 
-  removeOrNot(): void {
+  #removeOrNot(): void {
     const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       if (agent.x === -1) return;
@@ -603,7 +603,7 @@ class Game {
     });
   }
 
-  revertNotOwnerWall(): void {
+  #revertNotOwnerWall(): void {
     const agents = flat(this.players.map((p) => p.agents));
     const fld = this.field.tiles;
     const w = this.field.width;
@@ -623,7 +623,7 @@ class Game {
     });
   }
 
-  commit(): void {
+  #commit(): void {
     const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       // if (agent.x === -1) return;
@@ -634,12 +634,12 @@ class Game {
 }
 
 class Player<T extends Game = Game> {
-  public id: string;
-  public spec: string;
-  public game: T | null;
-  public actions: Action[];
-  public index: number;
-  public agents: Agent[];
+  id: string;
+  spec: string;
+  game: T | null;
+  actions: Action[];
+  index: number;
+  agents: Agent[];
 
   constructor(id: string, spec = "") {
     this.id = id;
