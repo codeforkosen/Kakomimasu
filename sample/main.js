@@ -1,4 +1,4 @@
-import { Action, Board, Game, Player } from "../mod.ts";
+import { Action, Game, Player } from "../mod.ts";
 
 const width = 8;
 const height = 8;
@@ -8,7 +8,7 @@ for (let i = 0; i < width * height; i++) {
 }
 const nAgent = 6;
 const totalTurn = 10;
-const board = new Board({ width, height, points, nAgent, totalTurn });
+const board = { width, height, points, nAgent, totalTurn };
 
 const game = new Game(board);
 const p1 = new Player("test1");
@@ -29,4 +29,4 @@ for (; ;) {
     break;
   }
 }
-console.log(game.toJSON());
+console.log(game);

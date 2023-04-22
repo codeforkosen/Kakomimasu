@@ -12,7 +12,7 @@ const prepare = () => {
     // util.rnd(16 * 2 + 1) - 16;
   }
   const nAgent = 9;
-  const board = new Board({ width, height, points, nAgent, totalTurn: 30 });
+  const board: Board = { width, height, points, nAgent, totalTurn: 30 };
 
   const game = new Game(board);
   const p1 = new Player("test1");

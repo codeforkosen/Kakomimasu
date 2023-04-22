@@ -18,7 +18,7 @@ Deno.test("flow", () => {
   }
   const nAgent = 6;
   const totalTurn = 10;
-  const board = new Board({ width, height, points, nAgent, totalTurn });
+  const board: Board = { width, height, points, nAgent, totalTurn };
 
   const game = new Game(board);
   const p1 = new Player("test1");
@@ -45,7 +45,7 @@ Deno.test("flow", () => {
     }
   }
   assertEquals(game.log.length, totalTurn);
-  cl(game.board.points);
+  cl(game.field.points);
   assertEquals(game.log.at(-1)?.players.map((p) => p.point), [{
     areaPoint: 0,
     wallPoint: 0,

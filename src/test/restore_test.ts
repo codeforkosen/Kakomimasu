@@ -1,7 +1,7 @@
 import { assert, assertEquals } from "./deps.ts";
 import { Action, Agent, Board, Field, Game, Player } from "../Kakomimasu.ts";
 
-const boardObj: ConstructorParameters<typeof Board>[0] = {
+const boardObj: Board = {
   width: 2,
   height: 2,
   points: [1, 2, 3, 4],
@@ -10,13 +10,8 @@ const boardObj: ConstructorParameters<typeof Board>[0] = {
   totalTurn: 10,
 };
 
-function assertBoard(a: Board, b: Board) {
-  assertEquals(a, b);
-}
-
 function assertAgent(a: Agent, b: Agent) {
   assertEquals(a, b);
-  assert(a.board === b.board); // check same instance
   assert(a.field === b.field); // check same instance
 }
 
@@ -26,7 +21,6 @@ function assertAction(a: Action, b: Action) {
 
 function assertField(a: Field, b: Field) {
   assertEquals(a, b);
-  assert(a.board === b.board); // check same instance
 }
 
 function assertGame(a: Game, b: Game) {
@@ -50,39 +44,14 @@ function assertPlayer(a: Player, b: Player) {
   assert(a.game === b.game); // check same instance
 }
 
-// Board test
-// constructor paramを変えてテスト
-Deno.test("fromJSON Board class with all param", () => {
-  const board = new Board(boardObj);
-  const restoredBoard = Board.fromJSON(JSON.parse(JSON.stringify(board)));
-
-  assertEquals(board, restoredBoard);
-});
-Deno.test("fromJSON Board class with no 'totalTurn'", () => {
-  const { totalTurn: _, ...b } = boardObj;
-  const board = new Board(b);
-  const restoredBoard = Board.fromJSON(JSON.parse(JSON.stringify(board)));
-
-  assertBoard(board, restoredBoard);
-});
-Deno.test("fromJSON Board class with no 'nPlayer'", () => {
-  const { nPlayer: _, ...b } = boardObj;
-  const board = new Board(b);
-  const restoredBoard = Board.fromJSON(JSON.parse(JSON.stringify(board)));
-
-  assertBoard(board, restoredBoard);
-});
-
 // Agent test
 // lastactionを変えてテスト
 Deno.test("fromJSON Agent class with lastaction is null", () => {
-  const board = new Board(boardObj);
-  const field = new Field(board);
-  const agent = new Agent(board, field, 1);
+  const field = new Field(boardObj);
+  const agent = new Agent(field, 1);
   const restoredAgent = Agent.fromJSON(
     JSON.parse(JSON.stringify(agent)),
     1,
-    board,
     field,
   );
 
@@ -92,41 +61,34 @@ Deno.test("fromJSON Agent class with lastaction is null", () => {
 // Action test
 Deno.test("fromJSON Action class", () => {
   const action = new Action(0, Action.NONE, 0, 0);
-  const restoredAction = Action.fromJSON(action);
+  const restoredAction = Action.fromJSON(JSON.parse(JSON.stringify(action)));
 
   assertAction(action, restoredAction);
 });
 
 // Field test
 Deno.test("fromJSON Field class", () => {
-  const board = new Board(boardObj);
-  const field = new Field(board);
-  const restoredField = Field.fromJSON(
-    JSON.parse(JSON.stringify(field)),
-    board,
-  );
+  const field = new Field(boardObj);
+  const restoredField = Field.fromJSON(JSON.parse(JSON.stringify(field)));
 
   assertField(field, restoredField);
 });
 
 // Game test
 Deno.test("fromJSON Game class", () => {
-  const board = new Board(boardObj);
-  const game = new Game(board);
+  const game = new Game(boardObj);
   const restoredGame = Game.fromJSON(JSON.parse(JSON.stringify(game)));
 
   assertGame(game, restoredGame);
 });
 Deno.test("fromJSON Game class with custom", () => {
-  const board = new Board(boardObj);
-  const game = new Game(board, { nPlayer: 3, totalTurn: 20 });
+  const game = new Game({ ...boardObj, nPlayer: 3, totalTurn: 20 });
   const restoredGame = Game.fromJSON(JSON.parse(JSON.stringify(game)));
 
   assertGame(game, restoredGame);
 });
 Deno.test("fromJSON Game class with players", () => {
-  const board = new Board(boardObj);
-  const game = new Game(board, { nPlayer: 2, totalTurn: 20 });
+  const game = new Game(boardObj);
   game.attachPlayer(new Player("abcd", "spec"));
   game.attachPlayer(new Player("efgh", "spec"));
   const restoredGame = Game.fromJSON(JSON.parse(JSON.stringify(game)));
@@ -144,7 +106,7 @@ Deno.test("fromJSON Player class with game is null", () => {
 });
 
 Deno.test("fromJSON Player class with game is class", () => {
-  const board = new Board(boardObj);
+  const board: Board = boardObj;
   const game = new Game(board);
   const player = new Player("abcd", "spec");
   player.setGame(game);

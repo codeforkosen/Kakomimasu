@@ -19,13 +19,13 @@ Deno.test("random", () => {
   const nAgent = 6;
   const [width, height] = [nAgent, nAgent];
   const totalTurn = 10000;
-  const board = new Board({
+  const board: Board = {
     width,
     height,
     points: new Array(width * height),
     nAgent,
     totalTurn,
-  });
+  };
 
   const initialput = false;
 

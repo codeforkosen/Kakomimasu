@@ -8,12 +8,12 @@ const cl = (...a: Parameters<Console["log"]>) => {
 Deno.test("fill1", () => {
   const nAgent = 6;
   const [width, height] = [3, 3];
-  const board = new Board({
+  const board: Board = {
     width,
     height,
     points: new Array(width * height),
     nAgent,
-  });
+  };
   const field = new Field(board);
 
   const p = () => {

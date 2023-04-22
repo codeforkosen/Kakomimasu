@@ -6,7 +6,7 @@ Deno.test("conflict5 test", () => {
   const [width, height] = [3, 1];
   const points = [1, 1, 1];
   const totalTurn = 20;
-  const board = new Board({ width, height, points, nAgent, totalTurn });
+  const board: Board = { width, height, points, nAgent, totalTurn };
 
   const game = new Game(board);
 

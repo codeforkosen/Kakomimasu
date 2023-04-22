@@ -3,7 +3,7 @@ import { assertEquals } from "./deps.ts";
 
 Deno.test("Game: too much attach", () => {
   const [width, height] = [3, 1];
-  const board = new Board({ width, height, points: new Array(width * height) });
+  const board: Board = { width, height, points: new Array(width * height) };
 
   const game = new Game(board);
 
@@ -14,7 +14,7 @@ Deno.test("Game: too much attach", () => {
 
 Deno.test("Game: attach same player", () => {
   const [width, height] = [3, 1];
-  const board = new Board({ width, height, points: new Array(width * height) });
+  const board: Board = { width, height, points: new Array(width * height) };
 
   const game = new Game(board);
 
@@ -26,7 +26,7 @@ Deno.test("Game: attach same player", () => {
 
 Deno.test("Game: status check", () => {
   const [width, height] = [3, 1];
-  const board = new Board({ width, height, points: new Array(width * height) });
+  const board: Board = { width, height, points: new Array(width * height) };
 
   const game = new Game(board);
 

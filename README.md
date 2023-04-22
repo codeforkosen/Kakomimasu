@@ -55,14 +55,15 @@ http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&p
 ```typescript
 import {
   Action,
+  Board,
   Game,
   Player,
 } from "https://raw.githubusercontent.com/codeforkosen/Kakomimasu/${version}/mod.ts";
-const board = new Board({
+const board: Board = {
   width: 10,
   height: 10,
   points: new Array(width * height),
-});
+};
 const game = new Game(board);
 ```
 

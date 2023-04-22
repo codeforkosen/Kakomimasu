@@ -12,7 +12,7 @@ Deno.test("two-dimensional array check", () => {
   for (let i = 0; i < width * height; i++) points[i] = i;
   const nAgent = 6;
   const totalTurn = 10;
-  const board = new Board({ width, height, points, nAgent, totalTurn });
+  const board: Board = { width, height, points, nAgent, totalTurn };
 
   const game = new Game(board);
   const p1 = new Player("test1");
@@ -39,7 +39,7 @@ Deno.test("two-dimensional array check", () => {
     }
   }
   assertEquals(game.log.length, totalTurn);
-  cl(game.board.points);
+  cl(game.field.points);
   assertEquals(game.log.at(-1)?.players.map((p) => p.point), [{
     areaPoint: 0,
     wallPoint: 0,
@@ -49,7 +49,7 @@ Deno.test("two-dimensional array check", () => {
   }]);
   // util.p(game.getStatusJSON());
 
-  const log = JSON.parse(JSON.stringify(game.toJSON()));
+  const log = JSON.parse(JSON.stringify(game));
   test2dArray(log);
 });
 

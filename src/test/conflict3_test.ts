@@ -4,15 +4,14 @@ import { assert, assertEquals, AssertionError } from "./deps.ts";
 Deno.test("conflict3", () => {
   const nAgent = 2;
   const totalTurn = 20;
-  const nsec = 3;
   const [width, height] = [3, 1];
-  const board = new Board({
+  const board: Board = {
     width,
     height,
     points: new Array(width * height),
     nAgent,
     totalTurn,
-  });
+  };
 
   const game = new Game(board);
 

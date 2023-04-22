@@ -7,12 +7,12 @@ const cl = (...a: Parameters<Console["log"]>) => {
 Deno.test("fill2", () => {
   const nAgent = 6;
   const [width, height] = [8, 8];
-  const board = new Board({
+  const board: Board = {
     width,
     height,
     points: new Array(width * height),
     nAgent,
-  });
+  };
   const field = new Field(board);
 
   const p = () => {

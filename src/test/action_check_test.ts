@@ -18,7 +18,7 @@ const tos = (game: Game) => {
     throw new AssertionError("agent conflict!! cnt:" + cnt);
   };
 
-  const { height, width } = game.board;
+  const { height, width } = game.field;
   const res = [];
 
   for (let i = 0; i < height; i++) {
@@ -44,7 +44,7 @@ const tos = (game: Game) => {
 
 Deno.test("Action: NONE", () => {
   const [width, height] = [3, 1];
-  const board = new Board({ width, height, points: new Array(width * height) });
+  const board: Board = { width, height, points: new Array(width * height) };
 
   const game = new Game(board);
 
@@ -63,7 +63,7 @@ Deno.test("Action: NONE", () => {
 
 Deno.test("Action: REMOVE checkOnBoard", () => {
   const [width, height] = [3, 1];
-  const board = new Board({ width, height, points: new Array(width * height) });
+  const board: Board = { width, height, points: new Array(width * height) };
 
   const game = new Game(board);
 

@@ -5,13 +5,13 @@ Deno.test("conflict2", () => {
   const nAgent = 6;
   const [width, height] = [3, 3];
   const totalTurn = 20;
-  const board = new Board({
+  const board: Board = {
     width,
     height,
     points: new Array(width * height),
     nAgent,
     totalTurn,
-  });
+  };
 
   const game = new Game(board);
 
