@@ -12,7 +12,7 @@ export type Point = {
   wallPoint: number;
 };
 
-interface Board {
+export interface Board {
   width: number;
   height: number;
   points: number[];
@@ -695,4 +695,4 @@ class Player<T extends Game = Game> {
   }
 }
 
-export { Action, Agent, type Board, Field, Game, Player };
+export { Action, Agent, Field, Game, Player };

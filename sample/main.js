@@ -16,7 +16,7 @@ const p2 = new Player("test2");
 game.attachPlayer(p1);
 game.attachPlayer(p2);
 game.start();
-for (; ;) {
+for (;;) {
   p1.setActions(Action.fromArray([
     [0, Action.PUT, 1, 1],
     [0, Action.MOVE, 2, 2],
