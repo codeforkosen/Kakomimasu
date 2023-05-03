@@ -56,9 +56,15 @@ http://2ndpinew.site/d/test/kakomimasu/local/v0/?w=10&h=10&nAgent=6&endTurn=10&p
 import {
   Action,
   Board,
-  Kakomimasu,
-} from "https://raw.githubusercontent.com/codeforkosen/Kakomimasu/v1.0.0/Kakomimasu.js";
-const kkmm = new Kakomimasu();
+  Game,
+  Player,
+} from "https://raw.githubusercontent.com/codeforkosen/Kakomimasu/${version}/mod.ts";
+const board: Board = {
+  width: 10,
+  height: 10,
+  points: new Array(width * height),
+};
+const game = new Game(board);
 ```
 
 ## コア利用方法（リポジトリを取得し、ローカルで使用する）
@@ -80,17 +86,16 @@ $ deno run sample/main.js
 ## コアテスト
 
 ```console
-$ deno test ./test
-```
-
-Github
-Actionsのローカル実行ツール「[act](https://github.com/nektos/act)」を使用したテストを行うには、actとDockerをインストールした状態で以下を実行
-
-```console
-$ act
+$ deno task test
 ```
 
 ## その他
+
+### Online版
+
+Kakomimasuコアを利用したAPIを通してリアルタイム対戦可能なオンラインサーバが公開されています。
+
+詳しくはこちら：[kakomimasu.com](https://kakomimasu.com)
 
 ### スマホアプリデザイン案
 

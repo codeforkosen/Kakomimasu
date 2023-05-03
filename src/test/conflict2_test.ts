@@ -1,20 +1,24 @@
-import { Action, Board, Kakomimasu } from "../Kakomimasu.ts";
+import { Action, Board, Game, Player } from "../Kakomimasu.ts";
 import { assert, assertEquals, AssertionError } from "./deps.ts";
 
 Deno.test("conflict2", () => {
-  const nagent = 6;
-  const [w, h] = [3, 3];
-  const nturn = 20;
-  const board = new Board({ w, h, points: new Array(w * h), nagent, nturn });
+  const nAgent = 6;
+  const [width, height] = [3, 3];
+  const totalTurn = 20;
+  const board: Board = {
+    width,
+    height,
+    points: new Array(width * height),
+    nAgent,
+    totalTurn,
+  };
 
-  const kkmm = new Kakomimasu();
-  kkmm.appendBoard(board);
-  const game = kkmm.createGame(board);
+  const game = new Game(board);
 
   const field = game.field;
 
-  const p1 = kkmm.createPlayer("test1");
-  const p2 = kkmm.createPlayer("test2");
+  const p1 = new Player("test1");
+  const p2 = new Player("test2");
   game.attachPlayer(p1);
   game.attachPlayer(p2);
   game.start();
@@ -37,10 +41,10 @@ Deno.test("conflict2", () => {
 
   const tos = () => {
     const res = [];
-    for (let i = 0; i < h; i++) {
+    for (let i = 0; i < height; i++) {
       const s = [];
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         const a0 = isOnAgent(0, j, i);
         const a1 = isOnAgent(1, j, i);
         if (a0 && a1) {
@@ -63,12 +67,12 @@ Deno.test("conflict2", () => {
   const chk = (s: string) => assertEquals(s.trim(), tos());
 
   // put
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.PUT, 0, 0],
     [1, Action.PUT, 0, 1],
     [2, Action.PUT, 0, 2],
   ]));
-  p2.setActions(Action.fromJSON([
+  p2.setActions(Action.fromArray([
     [0, Action.PUT, 2, 0],
     [1, Action.PUT, 2, 1],
     [2, Action.PUT, 2, 2],
@@ -82,12 +86,12 @@ W00 _.. W11
 `);
 
   // move conflict
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 1],
     [1, Action.MOVE, 1, 1],
     [2, Action.MOVE, 1, 1],
   ]));
-  p2.setActions(Action.fromJSON([
+  p2.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 1],
     [1, Action.MOVE, 1, 1],
     [2, Action.MOVE, 1, 1],
@@ -101,13 +105,13 @@ W00 _.. W11
 `);
 
   // move remove put conflict
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 1],
     [1, Action.REMOVE, 1, 1],
     [2, Action.REMOVE, 1, 1],
     [3, Action.PUT, 1, 1],
   ]));
-  p2.setActions(Action.fromJSON([
+  p2.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 1],
     [1, Action.REMOVE, 1, 1],
     [2, Action.MOVE, 1, 1],
@@ -122,12 +126,12 @@ W00 _.. W11
 `);
 
   // move no conflict
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 1, 0],
     [1, Action.MOVE, 1, 1],
     [2, Action.MOVE, 1, 2],
   ]));
-  p2.setActions(Action.fromJSON([]));
+  p2.setActions(Action.fromArray([]));
   assert(game.nextTurn());
   p();
   chk(`
@@ -137,12 +141,12 @@ W0. W00 W11
 `);
 
   // move no other wall and agent
-  p1.setActions(Action.fromJSON([
+  p1.setActions(Action.fromArray([
     [0, Action.MOVE, 2, 0],
     [1, Action.MOVE, 2, 1],
     [2, Action.MOVE, 2, 2],
   ]));
-  p2.setActions(Action.fromJSON([]));
+  p2.setActions(Action.fromArray([]));
   assert(game.nextTurn());
   p();
   chk(`

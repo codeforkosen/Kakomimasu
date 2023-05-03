@@ -1,210 +1,125 @@
 import { flat } from "./util.ts";
+import type {
+  ActionJson,
+  AgentJson,
+  FieldJson,
+  GameJson,
+  PlayerJson,
+} from "./json_type.ts";
 
 export type Point = {
   areaPoint: number;
   wallPoint: number;
 };
 
-class Board {
-  public w: number;
-  public h: number;
-  public points: number[];
-  public nagent: number;
-  public nturn: number;
-  public nsec: number;
-  public nplayer: number;
-  public name: string;
-
-  constructor(
-    { w, h, points, nagent, nturn, nsec, nplayer, name }: {
-      w: number;
-      h: number;
-      points: number[];
-      nagent: number;
-      nturn?: number;
-      nsec?: number;
-      nplayer?: number;
-      name?: string;
-    },
-  ) {
-    this.w = w;
-    this.h = h;
-    this.points = points;
-    this.nagent = nagent;
-    this.nturn = nturn || 30;
-    this.nsec = nsec || 3;
-    this.nplayer = nplayer || 2;
-    this.name = name || "";
-    if (this.points.length !== this.w * this.h) {
-      throw new Error("points.length must be " + this.w * this.h);
-    }
-    //console.log("board", this, this.name);
-    // if (!(w >= 12 && w <= 24 && h >= 12 && h <= 24)) { throw new Error("w and h 12-24"); }
-  }
-
-  static restore(data: Board): Board {
-    const board = new Board(data);
-    return board;
-  }
-
-  toLogJSON(): Board {
-    return { ...this };
-  }
-
-  getJSON(): {
-    name: string;
-    w: number;
-    h: number;
-    points: number[];
-    nagents: number;
-    nturn: number;
-    nsec: number;
-    nplayer: number;
-  } {
-    return {
-      name: this.name,
-      w: this.w,
-      h: this.h,
-      points: this.points,
-      nagents: this.nagent,
-      nturn: this.nturn,
-      nsec: this.nsec,
-      nplayer: this.nplayer,
-    };
-  }
-
-  toJSON(): {
-    name: string;
-    width: number;
-    height: number;
-    nAgent: number;
-    nPlayer: number;
-    nTurn: number;
-    nSec: number;
-    points: number[];
-  } {
-    return {
-      name: this.name,
-      width: this.w,
-      height: this.h,
-      nAgent: this.nagent,
-      nPlayer: this.nplayer,
-      nTurn: this.nturn,
-      nSec: this.nsec,
-      points: this.points,
-    };
-  }
+export interface Board {
+  width: number;
+  height: number;
+  points: number[];
+  nAgent?: number;
+  nPlayer?: number;
+  totalTurn?: number;
 }
 
 class Agent {
-  public board: Board;
-  public field: Field;
-  public playerid: number;
-  public x: number;
-  public y: number;
-  public bkx: number;
-  public bky: number;
-  public lastaction: Action | null;
+  field: Field;
+  playerIdx: number;
+  x: number;
+  y: number;
+  bkx: number;
+  bky: number;
+  #lastaction: Action | null;
 
-  constructor(board: Board, field: Field, playerid: number) {
-    this.board = board;
+  constructor(field: Field, playeridx: number) {
     this.field = field;
-    this.playerid = playerid;
+    this.playerIdx = playeridx;
     this.x = -1;
     this.y = -1;
     this.bkx = -1;
     this.bky = -1;
-    this.lastaction = null;
+    this.#lastaction = null;
   }
 
-  static restore(data: Agent, board: Board, field: Field): Agent {
-    const agent = new Agent(board, field, data.playerid);
+  static fromJSON(data: AgentJson, playerIdx: number, field: Field): Agent {
+    const agent = new Agent(field, playerIdx);
     agent.x = data.x;
     agent.y = data.y;
-    agent.bkx = data.bkx;
-    agent.bky = data.bky;
-    agent.lastaction = data.lastaction ?? null;
     return agent;
   }
-
-  toLogJSON(): Agent & { board: null; field: null } {
-    return { ...this, board: null, field: null };
+  toJSON(): AgentJson {
+    return { x: this.x, y: this.y };
   }
 
-  isOnBoard(): boolean {
+  #isOnBoard(): boolean {
     return this.x !== -1;
   }
 
-  checkOnBoard(x: number, y: number): boolean {
-    return x >= 0 && x < this.board.w && y >= 0 && y < this.board.h;
+  #checkOnBoard(x: number, y: number): boolean {
+    return x >= 0 && x < this.field.width && y >= 0 &&
+      y < this.field.height;
   }
 
-  checkDir(x: number, y: number): boolean {
+  #checkDir(x: number, y: number): boolean {
     if (this.x === x && this.y === y) return false;
     return Math.abs(this.x - x) <= 1 && Math.abs(this.y - y) <= 1;
   }
 
   check(act: Action): boolean {
-    this.lastaction = act;
+    this.#lastaction = act;
+    this.bkx = this.x;
+    this.bky = this.y;
     const x = act.x;
     const y = act.y;
     const t = act.type;
-    if (t === Action.PUT) return this.checkPut(x, y);
-    if (t === Action.NONE) return this.checkNone(x, y);
-    if (t === Action.MOVE) return this.checkMove(x, y);
-    if (t === Action.REMOVE) return this.checkRemove(x, y);
-    return false;
+    if (t === Action.PUT) return this.#checkPut(x, y);
+    else if (t === Action.MOVE) return this.#checkMove(x, y);
+    else if (t === Action.REMOVE) return this.#checkRemove(x, y);
+    else return false;
   }
 
-  checkPut(x: number, y: number): boolean {
-    if (this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
+  #checkPut(x: number, y: number): boolean {
+    if (this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
     return true;
   }
 
-  checkNone(_x: number, _y: number): boolean {
-    if (!this.isOnBoard()) return false;
+  #checkMove(x: number, y: number) {
+    if (!this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
+    if (!this.#checkDir(x, y)) return false;
     return true;
   }
 
-  checkMove(x: number, y: number) {
-    if (!this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
-    if (!this.checkDir(x, y)) return false;
-    return true;
-  }
-
-  checkRemove(x: number, y: number) {
-    if (!this.isOnBoard()) return false;
-    if (!this.checkOnBoard(x, y)) return false;
-    if (!this.checkDir(x, y)) return false;
-    //const _n = x + y * this.board.w;
+  #checkRemove(x: number, y: number) {
+    if (!this.#isOnBoard()) return false;
+    if (!this.#checkOnBoard(x, y)) return false;
+    if (!this.#checkDir(x, y)) return false;
     if (this.field.get(x, y).type !== Field.WALL) return false;
     return true;
   }
 
-  isValidAction(): boolean {
-    if (!this.lastaction) return false;
-    if (this.lastaction.res !== Action.SUCCESS) return false;
-    return true;
+  isValidAction(): Action | undefined {
+    if (!this.#lastaction) return;
+    if (this.#lastaction.res !== Action.SUCCESS) return;
+    return this.#lastaction;
   }
 
   putOrMove(): boolean {
     //console.log("putormove", this);
-    if (this.lastaction == null) throw new Error("putOrMove before check");
-    if (this.lastaction.res !== Action.SUCCESS) return false;
-    const act = this.lastaction;
+    if (this.#lastaction == null) throw new Error("putOrMove before check");
+    if (this.#lastaction.res !== Action.SUCCESS) return false;
+    const act = this.#lastaction;
     const x = act.x;
     const y = act.y;
     const t = act.type;
-    if (t === Action.PUT) return this.put(x, y);
-    if (t === Action.MOVE) return this.move(x, y);
+    if (t === Action.PUT) return this.#put(x, y);
+    if (t === Action.MOVE) return this.#move(x, y);
     return true;
   }
 
-  put(x: number, y: number): boolean {
-    if (!this.checkPut(x, y)) return false;
-    if (!this.field.setAgent(this.playerid, x, y)) {
+  #put(x: number, y: number): boolean {
+    if (!this.#checkPut(x, y)) return false;
+    if (!this.field.setAgent(this.playerIdx, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
     this.x = x;
@@ -212,14 +127,9 @@ class Agent {
     return true;
   }
 
-  none(x: number, y: number): boolean {
-    if (!this.checkNone(x, y)) return false;
-    return true;
-  }
-
-  move(x: number, y: number): boolean {
-    if (!this.checkMove(x, y)) return false;
-    if (!this.field.setAgent(this.playerid, x, y)) {
+  #move(x: number, y: number): boolean {
+    if (!this.#checkMove(x, y)) return false;
+    if (!this.field.setAgent(this.playerIdx, x, y)) {
       return false; // throw new Error("can't enter the wall");
     }
     this.x = x;
@@ -228,89 +138,67 @@ class Agent {
   }
 
   remove(): boolean {
-    if (this.lastaction == null) throw new Error("remove before check");
-    const { x, y } = this.lastaction;
-    if (!this.checkRemove(x, y)) return false;
+    if (this.#lastaction == null) throw new Error("remove before check");
+    const { x, y } = this.#lastaction;
+    if (!this.#checkRemove(x, y)) return false;
     this.field.set(x, y, Field.AREA, null);
     return true;
   }
 
   commit(): void {
-    this.bkx = this.x;
-    this.bky = this.y;
-    this.lastaction = null;
+    this.#lastaction = null;
   }
 
   revert(): void {
-    this.x = this.bkx;
-    this.y = this.bky;
-    const act = this.lastaction;
+    const act = this.#lastaction;
     if (
       act && (act.type === Action.MOVE || act.type === Action.PUT) &&
       act.res === Action.SUCCESS
     ) {
       act.res = Action.REVERT;
+      this.x = this.bkx;
+      this.y = this.bky;
     }
-  }
-
-  getJSON(): { x: number; y: number } {
-    return { x: this.x, y: this.y };
   }
 }
 
 export type ActionType = 1 | 2 | 3 | 4;
-type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
-export type ActionJSON = [number, ActionType, number, number];
+export type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
+export type ActionArray = [number, ActionType, number, number];
 
 class Action {
-  public agentid: number;
-  public type: ActionType;
-  public x: number;
-  public y: number;
-  public res: ActionRes;
+  agentId: number;
+  type: ActionType;
+  x: number;
+  y: number;
+  res: ActionRes;
 
   // Action Type
-  public static readonly PUT = 1;
-  public static readonly NONE = 2;
-  public static readonly MOVE = 3;
-  public static readonly REMOVE = 4;
+  static readonly PUT = 1;
+  static readonly NONE = 2;
+  static readonly MOVE = 3;
+  static readonly REMOVE = 4;
 
   // Action Res
-  public static readonly SUCCESS = 0;
-  public static readonly CONFLICT = 1;
-  public static readonly REVERT = 2;
-  public static readonly ERR_ONLY_ONE_TURN = 3;
-  public static readonly ERR_ILLEGAL_AGENT = 4;
-  public static readonly ERR_ILLEGAL_ACTION = 5;
+  static readonly SUCCESS = 0;
+  static readonly CONFLICT = 1;
+  static readonly REVERT = 2;
+  static readonly ERR_ONLY_ONE_TURN = 3;
+  static readonly ERR_ILLEGAL_AGENT = 4;
+  static readonly ERR_ILLEGAL_ACTION = 5;
 
   constructor(agentid: number, type: ActionType, x: number, y: number) {
-    this.agentid = agentid;
+    this.agentId = agentid;
     this.type = type;
     this.x = x;
     this.y = y;
     this.res = Action.SUCCESS;
   }
 
-  static restore(data: Action) {
-    const action = new Action(data.agentid, data.type, data.x, data.y);
+  static fromJSON(data: ActionJson) {
+    const action = new Action(data.agentId, data.type, data.x, data.y);
     action.res = data.res;
     return action;
-  }
-
-  getJSON(): {
-    agentId: number;
-    type: ActionType;
-    x: number;
-    y: number;
-    res: ActionRes;
-  } {
-    return {
-      agentId: this.agentid,
-      type: this.type,
-      x: this.x,
-      y: this.y,
-      res: this.res,
-    };
   }
 
   static getMessage(res: ActionRes): string {
@@ -324,51 +212,58 @@ class Action {
     ][res];
   }
 
-  static fromJSON = (array: ActionJSON[]) =>
+  static fromArray = (array: ActionArray[]) =>
     array.map((a) => new Action(a[0], a[1], a[2], a[3]));
 }
 
 type FieldType = typeof Field.AREA | typeof Field.WALL;
-type FieldCell = { type: FieldType; player: null | number };
+export type FieldTile = { type: FieldType; player: null | number };
+
+export type FieldInit = Omit<Board, "totalTurn">;
 
 class Field {
-  public board: Board;
-  public field: FieldCell[];
+  width: number;
+  height: number;
+  nAgent: number;
+  nPlayer: number;
+  points: number[];
+  tiles: FieldTile[];
 
-  public static readonly AREA = 0;
-  public static readonly WALL = 1;
+  static readonly AREA = 0;
+  static readonly WALL = 1;
 
-  constructor(board: Board) {
-    this.board = board;
-    // field
-    this.field = [];
-    for (let i = 0; i < this.board.w * this.board.h; i++) {
-      this.field.push({ type: Field.AREA, player: null });
+  constructor({ width, height, points, nAgent = 4, nPlayer = 2 }: FieldInit) {
+    if (points.length !== width * height) {
+      throw Error("points.length must be " + width * height);
     }
-  }
 
-  static restore(data: ReturnType<Field["toLogJSON"]>, board: Board) {
-    const field = new Field(board);
-    field.field = data.field;
-    return field;
-  }
-
-  toLogJSON() {
-    const field = this.field.map((cell) => {
-      return { ...cell };
+    this.width = width;
+    this.height = height;
+    this.nAgent = nAgent;
+    this.nPlayer = nPlayer;
+    this.points = points;
+    this.tiles = new Array(width * height).fill({
+      type: Field.AREA,
+      player: null,
     });
-    return { field, board: null };
+  }
+
+  static fromJSON(data: FieldJson) {
+    const { tiles, ...init } = data;
+    const field = new Field(init);
+    field.tiles = tiles;
+    return field;
   }
 
   set(x: number, y: number, att: FieldType, playerid: number | null): void {
     if (playerid !== null && playerid < 0) {
       throw Error("playerid must be 0 or more");
     }
-    this.field[x + y * this.board.w] = { type: att, player: playerid };
+    this.tiles[x + y * this.width] = { type: att, player: playerid };
   }
 
-  get(x: number, y: number): FieldCell {
-    return this.field[x + y * this.board.w];
+  get(x: number, y: number): FieldTile {
+    return this.tiles[x + y * this.width];
   }
 
   setAgent(playerid: number, x: number, y: number): boolean {
@@ -378,7 +273,7 @@ class Field {
     return true;
   }
 
-  fillBase(): void {
+  fillArea(): void {
     // プレイヤーごとに入れ子関係なく囲まれている所にフラグを立て、まとめる。
     // (bitごと 例:010だったら、1番目のプレイヤーの領地or城壁であるという意味)
     // 各マスの立っているbitが一つだけだったらそのプレイヤーの領地or城壁で確定。
@@ -386,16 +281,16 @@ class Field {
     // （whileするたびに入れ子が一個ずつ解消されていくイメージ）
     // 説明難しい…
 
-    const w = this.board.w;
-    const h = this.board.h;
-    const field: FieldCell[] = [];
+    const w = this.width;
+    const h = this.height;
+    const field: FieldTile[] = [];
 
     // 外側に空白のマスを作る
     for (let y = -1; y < h + 1; y++) {
       for (let x = -1; x < w + 1; x++) {
         if (x < 0 || x >= w || y < 0 || y >= h) {
           field.push({ type: Field.AREA, player: null });
-        } else field.push({ ...this.field[x + y * w] });
+        } else field.push({ ...this.tiles[x + y * w] });
       }
     }
 
@@ -404,7 +299,7 @@ class Field {
 
     while (mask.reduce((s, c) => s + c)) {
       const area = new Array(field.length);
-      for (let pid = 0; pid < this.board.nplayer; pid++) {
+      for (let pid = 0; pid < this.nPlayer; pid++) {
         for (let i = 0; i < field.length; i++) {
           area[i] |= 1 << pid;
         }
@@ -452,8 +347,8 @@ class Field {
       for (let j = 0; j < h; j++) {
         const n = i + j * w;
         const nexp = (i + 1) + (j + 1) * (w + 2);
-        if (this.field[n].type !== Field.WALL) {
-          this.field[n].player = field[nexp].player;
+        if (this.tiles[n].type !== Field.WALL) {
+          this.tiles[n].player = field[nexp].player;
         }
       }
     }
@@ -461,13 +356,13 @@ class Field {
 
   getPoints(): Point[] {
     const points: ReturnType<Field["getPoints"]> = [];
-    for (let i = 0; i < this.board.nplayer; i++) {
+    for (let i = 0; i < this.nPlayer; i++) {
       points[i] = { areaPoint: 0, wallPoint: 0 };
     }
-    this.field.forEach(({ type: att, player: pid }, idx) => {
+    this.tiles.forEach(({ type: att, player: pid }, idx) => {
       if (pid === null) return;
       const p = points[pid];
-      const pnt = this.board.points[idx];
+      const pnt = this.points[idx];
       if (att === Field.WALL) {
         p.wallPoint += pnt;
       } else if (att === Field.AREA) {
@@ -476,138 +371,127 @@ class Field {
     });
     return points;
   }
-
-  getJSON(): FieldCell[] {
-    return this.field;
-  }
 }
 
+export type GameInit = Board;
+
 class Game {
-  public board: Board;
-  public players: Player[];
-  public nturn: number;
-  public nsec: number;
-  public gaming: boolean;
-  public ending: boolean;
-  public field: Field;
-  public log: {
+  totalTurn: number;
+  players: Player[];
+  field: Field;
+  log: {
     players: {
       point: Point;
-      actions: ReturnType<typeof Action.prototype.getJSON>[];
+      actions: Action[];
     }[];
   }[];
-  public turn: number;
+  turn: number;
 
-  constructor(board: Board) {
-    this.board = board;
+  constructor(gameInit: GameInit) {
+    const { totalTurn = 30, ...fieldInit } = gameInit;
+
+    this.totalTurn = totalTurn;
     this.players = [];
-    this.nturn = board.nturn;
-    this.nsec = board.nsec;
-    this.gaming = false;
-    this.ending = false;
-    this.field = new Field(board);
+    this.field = new Field(fieldInit);
     this.log = [];
     this.turn = 0;
   }
 
-  static restore(data: Game): Game {
-    const board = Board.restore(data.board);
+  static fromJSON(data: GameJson): Game {
+    const board: GameInit = {
+      width: data.field.width,
+      height: data.field.height,
+      points: data.field.points,
+      nAgent: data.field.nAgent,
+      nPlayer: data.field.nPlayer,
+      totalTurn: data.totalTurn,
+    };
     const game = new Game(board);
-    game.players = data.players.map((p) => Player.restore(p));
-    game.gaming = data.gaming;
-    game.ending = data.ending;
-    game.field.field = data.field.field;
+    game.players = data.players.map((p) => Player.fromJSON(p, game));
+    game.field.tiles = data.field.tiles;
     game.log = data.log;
     game.turn = data.turn;
     return game;
   }
 
-  toLogJSON(): Game & { field: ReturnType<Field["toLogJSON"]> } {
-    const data: ReturnType<Game["toLogJSON"]> = {
-      ...this,
-      field: this.field.toLogJSON(),
-    };
-    data.players = data.players.map((p) => p.toLogJSON());
-    data.board = data.board.toLogJSON();
-    return data;
-  }
-
   attachPlayer(player: Player): boolean {
     if (!this.isFree()) return false;
     if (this.players.indexOf(player) >= 0) return false;
-    player.index = this.players.length;
-    this.players.push(player);
-    player.setGame(this);
 
+    player.index = this.players.push(player) - 1;
+    player.setGame(this);
     return true;
   }
 
-  isReady(): boolean {
-    return this.players.length === this.board.nplayer;
+  // status : free -> ready -> gaming -> ended
+  getStatus() {
+    if (this.turn === 0) {
+      if (this.players.length < this.field.nPlayer) return "free";
+      else return "ready";
+    } else if (this.log.length !== this.totalTurn) {
+      return "gaming";
+    } else {
+      return "ended";
+    }
   }
-
-  isFree(): boolean {
-    return !this.isReady() && !this.gaming && !this.ending;
+  isFree() {
+    return this.getStatus() === "free";
   }
-
-  isGaming(): boolean {
-    return this.gaming && !this.ending;
+  isReady() {
+    return this.getStatus() === "ready";
+  }
+  isGaming() {
+    return this.getStatus() === "gaming";
+  }
+  isEnded() {
+    return this.getStatus() === "ended";
   }
 
   start(): void {
     this.turn = 1;
-    this.gaming = true;
-    this.players.forEach((p) => p.noticeStart());
   }
-
-  /*setActions(player, actions) {
-    this.actions[player] = actions;
-  }*/
 
   nextTurn(): boolean {
     const actions: Action[][] = [];
     this.players.forEach((p, idx) => actions[idx] = p.getActions());
     // console.log("actions", actions);
 
-    this.checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
-    this.revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
-    this.checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
-    this.revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
-    this.putOrMove(); // 配置または動かし、フィールド更新
-    this.removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
+    this.#checkActions(actions); // 同じエージェントの2回移動、画面外など無効な操作をチェック
+    this.#revertNotOwnerWall(); // PUT, MOVE先が敵陣壁ではないか？チェックし無効化
+    this.#checkConflict(actions); // 同じマスを差しているものはすべて無効 // 壁remove & move は、removeが有効
+    this.#revertOverlap(); // 仮に配置または動かし、かぶったところをrevert
+    this.#putOrMove(); // 配置または動かし、フィールド更新
+    this.#removeOrNot(); // AgentがいるところをREMOVEしているものはrevert
 
-    this.commit();
+    this.#commit();
 
-    this.checkAgentConflict();
-
-    this.field.fillBase();
+    this.field.fillArea();
 
     this.log.push({
       players: actions.map((ar, idx) => {
         return {
           point: this.field.getPoints()[idx],
-          actions: ar.map((a) => a.getJSON()),
+          actions: ar,
         };
       }),
     });
 
-    if (this.turn < this.nturn) {
-      this.turn++;
-    } else {
-      this.gaming = false;
-      this.ending = true;
-    }
     this.players.forEach((p) => p.clearActions());
-    return this.gaming;
+    if (this.turn < this.totalTurn) {
+      this.turn++;
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  checkActions(actions: Action[][]): void {
+  #checkActions(actions: Action[][]): void {
     const nplayer = actions.length;
     // 範囲外と、かぶりチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
       const done: Record<string, Action> = {};
       actions[playerid].forEach((a) => {
-        const aid = a.agentid;
+        const aid = a.agentId;
         const agents = this.players[playerid].agents;
         if (aid < 0 || aid >= agents.length) {
           a.res = Action.ERR_ILLEGAL_AGENT;
@@ -625,7 +509,7 @@ class Game {
     // 変な動きチェック
     for (let playerid = 0; playerid < nplayer; playerid++) {
       actions[playerid].filter((a) => a.res === Action.SUCCESS).forEach((a) => {
-        const aid = a.agentid;
+        const aid = a.agentId;
         const agents = this.players[playerid].agents;
         const agent = agents[aid];
         if (!agent.check(a)) {
@@ -636,9 +520,9 @@ class Game {
     }
   }
 
-  checkConflict(actions: Action[][]): void {
+  #checkConflict(actions: Action[][]): void {
     //console.log("Actions", actions);
-    const chkfield: Action[][] = new Array(this.field.field.length);
+    const chkfield: Action[][] = new Array(this.field.tiles.length);
     for (let i = 0; i < chkfield.length; i++) {
       chkfield[i] = [];
     }
@@ -646,11 +530,9 @@ class Game {
     for (let playerid = 0; playerid < nplayer; playerid++) {
       actions[playerid].forEach((a) => {
         if (a.res !== Action.SUCCESS) return false;
-        const n = a.x + a.y * this.board.w;
+        const n = a.x + a.y * this.field.width;
         if (n >= 0 && n < chkfield.length) {
           chkfield[n].push(a);
-        } else {
-          console.log("?? n", n);
         }
       });
     }
@@ -661,27 +543,7 @@ class Game {
     });
   }
 
-  checkAgentConflict(): void {
-    const chkfield = new Array(this.field.field.length);
-    for (let i = 0; i < chkfield.length; i++) {
-      chkfield[i] = [];
-    }
-
-    flat(this.players.map((p) => p.agents)).forEach((agent) => {
-      if (agent.x === -1) return;
-      const _act = agent.lastaction;
-      const n = agent.x + agent.y * this.board.w;
-      chkfield[n].push(agent);
-      // console.log("agent", agent.playerid, agent.x, agent.y);
-    });
-    chkfield.filter((a) => a.length >= 2).forEach((a) => {
-      console.log("**\nduplicate!!", a);
-      throw Error("**\nduplicate!!");
-      //Deno.exit(0);
-    });
-  }
-
-  putOrMove(): void {
+  #putOrMove(): void {
     flat(this.players.map((p) => p.agents)).forEach((agent) => {
       if (!agent.isValidAction()) return;
       if (!agent.putOrMove()) {
@@ -692,25 +554,25 @@ class Game {
     });
   }
 
-  revertOverlap(): void {
+  #revertOverlap(): void {
     let reverts = false;
-    const chkfield: Agent[][] = new Array(this.field.field.length);
+    const chkfield: Agent[][] = new Array(this.field.tiles.length);
     do {
       for (let i = 0; i < chkfield.length; i++) {
         chkfield[i] = [];
       }
       flat(this.players.map((p) => p.agents)).forEach((agent) => {
-        const act = agent.lastaction;
+        const act = agent.isValidAction();
         if (
-          agent.isValidAction() && act &&
+          act &&
           (act.type === Action.MOVE || act.type === Action.PUT)
         ) {
-          const n = act.x + act.y * this.board.w;
+          const n = act.x + act.y * this.field.width;
           //console.log("act", n);
           chkfield[n].push(agent);
         } else {
           if (agent.x === -1) return;
-          const n = agent.x + agent.y * this.board.w;
+          const n = agent.x + agent.y * this.field.width;
           //console.log("agent", n);
           chkfield[n].push(agent);
         }
@@ -726,12 +588,11 @@ class Game {
     } while (reverts); // revertがあったら再度全件チェック
   }
 
-  removeOrNot(): void {
+  #removeOrNot(): void {
     const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       if (agent.x === -1) return;
-      if (!agent.isValidAction()) return;
-      const act = agent.lastaction;
+      const act = agent.isValidAction();
       if (!act) return;
       if (act.type !== Action.REMOVE) return;
       if (agents.find((a) => a.x === act.x && a.y === act.y)) {
@@ -742,14 +603,13 @@ class Game {
     });
   }
 
-  revertNotOwnerWall(): void {
+  #revertNotOwnerWall(): void {
     const agents = flat(this.players.map((p) => p.agents));
-    const fld = this.field.field;
-    const w = this.board.w;
+    const fld = this.field.tiles;
+    const w = this.field.width;
     agents.forEach((agent) => {
       if (agent.x === -1) return;
-      if (!agent.isValidAction()) return;
-      const act = agent.lastaction;
+      const act = agent.isValidAction();
       if (!act) return;
       if (act.type !== Action.MOVE && act.type !== Action.PUT) return;
       // only PUT & MOVE
@@ -757,13 +617,13 @@ class Game {
       const f = fld[n];
       const iswall = f.type === Field.WALL;
       const owner = f.player;
-      if (iswall && owner !== agent.playerid && owner !== -1) {
+      if (iswall && owner !== agent.playerIdx && owner !== -1) {
         agent.revert();
       }
     });
   }
 
-  commit(): void {
+  #commit(): void {
     const agents = flat(this.players.map((p) => p.agents));
     agents.forEach((agent) => {
       // if (agent.x === -1) return;
@@ -771,84 +631,15 @@ class Game {
       agent.commit();
     });
   }
-
-  getStatusJSON(): {
-    players: ReturnType<typeof Player.prototype.getJSON>[];
-    board: ReturnType<typeof Board.prototype.getJSON>;
-    field: ReturnType<typeof Field.prototype.getJSON>;
-    agents: ReturnType<typeof Agent.prototype.getJSON>[][];
-    points: ReturnType<typeof Field.prototype.getPoints>;
-    log: typeof Game.prototype.log;
-  } {
-    return {
-      players: this.players.map((p) => p.getJSON()),
-      board: this.board.getJSON(),
-      field: this.field.getJSON(),
-      agents: this.players.map((p) => p.agents.map((a) => a.getJSON())),
-      points: this.field.getPoints(),
-      log: this.log,
-    };
-  }
-
-  toJSON(): {
-    gaming: typeof Game.prototype.gaming; // boolean;
-    ending: typeof Game.prototype.ending; //boolean;
-    board: ReturnType<Board["toJSON"]> | null;
-    turn: typeof Game.prototype.turn;
-    totalTurn: typeof Game.prototype.nturn;
-    tiled: typeof Game.prototype.field.field | null;
-    players: {
-      id: string;
-      agents: { x: number; y: number }[];
-      point: ReturnType<typeof Field.prototype.getPoints>[0];
-    }[];
-    log: typeof Game.prototype.log;
-  } {
-    const players: ReturnType<Game["toJSON"]>["players"] = [];
-    this.players.forEach((p, i) => {
-      const id = p.id;
-      let agents: { x: number; y: number }[] = [];
-      if (this.isReady()) {
-        agents = [];
-        p.agents.forEach((a) => {
-          const agent = {
-            x: a.x,
-            y: a.y,
-          };
-          agents.push(agent);
-        });
-      }
-      const player = {
-        id: id,
-        agents: agents,
-        point: this.field.getPoints()[i],
-      };
-      players.push(player);
-    });
-
-    let board = null;
-    if (this.isReady()) board = this.board;
-
-    return {
-      gaming: this.gaming,
-      ending: this.ending,
-      board: board ? board.toJSON() : null,
-      turn: this.turn,
-      totalTurn: this.nturn,
-      tiled: this.isReady() ? this.field.field : null,
-      players: players,
-      log: this.log,
-    };
-  }
 }
 
 class Player<T extends Game = Game> {
-  public id: string;
-  public spec: string;
-  public game: T | null;
-  public actions: Action[];
-  public index: number;
-  public agents: Agent[];
+  id: string;
+  spec: string;
+  game: T | null;
+  actions: Action[];
+  index: number;
+  agents: Agent[];
 
   constructor(id: string, spec = "") {
     this.id = id;
@@ -859,34 +650,34 @@ class Player<T extends Game = Game> {
     this.agents = [];
   }
 
-  static restore(data: Player, game?: Game): Player {
+  static fromJSON(data: PlayerJson, game?: Game): Player {
     const player = new Player(data.id, data.spec);
     player.index = data.index;
     if (game) {
       player.game = game;
       player.agents = data.agents.map((a) => {
-        return Agent.restore(a, game.board, game.field);
+        return Agent.fromJSON(a, player.index, game.field);
       });
     }
 
     return player;
   }
 
-  toLogJSON(): Player {
-    const p = { ...this };
-    p.game = null;
-    p.agents = p.agents.map((a) => a.toLogJSON());
-    return p;
+  toJSON(): PlayerJson {
+    return {
+      id: this.id,
+      spec: this.spec,
+      index: this.index,
+      actions: this.actions,
+      agents: this.agents,
+    };
   }
 
   setGame(game: T): void {
     this.game = game;
-    for (let j = 0; j < game.board.nagent; j++) {
-      this.agents.push(new Agent(game.board, game.field, this.index));
+    for (let j = 0; j < game.field.nAgent; j++) {
+      this.agents.push(new Agent(game.field, this.index));
     }
-  }
-
-  noticeStart(): void {
   }
 
   setActions(actions: Action[]): typeof Game.prototype.turn {
@@ -902,67 +693,6 @@ class Player<T extends Game = Game> {
   clearActions(): void {
     this.actions = [];
   }
-
-  getJSON(): {
-    userId: typeof Player.prototype.id;
-    spec: typeof Player.prototype.spec;
-    index: typeof Player.prototype.index;
-  } {
-    return {
-      userId: this.id,
-      spec: this.spec,
-      index: this.index,
-    };
-  }
 }
 
-class Kakomimasu<T extends Game = Game> {
-  public games: T[];
-  public boards: Board[];
-
-  constructor() {
-    this.games = [];
-    this.boards = [];
-  }
-
-  appendBoard(board: Board): void {
-    this.boards.push(board);
-  }
-
-  getBoards(): typeof Kakomimasu.prototype.boards {
-    return this.boards;
-  }
-
-  /**
-   * @deprecated use addGame
-   */
-  createGame(...param: ConstructorParameters<typeof Game>): Game {
-    //console.log(board);
-    const game = new Game(...param);
-    this.games.push(game as T);
-    return game;
-  }
-
-  addGame(game: T) {
-    this.games.push(game);
-    return game;
-  }
-
-  getGames() {
-    return this.games;
-  }
-
-  getFreeGames() {
-    return this.games.filter((g) => g.isFree());
-  }
-
-  /**
-   * @deprecated use Player class
-   */
-  createPlayer(playername: string, spec = ""): Player {
-    if (spec == null) return new Player(playername);
-    else return new Player(playername, spec);
-  }
-}
-
-export { Action, Agent, Board, Field, Game, Kakomimasu, Player };
+export { Action, Agent, Field, Game, Player };

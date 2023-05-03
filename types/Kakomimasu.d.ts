@@ -1,90 +1,39 @@
+import type { ActionJson, AgentJson, FieldJson, GameJson, PlayerJson } from "./json_type.js";
 export declare type Point = {
     areaPoint: number;
     wallPoint: number;
 };
-declare class Board {
-    w: number;
-    h: number;
+export interface Board {
+    width: number;
+    height: number;
     points: number[];
-    nagent: number;
-    nturn: number;
-    nsec: number;
-    nplayer: number;
-    name: string;
-    constructor({ w, h, points, nagent, nturn, nsec, nplayer, name }: {
-        w: number;
-        h: number;
-        points: number[];
-        nagent: number;
-        nturn?: number;
-        nsec?: number;
-        nplayer?: number;
-        name?: string;
-    });
-    static restore(data: Board): Board;
-    toLogJSON(): Board;
-    getJSON(): {
-        name: string;
-        w: number;
-        h: number;
-        points: number[];
-        nagents: number;
-        nturn: number;
-        nsec: number;
-        nplayer: number;
-    };
-    toJSON(): {
-        name: string;
-        width: number;
-        height: number;
-        nAgent: number;
-        nPlayer: number;
-        nTurn: number;
-        nSec: number;
-        points: number[];
-    };
+    nAgent?: number;
+    nPlayer?: number;
+    totalTurn?: number;
 }
 declare class Agent {
-    board: Board;
+    #private;
     field: Field;
-    playerid: number;
+    playerIdx: number;
     x: number;
     y: number;
     bkx: number;
     bky: number;
-    lastaction: Action | null;
-    constructor(board: Board, field: Field, playerid: number);
-    static restore(data: Agent, board: Board, field: Field): Agent;
-    toLogJSON(): Agent & {
-        board: null;
-        field: null;
-    };
-    isOnBoard(): boolean;
-    checkOnBoard(x: number, y: number): boolean;
-    checkDir(x: number, y: number): boolean;
+    constructor(field: Field, playeridx: number);
+    static fromJSON(data: AgentJson, playerIdx: number, field: Field): Agent;
+    toJSON(): AgentJson;
     check(act: Action): boolean;
-    checkPut(x: number, y: number): boolean;
-    checkNone(_x: number, _y: number): boolean;
-    checkMove(x: number, y: number): boolean;
-    checkRemove(x: number, y: number): boolean;
-    isValidAction(): boolean;
+    isValidAction(): Action | undefined;
     putOrMove(): boolean;
-    put(x: number, y: number): boolean;
-    none(x: number, y: number): boolean;
-    move(x: number, y: number): boolean;
     remove(): boolean;
     commit(): void;
     revert(): void;
-    getJSON(): {
-        x: number;
-        y: number;
-    };
 }
 export declare type ActionType = 1 | 2 | 3 | 4;
-declare type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
-export declare type ActionJSON = [number, ActionType, number, number];
+export declare type ActionRes = 0 | 1 | 2 | 3 | 4 | 5;
+export declare type ActionArray = [number, ActionType, number, number];
 declare class Action {
-    agentid: number;
+    agentId: number;
     type: ActionType;
     x: number;
     y: number;
@@ -100,102 +49,56 @@ declare class Action {
     static readonly ERR_ILLEGAL_AGENT = 4;
     static readonly ERR_ILLEGAL_ACTION = 5;
     constructor(agentid: number, type: ActionType, x: number, y: number);
-    static restore(data: Action): Action;
-    getJSON(): {
-        agentId: number;
-        type: ActionType;
-        x: number;
-        y: number;
-        res: ActionRes;
-    };
+    static fromJSON(data: ActionJson): Action;
     static getMessage(res: ActionRes): string;
-    static fromJSON: (array: ActionJSON[]) => Action[];
+    static fromArray: (array: ActionArray[]) => Action[];
 }
 declare type FieldType = typeof Field.AREA | typeof Field.WALL;
-declare type FieldCell = {
+export declare type FieldTile = {
     type: FieldType;
     player: null | number;
 };
+export declare type FieldInit = Omit<Board, "totalTurn">;
 declare class Field {
-    board: Board;
-    field: FieldCell[];
+    width: number;
+    height: number;
+    nAgent: number;
+    nPlayer: number;
+    points: number[];
+    tiles: FieldTile[];
     static readonly AREA = 0;
     static readonly WALL = 1;
-    constructor(board: Board);
-    static restore(data: ReturnType<Field["toLogJSON"]>, board: Board): Field;
-    toLogJSON(): {
-        field: {
-            type: FieldType;
-            player: number;
-        }[];
-        board: any;
-    };
+    constructor({ width, height, points, nAgent, nPlayer }: FieldInit);
+    static fromJSON(data: FieldJson): Field;
     set(x: number, y: number, att: FieldType, playerid: number | null): void;
-    get(x: number, y: number): FieldCell;
+    get(x: number, y: number): FieldTile;
     setAgent(playerid: number, x: number, y: number): boolean;
-    fillBase(): void;
+    fillArea(): void;
     getPoints(): Point[];
-    getJSON(): FieldCell[];
 }
+export declare type GameInit = Board;
 declare class Game {
-    board: Board;
+    #private;
+    totalTurn: number;
     players: Player[];
-    nturn: number;
-    nsec: number;
-    gaming: boolean;
-    ending: boolean;
     field: Field;
     log: {
         players: {
             point: Point;
-            actions: ReturnType<typeof Action.prototype.getJSON>[];
+            actions: Action[];
         }[];
     }[];
     turn: number;
-    constructor(board: Board);
-    static restore(data: Game): Game;
-    toLogJSON(): Game & {
-        field: ReturnType<Field["toLogJSON"]>;
-    };
+    constructor(gameInit: GameInit);
+    static fromJSON(data: GameJson): Game;
     attachPlayer(player: Player): boolean;
-    isReady(): boolean;
+    getStatus(): "ended" | "free" | "ready" | "gaming";
     isFree(): boolean;
+    isReady(): boolean;
     isGaming(): boolean;
+    isEnded(): boolean;
     start(): void;
     nextTurn(): boolean;
-    checkActions(actions: Action[][]): void;
-    checkConflict(actions: Action[][]): void;
-    checkAgentConflict(): void;
-    putOrMove(): void;
-    revertOverlap(): void;
-    removeOrNot(): void;
-    revertNotOwnerWall(): void;
-    commit(): void;
-    getStatusJSON(): {
-        players: ReturnType<typeof Player.prototype.getJSON>[];
-        board: ReturnType<typeof Board.prototype.getJSON>;
-        field: ReturnType<typeof Field.prototype.getJSON>;
-        agents: ReturnType<typeof Agent.prototype.getJSON>[][];
-        points: ReturnType<typeof Field.prototype.getPoints>;
-        log: typeof Game.prototype.log;
-    };
-    toJSON(): {
-        gaming: typeof Game.prototype.gaming;
-        ending: typeof Game.prototype.ending;
-        board: ReturnType<Board["toJSON"]> | null;
-        turn: typeof Game.prototype.turn;
-        totalTurn: typeof Game.prototype.nturn;
-        tiled: typeof Game.prototype.field.field | null;
-        players: {
-            id: string;
-            agents: {
-                x: number;
-                y: number;
-            }[];
-            point: ReturnType<typeof Field.prototype.getPoints>[0];
-        }[];
-        log: typeof Game.prototype.log;
-    };
 }
 declare class Player<T extends Game = Game> {
     id: string;
@@ -205,35 +108,11 @@ declare class Player<T extends Game = Game> {
     index: number;
     agents: Agent[];
     constructor(id: string, spec?: string);
-    static restore(data: Player, game?: Game): Player;
-    toLogJSON(): Player;
+    static fromJSON(data: PlayerJson, game?: Game): Player;
+    toJSON(): PlayerJson;
     setGame(game: T): void;
-    noticeStart(): void;
     setActions(actions: Action[]): typeof Game.prototype.turn;
     getActions(): typeof Player.prototype.actions;
     clearActions(): void;
-    getJSON(): {
-        userId: typeof Player.prototype.id;
-        spec: typeof Player.prototype.spec;
-        index: typeof Player.prototype.index;
-    };
 }
-declare class Kakomimasu<T extends Game = Game> {
-    games: T[];
-    boards: Board[];
-    constructor();
-    appendBoard(board: Board): void;
-    getBoards(): typeof Kakomimasu.prototype.boards;
-    /**
-     * @deprecated use addGame
-     */
-    createGame(...param: ConstructorParameters<typeof Game>): Game;
-    addGame(game: T): T;
-    getGames(): T[];
-    getFreeGames(): T[];
-    /**
-     * @deprecated use Player class
-     */
-    createPlayer(playername: string, spec?: string): Player;
-}
-export { Action, Agent, Board, Field, Game, Kakomimasu, Player };
+export { Action, Agent, Field, Game, Player };

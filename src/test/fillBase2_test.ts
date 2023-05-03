@@ -4,17 +4,22 @@ const cl = (...a: Parameters<Console["log"]>) => {
   a;
 }; //console.log(...a);
 
-Deno.test("fillBase2", () => {
-  const nagent = 6;
-  const [w, h] = [8, 8];
-  const board = new Board({ w, h, points: new Array(w * h), nagent });
+Deno.test("fill2", () => {
+  const nAgent = 6;
+  const [width, height] = [8, 8];
+  const board: Board = {
+    width,
+    height,
+    points: new Array(width * height),
+    nAgent,
+  };
   const field = new Field(board);
 
   const p = () => {
-    for (let i = 0; i < h; i++) {
+    for (let i = 0; i < height; i++) {
       const s = [];
-      for (let j = 0; j < w; j++) {
-        const n = field.field[j + i * w];
+      for (let j = 0; j < width; j++) {
+        const n = field.tiles[j + i * width];
         s.push(
           "_W".charAt(n.type) + (n.player === null ? "." : n.player).toString(),
         );
@@ -28,11 +33,11 @@ Deno.test("fillBase2", () => {
     for (let i = 0; i < s.length; i++) {
       const c = s.charAt(i);
       if (c === "0") {
-        field.field[i] = { type: Field.WALL, player: 0 };
+        field.tiles[i] = { type: Field.WALL, player: 0 };
       } else if (c === "1") {
-        field.field[i] = { type: Field.WALL, player: 1 };
+        field.tiles[i] = { type: Field.WALL, player: 1 };
       } else {
-        field.field[i] = { type: Field.AREA, player: null };
+        field.tiles[i] = { type: Field.AREA, player: null };
       }
     }
   };
@@ -42,7 +47,7 @@ Deno.test("fillBase2", () => {
       const c = s.charAt(i);
       if (c !== ".") {
         const n = parseInt(c);
-        const f = field.field[i];
+        const f = field.tiles[i];
         if (f.type !== Field.AREA || f.player !== n) {
           throw new Error();
         }
@@ -65,7 +70,7 @@ Deno.test("fillBase2", () => {
 `);
 
   p();
-  field.fillBase();
+  field.fillArea();
 
   p();
 
@@ -94,7 +99,7 @@ Deno.test("fillBase2", () => {
 `);
 
   p();
-  field.fillBase();
+  field.fillArea();
   p();
 
   chk(`
@@ -122,7 +127,7 @@ Deno.test("fillBase2", () => {
 `);
 
   p();
-  field.fillBase();
+  field.fillArea();
   p();
 
   chk(`
