@@ -242,10 +242,11 @@ class Field {
     this.nAgent = nAgent;
     this.nPlayer = nPlayer;
     this.points = points;
-    this.tiles = new Array(width * height).fill({
-      type: Field.AREA,
-      player: null,
-    });
+    this.tiles = new Array(width * height);
+    // fillで初期化すると参照が同じになってしまうので、一つずつ初期化
+    for (let i = 0; i < width * height; i++) {
+      this.tiles[i] = { type: Field.AREA, player: null };
+    }
   }
 
   static fromJSON(data: FieldJson) {
@@ -297,46 +298,46 @@ class Field {
     const mask = new Array(field.length);
     for (let i = 0; i < mask.length; i++) mask[i] = 1;
 
+    // reduceはmaskの中身が全部0になるまで続けている
     while (mask.reduce((s, c) => s + c)) {
       const area = new Array(field.length);
       for (let pid = 0; pid < this.nPlayer; pid++) {
         for (let i = 0; i < field.length; i++) {
-          area[i] |= 1 << pid;
+          area[i] |= 1 << pid; // とりあえず全部自分の領地としてマーク？
         }
         // 外側の囲まれていないところを判定
+        // 0,0(上で余白のマスをつけているため必ず中立マス)から探索を初め壁にぶつかるまで探索することで囲まれていない部分を判定している
         const chk = (x: number, y: number) => {
           const n = x + y * (w + 2);
-          if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return;
-          else if ((area[n] & (1 << pid)) === 0) return;
+          if (x < 0 || x >= w + 2 || y < 0 || y >= h + 2) return; // ボードの外を判定しようとしていたらreturn
+          else if ((area[n] & (1 << pid)) === 0) return; // すでに囲まれていないと判定されたところはスキップ
           else if (
             mask[n] !== 0 && field[n].type === Field.WALL &&
             field[n].player === pid
           ) {
             return;
           } else {
-            area[n] &= ~(1 << pid);
-            chk(x - 1, y);
-            chk(x + 1, y);
-            chk(x - 1, y - 1);
-            chk(x, y - 1);
-            chk(x + 1, y - 1);
-            chk(x - 1, y + 1);
-            chk(x, y + 1);
-            chk(x + 1, y + 1);
+            area[n] &= ~(1 << pid); // 探索しているマスを「囲まれていない」と判定（ビットを下げる）
+            chk(x - 1, y); // 左のマスを探索
+            chk(x + 1, y); // 右のマスを探索
+            chk(x - 1, y - 1); // 左上のマスを探索
+            chk(x, y - 1); // 上のマスを探索
+            chk(x + 1, y - 1); // 右上のマスを探索
+            chk(x - 1, y + 1); // 左下のマスを探索
+            chk(x, y + 1); // 下のマスを探索
+            chk(x + 1, y + 1); // 右下のマスを探索
           }
         };
         chk(0, 0);
         //console.log(mask, narea, pid);
       }
 
-      //console.log(area);
-
       //console.log("mamamama");
       //console.log(mask, area, "mask");
       for (let i = 0; i < field.length; i++) {
         if (area[i] === 0) {
-          mask[i] = 0;
-        } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定
+          mask[i] = 0; // どのプレイヤーの領地でもないと判定されたところはスキップするようにmaskを0に設定
+        } else if ((area[i] & (area[i] - 1)) === 0) { // 2のべき乗かを判定（Trueならそのプレイヤーの領地として確定）
           field[i].player = Math.log2(area[i]);
           mask[i] = 0;
         }
@@ -348,7 +349,7 @@ class Field {
         const n = i + j * w;
         const nexp = (i + 1) + (j + 1) * (w + 2);
         if (this.tiles[n].type !== Field.WALL) {
-          this.tiles[n].player = field[nexp].player;
+          this.tiles[n] = field[nexp];
         }
       }
     }
